@@ -31,26 +31,6 @@ public class RequestController : ControllerBase
         return result;
     }
 
-    [Route("api/users")]
-    public async Task<IActionResult> Test()
-    {
-        var users = await dbContext.Users
-                            .Select(u => new
-                            {
-                                u.Id,
-                                u.Username,
-                                Workspaces = u.Workspaces
-                                                .Select(ws => new
-                                                {
-                                                    ws.Id,
-                                                    ws.Name
-                                                })
-                                                .ToList()
-                            })
-                            .ToListAsync();
-        return Ok(users);
-    }
-
     [Route("api/{username}/workspace")]
     public async Task<IActionResult> GetWorkspace(string username)
     {
