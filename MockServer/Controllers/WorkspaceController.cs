@@ -30,7 +30,8 @@ public class WorkspaceController : ControllerBase
             .Select(ws => new
             {
                 ws.Id,
-                ws.Name
+                ws.Name,
+                ws.FriendlyName
             })
             .ToList();
             return Ok(workspaces);
@@ -75,7 +76,7 @@ public class WorkspaceController : ControllerBase
             return NotFound("User not found");
         }
     }
-    [HttpGet("{id}/items")]
+    [HttpGet("{id}/request")]
     public async Task<IActionResult> GetAllRequests(int id)
     {
         Console.WriteLine("Id: " + id);
@@ -125,7 +126,7 @@ public class WorkspaceController : ControllerBase
         }
     }
 
-    [HttpPost("{id}/items")]
+    [HttpPost("{id}/request")]
     public async Task<IActionResult> AddItem(int id, [FromBody] ItemDto item)
     {
         Console.WriteLine("Id: " + id);
