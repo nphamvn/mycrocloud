@@ -5,5 +5,6 @@ namespace MockServer.Services;
 
 public interface IActionResultService
 {
+    //Task<bool> Auth();
     Task<CustomActionResult> GetActionResult(RequestDto request);
 }

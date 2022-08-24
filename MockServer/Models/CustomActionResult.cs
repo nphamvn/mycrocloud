@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MockServer.Entities;
 
 namespace MockServer.Models;
 
@@ -14,7 +15,7 @@ public class CustomActionResult : IActionResult
     {
         if (response == null)
         {
-            context.HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+            context.HttpContext.Response.StatusCode = 404;
             await context.HttpContext.Response.WriteAsync("Request not found");
             return;
         }

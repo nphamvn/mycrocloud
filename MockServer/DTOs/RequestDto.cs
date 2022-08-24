@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace MockServer.DTOs;
 
 public class RequestDto
@@ -7,4 +9,5 @@ public class RequestDto
     public string Path { get; set; }
     public string Method { get; set; }
     public IDictionary<string, string> Queries { get; set; }
+    public string ApiKey { get; set; }
 }

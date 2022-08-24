@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using MockServer.Models;
-using Newtonsoft.Json;
+using MockServer.Entities;
 
 namespace MockServer.Data;
 

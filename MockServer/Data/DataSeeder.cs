@@ -1,4 +1,4 @@
-using MockServer.Models;
+using MockServer.Entities;
 
 namespace MockServer.Data;
 
@@ -8,29 +8,44 @@ public static class DataSeeder
     {
         if (!dbContext.Users.Any())
         {
-            var response = new Response();
-            response.StatusCode = 200;
-            response.Body = "Hi";
-
-            var request = new Request();
-            request.Name = "Request1";
-            request.Method = "GET";
-            request.Path = "foo";
-            // request.Headers = new Dictionary<string, string>();
-            // request.Headers["Content-Type"] = "application/json";
-            // request.Headers["Accept"] = "*/*";
-            request.Response = response;
-
-            var workspace = new Workspace();
-            workspace.Name = "testapi";
-            workspace.FriendlyName = "Test Api";
-            workspace.Requests = new List<Request>();
-            workspace.Requests.Add(request);
-
             var user = new User();
             user.Username = "npham";
-            user.Workspaces = new List<Workspace>();
-            user.Workspaces.Add(workspace);
+            user.Workspaces = new List<Workspace> {
+                new Workspace {
+                    Name = "app1",
+                    FriendlyName = "App1",
+                    AccessScope = 0,
+                    ApiKey = Guid.NewGuid().ToString(),
+                    Requests = new List<Request>() {
+                        new Request {
+                            Name = "Request1",
+                            Method = "GET",
+                            Path = "foo",
+                            Response = new Response
+                            {
+                                StatusCode = 200,
+                                Body = "bar"
+                            }
+                        }
+                    }
+                },
+                new Workspace {
+                    Name = "app2",
+                    FriendlyName = "App2",
+                    Requests = new List<Request>() {
+                        new Request {
+                            Name = "Request1",
+                            Method = "GET",
+                            Path = "foo",
+                            Response = new Response
+                            {
+                                StatusCode = 200,
+                                Body = "bar"
+                            }
+                        }
+                    }
+                }
+            };
 
             dbContext.Users.Add(user);
             dbContext.SaveChanges();

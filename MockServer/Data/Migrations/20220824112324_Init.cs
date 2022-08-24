@@ -29,6 +29,8 @@ namespace MockServer.Data.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     FriendlyName = table.Column<string>(type: "TEXT", nullable: false),
+                    AccessScope = table.Column<int>(type: "INTEGER", nullable: false),
+                    ApiKey = table.Column<string>(type: "TEXT", nullable: true),
                     UserId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>

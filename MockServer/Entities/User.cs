@@ -1,4 +1,4 @@
-namespace MockServer.Models;
+namespace MockServer.Entities;
 
 public class User
 {

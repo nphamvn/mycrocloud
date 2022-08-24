@@ -89,6 +89,12 @@ namespace MockServer.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("AccessScope")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ApiKey")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("FriendlyName")
                         .IsRequired()
                         .HasColumnType("TEXT");

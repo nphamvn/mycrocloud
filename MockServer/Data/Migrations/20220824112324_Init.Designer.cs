@@ -10,7 +10,7 @@ using MockServer.Data;
 namespace MockServer.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220821091354_Init")]
+    [Migration("20220824112324_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -90,6 +90,12 @@ namespace MockServer.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<int>("AccessScope")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ApiKey")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("FriendlyName")
                         .IsRequired()

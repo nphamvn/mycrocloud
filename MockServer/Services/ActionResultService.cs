@@ -2,6 +2,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using MockServer.Data;
 using MockServer.DTOs;
+using MockServer.Entities;
 using MockServer.Models;
 
 namespace MockServer.Services;
@@ -29,6 +30,18 @@ public class ActionResultService : IActionResultService
             var workspace = user.Workspaces.FirstOrDefault();
             if (workspace != null)
             {
+                if (workspace.AccessScope == 0)
+                {
+                    if (request.ApiKey != workspace.ApiKey)
+                    {
+                        response = new Response
+                        {
+                            StatusCode = 401,
+                            Body = "You are not allowed to access this api"
+                        };
+                        return new CustomActionResult(response);
+                    }
+                }
                 var req = workspace.Requests.FirstOrDefault();
                 if (req != null)
                 {
