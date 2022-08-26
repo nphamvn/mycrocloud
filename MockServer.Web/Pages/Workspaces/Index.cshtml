@@ -1,9 +1,12 @@
 ﻿@page
-@model IndexModel
+@model MockServer.Web.Pages.Workspaces.IndexModel
 @{
     ViewData["Title"] = "Workspaces";
 }
 
 <div class="text-center">
     <h1 class="display-4">Workspaces page work</h1>
+    <div>
+        <a class="inline-block border rounded-lg px-4  py-2 text-center" asp-page="./Create">Create</a>
+    </div>
 </div>

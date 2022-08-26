@@ -1,2 +1,17 @@
 @page
+@model MockServer.Web.Pages.Workspaces.CreateModel
+@{
+    ViewData["Title"] = "Create workspace";
+}
 <h1>Create new workspace</h1>
+<form method="post">
+    <div class="flex">
+        <label for="Name">Name</label>
+        <input class="border" asp-for="Workspace!.Name">
+    </div>
+    <div>
+        <label for="FriendlyName">Friendly Name</label>
+        <input class="border" asp-for="Workspace!.FriendlyName">
+    </div>
+    <button class="border" type="submit">Create</button>
+</form>

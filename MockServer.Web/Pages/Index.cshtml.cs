@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace MockServer.Web.Pages.Workspaces;
+namespace MockServer.Web.Pages;
 
 public class IndexModel : PageModel
 {
@@ -12,9 +12,9 @@ public class IndexModel : PageModel
         _logger = logger;
     }
 
-    public IActionResult OnGet()
+    public void OnGet()
     {
+
         _logger.LogInformation("Get all workspaces");
-        return Page();
     }
 }

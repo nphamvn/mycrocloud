@@ -1,6 +1,10 @@
+using MockServer.Web.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddTransient<IWorkspacesService, WorkspacesService>();
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
