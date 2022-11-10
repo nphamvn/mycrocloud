@@ -1,11 +1,11 @@
 ﻿using System;
-namespace MockServer.Core.Entities.Request
+namespace MockServer.Core.Entities
 {
-	public class CallbackRequest
-	{
-		public CallbackRequest()
-		{
-		}
-	}
+    public class CallbackRequest
+    {
+        public CallbackRequest()
+        {
+        }
+    }
 }
 
