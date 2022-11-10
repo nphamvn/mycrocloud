@@ -8,9 +8,9 @@ namespace MockServer.Web.Pages.Workspaces;
 public class CreateModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
-    private readonly IWorkspacesService workspacesService;
+    private readonly IProjectService workspacesService;
 
-    public CreateModel(ILogger<IndexModel> logger, IWorkspacesService workspacesService)
+    public CreateModel(ILogger<IndexModel> logger, IProjectService workspacesService)
     {
         _logger = logger;
         this.workspacesService = workspacesService;
@@ -20,7 +20,7 @@ public class CreateModel : PageModel
     {
     }
     [BindProperty]
-    public Workspace? Workspace { get; set; }
+    public Project? Workspace { get; set; }
     public async Task<IActionResult> OnPost()
     {
         _logger.LogInformation(nameof(OnPost));

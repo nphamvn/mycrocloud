@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddTransient<IWorkspacesService, WorkspacesService>();
+builder.Services.AddTransient<IProjectService, WorkspacesService>();
 builder.Services.AddRazorPages();
 
 var app = builder.Build();

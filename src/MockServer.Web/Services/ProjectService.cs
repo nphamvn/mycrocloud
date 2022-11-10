@@ -2,14 +2,14 @@ using MockServer.Web.Models;
 
 namespace MockServer.Web.Services;
 
-public class WorkspacesService : IWorkspacesService
+public class WorkspacesService : IProjectService
 {
-    public Task AddMockRequest(Workspace workspace, Request request)
+    public Task AddMockRequest(Project workspace, Request request)
     {
         throw new NotImplementedException();
     }
 
-    public Task<Workspace> CreateWorkspaceAsync()
+    public Task<Project> CreateWorkspaceAsync()
     {
         throw new NotImplementedException();
     }
@@ -19,7 +19,7 @@ public class WorkspacesService : IWorkspacesService
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<Workspace>> GetWorkspacesAsync()
+    public Task<IEnumerable<Project>> GetWorkspacesAsync()
     {
         throw new NotImplementedException();
     }
