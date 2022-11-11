@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace MockServer.Web.Pages.Workspaces;
+namespace MockServer.Web.Pages.Projects;
 
 public class IndexModel : PageModel
 {

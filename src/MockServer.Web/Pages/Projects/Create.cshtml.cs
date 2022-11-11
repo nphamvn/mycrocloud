@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using MockServer.Web.Models;
 using MockServer.Web.Services;
 
-namespace MockServer.Web.Pages.Workspaces;
+namespace MockServer.Web.Pages.Projects;
 
 public class CreateModel : PageModel
 {
@@ -20,11 +20,11 @@ public class CreateModel : PageModel
     {
     }
     [BindProperty]
-    public Project? Workspace { get; set; }
+    public Project? Project { get; set; }
     public async Task<IActionResult> OnPost()
     {
         _logger.LogInformation(nameof(OnPost));
-        _logger.LogInformation(nameof(Workspace.Name) + ": " + Workspace!.Name);
+        _logger.LogInformation(nameof(Project.Name) + ": " + Project!.Name);
         return Redirect("./Index");
     }
 }
