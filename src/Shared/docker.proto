@@ -1,0 +1,47 @@
+service DockerService {
+    //Build image
+    rpc BuildImage (BuildImageRequest) returns (BuildImageResponse);
+
+    //Run container
+    rpc RunContainer (RunContainerRequest) returns (RunContainerResponse);
+
+    //Stop container
+    rpc StopContainer (StopContainerRequest) returns (StopContainerResponse);
+
+    //Remove image
+    rpc RemoveImage (RemoveImageRequest) returns (RemoveImageResponse);
+
+    //...//
+}
+
+message BuildImageRequest {
+    string message = 1;
+}
+
+message BuildImageResponse {
+    string message = 1;
+}
+
+message RunContainerRequest {
+    string message = 1;
+}
+
+message RunContainerResponse {
+    string message = 1;
+}
+
+message StopContainerRequest {
+    string message = 1;
+}
+
+message StopContainerResponse {
+    string message = 1;
+}
+
+message RemoveImageRequest {
+    string message = 1;
+}
+
+message RemoveImageResponse {
+    string message = 1;
+}
