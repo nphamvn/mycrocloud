@@ -1,12 +1,38 @@
-﻿@page
+﻿@page "{name?}"
 @model MockServer.Web.Pages.Projects.IndexModel
 @{
     ViewData["Title"] = "Workspaces";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Workspaces page work</h1>
-    <div>
-        <a class="inline-block border rounded-lg px-4  py-2 text-center" asp-page="./Create">Create</a>
-    </div>
+    <p class="fs-2 fw-ligh">You don't have any project. Create one by clicking button below</p>
+    <a class="btn btn-primary" asp-page="Create" role="button">Create</a>
+</div>
+<div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <div>
+                <h4>
+                    <a class="link-primary text-decoration-none" href="#">mock-server</a>
+                    <span></span>
+                    <span class="badge rounded-pill bg-light text-dark">Public</span>
+                </h4>
+                <div>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+                </div>
+            </div>
+        </li>
+        <li class="list-group-item">
+            <div>
+                <h4>
+                    <a class="link-primary text-decoration-none" href="#">my-blog</a>
+                    <span></span>
+                    <span class="badge rounded-pill bg-light text-dark">Private</span>
+                </h4>
+                <div>
+                    <p>Personal blog with Gastby and Netlify CMS</p>
+                </div>
+            </div>
+        </li>
+    </ul>
 </div>

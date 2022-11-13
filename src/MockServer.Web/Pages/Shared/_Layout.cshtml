@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MockServer.Web.styles.css" asp-append-version="true" />
-    @* <link href="~/css/output.css" rel="stylesheet"> *@
 </head>
 
 <body>
@@ -23,7 +22,22 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            @* <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a> *@
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-page="/Projects/Index">Projects</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                nam
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" asp-page="/Projects">Your projects</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                            </div>
                         </li>
                     </ul>
                 </div>
@@ -36,16 +50,20 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    @* <footer class="border-top footer text-muted">
         <div class="container text-center">
-            &copy; 2022 - MockServer
+        &copy; 2022 - MockServer
         </div>
-    </footer>
+        </footer> *@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
+    <script>
+        $(document).ready(function () {
+            $(".dropdown-toggle").dropdown();
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 
