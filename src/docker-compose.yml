@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  mockserver.callbackexecutor:
+    image: ${DOCKER_REGISTRY-}mockserver
+    build:
+      context: .
+      dockerfile: MockServer.CallbackExecutor/Dockerfile

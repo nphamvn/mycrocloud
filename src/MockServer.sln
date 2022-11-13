@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockServer.Infrastructure",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockServer.WebMVC", "MockServer.WebMVC\MockServer.WebMVC.csproj", "{52E99DAE-CC99-44B9-ADD2-26462B29E1D7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockServer.CallbackExecutor", "MockServer.CallbackExecutor\MockServer.CallbackExecutor.csproj", "{076482F6-3892-4FFA-9ABC-04F49C0E1AA0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +50,9 @@ Global
 		{52E99DAE-CC99-44B9-ADD2-26462B29E1D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52E99DAE-CC99-44B9-ADD2-26462B29E1D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52E99DAE-CC99-44B9-ADD2-26462B29E1D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{076482F6-3892-4FFA-9ABC-04F49C0E1AA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{076482F6-3892-4FFA-9ABC-04F49C0E1AA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{076482F6-3892-4FFA-9ABC-04F49C0E1AA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{076482F6-3892-4FFA-9ABC-04F49C0E1AA0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
