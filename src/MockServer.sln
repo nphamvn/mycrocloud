@@ -1,29 +1,26 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockServer.Web", "MockServer.Web\MockServer.Web.csproj", "{CC5A186F-333D-49AF-B92E-151783D54B6F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Web", "MockServer.Web\MockServer.Web.csproj", "{CC5A186F-333D-49AF-B92E-151783D54B6F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockServer.ReverseProxyServer", "MockServer.ReverseProxyServer\MockServer.ReverseProxyServer.csproj", "{13D6A2C2-FB19-4898-AAA7-C88C51A208FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.ReverseProxyServer", "MockServer.ReverseProxyServer\MockServer.ReverseProxyServer.csproj", "{13D6A2C2-FB19-4898-AAA7-C88C51A208FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockServer", "MockServer\MockServer.csproj", "{2E79848D-A212-4E44-9AB7-740496656F1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer", "MockServer\MockServer.csproj", "{2E79848D-A212-4E44-9AB7-740496656F1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockServer.Core", "MockServer.Core\MockServer.Core.csproj", "{883671FE-3C30-4ECA-9882-ACCF237138E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Core", "MockServer.Core\MockServer.Core.csproj", "{883671FE-3C30-4ECA-9882-ACCF237138E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockServer.Infrastructure", "MockServer.Infrastructure\MockServer.Infrastructure.csproj", "{6F834257-C6F3-47BA-BD5D-0F512D552136}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Infrastructure", "MockServer.Infrastructure\MockServer.Infrastructure.csproj", "{6F834257-C6F3-47BA-BD5D-0F512D552136}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockServer.WebMVC", "MockServer.WebMVC\MockServer.WebMVC.csproj", "{52E99DAE-CC99-44B9-ADD2-26462B29E1D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.WebMVC", "MockServer.WebMVC\MockServer.WebMVC.csproj", "{52E99DAE-CC99-44B9-ADD2-26462B29E1D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockServer.CallbackExecutor", "MockServer.CallbackExecutor\MockServer.CallbackExecutor.csproj", "{076482F6-3892-4FFA-9ABC-04F49C0E1AA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.CallbackExecutor", "MockServer.CallbackExecutor\MockServer.CallbackExecutor.csproj", "{076482F6-3892-4FFA-9ABC-04F49C0E1AA0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{CC5A186F-333D-49AF-B92E-151783D54B6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -54,5 +51,11 @@ Global
 		{076482F6-3892-4FFA-9ABC-04F49C0E1AA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{076482F6-3892-4FFA-9ABC-04F49C0E1AA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{076482F6-3892-4FFA-9ABC-04F49C0E1AA0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CD031E65-36C2-4037-A150-3475EDB9EC92}
 	EndGlobalSection
 EndGlobal
