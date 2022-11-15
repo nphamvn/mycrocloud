@@ -4,7 +4,7 @@
     {
         var message = new HttpResponseMessage();
         message.StatusCode = System.Net.HttpStatusCode.OK;
-        message.Content = new StringContent("Hello nampham-05. Your requested path: " + request.Path.Value);
+        message.Content = new StringContent("Hi nampham-02. Your requested path: " + request.Path.Value);
         return message;
     }
 }
