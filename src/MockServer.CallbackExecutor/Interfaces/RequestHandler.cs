@@ -10,6 +10,8 @@
         IExpectionCallback callback = context.RequestServices.GetRequiredService<IExpectionCallback>();
         var response = await callback.Handle(context.Request);
 
+        context.Response.StatusCode = (int)response.StatusCode;
+        await context.Response.WriteAsync(await response.Content.ReadAsStringAsync());
     }
 }
 

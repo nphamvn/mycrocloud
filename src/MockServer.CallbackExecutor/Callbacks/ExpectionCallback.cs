@@ -1,7 +1,10 @@
 ﻿public class ExpectionCallback : IExpectionCallback
 {
-    public Task<HttpResponseMessage> Handle(HttpRequest request)
+    public async Task<HttpResponseMessage> Handle(HttpRequest request)
     {
-        throw new NotImplementedException();
+        var message = new HttpResponseMessage();
+        message.StatusCode = System.Net.HttpStatusCode.OK;
+        message.Content = new StringContent("Hi. Your requested path: " + request.Path.Value);
+        return message;
     }
 }
