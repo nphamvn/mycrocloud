@@ -18,6 +18,8 @@ public class RequestHandlerFactory : IRequestHandlerFactory
                 return this.GetService(typeof(FixedRequestHandler));
             case ForwardingRequest _:
                 return this.GetService(typeof(ForwardingRequestHandler));
+            case CallbackRequest _:
+                return this.GetService(typeof(ForwardingRequestHandler));
             default:
                 throw new InvalidOperationException();
         }

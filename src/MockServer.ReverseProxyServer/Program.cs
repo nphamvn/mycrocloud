@@ -10,6 +10,7 @@ builder.Services.AddTransient<IRequestServices, RequestServices>();
 builder.Services.AddScoped<IRequestHandler, FixedRequestHandler>();
 builder.Services.AddScoped<IRequestHandler, ForwardingRequestHandler>();
 builder.Services.AddTransient<IRequestHandlerFactory, RequestHandlerFactory>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 

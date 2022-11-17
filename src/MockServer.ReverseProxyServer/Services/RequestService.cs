@@ -1,38 +1,47 @@
 using MockServer.ReverseProxyServer.Interfaces;
 using MockServer.ReverseProxyServer.Models;
 using Dapper;
-using Microsoft.Data.SqlClient;
-using MockServer.ReverseProxyServer.Entities;
 using Microsoft.Data.Sqlite;
+using MockServer.Core.Entities;
+using AutoMapper;
 
 namespace MockServer.ReverseProxyServer.Services;
 
 public class RequestServices : IRequestServices
 {
     private readonly string _connectionString;
-
-    public RequestServices(IConfiguration configuration)
+    private readonly IMapper _mapper;
+    public RequestServices(IConfiguration configuration, IMapper mapper)
     {
         _connectionString = configuration.GetConnectionString("SQLite");
+        _mapper = mapper;
     }
 
-    public async Task<AppRequest> GetBaseRequest(RequestModel model)
+    public async Task<AppRequest> FindRequest(RequestModel model)
     {
         var sql =
                 """
                 SELECT *
-                    FROM Requests r
-                        INNER JOIN
-                        Users u ON r.UserId = u.Id
-                    WHERE u.Username = "nampham" AND 
-                          r.Method = "GET" AND 
-                         r.Path = "foo";
+                FROM Requests r
+                    INNER JOIN
+                    Project p ON r.ProjectId = p.Id
+                    INNER JOIN
+                    Users u ON p.UserId = u.Id
+                WHERE u.Username = @username AND 
+                    p.Name = @projectName AND 
+                    r.Method = @method AND 
+                    r.Path = @path;
                 """;
 
         using var connection = new SqliteConnection(_connectionString);
-        var request = await connection.QuerySingleAsync<Request>(sql);
-
-        return new AppRequest();
+        var request = await connection.QuerySingleAsync<Request>(sql, new
+        {
+            username = model.Username,
+            projectName = model.ProjectName,
+            method = 1,
+            path = model.Path
+        });
+        return _mapper.Map<AppRequest>(request);
     }
 
     public async Task<AppRequest> GetRequest(RequestModel model)
@@ -41,7 +50,7 @@ public class RequestServices : IRequestServices
 
         if ("type" == "fixed")
         {
-            appRequest = new FixedRequest();
+            appRequest = new MockServer.ReverseProxyServer.Models.FixedRequest();
         }
         return appRequest;
     }

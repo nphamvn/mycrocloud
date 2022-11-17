@@ -5,6 +5,7 @@ namespace MockServer.ReverseProxyServer.Models;
 public class RequestModel
 {
     public string Username { get; set; }
+    public string ProjectName { get; set; }
     public string Method { get; set; }
     public string Path { get; set; }
 

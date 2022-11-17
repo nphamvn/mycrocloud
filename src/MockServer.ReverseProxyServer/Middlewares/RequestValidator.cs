@@ -19,14 +19,14 @@ public class RequestValidator
     {
         var requestModel = new RequestModel
         {
-            Username = "nampham",
+            Username = context.Request.Host.Host.Split('.')[0],
             Method = context.Request.Method,
-            Path = context.Request.Path.Value.Remove(0, 1)
+            Path = context.Request.Path.Value.StartsWith('/') ? context.Request.Path.Value.Remove(0, 1) : context.Request.Path.Value
         };
-        var request = await _requestService.GetBaseRequest(requestModel);
+        var request = await _requestService.FindRequest(requestModel);
         if (request != null)
         {
-            if (request.IsPublic)
+            if (request.Project.PublicAccess)
             {
                 await _next.Invoke(context);
             }

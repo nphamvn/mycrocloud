@@ -20,7 +20,6 @@ public class RequestHandler
 
     private AppRequest Map(RequestModel request, HttpContext context)
     {
-        Console.WriteLine("Map: Path: " + request.Path);
         var appRequest = new AppRequest();
         appRequest.HttpContext = context;
 
