@@ -4,7 +4,7 @@ namespace MockServer.ReverseProxyServer.Interfaces;
 
 public interface IRequestHandler
 {
-    Task<AppResponse> Handle(AppRequest request);
+    Task<ResponseMessage> GetResponseMessage(AppRequest request);
 }
 
 public interface IRequestHandler<T> : IRequestHandler where T : AppRequest

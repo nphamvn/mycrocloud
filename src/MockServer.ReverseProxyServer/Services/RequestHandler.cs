@@ -1,3 +1,4 @@
+using MockServer.ReverseProxyServer.Extentions;
 using MockServer.ReverseProxyServer.Interfaces;
 using MockServer.ReverseProxyServer.Models;
 
@@ -7,22 +8,27 @@ public class RequestHandler
 {
     public async Task Handle(HttpContext context)
     {
-        var request = (RequestModel)context.Items[nameof(RequestModel)];
+        var request = (IncomingRequest)context.Items[nameof(IncomingRequest)];
 
-        AppRequest appRequest = Map(request, context);
-        IRequestHandler requestHandler = context.RequestServices
-                                            .GetRequiredService<IRequestHandlerFactory>()
-                                            .GetInstance(appRequest);
-
-        var response = await requestHandler.Handle(appRequest);
-        await response.WriteResponse();
-    }
-
-    private AppRequest Map(RequestModel request, HttpContext context)
-    {
-        var appRequest = new AppRequest();
+        AppRequest appRequest = new AppRequest
+        {
+            Id = request.Id,
+            Path = request.Path
+        };
         appRequest.HttpContext = context;
 
+        IRequestHandler requestHandler = context.RequestServices
+                                            .GetRequiredService<IRequestHandlerFactory>()
+                                            .GetInstance(request.RequestType);
+
+        var response = await requestHandler.GetResponseMessage(appRequest);
+
+        await context.WriteResponse(response);
+    }
+
+    private AppRequest Map(IncomingRequest request, HttpContext context)
+    {
+        var appRequest = new AppRequest();
         return appRequest;
     }
 }

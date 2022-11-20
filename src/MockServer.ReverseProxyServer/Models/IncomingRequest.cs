@@ -1,13 +1,16 @@
 using System.Text;
+using MockServer.Core.Enums;
 
 namespace MockServer.ReverseProxyServer.Models;
 
-public class RequestModel
+public class IncomingRequest
 {
     public string Username { get; set; }
     public string ProjectName { get; set; }
     public string Method { get; set; }
     public string Path { get; set; }
+    public RequestType RequestType { get; set; }
+    public int Id { get; set; }
 
     public override string ToString()
     {

@@ -1,3 +1,4 @@
+using MockServer.Core.Enums;
 using MockServer.ReverseProxyServer.Interfaces;
 using MockServer.ReverseProxyServer.Models;
 
@@ -20,6 +21,21 @@ public class RequestHandlerFactory : IRequestHandlerFactory
                 return this.GetService(typeof(ForwardingRequestHandler));
             case CallbackRequest _:
                 return this.GetService(typeof(ForwardingRequestHandler));
+            default:
+                throw new InvalidOperationException();
+        }
+    }
+
+    public IRequestHandler GetInstance(RequestType type)
+    {
+        switch (type)
+        {
+            case RequestType.FIXED:
+                return this.GetService(typeof(FixedRequestHandler));
+            case RequestType.FORWARD:
+                return this.GetService(typeof(ForwardingRequestHandler));
+            case RequestType.CALLBACK:
+                return this.GetService(typeof(ExpectionCallbackExecutor));
             default:
                 throw new InvalidOperationException();
         }

@@ -1,12 +1,12 @@
 ﻿using System;
 namespace MockServer.Core.Entities
 {
-    public class FixedRequest
+    public class FixedRequest : BaseEntity
     {
         public int RequestId { get; set; }
     }
 
-    public class FixedRequestHeader
+    public class FixedRequestHeader : BaseEntity
     {
         public int FixedRequestId { get; set; }
         public string Name { get; set; }

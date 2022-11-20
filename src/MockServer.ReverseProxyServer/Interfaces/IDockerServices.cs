@@ -6,6 +6,5 @@ namespace MockServer.ReverseProxyServer.Interfaces
     {
         Task<BuildImageResult> BuildImage(BuildImageOptions request);
         Task<RunContainerResult> StartContainer(RunContainerOptions request);
-
     }
 }
