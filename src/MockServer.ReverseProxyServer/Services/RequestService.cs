@@ -17,7 +17,7 @@ public class RequestServices : IRequestServices
         _mapper = mapper;
     }
 
-    public async Task<AppRequest> FindRequest(RequestModel model)
+    public async Task<AppRequest> FindRequest(IncomingRequest model)
     {
         var sql =
                 """
@@ -27,10 +27,12 @@ public class RequestServices : IRequestServices
                     Project p ON r.ProjectId = p.Id
                     INNER JOIN
                     Users u ON p.UserId = u.Id
-                WHERE u.Username = @username AND 
-                    p.Name = @projectName AND 
-                    r.Method = @method AND 
-                    r.Path = @path;
+                    INNER JOIN
+                    Master_HttpMethod m ON r.Method = m.Id
+                WHERE upper(u.Username) = upper(@username) AND 
+                    upper(p.Name) = upper(@projectName) AND 
+                    m.UpperCaseName = upper(@method) AND 
+                    upper(r.Path) = upper(@path);
                 """;
 
         using var connection = new SqliteConnection(_connectionString);
@@ -38,14 +40,14 @@ public class RequestServices : IRequestServices
         {
             username = model.Username,
             projectName = model.ProjectName,
-            method = 1,
+            method = model.Method,
             path = model.Path
         });
 
         return _mapper.Map<AppRequest>(request);
     }
 
-    public async Task<AppRequest> GetRequest(RequestModel model)
+    public async Task<AppRequest> GetRequest(IncomingRequest model)
     {
         AppRequest appRequest = null;
 

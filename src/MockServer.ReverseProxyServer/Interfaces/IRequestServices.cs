@@ -4,6 +4,6 @@ namespace MockServer.ReverseProxyServer.Interfaces;
 
 public interface IRequestServices
 {
-    Task<AppRequest> FindRequest(RequestModel model);
-    Task<AppRequest> GetRequest(RequestModel model);
+    Task<AppRequest> FindRequest(IncomingRequest model);
+    Task<AppRequest> GetRequest(IncomingRequest model);
 }

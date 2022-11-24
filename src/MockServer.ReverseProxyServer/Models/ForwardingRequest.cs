@@ -8,8 +8,8 @@ public class ForwardingRequest : AppRequest
     {
 
     }
-    public ForwardingRequest(HttpContext context) : base(context)
+    public ForwardingRequest(HttpContext context)
     {
-
+        HttpContext = context;
     }
 }

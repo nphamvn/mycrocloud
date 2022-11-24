@@ -26,5 +26,8 @@
 	  <ProjectReference Include="..\MockServer.Core\MockServer.Core.csproj">
 	    <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
 	  </ProjectReference>
+	  <ProjectReference Include="..\MockServer.Infrastructure\MockServer.Infrastructure.csproj">
+	    <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+	  </ProjectReference>
 	</ItemGroup>
 </Project>

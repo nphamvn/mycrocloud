@@ -15,7 +15,7 @@ namespace MockServer.ReverseProxyServer.Services
             _dockerServices = dockerServices;
         }
 
-        public async Task<AppResponse> Handle(AppRequest request)
+        public async Task<ResponseMessage> GetResponseMessage(AppRequest request)
         {
             //1: Prepare source file by replacing user's class file to template source (username, requestId)
 
@@ -37,7 +37,7 @@ namespace MockServer.ReverseProxyServer.Services
             message.RequestUri = new Uri(string.Format("http://{0}:{1}/{2}", host, port, path));
             var response = await client.SendAsync(message);
 
-            return new AppResponse(request.HttpContext, new HttpResponseMessage());
+            return new ResponseMessage();
         }
 
         private HttpRequestMessage Create(ForwardingRequest request)

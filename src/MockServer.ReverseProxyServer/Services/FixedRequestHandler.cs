@@ -1,4 +1,5 @@
 using System.Net;
+using MockServer.Core.Repositories;
 using MockServer.ReverseProxyServer.Interfaces;
 using MockServer.ReverseProxyServer.Models;
 
@@ -6,21 +7,21 @@ namespace MockServer.ReverseProxyServer.Services;
 
 public class FixedRequestHandler : IRequestHandler
 {
-    public async Task<AppResponse> Handle(AppRequest request)
+    private readonly IRequestRepository _requestRepository;
+
+    public FixedRequestHandler(IRequestRepository requestRepository)
     {
-        var response = GetResponse((FixedRequest)request);
-        var message = new HttpResponseMessage();
-        message.StatusCode = (HttpStatusCode)response.StatusCode;
-        message.Content = new StringContent(response.Body);
-        return new AppResponse(request.HttpContext, message);
+        _requestRepository = requestRepository;
     }
 
-    private FixedRequestResponse GetResponse(FixedRequest request)
+    public async Task<ResponseMessage> GetResponseMessage(AppRequest request)
     {
-        return new FixedRequestResponse
+        var response = await _requestRepository.GetFixedResponse(request.Id);
+
+        return new ResponseMessage
         {
-            StatusCode = 201,
-            Body = "some data"
+            StatusCode = (HttpStatusCode)response.StatusCode,
+            Content = new StringContent(response.Body)
         };
     }
 }

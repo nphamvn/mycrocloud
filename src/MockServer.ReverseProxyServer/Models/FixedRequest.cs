@@ -6,8 +6,4 @@ public class FixedRequest : AppRequest
     {
 
     }
-    public FixedRequest(HttpContext context) : base(context)
-    {
-
-    }
 }

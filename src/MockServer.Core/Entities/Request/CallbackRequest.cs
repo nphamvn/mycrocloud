@@ -3,9 +3,7 @@ namespace MockServer.Core.Entities
 {
     public class CallbackRequest
     {
-        public CallbackRequest()
-        {
-        }
+
     }
 }
 
