@@ -41,6 +41,7 @@ public class RequestServices : IRequestServices
             method = 1,
             path = model.Path
         });
+
         return _mapper.Map<AppRequest>(request);
     }
 
