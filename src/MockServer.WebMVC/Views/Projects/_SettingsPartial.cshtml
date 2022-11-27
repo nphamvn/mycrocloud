@@ -1,0 +1,26 @@
+@model MockServer.WebMVC.Models.Project.ProjectIndexItem
+<div>
+    @using (Html.BeginForm("Rename", "Projects", new { name = Model.Name }))
+    {
+        <input type="text" name="newName" value="@Model.Name">
+        <button type="submit">Rename</button>
+    }
+    @using (Html.BeginForm("GenerateKey", "Projects", new { name = Model.Name }))
+    {
+        <input readonly type="text" value="@Model.PrivateKey">
+        <button type="submit">Generate</button>
+    }
+    @using (Html.BeginForm("Delete", "Projects", new { name = Model.Name }, FormMethod.Post, true, new
+    {
+        onsubmit =
+    "return validate(this);"
+    }))
+    {
+        <button type="submit">Delete project</button>
+    }
+</div>
+<script>
+    function validate(form) {
+        return confirm('Do you really want to delete the project?');
+    }
+</script>

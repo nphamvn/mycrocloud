@@ -14,6 +14,44 @@ public class RequestRepository : IRequestRepository
     {
         _connectionString = settings.Sqlite.ConnectionString;
     }
+
+    public async Task Create(int userId, string projectName, Request request)
+    {
+        var query =
+                """
+                INSERT INTO 
+                    Requests 
+                    (
+                         ProjectId,
+                         Type,
+                         Name,
+                         Method,
+                         Path
+                     )
+                     VALUES (
+                         (SELECT Id
+                          FROM Project
+                          WHERE UserId = @UserId AND 
+                            Name = @ProjectName),
+                         @Type,
+                         @Name,
+                         @Method,
+                         @Path
+                     );
+                """;
+
+        using var connection = new SqliteConnection(_connectionString);
+        await connection.ExecuteAsync(query, new
+        {
+            UserId = userId,
+            ProjectName = projectName,
+            Type = (int)request.Type,
+            Name = request.Name,
+            Method = (int)request.Method,
+            Path = request.Path
+        });
+    }
+
     public async Task<Request> FindRequest(string username, string projectName, string method, string path)
     {
         var query =
@@ -42,6 +80,40 @@ public class RequestRepository : IRequestRepository
         return await connection.QuerySingleOrDefaultAsync<Request>(query, new
         {
             username = username,
+            projectName = projectName,
+            method = method,
+            path = path
+        });
+    }
+
+    public async Task<Request> FindRequest(int userId, string projectName, RequestMethod method, string path)
+    {
+        var query =
+                """
+                SELECT
+                    r.Id,
+                    r.Type,
+                    r.Name,
+                    r.Path,
+                    m.Id,
+                    r.ProjectId
+                FROM Requests r
+                    INNER JOIN
+                    Project p ON r.ProjectId = p.Id
+                    INNER JOIN
+                    Users u ON p.UserId = u.Id
+                    INNER JOIN
+                    Master_HttpMethod m ON r.Method = m.Id
+                WHERE u.Id = @userId AND 
+                    upper(p.Name) = upper(@projectName) AND 
+                    m.Id = @method AND 
+                    upper(r.Path) = upper(@path);
+                """;
+
+        using var connection = new SqliteConnection(_connectionString);
+        return await connection.QuerySingleOrDefaultAsync<Request>(query, new
+        {
+            userId = userId,
             projectName = projectName,
             method = method,
             path = path

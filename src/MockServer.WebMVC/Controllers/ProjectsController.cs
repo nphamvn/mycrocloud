@@ -46,10 +46,24 @@ public class ProjectsController : BaseController
         return RedirectToAction(nameof(Detail), new { name = project.Name });
     }
 
-    [HttpPost("{name}/rename")]
+    [HttpPost("{name}/settings/rename")]
     public async Task<IActionResult> Rename(string name, string newName)
     {
         await _projectService.Rename(name, newName);
         return Ok();
+    }
+
+    [HttpPost("{name}/settings/generate-key")]
+    public async Task<IActionResult> GenerateKey(string name)
+    {
+        string key = await _projectService.GenerateKey(name);
+        return Ok(new { key = key });
+    }
+
+    [HttpPost("{name}/settings/delete")]
+    public async Task<IActionResult> Delete(string name)
+    {
+        await _projectService.Delete(name);
+        return RedirectToAction(nameof(Index));
     }
 }

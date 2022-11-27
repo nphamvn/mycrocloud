@@ -1,4 +1,6 @@
+using MockServer.Core.Interfaces;
 using MockServer.Core.Repositories;
+using MockServer.Core.Services;
 using MockServer.Core.Settings;
 using MockServer.Infrastructure.Repositories;
 using MockServer.WebMVC.Services;
@@ -14,13 +16,14 @@ namespace MockServer.WebMVC.Extentions
             var settings = new GlobalSettings();
             settings.Sqlite = new SqlSettings { ConnectionString = configuration.GetConnectionString("SQLite") };
             services.AddSingleton<GlobalSettings>(s => settings);
-
+            services.AddTransient<IApiKeyService, ApiKeyService>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddHttpContextAccessor();
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<IRequestRepository, RequestRepository>();
             services.AddScoped<IProjectService, ProjectService>();
+            services.AddScoped<IRequestService, RequestService>();
         }
     }
 }

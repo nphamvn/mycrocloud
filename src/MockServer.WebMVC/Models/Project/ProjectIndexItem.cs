@@ -8,4 +8,5 @@ public class ProjectIndexItem
     public string Name { get; set; }
     public string Description { get; set; }
     public ProjectAccessibility Accessibility { get; set; }
+    public string PrivateKey { get; set; }
 }

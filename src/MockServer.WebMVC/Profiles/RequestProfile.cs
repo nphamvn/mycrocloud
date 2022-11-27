@@ -12,5 +12,7 @@ public class RequestProfile : Profile
     public RequestProfile()
     {
         CreateMap<Core.Entities.Request, RequestItem>().ReverseMap();
+        //Core.Entities.Request
+        CreateMap<CreateRequestViewModel, Core.Entities.Request>().ReverseMap();
     }
 }

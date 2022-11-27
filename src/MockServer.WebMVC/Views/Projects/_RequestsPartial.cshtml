@@ -1,0 +1,16 @@
+@model MockServer.WebMVC.Models.Project.ProjectViewViewModel
+<div>
+    <a asp-action="Create" asp-controller="Requests" asp-route-projectName="@Model.ProjectInfo.Name">Add new request</a>
+    <ul>
+        @foreach (var req in Model.Requests)
+        {
+            <li id="@req.Id" onclick="load(this.id)">
+                <h4>
+                    <span>@req.Method</span>
+                    <p>@req.Name</p>
+                </h4>
+                <p>@req.Path</p>
+            </li>
+        }
+    </ul>
+</div>

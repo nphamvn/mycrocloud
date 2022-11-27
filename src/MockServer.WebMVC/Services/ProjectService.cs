@@ -1,5 +1,6 @@
 using Ardalis.GuardClauses;
 using AutoMapper;
+using MockServer.Core.Interfaces;
 using MockServer.Core.Models;
 using MockServer.Core.Repositories;
 using MockServer.WebMVC.Extentions;
@@ -15,13 +16,16 @@ public class ProjectService : IProjectService
     private readonly IProjectRepository projectRepository;
     private readonly IMapper _mapper;
     private readonly IRequestRepository _requestRepository;
+    private readonly IApiKeyService _apiKeyService;
 
     public ProjectService(IHttpContextAccessor contextAccessor,
     IProjectRepository projectRepository,
     IRequestRepository requestRepository,
+    IApiKeyService apiKeyService,
     IMapper mapper)
     {
         _requestRepository = requestRepository;
+        this._apiKeyService = apiKeyService;
         _mapper = mapper;
         this.contextAccessor = contextAccessor;
         this.projectRepository = projectRepository;
@@ -41,6 +45,30 @@ public class ProjectService : IProjectService
         mapped.UserId = user.Id;
         await projectRepository.Add(mapped);
         return true;
+    }
+
+    public async Task Delete(string name)
+    {
+        var user = contextAccessor.HttpContext.User.GetLoggedInUser<ApplicationUser>();
+        Guard.Against.Null(user, nameof(ApplicationUser));
+
+        var project = await projectRepository.Find(user.Id, name);
+        if (project != null)
+        {
+            await projectRepository.Delete(project.Id);
+        }
+    }
+
+    public async Task<string> GenerateKey(string name)
+    {
+        var user = contextAccessor.HttpContext.User.GetLoggedInUser<ApplicationUser>();
+        Guard.Against.Null(user, nameof(ApplicationUser));
+        var project = await projectRepository.Find(user.Id, name);
+        Guard.Against.Null(project);
+        var key = _apiKeyService.GenerateApiKey();
+        project.PrivateKey = key;
+        await projectRepository.Update(project);
+        return key;
     }
 
     public async Task<ProjectIndexViewModel> GetIndexViewModel()

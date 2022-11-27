@@ -41,6 +41,20 @@ public class ProjectRepository : IProjectRepository
         });
     }
 
+    public async Task Delete(int id)
+    {
+        var query =
+                """
+                DELETE FROM Project
+                    WHERE Id = @Id;              
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        await connection.ExecuteAsync(query, new
+        {
+            Id = id
+        });
+    }
+
     public async Task<Project> Find(int userId, string projectName)
     {
         var query =
@@ -52,7 +66,7 @@ public class ProjectRepository : IProjectRepository
                     PrivateKey
                 FROM Project
                 WHERE UserId = @UserId AND 
-                    Name = @Name;               
+                    upper(Name) = upper(@Name);               
                 """;
         using var connection = new SqliteConnection(_connectionString);
         return await connection.QuerySingleOrDefaultAsync<Project>(query, new
@@ -117,7 +131,7 @@ public class ProjectRepository : IProjectRepository
         using var connection = new SqliteConnection(_connectionString);
         await connection.ExecuteAsync(query, new
         {
-            Id= project.Id,
+            Id = project.Id,
             Name = project.Name,
             Description = project.Description,
             Accessibility = (int)project.Accessibility,

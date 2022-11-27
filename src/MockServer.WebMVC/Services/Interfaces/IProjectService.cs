@@ -9,4 +9,6 @@ public interface IProjectService
     Task<bool> Create(CreateProjectViewModel project);
     Task<ProjectViewViewModel> GetProjectViewViewModel(string name);
     Task Rename(string name, string newName);
+    Task<string> GenerateKey(string name);
+    Task Delete(string name);
 }

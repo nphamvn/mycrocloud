@@ -9,4 +9,5 @@ public interface IProjectRepository
     Task<IEnumerable<Project>> GetByUserId(int userId);
     Task Add(Project project);
     Task Update(Project project);
+    Task Delete(int id);
 }

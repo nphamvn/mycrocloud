@@ -4,9 +4,4 @@
         <a>@Model.Name</a>
         <span>@Model.Accessibility</span>
     </h1>
-    @using (Html.BeginForm("Rename", "Projects", new { name = Model.Name }))
-    {
-        <input type="text" name="newName" value="@Model.Name">
-        <button type="submit">Rename</button>
-    }
 </div>

@@ -1,0 +1,38 @@
+@using MockServer.Core.Enums
+@model MockServer.WebMVC.Models.Request.CreateRequestViewModel
+@{
+    ViewData["Title"] = "Create new request";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@using (Html.BeginForm("Create", "Requests", new { projectName = ViewData["ProjectName"] }, FormMethod.Post))
+{
+    <div>
+    <p>Type</p>
+    <input type="radio" asp-for="Type" value="@((int)RequestType.FIXED)" checked>
+    <label for="FIXED">FIXED</label><br>
+    <input type="radio" asp-for="Type" value="@((int)RequestType.FORWARD)">
+    <label for="FORWARD">FORWARD</label><br>
+    <input type="radio" asp-for="Type" value="@((int)RequestType.CALLBACK)">
+    <label for="CALLBACK">CALLBACK</label><br>
+</div>
+    <div>
+    <label asp-for="Name"></label>
+    <input type="text" asp-for="Name">
+</div>
+    <div>
+    <label asp-for="Method"></label>
+    <select asp-for="Method">
+        @foreach (var method in Enum.GetValues(typeof(RequestMethod)))
+            {
+                <option value="@((int)method)">@method</option>
+            }
+        </select>
+    </div>
+    <label asp-for="Path">Path</label>
+    <input type="text" asp-for="Path"><br><br>
+    <div>
+</div>
+    <button type="submit">Next</button>
+}

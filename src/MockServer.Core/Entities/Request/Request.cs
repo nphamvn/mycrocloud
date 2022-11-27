@@ -9,7 +9,7 @@ public class Request : BaseEntity
     public RequestType Type { get; set; }
     public string Name { get; set; }
     public string Path { get; set; }
-    public int Method { get; set; }
+    public RequestMethod Method { get; set; }
     public Project Project { get; set; }
 }
 
