@@ -86,4 +86,27 @@ public class RequestRepository : IRequestRepository
             id = requestId
         });
     }
+
+    public async Task<IEnumerable<Request>> GetProjectRequests(int ProjectId)
+    {
+        var query =
+                """
+                SELECT r.Id,
+                    r.ProjectId,
+                    r.Type,
+                    r.Name,
+                    r.Method,
+                    r.Path
+                FROM Requests r
+                    INNER JOIN
+                    Project p ON r.ProjectId = p.Id
+                WHERE p.Id = @ProjectId;
+                """;
+
+        using var connection = new SqliteConnection(_connectionString);
+        return await connection.QueryAsync<Request>(query, new
+        {
+            ProjectId = ProjectId
+        });
+    }
 }

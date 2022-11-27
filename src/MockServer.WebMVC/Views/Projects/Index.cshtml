@@ -1,0 +1,43 @@
+@using MockServer.Core.Models
+@using MockServer.WebMVC.Extentions;
+@model MockServer.WebMVC.Models.Project.ProjectIndexViewModel;
+@{
+    ViewData["Title"] = "Your Projects";
+}
+<h3>@ViewData["Title"]</h3>
+<div>
+    <div>
+        <input type="text" placeholder="Search projects" onchange="search()">
+        <label for="type">Type</label>
+        <select name="type" id="type">
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+        </select>
+        <label for="sort">Sort</label>
+        <select name="sort" id="sort">
+            <option value="atoz">A to Z</option>
+            <option value="recentlycreated">Recently created</option>
+            <option value="recentlyupdated">Recently updated</option>
+        </select>
+        <a asp-action="Create">Create</a>
+    </div>
+    <ul>
+        @foreach (var p in Model.Projects)
+        {
+            <li>
+                <h4>
+                    <a asp-action="Detail" asp-route-name="@p.Name">@p.Name</a>
+                    <span>@p.Accessibility</span>
+                </h4>
+                <p>@p.Description</p>
+            </li>
+        }
+    </ul>
+</div>
+@section Scripts {
+<script>
+    function search() {
+
+    }
+</script>
+}

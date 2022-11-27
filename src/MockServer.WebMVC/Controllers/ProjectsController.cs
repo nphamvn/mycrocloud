@@ -1,18 +1,55 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MockServer.WebMVC.DTOs.Project;
+using MockServer.WebMVC.Models.Project;
+using MockServer.WebMVC.Services.Interfaces;
 
 namespace MockServer.WebMVC.Controllers;
 
-[Route("projects")]
-public class ProjectsController : Controller
+[Authorize]
+public class ProjectsController : BaseController
 {
+    private readonly IProjectService _projectService;
+
+    public ProjectsController(IProjectService projectService)
+    {
+        _projectService = projectService;
+    }
     public async Task<IActionResult> Index()
     {
-        return Ok(nameof(Index));
+        var vm = await _projectService.GetIndexViewModel();
+        return View("Views/Projects/Index.cshtml", vm);
     }
 
-    [Route("{name}")]
+    [HttpGet("{name}")]
     public async Task<IActionResult> Detail(string name)
     {
-        return Ok(nameof(Detail) + ": " + name);
+        var vm = await _projectService.GetProjectViewViewModel(name);
+        return View("Views/Projects/View.cshtml", vm);
+    }
+
+    [HttpGet("create")]
+    public async Task<IActionResult> Create()
+    {
+        var vm = new CreateProjectViewModel();
+        return View("Views/Projects/Create.cshtml", vm);
+    }
+
+    [HttpPost("create")]
+    public async Task<IActionResult> Create(CreateProjectViewModel project)
+    {
+        if (!await _projectService.Create(project))
+        {
+            return View("Views/Projects/Create.cshtml", project);
+        }
+
+        return RedirectToAction(nameof(Detail), new { name = project.Name });
+    }
+
+    [HttpPost("{name}/rename")]
+    public async Task<IActionResult> Rename(string name, string newName)
+    {
+        await _projectService.Rename(name, newName);
+        return Ok();
     }
 }

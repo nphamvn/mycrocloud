@@ -1,0 +1,33 @@
+@model MockServer.WebMVC.Models.Project.ProjectViewViewModel
+@{
+    ViewData["Title"] = "View";
+}
+<div>
+    <partial name="_OverviewPartial" model="Model.ProjectInfo">
+        <div>
+            <ul>
+                @foreach (var req in Model.Requests)
+                {
+                    <li id="@req.Id" onclick="load(this.id)">
+                        <h4>
+                            <span>@req.Method</span>
+                            <p>@req.Name</p>
+                        </h4>
+                        <p>@req.Path</p>
+                    </li>
+                }
+            </ul>
+            <div>
+
+            </div>
+        </div>
+</div>
+
+@section Scripts
+{
+<script>
+    function load(id) {
+        console.log(id);
+    }
+</script>
+}

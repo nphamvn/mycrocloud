@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MockServer.WebMVC.Models;
 
@@ -17,7 +19,6 @@ public class HomeController : Controller
     {
         return View();
     }
-
     public IActionResult Privacy()
     {
         return View();
@@ -27,5 +28,11 @@ public class HomeController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        return SignOut("Cookies", "oidc");
     }
 }

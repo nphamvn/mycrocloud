@@ -34,7 +34,7 @@ public class RequestValidation
             incomingRequest.RequestType = request.Type;
             incomingRequest.Id = request.Id;
             var project = await _projectRepository.GetById(request.ProjectId);
-            if (project.PrivateAccess)
+            if (project.Accessibility == ProjectAccessibility.Private)
             {
                 string privateKey = context.Request.Headers["PrivateKey"];
                 if (!string.IsNullOrEmpty(privateKey) && privateKey == project.PrivateKey)
