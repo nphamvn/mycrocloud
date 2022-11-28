@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using MockServer.WebMVC.Extentions
+@using MockServer.Core.Models
+@using MockServer.WebMVC.Controllers;
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -31,13 +34,19 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Explore"
                                 asp-action="Index">Explore</a>
                         </li>
-                        <li class="nav-item">
-                            @using (Html.BeginForm("Logout", "Home", null, FormMethod.Post))
-                            {
-                                <button type="submit">Sign out</button>
-                            }
-                        </li>
                     </ul>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        @using (Html.BeginForm(nameof(AccountController.Logout), "Account", null, FormMethod.Post))
+                        {
+                            <button class="btn" type="submit">Logout</button>
+                        }
+                    }
+                    else
+                    {
+                        <a class="nav-link text-dark"
+                        href="@Url.Action(nameof(AccountController.Login), "Account")">Login</a>
+                    }
                 </div>
             </div>
         </nav>

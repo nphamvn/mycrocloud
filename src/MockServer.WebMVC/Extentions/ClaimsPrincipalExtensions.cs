@@ -18,7 +18,8 @@ namespace MockServer.WebMVC.Extentions
             {
                 var user = new ApplicationUser
                 {
-                    Id = Convert.ToInt32(principal.FindFirstValue("sub"))
+                    Id = Convert.ToInt32(principal.FindFirstValue("sub")),
+                    Username = principal.FindFirstValue("name")
                 };
 
                 return (T)Convert.ChangeType(user, typeof(T));

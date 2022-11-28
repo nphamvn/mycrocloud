@@ -3,15 +3,53 @@
     ViewData["Title"] = "View";
 }
 <div>
+    <span><a href="@Url.Action("View", new {name=Model.ProjectInfo.Name})">@Model.ProjectInfo.Name</a></span>
+    <span>/</span>
+    <strong><a href="@Url.Action("View", new {name=Model.ProjectInfo.Name})">@Model.ProjectInfo.Name</a></strong>
+</div>
+<div>
     <partial name="_OverviewPartial" model="Model.ProjectInfo" />
+</div>
+<!-- Tab links -->
+<div class="tab">
+    <button class="tablinks" onclick="openCity(event, 'London')">Requests</button>
+    <button class="tablinks" onclick="openCity(event, 'Paris')">Settings</button>
+</div>
+<!-- Tab content -->
+<div id="London" class="tabcontent">
     <partial name="_RequestsPartial" model="Model" />
+</div>
+
+<div id="Paris" class="tabcontent">
     <partial name="_SettingsPartial" model="Model.ProjectInfo" />
 </div>
+
+
 @section Scripts
 {
 <script>
     function load(id) {
         console.log(id);
+    }
+    function openCity(evt, cityName) {
+        // Declare all variables
+        var i, tabcontent, tablinks;
+
+        // Get all elements with class="tabcontent" and hide them
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        // Get all elements with class="tablinks" and remove the class "active"
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // Show the current tab, and add an "active" class to the button that opened the tab
+        document.getElementById(cityName).style.display = "block";
+        evt.currentTarget.className += " active";
     }
 </script>
 }

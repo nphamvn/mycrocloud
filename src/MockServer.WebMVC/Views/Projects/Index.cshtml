@@ -1,5 +1,6 @@
 @using MockServer.Core.Models
 @using MockServer.WebMVC.Extentions;
+@using MockServer.WebMVC.Controllers
 @model MockServer.WebMVC.Models.Project.ProjectIndexViewModel;
 @{
     ViewData["Title"] = "Your Projects";
@@ -26,7 +27,7 @@
         {
             <li>
                 <h4>
-                    <a asp-action="Detail" asp-route-name="@p.Name">@p.Name</a>
+                    <a href="@Url.Action(nameof(ProjectsController.View), new {name=p.Name})">@p.Name</a>
                     <span>@p.Accessibility</span>
                 </h4>
                 <p>@p.Description</p>

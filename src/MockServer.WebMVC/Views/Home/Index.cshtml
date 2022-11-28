@@ -3,10 +3,9 @@
 @using MockServer.Core.Models
 @{
     ViewData["Title"] = "Home Page";
-    //var properties = (await HttpContext.AuthenticateAsync());
     var user = User.GetLoggedInUser<ApplicationUser>();
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome @user.Id</h1>
+    <h1 class="display-4">Welcome, @user.Id</h1>
 </div>

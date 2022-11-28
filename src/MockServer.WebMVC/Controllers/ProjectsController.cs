@@ -22,7 +22,7 @@ public class ProjectsController : BaseController
     }
 
     [HttpGet("{name}")]
-    public async Task<IActionResult> Detail(string name)
+    public async Task<IActionResult> View(string name)
     {
         var vm = await _projectService.GetProjectViewViewModel(name);
         return View("Views/Projects/View.cshtml", vm);
@@ -43,7 +43,7 @@ public class ProjectsController : BaseController
             return View("Views/Projects/Create.cshtml", project);
         }
 
-        return RedirectToAction(nameof(Detail), new { name = project.Name });
+        return RedirectToAction(nameof(View), new { name = project.Name });
     }
 
     [HttpPost("{name}/settings/rename")]
