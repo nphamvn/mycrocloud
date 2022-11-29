@@ -1,0 +1,5 @@
+Doc
+https://learn.microsoft.com/en-us/aspnet/core/security/docker-https?view=aspnetcore-7.0
+
+Run container command
+docker run -it -dp 5001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORT=8001 -e ASPNETCORE_Kestrel__Certificates__Default__Password="crypticpassword" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v ${HOME}/.aspnet/https:/https/ mock-server.identity-server
