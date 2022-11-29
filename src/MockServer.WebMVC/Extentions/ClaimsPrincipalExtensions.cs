@@ -9,7 +9,7 @@ namespace MockServer.WebMVC.Extentions
 {
     public static class ClaimsPrincipalExtensions
     {
-        public static T GetLoggedInUser<T>(this ClaimsPrincipal principal)
+        public static T Parse<T>(this ClaimsPrincipal principal)
         {
             if (principal == null)
                 throw new ArgumentNullException(nameof(principal));
@@ -19,7 +19,8 @@ namespace MockServer.WebMVC.Extentions
                 var user = new ApplicationUser
                 {
                     Id = Convert.ToInt32(principal.FindFirstValue("sub")),
-                    Username = principal.FindFirstValue("name")
+                    Username = principal.FindFirstValue("name"),
+                    Email = principal.FindFirstValue("email")
                 };
 
                 return (T)Convert.ChangeType(user, typeof(T));

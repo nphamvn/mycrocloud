@@ -1,15 +1,15 @@
 @model MockServer.WebMVC.Models.Project.ProjectViewViewModel
-<div>
+<div class="w-25">
     <a asp-action="Create" asp-controller="Requests" asp-route-projectName="@Model.ProjectInfo.Name">Add new request</a>
-    <ul>
+    <ul class="list-group">
         @foreach (var req in Model.Requests)
         {
-            <li id="@req.Id" onclick="load(this.id)">
-                <h4>
-                    <span>@req.Method</span>
-                    <p>@req.Name</p>
-                </h4>
-                <p>@req.Path</p>
+            <li class="list-group-item" id="@req.Id" onclick="load(this.id)">
+                <div>
+                    <span class="badge bg-primary">@req.Method</span>
+                    <span>@req.Name</span>
+                </div>
+                <p class="m-0">@req.Path</p>
             </li>
         }
     </ul>

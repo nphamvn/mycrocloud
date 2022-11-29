@@ -6,22 +6,31 @@
 
 <h1>@ViewData["Title"]</h1>
 
-@using (Html.BeginForm("Create", "Projects", null, FormMethod.Post))
-{
-    <div>
-    <label asp-for="Name"></label>
-    <input type="text" asp-for="Name">
-</div>
-    <div>
-    <label asp-for="Description"></label>
-    <input type="text" asp-for="Description">
-</div>
-    <div>
-    <p>Accessibility</p>
-    <input type="radio" asp-for="Accessibility" value="@((int)ProjectAccessibility.Public)" checked>
-    <label for="pulic">Public</label><br>
-    <input type="radio" asp-for="Accessibility" value="@((int)ProjectAccessibility.Private)">
-    <label for="private">Private</label><br>
-</div>
-    <button type="submit">Save</button>
-}
+@* @using (Html.BeginForm("Create", "Projects", null, FormMethod.Post))
+    { *@
+<form asp-action="Create" method="POST">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input class="form-control" type="text" asp-for="Name">
+    </div>
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <textarea class="form-control" rows="3" asp-for="Description"></textarea>
+        <small class="form-text text-muted">Add a brief summary about this project.</small>
+    </div>
+    <div class="form-group">
+        Accessibility
+        <div class="class=" form-check"">
+            <input class="form-check-input" type="radio" asp-for="Accessibility"
+                value="@((int)ProjectAccessibility.Public)" checked>
+            <label class="form-check-label" for="pulic">Public</label>
+        </div>
+        <div>
+            <input class="form-check-input" type="radio" asp-for="Accessibility"
+                value="@((int)ProjectAccessibility.Private)">
+            <label class="form-check-label" for="private">Private</label>
+        </div>
+    </div>
+    <button class="btn btn-primary" type="submit">Save</button>
+</form>
+@* } *@

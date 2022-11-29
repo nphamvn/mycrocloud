@@ -1,20 +1,27 @@
+@using MockServer.Core.Models
+@using MockServer.WebMVC.Extentions
 @model MockServer.WebMVC.Models.Project.ProjectViewViewModel
 @{
     ViewData["Title"] = "View";
 }
-<div>
-    <span><a href="@Url.Action("View", new {name=Model.ProjectInfo.Name})">@Model.ProjectInfo.Name</a></span>
+<div class="my-3">
+    <span><a class="text-decoration-none"
+            href="@Url.Action("Index", "Home")">@(User.Parse<ApplicationUser>().Username)</a></span>
     <span>/</span>
-    <strong><a href="@Url.Action("View", new {name=Model.ProjectInfo.Name})">@Model.ProjectInfo.Name</a></strong>
+    <strong><a class="text-decoration-none"
+            href="@Url.Action("View", new {name=Model.ProjectInfo.Name})">@Model.ProjectInfo.Name</a></strong>
+    <span class="badge bg-secondary">@Model.ProjectInfo.Accessibility</span>
 </div>
-<div>
-    <partial name="_OverviewPartial" model="Model.ProjectInfo" />
-</div>
+
 <!-- Tab links -->
-<div class="tab">
-    <button class="tablinks" onclick="openCity(event, 'London')">Requests</button>
-    <button class="tablinks" onclick="openCity(event, 'Paris')">Settings</button>
-</div>
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <button class="nav-link" onclick="openTab(event, 'London')">Requests</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" onclick="openTab(event, 'Paris')">Settings</button>
+    </li>
+</ul>
 <!-- Tab content -->
 <div id="London" class="tabcontent">
     <partial name="_RequestsPartial" model="Model" />
@@ -31,7 +38,7 @@
     function load(id) {
         console.log(id);
     }
-    function openCity(evt, cityName) {
+    function openTab(evt, tabName) {
         // Declare all variables
         var i, tabcontent, tablinks;
 
@@ -42,13 +49,13 @@
         }
 
         // Get all elements with class="tablinks" and remove the class "active"
-        tablinks = document.getElementsByClassName("tablinks");
+        tablinks = document.getElementsByClassName("nav-link");
         for (i = 0; i < tablinks.length; i++) {
             tablinks[i].className = tablinks[i].className.replace(" active", "");
         }
 
         // Show the current tab, and add an "active" class to the button that opened the tab
-        document.getElementById(cityName).style.display = "block";
+        document.getElementById(tabName).style.display = "block";
         evt.currentTarget.className += " active";
     }
 </script>

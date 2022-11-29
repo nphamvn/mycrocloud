@@ -3,9 +3,17 @@
 @using MockServer.Core.Models
 @{
     ViewData["Title"] = "Home Page";
-    var user = User.GetLoggedInUser<ApplicationUser>();
+    var user = User.Parse<ApplicationUser>();
 }
-
-<div class="text-center">
-    <h1 class="display-4">Welcome, @user.Id</h1>
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="text-center">
+    <h1 class="display-4">Welcome, @user.Username</h1>
 </div>
+}
+else
+{
+    <div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+</div>
+}

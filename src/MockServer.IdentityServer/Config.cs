@@ -23,7 +23,7 @@ public static class Config
         {
             ClientId = "web",
             ClientSecrets = { new Secret("secret".Sha256()) },
-
+            AlwaysIncludeUserClaimsInIdToken = true,
             AllowedGrantTypes = GrantTypes.Code,
             
             // where to redirect to after login

@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Home Page";
     //var properties = (await HttpContext.AuthenticateAsync());
-    var user = User.GetLoggedInUser<ApplicationUser>();
+    var user = User.Parse<ApplicationUser>();
 }
 
 <div class="text-center">

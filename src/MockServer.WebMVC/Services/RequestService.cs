@@ -28,7 +28,7 @@ public class RequestService : IRequestService
     }
     public async Task Create(string projectName, CreateRequestViewModel request)
     {
-        var user = contextAccessor.HttpContext.User.GetLoggedInUser<ApplicationUser>();
+        var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
 
         var existing = await _requestRepository.FindRequest(user.Id, projectName, request.Method, request.Path);

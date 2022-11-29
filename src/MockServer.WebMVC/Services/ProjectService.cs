@@ -33,7 +33,7 @@ public class ProjectService : IProjectService
 
     public async Task<bool> Create(CreateProjectViewModel project)
     {
-        var user = contextAccessor.HttpContext.User.GetLoggedInUser<ApplicationUser>();
+        var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
 
         var existing = await projectRepository.Find(user.Id, project.Name);
@@ -49,7 +49,7 @@ public class ProjectService : IProjectService
 
     public async Task Delete(string name)
     {
-        var user = contextAccessor.HttpContext.User.GetLoggedInUser<ApplicationUser>();
+        var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
 
         var project = await projectRepository.Find(user.Id, name);
@@ -61,7 +61,7 @@ public class ProjectService : IProjectService
 
     public async Task<string> GenerateKey(string name)
     {
-        var user = contextAccessor.HttpContext.User.GetLoggedInUser<ApplicationUser>();
+        var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
         var project = await projectRepository.Find(user.Id, name);
         Guard.Against.Null(project);
@@ -73,7 +73,7 @@ public class ProjectService : IProjectService
 
     public async Task<ProjectIndexViewModel> GetIndexViewModel()
     {
-        var user = contextAccessor.HttpContext.User.GetLoggedInUser<ApplicationUser>();
+        var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
 
         var projects = await projectRepository.GetByUserId(user.Id);
@@ -91,7 +91,7 @@ public class ProjectService : IProjectService
 
     public async Task<ProjectViewViewModel> GetProjectViewViewModel(string name)
     {
-        var user = contextAccessor.HttpContext.User.GetLoggedInUser<ApplicationUser>();
+        var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
         var project = await projectRepository.Find(user.Id, name);
         var vm = new ProjectViewViewModel();
@@ -103,7 +103,7 @@ public class ProjectService : IProjectService
 
     public async Task Rename(string name, string newName)
     {
-        var user = contextAccessor.HttpContext.User.GetLoggedInUser<ApplicationUser>();
+        var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
         var project = await projectRepository.Find(user.Id, name);
         if (project != null)
