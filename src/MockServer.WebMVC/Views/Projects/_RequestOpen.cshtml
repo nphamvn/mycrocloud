@@ -1,0 +1,14 @@
+@model MockServer.WebMVC.Models.Project.RequestOpenViewModel
+<div>
+    <p>@Model.Name</p>
+    <p><span id="method">@Model.Method</span> <span id="url">@Model.Url</span></p>
+    <button onclick="sendRequest()">Send</button>
+</div>
+<script>
+    function sendRequest() {
+        console.log({
+            type: $('#method').text(),
+            url: $('#url').text()
+        });
+    }
+</script>

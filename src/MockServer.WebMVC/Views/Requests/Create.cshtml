@@ -9,13 +9,20 @@
 @using (Html.BeginForm("Create", "Requests", new { projectName = ViewData["ProjectName"] }, FormMethod.Post))
 {
     <div>
-    <p>Type</p>
-    <input type="radio" asp-for="Type" value="@((int)RequestType.FIXED)" checked>
-    <label for="FIXED">FIXED</label><br>
-    <input type="radio" asp-for="Type" value="@((int)RequestType.FORWARD)">
-    <label for="FORWARD">FORWARD</label><br>
-    <input type="radio" asp-for="Type" value="@((int)RequestType.CALLBACK)">
-    <label for="CALLBACK">CALLBACK</label><br>
+    Type
+    <div class="form-check">
+        <input type="radio" asp-for="Type" value="@((int)RequestType.FIXED)" checked>
+        <label for="FIXED">Fixed</label>
+
+    </div>
+    <div class="form-check">
+        <input type="radio" asp-for="Type" value="@((int)RequestType.FORWARD)">
+        <label for="FORWARD">Forward</label>
+    </div>
+    <div class="form-check">
+        <input type="radio" asp-for="Type" value="@((int)RequestType.CALLBACK)">
+        <label for="CALLBACK">Callback</label>
+    </div>
 </div>
     <div>
     <label asp-for="Name"></label>

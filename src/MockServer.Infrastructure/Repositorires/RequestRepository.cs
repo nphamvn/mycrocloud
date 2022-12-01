@@ -120,6 +120,30 @@ public class RequestRepository : IRequestRepository
         });
     }
 
+    public async Task<Request> Get(int userId, string projectName, int id)
+    {
+        var query =
+                """
+                SELECT r.*
+                FROM Requests r
+                    INNER JOIN
+                    Project p ON r.ProjectId = p.Id
+                    INNER JOIN
+                    Users u ON p.UserId = u.Id
+                WHERE r.Id = @RequestId AND 
+                    u.Id = @UserId AND 
+                    lower(p.Name) = lower(@ProjectName);
+                """;
+
+        using var connection = new SqliteConnection(_connectionString);
+        return await connection.QuerySingleOrDefaultAsync<Request>(query, new
+        {
+            RequestId = id,
+            UserId = userId,
+            ProjectName = projectName
+        });
+    }
+
     public async Task<FixedResponse> GetFixedResponse(int requestId)
     {
         var query =

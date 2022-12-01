@@ -66,4 +66,12 @@ public class ProjectsController : BaseController
         await _projectService.Delete(name);
         return RedirectToAction(nameof(Index));
     }
+
+    [HttpGet("{name}/requests/{id:int}")]
+    public async Task<IActionResult> GetRequestEditorParital(string name, int id)
+    {
+        var vm = await _projectService.GetRequestOpenViewModel(name, id);
+        vm.ProjectName = name;
+        return PartialView("Views/Projects/_RequestOpen.cshtml", vm);
+    }
 }

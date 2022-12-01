@@ -13,30 +13,31 @@
     <span class="badge bg-secondary">@Model.ProjectInfo.Accessibility</span>
 </div>
 
-<!-- Tab links -->
-<ul class="nav nav-tabs">
-    <li class="nav-item">
-        <button class="nav-link" onclick="openTab(event, 'London')">Requests</button>
-    </li>
-    <li class="nav-item">
-        <button class="nav-link" onclick="openTab(event, 'Paris')">Settings</button>
-    </li>
-</ul>
-<!-- Tab content -->
-<div id="London" class="tabcontent">
-    <partial name="_RequestsPartial" model="Model" />
-</div>
+<div>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <button id="defaultOpen" class="nav-link" onclick="openTab(event, 'Requests')">Requests</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" onclick="openTab(event, 'Settings')">Settings</button>
+        </li>
+    </ul>
+    <!-- Tab content -->
+    <div id="Requests" class="tabcontent">
+        <partial name="_RequestsPartial" model="Model" />
+    </div>
 
-<div id="Paris" class="tabcontent">
-    <partial name="_SettingsPartial" model="Model.ProjectInfo" />
+    <div id="Settings" class="tabcontent">
+        <partial name="_SettingsPartial" model="Model.ProjectInfo" />
+    </div>
 </div>
-
 
 @section Scripts
 {
 <script>
+    document.getElementById("defaultOpen").click();
     function load(id) {
-        console.log(id);
+        $('#RequestOpen').load('/Projects/@Model.ProjectInfo.Name/Requests/' + id);
     }
     function openTab(evt, tabName) {
         // Declare all variables
