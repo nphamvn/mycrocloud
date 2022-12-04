@@ -3,9 +3,9 @@ namespace MockServer.Core.Enums
 {
     public enum RequestType
     {
-        FIXED = 1,
-        FORWARD = 2,
-        CALLBACK = 3
+        Fixed = 1,
+        Forwarding = 2,
+        Callback = 3
     }
 }
 

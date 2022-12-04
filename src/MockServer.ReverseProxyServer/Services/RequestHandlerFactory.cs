@@ -30,11 +30,11 @@ public class RequestHandlerFactory : IRequestHandlerFactory
     {
         switch (type)
         {
-            case RequestType.FIXED:
+            case RequestType.Fixed:
                 return this.GetService(typeof(FixedRequestHandler));
-            case RequestType.FORWARD:
+            case RequestType.Forwarding:
                 return this.GetService(typeof(ForwardingRequestHandler));
-            case RequestType.CALLBACK:
+            case RequestType.Callback:
                 return this.GetService(typeof(ExpectionCallbackExecutor));
             default:
                 throw new InvalidOperationException();

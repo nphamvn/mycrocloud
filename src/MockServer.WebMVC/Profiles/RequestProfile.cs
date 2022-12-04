@@ -15,5 +15,6 @@ public class RequestProfile : Profile
         CreateMap<Core.Entities.Request, RequestItem>().ReverseMap();
         CreateMap<CreateRequestViewModel, Core.Entities.Request>().ReverseMap();
         CreateMap<Core.Entities.Request, RequestOpenViewModel>().ReverseMap();
+        CreateMap<Core.Entities.FixedRequest, FixedRequestConfigViewModel>().ReverseMap();
     }
 }

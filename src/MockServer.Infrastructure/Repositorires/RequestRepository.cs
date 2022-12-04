@@ -15,7 +15,7 @@ public class RequestRepository : IRequestRepository
         _connectionString = settings.Sqlite.ConnectionString;
     }
 
-    public async Task Create(int userId, string projectName, Request request)
+    public async Task<int> Create(int userId, string projectName, Request request)
     {
         var query =
                 """
@@ -38,10 +38,11 @@ public class RequestRepository : IRequestRepository
                          @Method,
                          @Path
                      );
+                    SELECT last_insert_rowid();
                 """;
 
         using var connection = new SqliteConnection(_connectionString);
-        await connection.ExecuteAsync(query, new
+        return await connection.QuerySingleAsync<int>(query, new
         {
             UserId = userId,
             ProjectName = projectName,
@@ -49,6 +50,21 @@ public class RequestRepository : IRequestRepository
             Name = request.Name,
             Method = (int)request.Method,
             Path = request.Path
+        });
+    }
+
+    public async Task Delete(int userId, string projectName, int id)
+    {
+        var query =
+                """
+                DELETE FROM Requests
+                    WHERE Id = @Id;
+                """;
+
+        using var connection = new SqliteConnection(_connectionString);
+        await connection.ExecuteAsync(query, new
+        {
+            Id = id
         });
     }
 
@@ -144,6 +160,26 @@ public class RequestRepository : IRequestRepository
         });
     }
 
+    public async Task<FixedRequest> GetFixedRequestConfig(int userId, string projectName, int id)
+    {
+        var query =
+                """
+                SELECT res.RequestId,
+                    res.StatusCode ResponseStatusCode,
+                    res.Body ResponseBody
+                FROM FixedRequestResponse res
+                    INNER JOIN
+                    Requests req ON res.RequestId = req.Id
+                WHERE req.Id = @Id;
+                """;
+
+        using var connection = new SqliteConnection(_connectionString);
+        return await connection.QuerySingleOrDefaultAsync<FixedRequest>(query, new
+        {
+            Id = id
+        });
+    }
+
     public async Task<FixedResponse> GetFixedResponse(int requestId)
     {
         var query =
@@ -203,6 +239,39 @@ public class RequestRepository : IRequestRepository
         return await connection.QueryAsync<Request>(query, new
         {
             ProjectId = ProjectId
+        });
+    }
+
+    public async Task SaveFixedRequestConfig(int userId, string projectName, int requestId, FixedRequest config)
+    {
+        var query =
+                """
+                INSERT INTO 
+                    FixedRequestResponse 
+                    (
+                        RequestId,
+                        StatusCode,
+                        ContentType,
+                        Body,
+                        Delay
+                     )
+                     VALUES (
+                         @RequestId,
+                         @StatusCode,
+                         @ContentType,
+                         @Body,
+                         @Delay
+                     );
+                """;
+
+        using var connection = new SqliteConnection(_connectionString);
+        await connection.ExecuteAsync(query, new
+        {
+            RequestId = requestId,
+            StatusCode = config.ResponseStatusCode,
+            ContentType = config.ResponseContentType,
+            Body = config.ResponseBody,
+            Delay = config.Delay
         });
     }
 }

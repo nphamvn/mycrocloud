@@ -1,4 +1,6 @@
 @using MockServer.Core.Enums
+@using MockServer.Core.Models
+@using MockServer.WebMVC.Extentions
 @model MockServer.WebMVC.Models.Request.CreateRequestViewModel
 @{
     ViewData["Title"] = "Create new request";
@@ -8,38 +10,75 @@
 
 @using (Html.BeginForm("Create", "Requests", new { projectName = ViewData["ProjectName"] }, FormMethod.Post))
 {
+    <div class="mb-2">
     <div>
-    Type
-    <div class="form-check">
-        <input type="radio" asp-for="Type" value="@((int)RequestType.FIXED)" checked>
-        <label for="FIXED">Fixed</label>
-
+        <div class="form-check">
+            <input class="form-check-input" type="radio" asp-for="Type" value="@((int)RequestType.Fixed)" checked>
+            <label class="form-check-label" for="FIXED">Fixed</label>
+        </div>
+        <small id="emailHelp" class="form-text text-muted px-3">Return a "mock" response when a request matches an
+            expectation</small>
     </div>
-    <div class="form-check">
-        <input type="radio" asp-for="Type" value="@((int)RequestType.FORWARD)">
-        <label for="FORWARD">Forward</label>
+    <div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" asp-for="Type" value="@((int)RequestType.Forwarding)">
+            <label class="form-check-label" for="FORWARD">Forward</label>
+        </div>
+        <small id="emailHelp" class="form-text text-muted px-3">Forward a request when the request matches an
+            expectation
+            (i.e. a dynamic port forwarding proxy)
+        </small>
     </div>
-    <div class="form-check">
-        <input type="radio" asp-for="Type" value="@((int)RequestType.CALLBACK)">
-        <label for="CALLBACK">Callback</label>
+    <div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" asp-for="Type" value="@((int)RequestType.Callback)">
+            <label class="form-check-label" for="CALLBACK">Callback</label>
+        </div>
+        <small id="emailHelp" class="form-text text-muted px-3">Execute a callback when a request matches an
+            expectation,
+            allowing the response to be created dynamically
+        </small>
     </div>
 </div>
-    <div>
+    <div class="form-group mb-2">
     <label asp-for="Name"></label>
-    <input type="text" asp-for="Name">
+    <input class="form-control" type="text" asp-for="Name">
+    <span asp-validation-for="Name" class="text-danger"></span>
 </div>
-    <div>
-    <label asp-for="Method"></label>
-    <select asp-for="Method">
-        @foreach (var method in Enum.GetValues(typeof(RequestMethod)))
-            {
-                <option value="@((int)method)">@method</option>
-            }
-        </select>
+    <div class="row mb-2">
+    <div class="form-group col-3">
+        <label asp-for="Method">Method</label>
+        <select id="method" class="form-control" asp-for="Method" onchange="generatePreviewUrl()">
+            @foreach (var method in Enum.GetValues(typeof(RequestMethod)))
+                {
+                    <option value="@((int)method)">@method</option>
+                }
+            </select>
+        </div>
+        <div class="form-group col-9">
+            <label asp-for="Path">Path</label>
+            <input id="path" class="form-control" type="text" asp-for="Path" placeholder="foo"
+            onkeypress="validatePathTyping(event)" onkeyup="generatePreviewUrl()">
+            <span asp-validation-for="Path" class="text-danger"></span>
+        </div>
     </div>
-    <label asp-for="Path">Path</label>
-    <input type="text" asp-for="Path"><br><br>
-    <div>
+    <div class="form-group mb-3">
+    <label>Url</label>
+    <input readonly class="form-control" type="text" id="previewUrl">
 </div>
-    <button type="submit">Next</button>
+    <button class="btn btn-primary" type="submit">Save & Continue</button>
 }
+<script>
+    let baseUrl = 'https://' + '@(User.Parse<ApplicationUser>().Username)' + '.mockserver.com/' + '@ViewData["ProjectName"]' + '/';
+    function generatePreviewUrl() {
+        var method = $('#method option:selected').text();
+        var path = $('#path').val();
+        $('#previewUrl').val(method + '     ' + baseUrl + path);
+    }
+    function validatePathTyping(event) {
+        if (event.which == 32) {
+            event.preventDefault();
+            return false;
+        }
+    }
+</script>

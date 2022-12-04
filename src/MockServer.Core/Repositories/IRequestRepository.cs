@@ -11,5 +11,8 @@ public interface IRequestRepository
     Task<FixedResponse> GetFixedResponse(int requestId);
     Task<ForwardingRequest> GetForwardingRequest(int requestId);
     Task<IEnumerable<Request>> GetProjectRequests(int ProjectId);
-    Task Create(int userId, string projectName, Request request);
+    Task<int> Create(int userId, string projectName, Request request);
+    Task<FixedRequest> GetFixedRequestConfig(int userId, string projectName, int id);
+    Task SaveFixedRequestConfig(int userId, string projectName, int req, FixedRequest config);
+    Task Delete(int userId, string projectName, int id);
 }

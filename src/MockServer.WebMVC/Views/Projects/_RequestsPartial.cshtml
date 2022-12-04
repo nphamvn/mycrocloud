@@ -3,7 +3,7 @@
     <div class="col-3">
         <a asp-action="Create" asp-controller="Requests" asp-route-projectName="@Model.ProjectInfo.Name">Add new
             request</a>
-        <ul class="list-group">
+        <ul id="requests" class="list-group">
             @foreach (var req in Model.Requests)
             {
                 <li class="list-group-item" id="@req.Id" onclick="load(this.id)">
@@ -12,6 +12,8 @@
                         <span>@req.Name</span>
                     </div>
                     <p class="m-0">@req.Path</p>
+                    <button class="btn btn-sm btn-danger" onclick="deleteRequest(@req.Id)"><i
+                        class="bi bi-trash"></i></button>
                 </li>
             }
         </ul>
@@ -20,3 +22,16 @@
 
     </div>
 </div>
+<script>
+    function deleteRequest(id) {
+        if (confirm('delete request ' + id + '?')) {
+            $.ajax({
+                type: 'POST',
+                url: '/Projects/@Model.ProjectInfo.Name' + '/requests/' + id + '/delete',
+                success: function () {
+                    $('#requests ' + '#' + id).remove();
+                }
+            });
+        }
+    }
+</script>

@@ -8,5 +8,9 @@ namespace MockServer.WebMVC.Services.Interfaces;
 
 public interface IRequestService
 {
-    Task Create(string projectName, CreateRequestViewModel request);
+    Task<int> Create(string projectName, CreateRequestViewModel request);
+    Task<RequestItem> Get(string projectname, int id);
+    Task<FixedRequestConfigViewModel> GetFixedRequestConfigViewModel(string projectname, int id);
+    Task SaveFixedRequestConfig(string projectname, int id, FixedRequestConfigViewModel config);
+    Task Delete(string projectname, int id);
 }
