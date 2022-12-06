@@ -22,20 +22,8 @@
         </select>
         <a class="btn btn-primary text-decoration-none" asp-action="Create">Create</a>
     </div>
-    <div class="my-3">
-        <ul class="list-group list-group-flush">
-            @foreach (var p in Model.Projects)
-            {
-                <li class="list-group-item">
-                    <h4>
-                        <a class="text-decoration-none"
-                        href="@Url.Action(nameof(ProjectsController.View), new {name=p.Name})">@p.Name</a>
-                        <span class="badge bg-secondary">@p.Accessibility</span>
-                    </h4>
-                    <p>@p.Description</p>
-                </li>
-            }
-        </ul>
+    <div id="projectList" class="my-3">
+        <partial name="_ProjectListPartial.cshtml" model="Model.Projects"></partial>
     </div>
 </div>
 @section Scripts {

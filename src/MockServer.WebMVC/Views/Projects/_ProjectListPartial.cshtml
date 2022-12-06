@@ -1,0 +1,17 @@
+@using MockServer.Core.Enums
+@using MockServer.WebMVC.Controllers
+@model ICollection<MockServer.WebMVC.Models.Project.ProjectIndexItem>;
+<ul class="list-group list-group-flush">
+    @foreach (var p in Model)
+    {
+        <li class="list-group-item">
+            <div>
+                <h4>
+                    <a class="text-decoration-none"
+                    href="@Url.Action(nameof(ProjectsController.View), new {name=p.Name})">@p.Name</a>
+                </h4>
+                <span class="badge rounded-pill @p.BadgeColor">@p.Accessibility</span>
+            </div <p>@p.Description</p>
+        </li>
+    }
+</ul>

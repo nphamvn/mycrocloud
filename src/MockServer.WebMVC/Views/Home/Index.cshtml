@@ -9,7 +9,15 @@
 {
     <div class="text-center">
     <h1 class="display-4">Welcome, @user.Username</h1>
-</div>
+    <img src="@user.AvatarUrl">
+    <dl>
+        @foreach (var claim in User.Claims)
+            {
+                <dt>@claim.Type</dt>
+                <dd>@claim.Value</dd>
+            }
+        </dl>
+    </div>
 }
 else
 {

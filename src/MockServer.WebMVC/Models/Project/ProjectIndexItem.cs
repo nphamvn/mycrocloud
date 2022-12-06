@@ -9,4 +9,10 @@ public class ProjectIndexItem
     public string Description { get; set; }
     public ProjectAccessibility Accessibility { get; set; }
     public string PrivateKey { get; set; }
+    public string BadgeColor => Accessibility switch
+    {
+        ProjectAccessibility.Public => "bg-primary",
+        ProjectAccessibility.Private => "bg-secondary",
+        _ => ""
+    };
 }

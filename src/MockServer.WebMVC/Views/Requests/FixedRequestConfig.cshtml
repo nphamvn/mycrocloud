@@ -1,5 +1,9 @@
 @using MockServer.WebMVC.Controllers
+@using MockServer.WebMVC.Models.Request
 @model MockServer.WebMVC.Models.Request.FixedRequestConfigViewModel
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.9.2/jsoneditor.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.9.2/jsoneditor.min.css" rel="stylesheet"
+    type="text/css">
 <h3>Fixed request configuration</h3>
 @using (Html.BeginForm(nameof(RequestsController.ConfigFixedRequest), "Requests", new
 {
@@ -11,30 +15,31 @@
     <h3>Expectation response</h3>
     <div class="col-md-2  mb-2">
         <label for="inputState" class="form-label">Status code</label>
-        <input type="text" list="cars" class="form-control" asp-for="ResponseStatusCode" />
-        <datalist id="cars">
-            <option value="200">OK</option>
-            <option value="201">Created</option>
-            <option value="202">Accepted</option>
-            <option>Audi</option>
-        </datalist>
-    </div>
-    <div class="form-group  mb-2">
-        <label for="exampleFormControlTextarea1">Headers</label>
-        <div class="w-50 p-2">
-            <button type="button" class="btn btn-primary btn-sm" onclick="addParam()"><i
-                    class="bi bi-plus"></i></button>
-            <ul id="params" class="my-2" style="list-style: none;padding: 0">
-            </ul>
+        <input type="text" list="commonStatusCodes" class="form-control" asp-for="ResponseStatusCode" />
+        <datalist id="commonStatusCodes">
+            @foreach (var item in FixedRequestConfigViewModel.CommonHttpStatusCode)
+                {
+                    <option value="@Convert.ToInt32(item.Value)">@item.Text</option>
+                }
+            </datalist>
         </div>
+        <div class="form-group  mb-2">
+            <label for="exampleFormControlTextarea1">Headers</label>
+            <div class="w-50 p-2">
+                <button type="button" class="btn btn-primary btn-sm" onclick="addParam()"><i
+                    class="bi bi-plus"></i></button>
+                <ul id="params" class="my-2" style="list-style: none;padding: 0">
+                </ul>
+            </div>
+        </div>
+        <div class="form-group mb-2">
+            <label for="exampleFormControlTextarea1">Body</label>
+            <textarea class="form-control" rows="5" asp-for="ResponseBody">
+                        </textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary mb-2">Save</button>
     </div>
-    <div class="form-group mb-2">
-        <label for="exampleFormControlTextarea1">Body</label>
-        <textarea class="form-control" rows="5" asp-for="ResponseBody">
-        </textarea>
-    </div>
-    <button type="submit" class="btn btn-primary mb-2">Save</button>
-</div>
 }
 <script>
     let paramNo = 0;

@@ -1,7 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using MockServer.WebMVC.Extentions;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+var logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+builder.Logging.AddSerilog(logger);
 builder.Services.ConfigureServices(builder.Configuration);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -23,7 +28,8 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Clear();
         options.Scope.Add("openid");
         options.Scope.Add("profile");
-
+        options.Scope.Add("verification");
+        options.GetClaimsFromUserInfoEndpoint = true;
         options.SaveTokens = true;
     });
 
@@ -47,6 +53,5 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-//.RequireAuthorization();
 
 app.Run();
