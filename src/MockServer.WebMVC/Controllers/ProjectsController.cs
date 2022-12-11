@@ -38,6 +38,10 @@ public class ProjectsController : BaseController
     [HttpPost("create")]
     public async Task<IActionResult> Create(CreateProjectViewModel project)
     {
+        if (!ModelState.IsValid)
+        {
+            return View("Views/Projects/Create.cshtml", project);
+        }
         if (!await _projectService.Create(project))
         {
             return View("Views/Projects/Create.cshtml", project);
@@ -50,7 +54,7 @@ public class ProjectsController : BaseController
     public async Task<IActionResult> Rename(string name, string newName)
     {
         await _projectService.Rename(name, newName);
-        return Ok();
+        return RedirectToAction(nameof(View), new { name = newName });
     }
 
     [HttpPost("{name}/settings/generate-key")]

@@ -10,19 +10,7 @@ public static class Config
         new IdentityResource[]
         {
             new IdentityResources.OpenId(),
-            new IdentityResources.Profile(),
-            new IdentityResource()
-      {
-          Name = "verification",
-          UserClaims = new List<string>
-          {
-              "id",
-              "name",
-              "login",
-              "html_url",
-              "avatar_url"
-          }
-      }
+            new IdentityResources.Profile()
         };
 
     public static IEnumerable<ApiScope> ApiScopes =>
@@ -48,8 +36,7 @@ public static class Config
             AllowedScopes = new List<string>
             {
                 IdentityServerConstants.StandardScopes.OpenId,
-                IdentityServerConstants.StandardScopes.Profile,
-                "verification"
+                IdentityServerConstants.StandardScopes.Profile
             }
         }
             };

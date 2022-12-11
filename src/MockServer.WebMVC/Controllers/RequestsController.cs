@@ -69,4 +69,11 @@ public class RequestsController : Controller
         await _requestService.Delete(projectName, id);
         return Ok();
     }
+
+    [HttpGet("/create")]
+    public async Task<IActionResult> GetCreatePartial()
+    {
+        ViewData["ProjectName"] = "projectName";
+        return PartialView("Views/Requests/_CreateRequestPartial.cshtml");
+    }
 }

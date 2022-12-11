@@ -20,11 +20,6 @@ public class ProfileService : IProfileService
         //var claims = GetRequestedClaims(user, requestedClaimsTypes);
         //context.IssuedClaims.Add(new Claim("email", "nam@npham.me"));
         //context.IssuedClaims.Add(new Claim("name", "npham"));
-        Log.Logger.Information("HERE!!!!!!!!!!!!!!");
-        foreach (var type in requestedClaimTypes)
-        {
-            Log.Logger.Information(type);
-        }
         return Task.CompletedTask;
     }
 

@@ -58,7 +58,17 @@ internal static class HostingExtensions
                                     context.RunClaimActions(json.RootElement);
                                 }
                             };
-                        });
+                        })
+                        .AddGoogle(options =>
+                        {
+                            options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                            options.ClientId = "1003248858371-s5bsd1mre1dvi635pflp0fm2tpcl8sj1.apps.googleusercontent.com";
+                            options.ClientSecret = "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";
+
+                            options.ClaimActions.Clear();
+                        })
+                        ;
+
         builder.Services.AddTransient<IProfileService, ProfileService>();
 
         return builder.Build();

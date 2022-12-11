@@ -1,15 +1,21 @@
 @using MockServer.WebMVC.Controllers;
 @model MockServer.WebMVC.Models.Project.RequestOpenViewModel
-<div class="row">
+<div class="row p-1">
     <div class="col">
-        <p>@Model.Name</p>
-        <a
-            href="@Url.Action(nameof(RequestsController.Config), "Requests", new {projectName = Model.ProjectName, id = Model.Id})">Config
-        </a>
+        <p class="fw-bolder">@Model.Name</p>
+        @* <a
+            href="@Url.Action(nameof(RequestsController.Config), "Requests", new {projectName = Model.ProjectName, id =
+            Model.Id})">Config
+            </a> *@
         <div>
-            <div class=" d-flex">
-                <p class="mr-auto"><span id="method">@Model.Method</span> <span id="url">@Model.Url</span></p>
-                <button class="btn btn-primary ml-auto" onclick="sendRequest()">Send</button>
+            <div class="d-flex">
+                <div>
+                    <span class="me-2" id="method">@Model.Method</span>
+                    <span id="url">@Model.Url</span>
+                </div>
+                <div class="ms-auto">
+                    <button class="btn bg-violet-500 btn-sm text-white px-3" onclick="sendRequest()">Send</button>
+                </div>
             </div>
             <div>
                 <ul class="nav nav-tabs">
@@ -48,12 +54,8 @@
         Response
     </div>
 </div>
-
-
 <script>
-    let paramNo = 0;
     function sendRequest() {
-
         var headers = [];
 
         $('#params li').each(function () {
@@ -126,59 +128,4 @@
     function deleteParam(paramNo) {
         $('#params ' + '#param' + paramNo).remove();
     }
-</script>
-<script>
-    class RequestParamElement extends HTMLElement {
-        delButton = document.createElement('button');
-        keyInput = document.createElement('input');
-        valueInput = document.createElement('input');
-        var div = document.createElement('div');
-    constructor() {
-        super();
-        //var div = document.createElement('div');
-        div.className = 'row';
-        div.innerHTML = 'This is a div';
-        @* var delIcon = document.createElement('i');
-                delIcon.classList.add('bi', 'bi-trash');
-                delButton.append(delIcon);
-                //delButton.onclick = deleteParam(paramNo);
-                delButton.setAttribute('onclick', 'deleteParam(' + paramNo + ')');
-                delButton.classList.add('btn', 'btn-secondary', 'btn-sm');
-                var delButtonDiv = document.createElement('div');
-                delButtonDiv.className = 'col';
-                delButtonDiv.appendChild(delButton);
-
-                var keyDiv = document.createElement('div');
-                keyDiv.className = 'col';
-
-                keyInput.id = 'param' + paramNo + '-key';
-                keyInput.type = 'text';
-                keyInput.classList.add('form-control', 'form-control-sm');
-                keyInput.name = 'param' + paramNo + '-key';
-                keyInput.placeholder = 'Key';
-                keyDiv.appendChild(keyInput);
-
-                var valueDiv = document.createElement('div');
-                valueDiv.className = 'col';
-
-                valueInput.id = 'param' + paramNo + '-value';
-                valueInput.type = 'text';
-                valueInput.classList.add('form-control', 'form-control-sm');
-                valueInput.name = 'param' + paramNo + '-value';
-                valueInput.placeholder = 'Value';
-                valueDiv.appendChild(valueInput);
-
-                div.appendChild(keyDiv);
-                div.appendChild(valueDiv);
-                div.appendChild(delButtonDiv); *@
-
-            this.attachShadow({ mode: 'open' })
-                .appendChild(div);
-    }
-    connectedCallback() {
-        this.d
-        console.log(this.getAttribute('paramNo'));
-    }
-    }
-    customElements.define('request-param', RequestParamElement);
 </script>
