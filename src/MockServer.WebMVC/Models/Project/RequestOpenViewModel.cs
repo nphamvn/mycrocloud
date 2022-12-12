@@ -17,5 +17,13 @@ public class RequestOpenViewModel
     public RequestType Type { get; set; }
     public string Username { get; set; }
     public string Url => string.Format("https://{0}.mockserver.com/{1}/{2}", Username, ProjectName, Path);
-
+    public string MethodTextColor
+    => Method switch
+    {
+        RequestMethod.DELETE => "text-red",
+        RequestMethod.POST => "text-orange",
+        RequestMethod.PUT => "text-yellow",
+        RequestMethod.GET => "text-green",
+        _ => "text-red"
+    };
 }

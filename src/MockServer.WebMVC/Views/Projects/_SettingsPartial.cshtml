@@ -1,21 +1,24 @@
 @model MockServer.WebMVC.Models.Project.ProjectIndexItem
-<div class="p-2">
+<div class="p-3">
     @using (Html.BeginForm("Rename", "Projects", new { name = Model.Name }, FormMethod.Post, true, new
     {
-        @class = "mb-2"
+        @class = "mb-2 border-bottom pb-3 border-1"
     }))
     {
         <div class="row">
             <div class="col-3">
                 <strong for="newName" class="form-label font-semibold">Project name</strong>
                 <div class="d-flex">
-                    <input class="form-control me-2" type="text" name="newName" value="@Model.Name">
+                    <input class="form-control me-2" type="text" name="newName" value="@Model.Name" autocomplete="off">
                     <button class="btn btn-sm border" type="submit">Rename</button>
                 </div>
             </div>
         </div>
     }
-    @using (Html.BeginForm("GenerateKey", "Projects", new { name = Model.Name }))
+    @using (Html.BeginForm("GenerateKey", "Projects", new { name = Model.Name }, FormMethod.Post, true, new
+    {
+        @class = "mb-3 pb-3 border-bottom border-1"
+    }))
     {
         <div>
             <strong>Private key</strong>

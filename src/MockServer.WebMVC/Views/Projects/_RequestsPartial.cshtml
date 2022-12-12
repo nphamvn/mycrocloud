@@ -12,7 +12,7 @@
             <ul id="requests" class="list-group list-group-flush mt-2">
                 @foreach (var req in Model.Requests)
                 {
-                    <li id="request-@req.Id" class="list-group-item p-2">
+                    <li id="request-@req.Id" class="list-group-item p-1">
                         <div class="row">
                             <div class="col" onclick="openRequest(@req.Id)">
                                 <span class="text-base fw-light text-slate-700">@req.Name</span>
@@ -22,7 +22,7 @@
                                     <small class="text-muted">/@req.Path</small>
                                 </div>
                             </div>
-                            <div style="width: 40px;">
+                            <div class="p-0" style="width: 40px;">
                                 @* <button class="btn btn-sm" onclick="showMenu(@req.Id)"></button> *@
                                 <div class="dropdown">
                                     <button class="btn btn-sm" type="button" id="dropdownMenuButton1"

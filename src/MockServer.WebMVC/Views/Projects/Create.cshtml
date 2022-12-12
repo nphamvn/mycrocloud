@@ -33,8 +33,12 @@
                             value="@((int)ProjectAccessibility.Private)">
                         <label class="form-check-label ms-1" for="private">Private</label>
                     </div>
-                    <small class="form-text text-muted ms-3">Only you can see this project. You have to add
-                        XXX-PrivateKey header to call requests.</small>
+                    <div class="ps-3">
+                        <small class="form-text text-muted">Only you can see this project.
+                            To call the requests in this project, you'll need to add an <code>x-private-key</code>
+                            header to
+                            your requests. You can get and change the key in the settings page.</small>
+                    </div>
                 </div>
             </div>
             <div class="mt-3 border-top border-1 pt-2">

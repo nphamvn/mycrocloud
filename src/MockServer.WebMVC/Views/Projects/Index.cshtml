@@ -10,11 +10,11 @@
         <h3>@ViewData["Title"]</h3>
         <div class="mt-2">
             <div class="d-flex">
-                <form id="filter" class="row" action="">
-                    <div class="col-auto">
+                <form id="filter" class="flex-grow-1 row" action="">
+                    <div class="col-8">
                         <input class="form-control" type="text" placeholder="Find a project..." onchange="search()">
                     </div>
-                    <div class="col-auto dropdown">
+                    <div class="col-2 dropdown">
                         <button class="btn border dropdown-toggle" type="button" id="dropdownMenuButton1"
                             data-bs-toggle="dropdown" aria-expanded="false">
                             Type
@@ -25,7 +25,7 @@
                             <li><a class="dropdown-item" href="#">Private</a></li>
                         </ul>
                     </div>
-                    <div class="col-auto dropdown">
+                    <div class="col-2 dropdown">
                         <button class="btn border dropdown-toggle" type="button" id="dropdownMenuButton1"
                             data-bs-toggle="dropdown" aria-expanded="false">
                             Sort
@@ -38,7 +38,7 @@
                     </div>
                 </form>
                 <div>
-                    <a class="btn btn-primary text-decoration-none" asp-action="Create">Create</a>
+                    <a class="btn btn-primary text-decoration-none px-5" asp-action="Create">New</a>
                 </div>
             </div>
             <div id="projectList" class="my-3">

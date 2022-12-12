@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MockServer.WebMVC.Attributes;
 using MockServer.WebMVC.DTOs.Project;
 using MockServer.WebMVC.Models.Project;
 using MockServer.WebMVC.Services.Interfaces;
@@ -57,6 +58,7 @@ public class ProjectsController : BaseController
         return RedirectToAction(nameof(View), new { name = newName });
     }
 
+    [AjaxOnly]
     [HttpPost("{name}/settings/generate-key")]
     public async Task<IActionResult> GenerateKey(string name)
     {
@@ -70,7 +72,7 @@ public class ProjectsController : BaseController
         await _projectService.Delete(name);
         return RedirectToAction(nameof(Index));
     }
-
+    [AjaxOnly]
     [HttpGet("{name}/requests/{id:int}")]
     public async Task<IActionResult> GetRequestEditorParital(string name, int id)
     {

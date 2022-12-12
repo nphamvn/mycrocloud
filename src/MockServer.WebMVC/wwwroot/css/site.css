@@ -19,9 +19,14 @@ body {
 
 /* Style the tab */
 .tab {
-  overflow: hidden;
-  border: 1px solid #ccc;
-  background-color: #f1f1f1;
+  display: "flex";
+  flex-wrap: wrap;
+  margin-bottom: -1px;
+}
+
+.tablinks {
+  display: inline-block;
+  padding: 0.5rem;
 }
 
 /* Style the buttons that are used to open the tab content */
@@ -53,6 +58,10 @@ body {
   border-top: none;
 }
 
+.tab-active {
+  background-color: #ccc;
+  color: red;
+}
 .bg-slate-200 {
   background-color:rgb(241 245 249);
 }
@@ -100,4 +109,20 @@ body {
 
 .font-semibold {
   font-weight: 600;
+}
+
+.text-red {
+  color: rgb(239 68 68);
+}
+
+.text-orange {
+  color: rgb(249 115 22);
+}
+
+.text-yellow {
+  color: rgb(234 179 8);
+}
+
+.text-green {
+  color: rgb(34 197 94);
 }

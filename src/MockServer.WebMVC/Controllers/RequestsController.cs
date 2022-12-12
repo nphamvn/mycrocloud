@@ -2,6 +2,7 @@ using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MockServer.Core.Enums;
+using MockServer.WebMVC.Attributes;
 using MockServer.WebMVC.Models.Request;
 using MockServer.WebMVC.Services.Interfaces;
 
@@ -63,6 +64,7 @@ public class RequestsController : Controller
         return Ok(config);
     }
 
+    [AjaxOnly]
     [HttpPost("{id:int}/delete")]
     public async Task<IActionResult> Delete(string projectName, int id)
     {
@@ -70,6 +72,7 @@ public class RequestsController : Controller
         return Ok();
     }
 
+    [AjaxOnly]
     [HttpGet("/create")]
     public async Task<IActionResult> GetCreatePartial()
     {

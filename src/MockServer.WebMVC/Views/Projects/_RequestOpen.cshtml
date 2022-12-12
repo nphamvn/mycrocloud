@@ -2,42 +2,46 @@
 @model MockServer.WebMVC.Models.Project.RequestOpenViewModel
 <div class="row p-1">
     <div class="col">
-        <p class="fw-bolder">@Model.Name</p>
-        @* <a
-            href="@Url.Action(nameof(RequestsController.Config), "Requests", new {projectName = Model.ProjectName, id =
-            Model.Id})">Config
-            </a> *@
+        <div class="mb-1">
+            <strong class="fw-bolder">@Model.Name</strong>
+        </div>
+        <div class="mb-2">
+            <small>The first request</small>
+        </div>
+        <div class="mb-2">
+            <strong class="me-2 @Model.MethodTextColor" id="method">@Model.Method</strong>
+            <span id="path">@Model.Path</span>
+        </div>
+        <div class="input-group mb-3">
+            <input id="privateKey" type="text" class="form-control" value="@Model.Url" readonly>
+            <button id="btnCopyPrivateKeyToClipboard" type="button" class="input-group-text">
+                <i class="bi bi-clipboard">
+                </i></button>
+        </div>
         <div>
-            <div class="d-flex">
-                <div>
-                    <span class="me-2" id="method">@Model.Method</span>
-                    <span id="url">@Model.Url</span>
-                </div>
-                <div class="ms-auto">
-                    <button class="btn bg-violet-500 btn-sm text-white px-3" onclick="sendRequest()">Send</button>
-                </div>
-            </div>
+            <h5>Fixed request</h5>
             <div>
+                <h6>Request</h6>
                 <ul class="nav nav-tabs">
                     <li class="nav-item">
-                        <a href="#photo1" class="nav-link active" data-bs-toggle="tab">Params</a>
+                        <a href="#photo1" class="nav-link active py-1" data-bs-toggle="tab">Params</a>
                     </li>
                     <li class="nav-item">
-                        <a href="#photo2" class="nav-link" data-bs-toggle="tab">Headers</a>
+                        <a href="#photo2" class="nav-link py-1" data-bs-toggle="tab">Headers</a>
                     </li>
                     <li class="nav-item">
-                        <a href="#photo3" class="nav-link" data-bs-toggle="tab">Body</a>
+                        <a href="#photo3" class="nav-link py-1" data-bs-toggle="tab">Body</a>
                     </li>
                 </ul>
-
-                <!-- 写真部分 -->
                 <div class="tab-content">
                     <div id="photo1" class="tab-pane active">
-                        <div class="w-50 p-2">
+                        <div class="d-flex px-2 mt-1">
+                            <p>Query Parameters</p>
+                            <button class="btn btn-link" onclick="addParam()">Add</button>
+                        </div>
+                        <div>
                             <ul id="params" class="my-2" style="list-style: none;padding: 0">
                             </ul>
-                            <button class="btn btn-primary btn-sm" onclick="addParam()"><i
-                                    class="bi bi-plus"></i></button>
                         </div>
                     </div>
                     <div id="photo2" class="tab-pane mb-2">
@@ -48,10 +52,10 @@
                     </div>
                 </div>
             </div>
+            <div>
+                <h6>Response</h6>
+            </div>
         </div>
-    </div>
-    <div class="col">
-        Response
     </div>
 </div>
 <script>
