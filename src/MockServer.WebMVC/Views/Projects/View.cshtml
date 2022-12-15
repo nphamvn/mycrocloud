@@ -2,7 +2,7 @@
 @using MockServer.WebMVC.Extentions
 @model MockServer.WebMVC.Models.Project.ProjectViewViewModel
 @{
-    ViewData["Title"] = "View";
+    ViewData["Title"] = Model.ProjectInfo.Name;
     ViewData["ProjectName"] = Model.ProjectInfo.Name;
 }
 <div class="my-2">
@@ -15,7 +15,7 @@
         class="badge rounded-pill bg-light py-1 fs-6 fw-normal text-dark border border-secondary">@Model.ProjectInfo.Accessibility</span>
 </div>
 
-<div>
+<div class="h-100">
     <ul class="nav nav-tabs">
         <li class="nav-item">
             <button id="defaultOpen" class="nav-link py-1" onclick="openTab(event, 'Requests')">Requests</button>
@@ -36,6 +36,10 @@
 
 @section Scripts
 {
+<script src="~/lib/json-editor.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.14.0/ace.js"
+    integrity="sha512-WYlXqL7GPpZL2ImDErTX0RMKy5hR17vGW5yY04p9Z+YhYFJcUUFRT31N29euNB4sLNNf/s0XQXZfzg3uKSoOdA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
     document.getElementById("defaultOpen").click();
     function openTab(evt, tabName) {
