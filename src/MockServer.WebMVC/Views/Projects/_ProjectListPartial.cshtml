@@ -6,11 +6,12 @@
     {
         <li class="list-group-item">
             <div>
-                <h4>
-                    <a class="text-decoration-none"
+                <h3>
+                    <a class="text-decoration-none me-2"
                     href="@Url.Action(nameof(ProjectsController.View), new {name=p.Name})">@p.Name</a>
-                </h4>
-                <span class="badge rounded-pill @p.BadgeColor">@p.Accessibility</span>
+                    <span
+                    class="badge rounded-pill bg-light py-1 fs-6 fw-normal text-dark border border-secondary">@p.Accessibility</span>
+                </h3>
             </div <p>@p.Description</p>
         </li>
     }

@@ -2,43 +2,46 @@
 @using MockServer.WebMVC.Extentions
 @model MockServer.WebMVC.Models.Project.ProjectViewViewModel
 @{
-    ViewData["Title"] = "View";
+    ViewData["Title"] = Model.ProjectInfo.Name;
+    ViewData["ProjectName"] = Model.ProjectInfo.Name;
 }
-<div class="my-3">
+<div class="my-2">
     <span><a class="text-decoration-none"
             href="@Url.Action("Index", "Home")">@(User.Parse<ApplicationUser>().Username)</a></span>
     <span>/</span>
     <strong><a class="text-decoration-none"
             href="@Url.Action("View", new {name=Model.ProjectInfo.Name})">@Model.ProjectInfo.Name</a></strong>
-    <span class="badge bg-secondary">@Model.ProjectInfo.Accessibility</span>
+    <span
+        class="badge rounded-pill bg-light py-1 fs-6 fw-normal text-dark border border-secondary">@Model.ProjectInfo.Accessibility</span>
 </div>
 
-<div>
+<div class="h-100">
     <ul class="nav nav-tabs">
         <li class="nav-item">
-            <button id="defaultOpen" class="nav-link" onclick="openTab(event, 'Requests')">Requests</button>
+            <button id="defaultOpen" class="nav-link py-1" onclick="openTab(event, 'Requests')">Requests</button>
         </li>
         <li class="nav-item">
-            <button class="nav-link" onclick="openTab(event, 'Settings')">Settings</button>
+            <button class="nav-link py-1" onclick="openTab(event, 'Settings')">Settings</button>
         </li>
     </ul>
     <!-- Tab content -->
-    <div id="Requests" class="tabcontent">
+    <div style="height: calc(100vh - 230px);" id="Requests" class="tabcontent p-1">
         <partial name="_RequestsPartial" model="Model" />
     </div>
 
-    <div id="Settings" class="tabcontent">
+    <div style="height: calc(100vh - 230px);" id="Settings" class="tabcontent">
         <partial name="_SettingsPartial" model="Model.ProjectInfo" />
     </div>
 </div>
 
 @section Scripts
 {
+<script src="~/lib/json-editor.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.14.0/ace.js"
+    integrity="sha512-WYlXqL7GPpZL2ImDErTX0RMKy5hR17vGW5yY04p9Z+YhYFJcUUFRT31N29euNB4sLNNf/s0XQXZfzg3uKSoOdA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
     document.getElementById("defaultOpen").click();
-    function load(id) {
-        $('#RequestOpen').load('/Projects/@Model.ProjectInfo.Name/Requests/' + id);
-    }
     function openTab(evt, tabName) {
         // Declare all variables
         var i, tabcontent, tablinks;
@@ -59,5 +62,71 @@
         document.getElementById(tabName).style.display = "block";
         evt.currentTarget.className += " active";
     }
+    class RequestParamElement extends HTMLElement {
+        delButton = document.createElement('button');
+        keyInput = document.createElement('input');
+        valueInput = document.createElement('input');
+        div = document.createElement('div');
+        constructor() {
+            super();
+            //var div = document.createElement('div');
+            div.className = 'row';
+            div.innerHTML = 'This is a div';
+            @* var delIcon = document.createElement('i');
+                    delIcon.classList.add('bi', 'bi-trash');
+                    delButton.append(delIcon);
+                    //delButton.onclick = deleteParam(paramNo);
+                    delButton.setAttribute('onclick', 'deleteParam(' + paramNo + ')');
+                    delButton.classList.add('btn', 'btn-secondary', 'btn-sm');
+                    var delButtonDiv = document.createElement('div');
+                    delButtonDiv.className = 'col';
+                    delButtonDiv.appendChild(delButton);
+
+                    var keyDiv = document.createElement('div');
+                    keyDiv.className = 'col';
+
+                    keyInput.id = 'param' + paramNo + '-key';
+                    keyInput.type = 'text';
+                    keyInput.classList.add('form-control', 'form-control-sm');
+                    keyInput.name = 'param' + paramNo + '-key';
+                    keyInput.placeholder = 'Key';
+                    keyDiv.appendChild(keyInput);
+
+                    var valueDiv = document.createElement('div');
+                    valueDiv.className = 'col';
+
+                    valueInput.id = 'param' + paramNo + '-value';
+                    valueInput.type = 'text';
+                    valueInput.classList.add('form-control', 'form-control-sm');
+                    valueInput.name = 'param' + paramNo + '-value';
+                    valueInput.placeholder = 'Value';
+                    valueDiv.appendChild(valueInput);
+
+                    div.appendChild(keyDiv);
+                    div.appendChild(valueDiv);
+                    div.appendChild(delButtonDiv); *@
+
+                this.attachShadow({ mode: 'open' })
+                    .appendChild(div);
+        }
+        connectedCallback() {
+            this.d
+            console.log(this.getAttribute('paramNo'));
+        }
+    }
+    customElements.define('request-param', RequestParamElement);
+</script>
+<script>
+    $("#btnCopyPrivateKeyToClipboard").click(function () {
+        var key = $('#privateKey').val();
+        navigator.clipboard.writeText(key)
+            .then(() => {
+                $("#btnCopyPrivateKeyToClipboard i").addClass('bi-clipboard-check')
+                    .addClass('text-info')
+                    .removeClass('bi-clipboard');
+            }).catch((e) => {
+                alert('error: ' + e.message);
+            });
+    });
 </script>
 }

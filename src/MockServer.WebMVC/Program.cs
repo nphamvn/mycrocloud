@@ -28,7 +28,6 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Clear();
         options.Scope.Add("openid");
         options.Scope.Add("profile");
-        options.Scope.Add("verification");
         options.GetClaimsFromUserInfoEndpoint = true;
         options.SaveTokens = true;
     });

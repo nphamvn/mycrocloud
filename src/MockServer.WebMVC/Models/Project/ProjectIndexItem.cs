@@ -11,7 +11,7 @@ public class ProjectIndexItem
     public string PrivateKey { get; set; }
     public string BadgeColor => Accessibility switch
     {
-        ProjectAccessibility.Public => "bg-primary",
+        ProjectAccessibility.Public => "bg-light",
         ProjectAccessibility.Private => "bg-secondary",
         _ => ""
     };

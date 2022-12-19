@@ -1,28 +1,64 @@
+@using MockServer.WebMVC.Controllers
 @model MockServer.WebMVC.Models.Project.ProjectViewViewModel
-<div class="row">
+<div class="row p-2">
     <div class="col-3">
-        <a asp-action="Create" asp-controller="Requests" asp-route-projectName="@Model.ProjectInfo.Name">Add new
-            request</a>
-        <ul id="requests" class="list-group">
-            @foreach (var req in Model.Requests)
-            {
-                <li class="list-group-item" id="@req.Id" onclick="load(this.id)">
-                    <div>
-                        <span class="badge bg-primary">@req.Method</span>
-                        <span>@req.Name</span>
-                    </div>
-                    <p class="m-0">@req.Path</p>
-                    <button class="btn btn-sm btn-danger" onclick="deleteRequest(@req.Id)"><i
-                        class="bi bi-trash"></i></button>
-                </li>
-            }
-        </ul>
+        <div class="d-grid gap-2">
+            <button type="button" onclick="getCreateRequestPartial()" class="btn btn-sm bg-violet-500 text-white"
+                data-bs-toggle="modal" data-bs-target="#createRequestModalCenter">
+                New
+            </button>
+        </div>
+        <div>
+            <ul id="requests" class="list-group list-group-flush mt-2">
+                @foreach (var req in Model.Requests)
+                {
+                    <li id="request-@req.Id" class="list-group-item p-1">
+                        <div class="row">
+                            <div class="col" onclick="openRequest(@req.Id)">
+                                <span class="text-base fw-light text-slate-700">@req.Name</span>
+                                <div>
+                                    <small class="badge rounded-pill py-1 fw-normal text-white me-1 bg-sky-400"
+                                    style="width: 50px;">@req.Method</small>
+                                    <small class="text-muted">/@req.Path</small>
+                                </div>
+                            </div>
+                            <div class="p-0" style="width: 40px;">
+                                @* <button class="btn btn-sm" onclick="showMenu(@req.Id)"></button> *@
+                                <div class="dropdown">
+                                    <button class="btn btn-sm" type="button" id="dropdownMenuButton1"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span>...</span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                        <li><a class="dropdown-item" href="#">Action</a></li>
+                                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                                        <li><a class="dropdown-item" href="#">Delete</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
     </div>
-    <div class="col-9" id="RequestOpen">
+    <div class="col-6" id="RequestOpen">
 
     </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="createRequestModalCenter" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div id="createRequestModalContent" class="modal-content">
+
+        </div>
+    </div>
+</div>
 <script>
+    function showMenu(id) {
+
+    }
     function deleteRequest(id) {
         if (confirm('delete request ' + id + '?')) {
             $.ajax({
@@ -34,4 +70,22 @@
             });
         }
     }
+
+    function getCreateRequestPartial() {
+        $.ajax({
+            async: false,
+            type: 'GET',
+            url: '@Url.Action(nameof(RequestsController.GetCreatePartial), "Requests", new {projectName = "app-1"})',
+            success: function (data) {
+                $('#createRequestModalContent').html(data);
+            }
+        })
+    }
+    function openRequest(id) {
+        var selected = $('#request-' + id);
+        selected.parent().find('li').removeClass('bg-slate-200');
+        selected.addClass('bg-slate-200');
+        $('#RequestOpen').load('/Projects/@ViewData["ProjectName"]/Requests/' + id);
+    }
+    let paramNo = 0;
 </script>

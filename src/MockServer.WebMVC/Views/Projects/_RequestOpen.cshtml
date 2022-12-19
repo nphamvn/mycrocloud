@@ -1,59 +1,197 @@
 @using MockServer.WebMVC.Controllers;
 @model MockServer.WebMVC.Models.Project.RequestOpenViewModel
-<div class="row">
-    <div class="col">
-        <p>@Model.Name</p>
-        <a
-            href="@Url.Action(nameof(RequestsController.Config), "Requests", new {projectName = Model.ProjectName, id = Model.Id})">Config
-        </a>
+<style type="text/css" media="screen">
+    #editor {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+</style>
+<div class="overflow-scroll" style="height: 300px">
+    <div class="mb-1">
+        <strong class="fw-bolder">@Model.Name</strong>
+    </div>
+    <div class="mb-2">
+        <small>The first request</small>
+    </div>
+    <div class="mb-2">
+        <strong class="me-2 @Model.MethodTextColor" id="method">@Model.Method</strong>
+        <span id="path">@Model.Path</span>
+    </div>
+    <div class="input-group mb-3">
+        <input id="privateKey" type="text" class="form-control" value="@Model.Url" readonly>
+        <button id="btnCopyPrivateKeyToClipboard" type="button" class="input-group-text">
+            <i class="bi bi-clipboard">
+            </i></button>
+    </div>
+    <div>
+        <h5>Fixed request</h5>
         <div>
-            <div class=" d-flex">
-                <p class="mr-auto"><span id="method">@Model.Method</span> <span id="url">@Model.Url</span></p>
-                <button class="btn btn-primary ml-auto" onclick="sendRequest()">Send</button>
-            </div>
-            <div>
-                <ul class="nav nav-tabs">
-                    <li class="nav-item">
-                        <a href="#photo1" class="nav-link active" data-bs-toggle="tab">Params</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#photo2" class="nav-link" data-bs-toggle="tab">Headers</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#photo3" class="nav-link" data-bs-toggle="tab">Body</a>
-                    </li>
-                </ul>
+            <h6>Request</h6>
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a href="#photo1" class="nav-link active py-1" data-bs-toggle="tab">Params</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#photo2" class="nav-link py-1" data-bs-toggle="tab">Headers</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#photo3" class="nav-link py-1" data-bs-toggle="tab">Body</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div id="photo1" class="tab-pane active p-2">
+                    <table class="table table-sm p-0 m-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 35%" scope="col">Key</th>
+                                <th style="width: 35%" scope="col">Value</th>
+                                <th style="width: 10%" scope="col">Required</th>
+                                <th style="width: 10%" scope="col">Exactly</th>
+                                <th style="width: 10%" scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var param in Model.Params)
+                            {
+                                <tr>
+                                    <td class="align-middle"><input type="text" class="form-control form-control-sm"
+                                        value="@param.Key">
+                                    </td>
+                                    <td class="align-middle"><input type="text" class="form-control form-control-sm"
+                                        value="@param.Value">
+                                    </td>
+                                    <td class="align-middle"><input type="checkbox" class="form-check-input"
+                                        @(param.Required?"checked":"")>
+                                    </td>
+                                    <td class="align-middle"><input type="checkbox" class="form-check-input"
+                                        @(param.Exactly?"checked":"")>
+                                    </td>
+                                    <td class="align-middle"><button class="btn"><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div id="photo2" class="tab-pane p-2">
+                    <table class="table table-sm p-0 m-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 35%" scope="col">Header</th>
+                                <th style="width: 35%" scope="col">Value</th>
+                                <th style="width: 10%" scope="col">Required</th>
+                                <th style="width: 10%" scope="col">Exactly</th>
+                                <th style="width: 10%" scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var header in Model.Headers)
+                            {
+                                <tr>
+                                    <td class="align-middle"><input type="text" class="form-control form-control-sm"
+                                        value="@header.Name">
+                                    </td>
+                                    <td class="align-middle"><input type="text" class="form-control form-control-sm"
+                                        value="@header.Value">
+                                    </td>
+                                    <td class="align-middle"><input type="checkbox" class="form-check-input"
+                                        @(header.Required?"checked":"")>
+                                    </td>
+                                    <td class="align-middle"><input type="checkbox" class="form-check-input"
+                                        @(header.Exactly?"checked":"")>
+                                    </td>
+                                    <td class="align-middle"><button class="btn"><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div id="photo3" class="tab-pane p-2">
+                    <div class="px-2 mt-1">
+                        <div class="d-flex input-group mb-2">
+                            <div class="form-check me-5">
+                                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    Required
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Exactly
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="d-flex">
 
-                <!-- 写真部分 -->
-                <div class="tab-content">
-                    <div id="photo1" class="tab-pane active">
-                        <div class="w-50 p-2">
-                            <ul id="params" class="my-2" style="list-style: none;padding: 0">
-                            </ul>
-                            <button class="btn btn-primary btn-sm" onclick="addParam()"><i
-                                    class="bi bi-plus"></i></button>
+                                <select class="form-select form-select-sm w-auto mb-1">
+                                    <option value="1" selected>JSON</option>
+                                    <option value="2">XML</option>
+                                    <option value="3">Text</option>
+                                </select>
+                                <div class="ms-auto">
+                                    <button class="btn btn-sm btn-link text-decoration-none">Format</button>
+                                </div>
+                            </div>
+                            <div class="position-relative" style="min-height: 150px;">
+                                <div id="editor"></div>
+                            </div>
                         </div>
                     </div>
-                    <div id="photo2" class="tab-pane mb-2">
-                        <p>Headers</p>
-                    </div>
-                    <div id="photo3" class="tab-pane">
-                        <p>Body</p>
+                </div>
+                <div id="photo3" class="tab-pane p-2">
+                    <div class="px-2 mt-1">
+                        <div class="d-flex input-group mb-2">
+                            <div class="form-check me-5">
+                                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    Required
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Exactly
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="d-flex">
+
+                                <select class="form-select form-select-sm w-auto mb-1">
+                                    <option value="1" selected>JSON</option>
+                                    <option value="2">XML</option>
+                                    <option value="3">Text</option>
+                                </select>
+                                <div class="ms-auto">
+                                    <button class="btn btn-sm btn-link text-decoration-none">Format</button>
+                                </div>
+                            </div>
+                            <div class="position-relative" style="min-height: 150px;">
+                                <div id="editor"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="col">
-        Response
+        <div>
+            <h6>Response</h6>
+        </div>
     </div>
 </div>
-
-
 <script>
-    let paramNo = 0;
-    function sendRequest() {
+    var editor = ace.edit("editor");
+    editor.session.setMode("ace/mode/json");
+</script>
+<script>
 
+    function sendRequest() {
         var headers = [];
 
         $('#params li').each(function () {
@@ -126,59 +264,4 @@
     function deleteParam(paramNo) {
         $('#params ' + '#param' + paramNo).remove();
     }
-</script>
-<script>
-    class RequestParamElement extends HTMLElement {
-        delButton = document.createElement('button');
-        keyInput = document.createElement('input');
-        valueInput = document.createElement('input');
-        var div = document.createElement('div');
-    constructor() {
-        super();
-        //var div = document.createElement('div');
-        div.className = 'row';
-        div.innerHTML = 'This is a div';
-        @* var delIcon = document.createElement('i');
-                delIcon.classList.add('bi', 'bi-trash');
-                delButton.append(delIcon);
-                //delButton.onclick = deleteParam(paramNo);
-                delButton.setAttribute('onclick', 'deleteParam(' + paramNo + ')');
-                delButton.classList.add('btn', 'btn-secondary', 'btn-sm');
-                var delButtonDiv = document.createElement('div');
-                delButtonDiv.className = 'col';
-                delButtonDiv.appendChild(delButton);
-
-                var keyDiv = document.createElement('div');
-                keyDiv.className = 'col';
-
-                keyInput.id = 'param' + paramNo + '-key';
-                keyInput.type = 'text';
-                keyInput.classList.add('form-control', 'form-control-sm');
-                keyInput.name = 'param' + paramNo + '-key';
-                keyInput.placeholder = 'Key';
-                keyDiv.appendChild(keyInput);
-
-                var valueDiv = document.createElement('div');
-                valueDiv.className = 'col';
-
-                valueInput.id = 'param' + paramNo + '-value';
-                valueInput.type = 'text';
-                valueInput.classList.add('form-control', 'form-control-sm');
-                valueInput.name = 'param' + paramNo + '-value';
-                valueInput.placeholder = 'Value';
-                valueDiv.appendChild(valueInput);
-
-                div.appendChild(keyDiv);
-                div.appendChild(valueDiv);
-                div.appendChild(delButtonDiv); *@
-
-            this.attachShadow({ mode: 'open' })
-                .appendChild(div);
-    }
-    connectedCallback() {
-        this.d
-        console.log(this.getAttribute('paramNo'));
-    }
-    }
-    customElements.define('request-param', RequestParamElement);
 </script>
