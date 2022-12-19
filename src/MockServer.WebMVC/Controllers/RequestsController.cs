@@ -74,9 +74,9 @@ public class RequestsController : Controller
 
     [AjaxOnly]
     [HttpGet("/create")]
-    public async Task<IActionResult> GetCreatePartial()
+    public async Task<IActionResult> GetCreatePartial(string projectName)
     {
-        ViewData["ProjectName"] = "projectName";
+        ViewData["ProjectName"] = projectName;
         return PartialView("Views/Requests/_CreateRequestPartial.cshtml");
     }
 }

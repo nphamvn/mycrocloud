@@ -1,3 +1,5 @@
+using MockServer.Core.Entities.Projects;
+
 namespace MockServer.Core.Entities;
 
 public class AppUser : BaseEntity

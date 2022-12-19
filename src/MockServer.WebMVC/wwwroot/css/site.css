@@ -15,6 +15,7 @@ html {
 
 body {
   margin-bottom: 60px;
+  height: 100%;
 }
 
 /* Style the tab */
@@ -75,6 +76,10 @@ body {
   background-color: rgb(56 189 248);
 }
 
+.bg-gray {
+  background-color: rgb(237 233 254);;
+}
+
 .text-slate-700 {
   color: rgb(51 65 85);
 }
@@ -125,4 +130,51 @@ body {
 
 .text-green {
   color: rgb(34 197 94);
+}
+
+.text-gray {
+  color: rgb(107 114 128);
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.border-gray {
+  border-color: rgb(107 114 128);
+}
+
+.text-lg {
+  font-size: 1.125rem;
+    /* 18px */
+    line-height: 1.75rem;
+    /* 28px */
+}
+
+.text-xl {
+  font-size: 1.5rem;
+    /* 24px */
+  line-height: 2rem;
+    /* 32px */
+}
+
+.text-sm {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.25rem; /* 20px */
+}
+
+.nav-tabs .nav-link {
+  color: black;
+}
+.nav-tabs .nav-link.active {
+  border-bottom: 2px solid rgb(124 58 237);
+}
+
+.btn-show-on-hover:hover {
+  color: rgb(239 68 68);
+}
+
+.request-container {
+  position: relative;
 }

@@ -34,6 +34,13 @@ public class RequestOpenViewModel
             Value = "1",
             Required = true,
             Exactly = true
+        },
+        new RequestParam {
+            Id = 2,
+            Key = "sort",
+            Value = "name",
+            Required = true,
+            Exactly = true
         }
     };
     public IEnumerable<RequestHeader> Headers { get; set; } = new List<RequestHeader>

@@ -1,11 +1,8 @@
-﻿using System;
-namespace MockServer.Core.Entities
+﻿namespace MockServer.Core.Entities.Requests;
+public class ForwardingRequest : BaseEntity
 {
-    public class ForwardingRequest : BaseEntity
-    {
-        public int RequestId { get; set; }
-        public string Scheme { get; set; }
-        public string Host { get; set; }
-    }
+    public int RequestId { get; set; }
+    public string Scheme { get; set; }
+    public string Host { get; set; }
 }
 

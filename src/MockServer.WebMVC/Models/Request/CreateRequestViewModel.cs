@@ -17,4 +17,5 @@ public class CreateRequestViewModel
     [StringLength(50, ErrorMessage = "Name length can't be more than 8.")]
     public string Path { get; set; }
     public RequestMethod Method { get; set; }
+    public string Description { get; set; }
 }

@@ -7,6 +7,6 @@ public class RequestProfile : Profile
 {
     public RequestProfile()
     {
-        CreateMap<MockServer.Core.Entities.Request, AppRequest>();
+        CreateMap<MockServer.Core.Entities.Requests.Request, AppRequest>();
     }
 }

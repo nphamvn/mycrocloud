@@ -1,4 +1,4 @@
-namespace MockServer.Core;
+namespace MockServer.Core.Entities;
 
 public class BaseEntity
 {

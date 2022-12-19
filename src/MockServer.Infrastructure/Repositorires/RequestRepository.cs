@@ -1,10 +1,9 @@
 using Dapper;
 using Microsoft.Data.Sqlite;
-using MockServer.Core.Entities;
+using MockServer.Core.Entities.Requests;
 using MockServer.Core.Enums;
 using MockServer.Core.Repositories;
 using MockServer.Core.Settings;
-
 namespace MockServer.Infrastructure.Repositories;
 
 public class RequestRepository : IRequestRepository
@@ -22,21 +21,23 @@ public class RequestRepository : IRequestRepository
                 INSERT INTO 
                     Requests 
                     (
-                         ProjectId,
-                         Type,
-                         Name,
-                         Method,
-                         Path
+                        ProjectId,
+                        Type,
+                        Name,
+                        Method,
+                        Path,
+                        Description
                      )
                      VALUES (
-                         (SELECT Id
+                        (SELECT Id
                           FROM Project
                           WHERE UserId = @UserId AND 
                             Name = @ProjectName),
-                         @Type,
-                         @Name,
-                         @Method,
-                         @Path
+                        @Type,
+                        @Name,
+                        @Method,
+                        @Path,
+                        @Description
                      );
                     SELECT last_insert_rowid();
                 """;
@@ -49,7 +50,8 @@ public class RequestRepository : IRequestRepository
             Type = (int)request.Type,
             Name = request.Name,
             Method = (int)request.Method,
-            Path = request.Path
+            Path = request.Path,
+            Description = request.Description
         });
     }
 
@@ -77,6 +79,7 @@ public class RequestRepository : IRequestRepository
                     r.Type,
                     r.Name,
                     r.Path,
+                    r.Description,
                     m.UpperCaseName AS Method,
                     r.ProjectId
                 FROM Requests r
@@ -111,6 +114,7 @@ public class RequestRepository : IRequestRepository
                     r.Type,
                     r.Name,
                     r.Path,
+                    r.r.Description,
                     m.Id,
                     r.ProjectId
                 FROM Requests r

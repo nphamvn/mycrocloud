@@ -12,7 +12,7 @@ public class AjaxResult
         => Errors.Count == 0;
     public void AddError(string message)
     {
-        Errors.Add(new (message));
+        Errors.Add(new(message));
     }
 }
 public class AjaxResult<T> : AjaxResult where T : class
@@ -24,7 +24,7 @@ public class Error
 {
     public Error()
     {
-        
+
     }
     public Error(string errorMessage)
     {

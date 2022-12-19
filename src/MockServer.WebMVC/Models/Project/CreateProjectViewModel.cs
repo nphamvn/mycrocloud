@@ -11,7 +11,7 @@ public class CreateProjectViewModel
 {
     [Display(Name = "Name")]
     [Required(ErrorMessage = "Please enter the project name.")]
-    [RegularExpression(@"^[a-zA-Z''-']{1,40}$", ErrorMessage = "Characters are not allowed.")]
+    //[RegularExpression(@"^[a-zA-Z''-']{1,40}$", ErrorMessage = "Characters are not allowed.")]
     public string Name { get; set; }
     public ProjectAccessibility Accessibility { get; set; }
     public string Description { get; set; }

@@ -7,18 +7,22 @@ namespace MockServer.WebMVC.Controllers.Api;
 public class TestController : ApiController
 {
     [HttpGet("ok")]
-    public IActionResult GetOk() {
-        return Ok(new AjaxResult<Foo> {
-            Data = new Foo {Bar = 1312}
+    public IActionResult GetOk()
+    {
+        return Ok(new AjaxResult<Foo>
+        {
+            Data = new Foo { Bar = 1312 }
         });
     }
     [HttpGet("error")]
-    public IActionResult GetErro() {
+    public IActionResult GetErro()
+    {
         AjaxResult result = new();
         result.AddError("something went wrong");
         return BadRequest(result);
     }
 }
-public class Foo {
+public class Foo
+{
     public int Bar { get; set; }
 }

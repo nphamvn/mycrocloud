@@ -1,9 +1,7 @@
 ﻿using System;
-namespace MockServer.Core.Entities
+namespace MockServer.Core.Entities.Requests;
+public class CallbackRequest
 {
-    public class CallbackRequest
-    {
 
-    }
 }
 

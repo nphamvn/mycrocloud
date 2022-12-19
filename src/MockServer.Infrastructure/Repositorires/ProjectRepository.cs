@@ -1,6 +1,6 @@
 using Dapper;
 using Microsoft.Data.Sqlite;
-using MockServer.Core.Entities;
+using MockServer.Core.Entities.Projects;
 using MockServer.Core.Repositories;
 using MockServer.Core.Settings;
 
@@ -22,13 +22,15 @@ public class ProjectRepository : IProjectRepository
                         UserId,
                         Name,
                         Description,
-                        Accessibility
+                        Accessibility,
+                        CreatedAt
                     )
                     VALUES (
                         @UserId,
                         @Name,
                         @Description,
-                        @Accessibility
+                        @Accessibility,
+                        datetime('now','localtime')
                     );
                 """;
         using var connection = new SqliteConnection(_connectionString);
@@ -96,23 +98,49 @@ public class ProjectRepository : IProjectRepository
         });
     }
 
-    public async Task<IEnumerable<Project>> GetByUserId(int userId)
+    public async Task<IEnumerable<Project>> GetByUserId(int userId, string query, int accessibility, string sort)
     {
-        var query =
+        var sql =
                 """
                 SELECT Id,
                     Name,
                     Description,
                     Accessibility,
-                    PrivateKey
+                    PrivateKey,
+                    CreatedAt,
+                    UpdatedAt
                 FROM Project
-                WHERE UserId = @UserId;
+                WHERE UserId = @UserId
                 """;
+        List<string> conditions = new();
+        if (!string.IsNullOrEmpty(query))
+        {
+            conditions.Add("Name LIKE @Query OR Description LIKE @Query");
+        }
+        if (accessibility != 0)
+        {
+            conditions.Add("Accessibility = @Accessibility");
+        }
+        if (conditions.Count > 0)
+        {
+            sql += " AND " + string.Join(" AND ", conditions);
+        }
+
+        if (!string.IsNullOrEmpty(sort))
+        {
+            sql += " ORDER BY " + sort;
+        }
+        else
+        {
+            sql += " ORDER BY UpdatedAt DESC";
+        }
 
         using var connection = new SqliteConnection(_connectionString);
-        return await connection.QueryAsync<Project>(query, new
+        return await connection.QueryAsync<Project>(sql, new
         {
-            UserId = userId
+            UserId = userId,
+            Query = "%" + query + "%",
+            Accessibility = accessibility
         });
     }
 
@@ -125,7 +153,8 @@ public class ProjectRepository : IProjectRepository
                     Name = @Name,
                     Description = @Description,
                     Accessibility = @Accessibility,
-                    PrivateKey = @PrivateKey
+                    PrivateKey = @PrivateKey,
+                    UpdatedAt = datetime('now','localtime')
                 WHERE Id = @Id;
                 """;
         using var connection = new SqliteConnection(_connectionString);

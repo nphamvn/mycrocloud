@@ -1,36 +1,40 @@
 @using MockServer.Core.Models
+@using MockServer.WebMVC.Controllers
 @using MockServer.WebMVC.Extentions
 @model MockServer.WebMVC.Models.Project.ProjectViewViewModel
 @{
     ViewData["Title"] = Model.ProjectInfo.Name;
     ViewData["ProjectName"] = Model.ProjectInfo.Name;
 }
-<div class="my-2">
+<div class="mb-2">
     <span><a class="text-decoration-none"
             href="@Url.Action("Index", "Home")">@(User.Parse<ApplicationUser>().Username)</a></span>
     <span>/</span>
     <strong><a class="text-decoration-none"
             href="@Url.Action("View", new {name=Model.ProjectInfo.Name})">@Model.ProjectInfo.Name</a></strong>
     <span
-        class="badge rounded-pill bg-light py-1 fs-6 fw-normal text-dark border border-secondary">@Model.ProjectInfo.Accessibility</span>
+        class="badge py-0 rounded-pill bg-light text-sm fw-bolder text-gray border border-secondary">@Model.ProjectInfo.Accessibility</span>
 </div>
 
-<div class="h-100">
-    <ul class="nav nav-tabs">
-        <li class="nav-item">
-            <button id="defaultOpen" class="nav-link py-1" onclick="openTab(event, 'Requests')">Requests</button>
+<div style="height: calc(100vh - 180px);">
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button id="default-tab" class="nav-link active py-1" data-bs-toggle="tab" data-bs-target="#requests-tab"
+                type="button" role="tab">Requests</button>
         </li>
-        <li class="nav-item">
-            <button class="nav-link py-1" onclick="openTab(event, 'Settings')">Settings</button>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link py-1" data-bs-toggle="tab" data-bs-target="#settings-tab" type="button"
+                role="tab">Settings</button>
         </li>
     </ul>
     <!-- Tab content -->
-    <div style="height: calc(100vh - 230px);" id="Requests" class="tabcontent p-1">
-        <partial name="_RequestsPartial" model="Model" />
-    </div>
-
-    <div style="height: calc(100vh - 230px);" id="Settings" class="tabcontent">
-        <partial name="_SettingsPartial" model="Model.ProjectInfo" />
+    <div class="tab-content h-100">
+        <div id="requests-tab" class="tab-pane fade show active h-100">
+            <partial name="_RequestsPartial" model="Model" />
+        </div>
+        <div id="settings-tab" class="tab-pane fade h-100">
+            <partial name="_SettingsPartial" model="Model.ProjectInfo" />
+        </div>
     </div>
 </div>
 
@@ -40,93 +44,4 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.14.0/ace.js"
     integrity="sha512-WYlXqL7GPpZL2ImDErTX0RMKy5hR17vGW5yY04p9Z+YhYFJcUUFRT31N29euNB4sLNNf/s0XQXZfzg3uKSoOdA=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script>
-    document.getElementById("defaultOpen").click();
-    function openTab(evt, tabName) {
-        // Declare all variables
-        var i, tabcontent, tablinks;
-
-        // Get all elements with class="tabcontent" and hide them
-        tabcontent = document.getElementsByClassName("tabcontent");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-        }
-
-        // Get all elements with class="tablinks" and remove the class "active"
-        tablinks = document.getElementsByClassName("nav-link");
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].className = tablinks[i].className.replace(" active", "");
-        }
-
-        // Show the current tab, and add an "active" class to the button that opened the tab
-        document.getElementById(tabName).style.display = "block";
-        evt.currentTarget.className += " active";
-    }
-    class RequestParamElement extends HTMLElement {
-        delButton = document.createElement('button');
-        keyInput = document.createElement('input');
-        valueInput = document.createElement('input');
-        div = document.createElement('div');
-        constructor() {
-            super();
-            //var div = document.createElement('div');
-            div.className = 'row';
-            div.innerHTML = 'This is a div';
-            @* var delIcon = document.createElement('i');
-                    delIcon.classList.add('bi', 'bi-trash');
-                    delButton.append(delIcon);
-                    //delButton.onclick = deleteParam(paramNo);
-                    delButton.setAttribute('onclick', 'deleteParam(' + paramNo + ')');
-                    delButton.classList.add('btn', 'btn-secondary', 'btn-sm');
-                    var delButtonDiv = document.createElement('div');
-                    delButtonDiv.className = 'col';
-                    delButtonDiv.appendChild(delButton);
-
-                    var keyDiv = document.createElement('div');
-                    keyDiv.className = 'col';
-
-                    keyInput.id = 'param' + paramNo + '-key';
-                    keyInput.type = 'text';
-                    keyInput.classList.add('form-control', 'form-control-sm');
-                    keyInput.name = 'param' + paramNo + '-key';
-                    keyInput.placeholder = 'Key';
-                    keyDiv.appendChild(keyInput);
-
-                    var valueDiv = document.createElement('div');
-                    valueDiv.className = 'col';
-
-                    valueInput.id = 'param' + paramNo + '-value';
-                    valueInput.type = 'text';
-                    valueInput.classList.add('form-control', 'form-control-sm');
-                    valueInput.name = 'param' + paramNo + '-value';
-                    valueInput.placeholder = 'Value';
-                    valueDiv.appendChild(valueInput);
-
-                    div.appendChild(keyDiv);
-                    div.appendChild(valueDiv);
-                    div.appendChild(delButtonDiv); *@
-
-                this.attachShadow({ mode: 'open' })
-                    .appendChild(div);
-        }
-        connectedCallback() {
-            this.d
-            console.log(this.getAttribute('paramNo'));
-        }
-    }
-    customElements.define('request-param', RequestParamElement);
-</script>
-<script>
-    $("#btnCopyPrivateKeyToClipboard").click(function () {
-        var key = $('#privateKey').val();
-        navigator.clipboard.writeText(key)
-            .then(() => {
-                $("#btnCopyPrivateKeyToClipboard i").addClass('bi-clipboard-check')
-                    .addClass('text-info')
-                    .removeClass('bi-clipboard');
-            }).catch((e) => {
-                alert('error: ' + e.message);
-            });
-    });
-</script>
 }

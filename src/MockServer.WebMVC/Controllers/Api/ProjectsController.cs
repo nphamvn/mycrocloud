@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using MockServer.WebMVC.Models.Common;
+using MockServer.WebMVC.Models.Project;
 using MockServer.WebMVC.Services.Interfaces;
 
 namespace MockServer.WebMVC.Controllers.Api;
@@ -11,11 +13,4 @@ public class ProjectsController : ApiController
     {
         _projectService = projectService;
     }
-
-    // [HttpPost("rename")]
-    // public async Task<IActionResult> Rename(string name, string newName)
-    // {
-    //     await _projectService.Rename(name, newName);
-    //     return Ok();
-    // }
 }

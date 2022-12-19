@@ -1,5 +1,6 @@
 using Ardalis.GuardClauses;
 using AutoMapper;
+using MockServer.Core.Enums;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Models;
 using MockServer.Core.Repositories;
@@ -41,7 +42,7 @@ public class ProjectService : IProjectService
         {
             return false;
         }
-        var mapped = _mapper.Map<Core.Entities.Project>(project);
+        var mapped = _mapper.Map<Core.Entities.Projects.Project>(project);
         mapped.UserId = user.Id;
         await projectRepository.Add(mapped);
         return true;
@@ -71,12 +72,12 @@ public class ProjectService : IProjectService
         return key;
     }
 
-    public async Task<ProjectIndexViewModel> GetIndexViewModel()
+    public async Task<ProjectIndexViewModel> GetIndexViewModel(ProjectSearchModel searchModel)
     {
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
-
-        var projects = await projectRepository.GetByUserId(user.Id);
+        Enum.TryParse<ProjectAccessibility>(searchModel.Accessibility, out ProjectAccessibility accessibility);
+        var projects = await projectRepository.GetByUserId(user.Id, searchModel.Query, (int)accessibility, searchModel.Sort);
 
         var vm = new ProjectIndexViewModel();
         vm.Projects = projects.Select(p => new ProjectIndexItem
@@ -84,7 +85,9 @@ public class ProjectService : IProjectService
             Id = p.Id,
             Name = p.Name,
             Description = p.Description,
-            Accessibility = p.Accessibility
+            Accessibility = p.Accessibility,
+            CreatedAt = p.CreatedAt,
+            UpdatedAt = p.UpdatedAt
         }).ToList();
         return vm;
     }
@@ -122,6 +125,18 @@ public class ProjectService : IProjectService
         if (project != null)
         {
             project.Name = newName;
+            await projectRepository.Update(project);
+        }
+    }
+
+    public async Task SetAccessibility(string name, ProjectAccessibility accessibility)
+    {
+        var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
+        Guard.Against.Null(user, nameof(ApplicationUser));
+        var project = await projectRepository.Find(user.Id, name);
+        if (project != null)
+        {
+            project.Accessibility = accessibility;
             await projectRepository.Update(project);
         }
     }

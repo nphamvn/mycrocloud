@@ -1,4 +1,5 @@
 using MockServer.Core.Entities;
+using MockServer.Core.Entities.Requests;
 using MockServer.Core.Enums;
 
 namespace MockServer.Core.Repositories;

@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
-using MockServer.Core.Entities;
+using MockServer.Core.Entities.Projects;
 using MockServer.WebMVC.Models.Project;
 
 namespace MockServer.WebMVC.Profiles;

@@ -1,18 +1,18 @@
 @using MockServer.WebMVC.Controllers
 @model MockServer.WebMVC.Models.Project.ProjectViewViewModel
-<div class="row p-2">
-    <div class="col-3">
+<div class="row h-100 p-2">
+    <div class="col-3 h-100 overflow-scroll">
         <div class="d-grid gap-2">
             <button type="button" onclick="getCreateRequestPartial()" class="btn btn-sm bg-violet-500 text-white"
                 data-bs-toggle="modal" data-bs-target="#createRequestModalCenter">
                 New
             </button>
         </div>
-        <div>
+        <div class="request-container">
             <ul id="requests" class="list-group list-group-flush mt-2">
                 @foreach (var req in Model.Requests)
                 {
-                    <li id="request-@req.Id" class="list-group-item p-1">
+                    <li data-request-id="@req.Id" id="request-@req.Id" class="list-group-item p-1 rounded">
                         <div class="row">
                             <div class="col" onclick="openRequest(@req.Id)">
                                 <span class="text-base fw-light text-slate-700">@req.Name</span>
@@ -23,18 +23,9 @@
                                 </div>
                             </div>
                             <div class="p-0" style="width: 40px;">
-                                @* <button class="btn btn-sm" onclick="showMenu(@req.Id)"></button> *@
-                                <div class="dropdown">
-                                    <button class="btn btn-sm" type="button" id="dropdownMenuButton1"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span>...</span>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                        <li><a class="dropdown-item" href="#">Action</a></li>
-                                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                                        <li><a class="dropdown-item" href="#">Delete</a></li>
-                                    </ul>
-                                </div>
+                                <button class="btn btn-sm btn-context-menu" type="button">
+                                    <span>...</span>
+                                </button>
                             </div>
                         </div>
                     </li>
@@ -42,8 +33,7 @@
             </ul>
         </div>
     </div>
-    <div class="col-6" id="RequestOpen">
-
+    <div class="col-9 h-100" id="RequestOpen">
     </div>
 </div>
 <!-- Modal -->
@@ -55,10 +45,82 @@
         </div>
     </div>
 </div>
-<script>
-    function showMenu(id) {
+<template id="context-menu">
+    <style>
+        .context-menu-container {
+            position: absolute;
+        }
+    </style>
+    <div class="context-menu-container" name="test">
+        <div class="btn-group-vertical" role="group">
+            <button name="btnDelete" type="button" class="btn btn-default text-danger">Delete</button>
+        </div>
+    </div>
+</template>
 
+<!-- Modal -->
+<template id="requestDeleteConfirmModalTemplate">
+    <div class="modal fade" id="requestDeleteConfirmModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Delete confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are your sure want to delete request?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    const documentClickHandler = function (e) {
+        const menu = document.querySelector('.context-menu-container');
+        const button = document.querySelectorAll('#requests .btn-context-menu');
+        let buttonClicked = false;
+        button.forEach(b => {
+            if (b.contains(e.target)) {
+                buttonClicked = true;
+            }
+        });
+        const isClickedOutside = !menu.contains(e.target) && !buttonClicked;
+        if (isClickedOutside) {
+            //Remove the menu
+            $('.context-menu-container').remove();
+            // Remove the event handler
+            $(document).off('click', documentClickHandler);
+        }
     }
+    $(function () {
+        $('#requests .btn-context-menu').click(function (e) {
+            const requestId = $(this).closest('li').data('request-id');
+            var position = $(this).offset();
+            var left = (position.left - $(this).width() - 30) + 'px';
+            var top = (position.top + $(this).height() + 8) + 'px';
+            const template = document.querySelector('#context-menu');
+            const clone = template.content.cloneNode(true);
+            var container = clone.querySelector('.context-menu-container');
+            container.style.left = left;
+            container.style.top = top;
+            const deleteButton = container.querySelector('button[name=btnDelete]');
+            deleteButton.addEventListener("click", function () {
+                const modal = document.querySelector('#requestDeleteConfirmModalTemplate')
+                    .content.cloneNode(true);
+                document.body.append(modal);
+                $("#requestDeleteConfirmModal").modal("show");
+            });
+            $('.request-container').append(container);
+            $(document).click(documentClickHandler);
+        });
+    });
+
     function deleteRequest(id) {
         if (confirm('delete request ' + id + '?')) {
             $.ajax({
@@ -72,20 +134,19 @@
     }
 
     function getCreateRequestPartial() {
-        $.ajax({
+        $.get({
             async: false,
-            type: 'GET',
-            url: '@Url.Action(nameof(RequestsController.GetCreatePartial), "Requests", new {projectName = "app-1"})',
+            url: '@Url.Action(nameof(RequestsController.GetCreatePartial), "Requests", new { projectName = ViewData["ProjectName"]})',
             success: function (data) {
                 $('#createRequestModalContent').html(data);
             }
         })
     }
+
     function openRequest(id) {
         var selected = $('#request-' + id);
-        selected.parent().find('li').removeClass('bg-slate-200');
-        selected.addClass('bg-slate-200');
+        selected.parent().find('li').removeClass('bg-gray');
+        selected.addClass('bg-gray');
         $('#RequestOpen').load('/Projects/@ViewData["ProjectName"]/Requests/' + id);
     }
-    let paramNo = 0;
 </script>

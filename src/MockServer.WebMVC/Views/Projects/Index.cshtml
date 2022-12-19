@@ -1,5 +1,3 @@
-@using MockServer.Core.Models
-@using MockServer.WebMVC.Extentions;
 @using MockServer.WebMVC.Controllers
 @model MockServer.WebMVC.Models.Project.ProjectIndexViewModel;
 @{
@@ -10,31 +8,37 @@
         <h3>@ViewData["Title"]</h3>
         <div class="mt-2">
             <div class="d-flex">
-                <form id="filter" class="flex-grow-1 row" action="">
-                    <div class="col-8">
-                        <input class="form-control" type="text" placeholder="Find a project..." onchange="search()">
-                    </div>
-                    <div class="col-2 dropdown">
-                        <button class="btn border dropdown-toggle" type="button" id="dropdownMenuButton1"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Type
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                            <li><a class="dropdown-item" href="#">All</a></li>
-                            <li><a class="dropdown-item" href="#">Public</a></li>
-                            <li><a class="dropdown-item" href="#">Private</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-2 dropdown">
-                        <button class="btn border dropdown-toggle" type="button" id="dropdownMenuButton1"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Sort
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                            <li><a class="dropdown-item" href="#">A to Z</a></li>
-                            <li><a class="dropdown-item" href="#">Recently created</a></li>
-                            <li><a class="dropdown-item" href="#">Recently updated</a></li>
-                        </ul>
+                <form id="search" class="flex-grow-1 row" action="@Url.Action(nameof(ProjectsController.Index))"
+                    method="get">
+                    <div class="d-flex">
+                        <div class="me-auto w-100">
+                            <input id="query" asp-for="Search.Query" class="form-control" type="text" autocomplete="off"
+                                placeholder="Find a project...">
+                        </div>
+                        <div class="dropdown mx-2">
+                            <input id="accessibility" type="hidden" name="Search.Accessibility" value="">
+                            <button class="btn border dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Accessibility
+                            </button>
+                            <ul id="accessibility_dropdown" class="dropdown-menu">
+                                <li data-accessibility=""><a class="dropdown-item" href="#">All</a></li>
+                                <li data-accessibility="Public"><a class="dropdown-item" href="#">Public</a></li>
+                                <li data-accessibility="Private"><a class="dropdown-item" href="#">Private</a></li>
+                            </ul>
+                        </div>
+                        <div class="dropdown me-2">
+                            <input id="sort" type="hidden" name="Search.Sort" value="">
+                            <button class="btn border dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Sort
+                            </button>
+                            <ul id="sort_dropdown" class="dropdown-menu">
+                                <li data-sort="name"><a class="dropdown-item" href="#">A to Z</a></li>
+                                <li data-sort="createdAt"><a class="dropdown-item" href="#">Recently created</a></li>
+                                <li data-sort="updatedAt"><a class="dropdown-item" href="#">Recently updated</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </form>
                 <div>
@@ -48,12 +52,115 @@
     </div>
 </div>
 @section Scripts {
+<script src="https://unpkg.com/javascript-time-ago@2.5.9/bundle/javascript-time-ago.js"></script>
 <script>
-    function search() {
+    @* TimeAgo.addDefaultLocale({locale: 'en',
+            now: {
+            now: {
+            current: "now",
+            future: "in a moment",
+            past: "just now"
+            }
+            }}); *@
 
-    }
-    $('#filter input').on('change', function () {
-        $(this).closest('form').submit();
+        TimeAgo.addDefaultLocale({
+            locale: 'en',
+            now: {
+                now: {
+                    current: "now",
+                    future: "in a moment",
+                    past: "just now"
+                }
+            },
+            long: {
+                year: {
+                    past: {
+                        one: "{0} year ago",
+                        other: "{0} years ago"
+                    },
+                    future: {
+                        one: "in {0} year",
+                        other: "in {0} years"
+                    }
+                },
+                month: {
+                    past: {
+                        one: "{0} month ago",
+                        other: "{0} months ago"
+                    },
+                    future: {
+                        one: "in {0} month",
+                        other: "in {0} months"
+                    }
+                },
+                day: {
+                    past: {
+                        one: "{0} day ago",
+                        other: "{0} days ago"
+                    },
+                    future: {
+                        one: "in {0} day",
+                        other: "in {0} days"
+                    }
+                },
+                hour: {
+                    past: {
+                        one: "{0} hour ago",
+                        other: "{0} hours ago"
+                    },
+                    future: {
+                        one: "in {0} hour",
+                        other: "in {0} hours"
+                    }
+                },
+                minute: {
+                    past: {
+                        one: "{0} minute ago",
+                        other: "{0} minutes ago"
+                    },
+                    future: {
+                        one: "in {0} minute",
+                        other: "in {0} minutes"
+                    }
+                },
+                second: {
+                    past: {
+                        one: "{0} second ago",
+                        other: "{0} seconds ago"
+                    },
+                    future: {
+                        one: "in {0} minute",
+                        other: "in {0} minutes"
+                    }
+                }
+            }
+        });
+</script>
+<script>
+    $(function () {
+        $('#search #query').keyup(delay(function (e) {
+            $(this).closest('form').submit();
+        }, 500));
+
+        $('#search #accessibility_dropdown li').click(function () {
+            var accessibility = $(this).data('accessibility');
+            if (accessibility !== '') {
+                $('#search #accessibility').val(accessibility);
+            }
+            $(this).closest('form').submit();
+        });
+        $('#search #sort_dropdown li').click(function () {
+            var sort = $(this).data('sort');
+            $('#search #sort').val(sort);
+            $(this).closest('form').submit();
+        });
     });
+    function delay(fn, ms) {
+        let timer = 0
+        return function (...args) {
+            clearTimeout(timer)
+            timer = setTimeout(fn.bind(this, ...args), ms || 0)
+        }
+    }
 </script>
 }

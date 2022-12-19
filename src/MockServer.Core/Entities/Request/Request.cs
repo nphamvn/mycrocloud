@@ -1,7 +1,6 @@
-﻿using System;
-using MockServer.Core.Enums;
-
-namespace MockServer.Core.Entities;
+﻿using MockServer.Core.Enums;
+using MockServer.Core.Entities.Projects;
+namespace MockServer.Core.Entities.Requests;
 public class Request : BaseEntity
 {
     public int Id { get; set; }
@@ -9,6 +8,7 @@ public class Request : BaseEntity
     public RequestType Type { get; set; }
     public string Name { get; set; }
     public string Path { get; set; }
+    public string Description { get; set; }
     public RequestMethod Method { get; set; }
     public Project Project { get; set; }
 }

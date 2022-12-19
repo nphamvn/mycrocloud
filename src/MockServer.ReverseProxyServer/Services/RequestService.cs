@@ -2,7 +2,7 @@ using MockServer.ReverseProxyServer.Interfaces;
 using MockServer.ReverseProxyServer.Models;
 using Dapper;
 using Microsoft.Data.Sqlite;
-using MockServer.Core.Entities;
+using MockServer.Core.Entities.Requests;
 using AutoMapper;
 
 namespace MockServer.ReverseProxyServer.Services;

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using AutoMapper;
 using MockServer.Core.Models;
@@ -34,7 +30,7 @@ public class RequestService : IRequestService
         var existing = await _requestRepository.FindRequest(user.Id, projectName, request.Method, request.Path);
         if (existing == null)
         {
-            var mapped = mapper.Map<Core.Entities.Request>(request);
+            var mapped = mapper.Map<Core.Entities.Requests.Request>(request);
             return await _requestRepository.Create(user.Id, projectName, mapped);
         }
         else
@@ -71,7 +67,7 @@ public class RequestService : IRequestService
     {
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
-        var mapped = mapper.Map<Core.Entities.FixedRequest>(config);
+        var mapped = mapper.Map<Core.Entities.Requests.FixedRequest>(config);
         await _requestRepository.SaveFixedRequestConfig(user.Id, projectname, id, mapped);
     }
 }
