@@ -24,7 +24,7 @@
                             </div>
                             <div class="p-0" style="width: 40px;">
                                 <button class="btn btn-sm btn-context-menu" type="button">
-                                    <span>...</span>
+                                    ...
                                 </button>
                             </div>
                         </div>
@@ -46,12 +46,7 @@
     </div>
 </div>
 <template id="context-menu">
-    <style>
-        .context-menu-container {
-            position: absolute;
-        }
-    </style>
-    <div class="context-menu-container" name="test">
+    <div class="context-menu-container">
         <div class="btn-group-vertical" role="group">
             <button name="btnDelete" type="button" class="btn btn-default text-danger">Delete</button>
         </div>
@@ -73,47 +68,56 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger">Delete</button>
+                    <button name="btnDelete" type="button" class="btn btn-danger">Delete</button>
                 </div>
             </div>
         </div>
     </div>
 </template>
-
 <script>
     const documentClickHandler = function (e) {
-        const menu = document.querySelector('.context-menu-container');
-        const button = document.querySelectorAll('#requests .btn-context-menu');
-        let buttonClicked = false;
-        button.forEach(b => {
-            if (b.contains(e.target)) {
-                buttonClicked = true;
-            }
-        });
-        const isClickedOutside = !menu.contains(e.target) && !buttonClicked;
-        if (isClickedOutside) {
-            //Remove the menu
-            $('.context-menu-container').remove();
+        const menu = $('.context-menu-container');
+        const button = $('.btn-clicked');
+        // Check if the target of the click event is the context menu or one of its children
+        if (e.target !== menu[0] && !menu.has(e.target).length && !$(e.target).is(button)) {
+            button.removeClass('btn-clicked');
             // Remove the event handler
             $(document).off('click', documentClickHandler);
+            //Remove the menu
+            menu.remove();
         }
     }
     $(function () {
         $('#requests .btn-context-menu').click(function (e) {
+            $('.btn-clicked').removeClass('btn-clicked');
+            $(document).off('click', documentClickHandler);
+            $('.context-menu-container').remove();
+
             const requestId = $(this).closest('li').data('request-id');
+            $(this).addClass('btn-clicked');
             var position = $(this).offset();
-            var left = (position.left - $(this).width() - 30) + 'px';
-            var top = (position.top + $(this).height() + 8) + 'px';
             const template = document.querySelector('#context-menu');
-            const clone = template.content.cloneNode(true);
-            var container = clone.querySelector('.context-menu-container');
-            container.style.left = left;
-            container.style.top = top;
-            const deleteButton = container.querySelector('button[name=btnDelete]');
-            deleteButton.addEventListener("click", function () {
+            const instance = template.content.cloneNode(true);
+            var container = $('.context-menu-container', instance);
+            console.log('position.left: ' + position.left);
+            console.log('container.width: ' + container.width());
+            console.log('container.outerWidth: ' + container.outerWidth());
+            console.log('container.innerHeight: ' + container.innerHeight());
+            console.log('button.outerWidth: ' + $(this).outerWidth());
+            var left = (position.left - 70 + $(this).outerWidth()) + 'px';
+            var top = (position.top + $(this).outerHeight()) + 'px';
+            container.css({
+                'left': left,
+                'top': top
+            });
+            const deleteButton = $('button[name=btnDelete]', container);
+            deleteButton.click(function () {
                 const modal = document.querySelector('#requestDeleteConfirmModalTemplate')
                     .content.cloneNode(true);
-                document.body.append(modal);
+                $('body').append(modal);
+                $("#requestDeleteConfirmModal button[name=btnDelete]").click(function () {
+                    location.reload();
+                });
                 $("#requestDeleteConfirmModal").modal("show");
             });
             $('.request-container').append(container);

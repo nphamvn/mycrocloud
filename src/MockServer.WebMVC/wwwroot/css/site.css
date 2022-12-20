@@ -174,7 +174,7 @@ body {
 .btn-show-on-hover:hover {
   color: rgb(239 68 68);
 }
-
-.request-container {
-  position: relative;
+.context-menu-container {
+  position: absolute;
+  width: 70px;
 }
