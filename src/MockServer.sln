@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Web", "MockServe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.ReverseProxyServer", "MockServer.ReverseProxyServer\MockServer.ReverseProxyServer.csproj", "{13D6A2C2-FB19-4898-AAA7-C88C51A208FE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer", "MockServer\MockServer.csproj", "{2E79848D-A212-4E44-9AB7-740496656F1F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Core", "MockServer.Core\MockServer.Core.csproj", "{883671FE-3C30-4ECA-9882-ACCF237138E7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Infrastructure", "MockServer.Infrastructure\MockServer.Infrastructure.csproj", "{6F834257-C6F3-47BA-BD5D-0F512D552136}"
@@ -17,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.WebMVC", "MockSe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.CallbackExecutor", "MockServer.CallbackExecutor\MockServer.CallbackExecutor.csproj", "{076482F6-3892-4FFA-9ABC-04F49C0E1AA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockServer.IdentityServer", "MockServer.IdentityServer\MockServer.IdentityServer.csproj", "{51CBE00E-8F34-41CA-AC8B-57474A3A65B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.IdentityServer", "MockServer.IdentityServer\MockServer.IdentityServer.csproj", "{51CBE00E-8F34-41CA-AC8B-57474A3A65B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +31,6 @@ Global
 		{13D6A2C2-FB19-4898-AAA7-C88C51A208FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13D6A2C2-FB19-4898-AAA7-C88C51A208FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13D6A2C2-FB19-4898-AAA7-C88C51A208FE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2E79848D-A212-4E44-9AB7-740496656F1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2E79848D-A212-4E44-9AB7-740496656F1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2E79848D-A212-4E44-9AB7-740496656F1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2E79848D-A212-4E44-9AB7-740496656F1F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{883671FE-3C30-4ECA-9882-ACCF237138E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{883671FE-3C30-4ECA-9882-ACCF237138E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{883671FE-3C30-4ECA-9882-ACCF237138E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
