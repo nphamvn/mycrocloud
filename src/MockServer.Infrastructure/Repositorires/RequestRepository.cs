@@ -57,17 +57,39 @@ public class RequestRepository : IRequestRepository
 
     public async Task Delete(int userId, string projectName, int id)
     {
-        var query =
-                """
-                DELETE FROM Requests
-                    WHERE Id = @Id;
-                """;
-
         using var connection = new SqliteConnection(_connectionString);
-        await connection.ExecuteAsync(query, new
+        await connection.OpenAsync();
+        using var trans = await connection.BeginTransactionAsync();
+        try
         {
-            Id = id
-        });
+            var delete1 = "DELETE FROM CallbackRequest WHERE RequestId = @Id";
+            await connection.ExecuteAsync(delete1, new { Id = id }, trans);
+
+            var delete2 = "DELETE FROM FixedRequestBody WHERE RequestId = @Id";
+            await connection.ExecuteAsync(delete2, new { Id = id }, trans);
+
+            var delete3 = "DELETE FROM FixedRequestParams WHERE RequestId = @Id";
+            await connection.ExecuteAsync(delete3, new { Id = id }, trans);
+
+            var delete4 = "DELETE FROM FixedRequestResponse WHERE RequestId = @Id";
+            await connection.ExecuteAsync(delete4, new { Id = id }, trans);
+
+            var delete5 = "DELETE FROM FixedResponseHeader WHERE RequestId = @Id";
+            await connection.ExecuteAsync(delete5, new { Id = id }, trans);
+
+            var delete6 = "DELETE FROM ForwardingRequest WHERE RequestId = @Id";
+            await connection.ExecuteAsync(delete6, new { Id = id }, trans);
+
+            var query = "DELETE FROM Requests WHERE Id = @Id;";
+            await connection.ExecuteAsync(query, new { Id = id }, trans);
+
+            await trans.CommitAsync();
+        }
+        catch (Exception)
+        {
+            await trans.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<Request> FindRequest(string username, string projectName, string method, string path)
