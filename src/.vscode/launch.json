@@ -26,7 +26,7 @@
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/MockServer.WebMVC/bin/Debug/net6.0/MockServer.WebMVC.dll",
             "args": [],
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/MockServer.WebMVC",
             "stopAtEntry": false,
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",

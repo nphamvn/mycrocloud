@@ -1,6 +1,7 @@
 using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MockServer.Core.Enums;
 using MockServer.WebMVC.Attributes;
 using MockServer.WebMVC.Models.Request;
@@ -34,6 +35,22 @@ public class RequestsController : Controller
         }
         int id = await _requestService.Create(projectName, request);
         return RedirectToAction(nameof(Config), new { projectName = projectName, id = id });
+    }
+
+    [AjaxOnly]
+    [HttpPost("create")]
+    public async Task<IActionResult> CreateAjax(string projectName, CreateRequestViewModel request)
+    {
+        if (!ModelState.IsValid)
+        {
+            IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
+            return BadRequest(allErrors);
+        }
+        int id = await _requestService.Create(projectName, request);
+        return Ok(new
+        {
+            id = id
+        });
     }
 
     [HttpGet("{id:int}/config")]

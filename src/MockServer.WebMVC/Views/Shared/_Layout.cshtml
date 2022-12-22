@@ -8,6 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
+    @* <link rel="stylesheet" href="~/css/tailwind.css" /> *@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MockServer.WebMVC.styles.css" asp-append-version="true" />
@@ -45,12 +46,13 @@
                     {
                         @using (Html.BeginForm(nameof(AccountController.Logout), "Account", null, FormMethod.Post))
                         {
-                            <button class="btn bg-violet-500 text-white" type="submit">Logout</button>
+                            <button class="btn text-white" type="submit">Logout</button>
                         }
                     }
                     else
                     {
-                        <a class="nav-link text-dark" href="@Url.Action(nameof(AccountController.Login), "Account")">Login</a>
+                        <a class="nav-link text-white"
+                        href="@Url.Action(nameof(AccountController.Login), "Account")">Login</a>
                     }
                 </div>
             </div>

@@ -16,6 +16,7 @@ public class RequestOpenViewModel
     public int ProjectId { get; set; }
     public RequestType Type { get; set; }
     public string Username { get; set; }
+    public string Description { get; set; }
     public string Url => string.Format("https://{0}.mockserver.com/{1}/{2}", Username, ProjectName, Path);
     public string MethodTextColor
     => Method switch

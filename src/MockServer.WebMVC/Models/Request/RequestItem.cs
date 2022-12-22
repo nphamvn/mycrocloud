@@ -14,4 +14,14 @@ public class RequestItem
     public string Path { get; set; }
     public RequestMethod Method { get; set; }
     public string Description { get; set; }
+
+    public string MethodBadgeColor
+    => Method switch
+    {
+        RequestMethod.DELETE => "bg-red",
+        RequestMethod.POST => "bg-orange",
+        RequestMethod.PUT => "bg-yellow",
+        RequestMethod.GET => "bg-green",
+        _ => ""
+    };
 }

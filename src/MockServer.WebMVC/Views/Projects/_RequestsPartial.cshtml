@@ -12,12 +12,13 @@
             <ul id="requests" class="list-group list-group-flush mt-2">
                 @foreach (var req in Model.Requests)
                 {
-                    <li data-request-id="@req.Id" id="request-@req.Id" class="list-group-item p-1 rounded">
+                    <li data-request-id="@req.Id" id="request-@req.Id"
+                    class="request-list-item list-group-item px-2 rounded">
                         <div class="row">
                             <div class="col" onclick="openRequest(@req.Id)">
                                 <span class="text-base fw-light text-slate-700">@req.Name</span>
                                 <div>
-                                    <small class="badge rounded-pill py-1 fw-normal text-white me-1 bg-sky-400"
+                                    <small class="badge rounded-pill py-1 fw-normal text-white me-1 @req.MethodBadgeColor"
                                     style="width: 50px;">@req.Method</small>
                                     <small class="text-muted">/@req.Path</small>
                                 </div>

@@ -136,7 +136,7 @@ public class RequestRepository : IRequestRepository
                     r.Type,
                     r.Name,
                     r.Path,
-                    r.r.Description,
+                    r.Description,
                     m.Id,
                     r.ProjectId
                 FROM Requests r
