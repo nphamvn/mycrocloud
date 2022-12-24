@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Web", "MockServer.Web\MockServer.Web.csproj", "{CC5A186F-333D-49AF-B92E-151783D54B6F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.ReverseProxyServer", "MockServer.ReverseProxyServer\MockServer.ReverseProxyServer.csproj", "{13D6A2C2-FB19-4898-AAA7-C88C51A208FE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Core", "MockServer.Core\MockServer.Core.csproj", "{883671FE-3C30-4ECA-9882-ACCF237138E7}"
@@ -23,10 +21,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CC5A186F-333D-49AF-B92E-151783D54B6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CC5A186F-333D-49AF-B92E-151783D54B6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CC5A186F-333D-49AF-B92E-151783D54B6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CC5A186F-333D-49AF-B92E-151783D54B6F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{13D6A2C2-FB19-4898-AAA7-C88C51A208FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{13D6A2C2-FB19-4898-AAA7-C88C51A208FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13D6A2C2-FB19-4898-AAA7-C88C51A208FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
