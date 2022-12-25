@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MockServer.Core.Entities.Requests;
 using MockServer.Core.Enums;
 
 namespace MockServer.WebMVC.Models.Project;
@@ -27,48 +28,7 @@ public class RequestOpenViewModel
         RequestMethod.GET => "text-green",
         _ => "text-red"
     };
-    public IEnumerable<RequestParam> Params { get; set; } = new List<RequestParam>
-    {
-        new RequestParam {
-            Id = 1,
-            Key = "page",
-            Value = "1",
-            Required = true,
-            Exactly = true
-        },
-        new RequestParam {
-            Id = 2,
-            Key = "sort",
-            Value = "name",
-            Required = true,
-            Exactly = true
-        }
-    };
-    public IEnumerable<RequestHeader> Headers { get; set; } = new List<RequestHeader>
-    {
-        new RequestHeader {
-            Id = 1,
-            Name = "Accept",
-            Value = "*/*",
-            Required = true,
-            Exactly = true
-        }
-    };
-}
-
-public class RequestHeader
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public string Value { get; set; }
-    public bool Required { get; set; }
-    public bool Exactly { get; set; }
-}
-public class RequestParam
-{
-    public int Id { get; set; }
-    public string Key { get; set; }
-    public string Value { get; set; }
-    public bool Required { get; set; }
-    public bool Exactly { get; set; }
+    public IList<RequestParam> RequestParams { get; set; }
+    public IList<RequestHeader> RequestHeaders { get; set; }
+    public RequestBody RequestBody { get; set; }
 }

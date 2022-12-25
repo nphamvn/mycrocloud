@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using MockServer.Core.Entities.Requests;
@@ -268,6 +269,73 @@ public class RequestRepository : IRequestRepository
         });
     }
 
+    public async Task<RequestBody> GetRequestBody(int requestId)
+    {
+        var query =
+                   """
+                    SELECT
+                        Required,
+                        MatchExactly,
+                        Format,
+                        Text
+                    FROM
+                        RequestBody
+                    WHERE
+                        RequestId = @RequestId
+                   """;
+        using var connection = new SqliteConnection(_connectionString);
+        return await connection.QuerySingleOrDefaultAsync<RequestBody>(query, new
+        {
+            RequestId = requestId
+        });
+    }
+
+    public async Task<IEnumerable<RequestHeader>> GetRequestHeaders(int id)
+    {
+        var query =
+                      """
+                    SELECT
+                        Id,
+                        Name,
+                        Value,
+                        Required,
+                        MatchExactly,
+                        Description
+                    FROM
+                        RequestHeaders
+                    WHERE
+                        RequestId = @RequestId
+                   """;
+        using var connection = new SqliteConnection(_connectionString);
+        return await connection.QueryAsync<RequestHeader>(query, new
+        {
+            RequestId = id
+        });
+    }
+
+    public async Task<IEnumerable<RequestParam>> GetRequestParams(int id)
+    {
+        var query =
+                   """
+                    SELECT
+                        Id,
+                        Key,
+                        Value,
+                        Required,
+                        MatchExactly,
+                        Description
+                    FROM
+                        RequestParams
+                    WHERE
+                        RequestId = @RequestId
+                   """;
+        using var connection = new SqliteConnection(_connectionString);
+        return await connection.QueryAsync<RequestParam>(query, new
+        {
+            RequestId = id
+        });
+    }
+
     public async Task SaveFixedRequestConfig(int userId, string projectName, int requestId, FixedRequest config)
     {
         var query =
@@ -299,5 +367,164 @@ public class RequestRepository : IRequestRepository
             Body = config.ResponseBody,
             Delay = config.Delay
         });
+    }
+
+    public async Task UpdateRequestBody(int id, FixedRequest config)
+    {
+        if (config.RequestBody is RequestBody body)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
+            using var transaction = await connection.BeginTransactionAsync();
+            try
+            {
+                var deleteQuery = "DELETE FROM RequestBody WHERE RequestId = @RequestId";
+                await connection.ExecuteAsync(deleteQuery, new
+                {
+                    RequestId = id,
+                }, transaction);
+                var insertQuery =
+                        """
+                         INSERT INTO RequestBody (
+                            RequestId,
+                            Required,
+                            MatchExactly,
+                            Format,
+                            Text
+                        ) VALUES(
+                            @RequestId,
+                            @Required,
+                            @MatchExactly,
+                            @Format,
+                            @Text
+                        )
+                        """;
+
+                await connection.ExecuteAsync(insertQuery, new
+                {
+                    RequestId = id,
+                    Required = body.Required,
+                    MatchExactly = body.MatchExactly,
+                    Format = body.Format,
+                    Text = body.Text
+                }, transaction);
+                await transaction.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+    }
+
+    public async Task UpdateRequestHeaders(int id, FixedRequest config)
+    {
+        if (config.RequestHeaders is IList<RequestHeader> headers)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
+            using var transaction = await connection.BeginTransactionAsync();
+            try
+            {
+                var deleteQuery = "DELETE FROM RequestHeaders WHERE RequestId = @RequestId";
+                await connection.ExecuteAsync(deleteQuery, new
+                {
+                    RequestId = id,
+                }, transaction);
+
+                var map = headers.Select(h => new
+                {
+                    RequestId = id,
+                    Name = h.Name,
+                    Value = h.Value,
+                    Required = h.Required,
+                    MatchExactly = h.MatchExactly,
+                    Description = h.Description
+                })
+                .ToList();
+                var insertQuery =
+                        """
+                         INSERT INTO RequestHeaders (
+                            RequestId,
+                            Name,
+                            Value,
+                            Required,
+                            MatchExactly,
+                            Description
+                        ) VALUES(
+                            @RequestId,
+                            @Name,
+                            @Value,
+                            @Required,
+                            @MatchExactly,
+                            @Description
+                        )
+                        """;
+
+                await connection.ExecuteAsync(insertQuery, map, transaction);
+                await transaction.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+    }
+
+    public async Task UpdateRequestParams(int id, FixedRequest config)
+    {
+        if (config.RequestParams is IList<RequestParam> @params)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
+            using var transaction = await connection.BeginTransactionAsync();
+            try
+            {
+                var deleteQuery = "DELETE FROM RequestParams WHERE RequestId = @RequestId";
+                await connection.ExecuteAsync(deleteQuery, new
+                {
+                    RequestId = id,
+                }, transaction);
+
+                var map = @params.Select(p => new
+                {
+                    RequestId = id,
+                    Key = p.Key,
+                    Value = p.Value,
+                    Required = p.Required,
+                    MatchExactly = p.MatchExactly,
+                    Description = p.Description
+                })
+                .ToList();
+                var insertQuery =
+                        """
+                         INSERT INTO RequestParams (
+                            RequestId,
+                            Key,
+                            Value,
+                            Required,
+                            MatchExactly,
+                            Description
+                        ) VALUES(
+                            @RequestId,
+                            @Key,
+                            @Value,
+                            @Required,
+                            @MatchExactly,
+                            @Description
+                        )
+                        """;
+
+                await connection.ExecuteAsync(insertQuery, map, transaction);
+                await transaction.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
     }
 }

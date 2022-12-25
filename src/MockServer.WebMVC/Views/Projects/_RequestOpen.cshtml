@@ -1,3 +1,4 @@
+@using MockServer.WebMVC.Controllers
 @model MockServer.WebMVC.Models.Project.RequestOpenViewModel
 <style type="text/css" media="screen">
     #request-body-editor,
@@ -28,9 +29,14 @@
                 </i></button>
         </div>
         <div>
-            <h5>Fixed request</h5>
+            <div class="d-flex">
+                <h5 class="me-auto">Fixed request</h5>
+            </div>
             <div>
-                <h6>Request</h6>
+                <div class="d-flex">
+                    <h6 class="me-auto">Request</h6>
+                    <button id="btnSave" class="btn btn-primary btn-sm px-3">Save</button>
+                </div>
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button type="button" class="nav-link active py-1" data-bs-toggle="tab"
@@ -58,20 +64,24 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var param in Model.Params)
+                                @for (int i = 0; i < Model.RequestParams.Count; i++)
                                 {
-                                    <tr data-order="@param.Id">
-                                        <td class="align-middle"><input type="text"
-                                            class="form-control form-control-sm param-key" value="@param.Key">
+                                    <tr>
+                                        <td class="align-middle"><input asp-for="RequestParams[i].Key" type="text"
+                                            class="form-control form-control-sm param-key" placeholder="key">
                                         </td>
                                         <td class="align-middle"><input type="text"
-                                            class="form-control form-control-sm param-value" value="@param.Value">
+                                            class="form-control form-control-sm param-value"
+                                            asp-for="RequestParams[i].Value" placeholder="value">
                                         </td>
-                                        <td class="align-middle"><input type="checkbox" class="form-check-input"
-                                            @(param.Required?"checked":"")>
+                                        <td class="align-middle"><input type="checkbox"
+                                            class="form-check-input param-required" asp-for="RequestParams[i].Required"
+                                            checked=@Model.RequestParams[i].Required>
                                         </td>
-                                        <td class="align-middle"><input type="checkbox" class="form-check-input"
-                                            @(param.Exactly?"checked":"")>
+                                        <td class="align-middle"><input type="checkbox"
+                                            class="form-check-input param-match-exactly"
+                                            asp-for="RequestParams[i].MatchExactly"
+                                            checked=@Model.RequestParams[i].MatchExactly>
                                         </td>
                                         <td class="align-middle"><button
                                             class="btn param-delete text-gray btn-show-on-hover"><i
@@ -83,7 +93,7 @@
                         </table>
                     </div>
                     <div id="request-header-tab" class="tab-pane fade p-2" role="tabpanel">
-                        <table class="table table-sm p-0 m-0">
+                        <table id="request-header-table" class="table table-sm p-0 m-0">
                             <thead>
                                 <tr>
                                     <th style="width: 35%" scope="col">Header</th>
@@ -94,22 +104,26 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var header in Model.Headers)
+                                @for (int i = 0; i < Model.RequestHeaders.Count; i++)
                                 {
                                     <tr>
                                         <td class="align-middle"><input type="text" class="form-control form-control-sm"
-                                            value="@header.Name">
+                                            asp-for="RequestHeaders[i].Name" placeholder="name">
                                         </td>
                                         <td class="align-middle"><input type="text" class="form-control form-control-sm"
-                                            value="@header.Value">
+                                            asp-for="RequestHeaders[i].Value" placeholder="value">
                                         </td>
                                         <td class="align-middle"><input type="checkbox" class="form-check-input"
-                                            @(header.Required?"checked":"")>
+                                            asp-for="RequestHeaders[i].Required"
+                                            checked=@Model.RequestHeaders[i].Required>
                                         </td>
                                         <td class="align-middle"><input type="checkbox" class="form-check-input"
-                                            @(header.Exactly?"checked":"")>
+                                            asp-for="RequestHeaders[i].MatchExactly"
+                                            checked=@Model.RequestHeaders[i].MatchExactly>
                                         </td>
-                                        <td class="align-middle"><button class="btn"><i class="bi bi-trash"></i></button>
+                                        <td class="align-middle"><button
+                                            class="btn header-delete text-gray btn-show-on-hover"><i
+                                                class="bi bi-trash"></i></button>
                                         </td>
                                     </tr>
                                 }
@@ -120,17 +134,14 @@
                         <div class="px-2 mt-1">
                             <div class="d-flex input-group mb-2">
                                 <div class="form-check me-5">
-                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                                    <label class="form-check-label" for="flexCheckDefault">
-                                        Required
-                                    </label>
+                                    <input class="form-check-input" type="checkbox" asp-for="RequestBody.Required" 
+                                        checked="@Model.RequestBody?.Required">
+                                    <label class="form-check-label" asp-for="RequestBody.Required"></label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"
-                                        checked>
-                                    <label class="form-check-label" for="flexCheckChecked">
-                                        Exactly
-                                    </label>
+                                    <input class="form-check-input" type="checkbox" value="" asp-for="RequestBody.MatchExactly"
+                                        checked="@Model.RequestBody?.MatchExactly">
+                                    <label class="form-check-label" for="flexCheckChecked">Exactly</label>
                                 </div>
                             </div>
                             <div>
@@ -145,6 +156,7 @@
                                     </div>
                                 </div>
                                 <div class="position-relative" style="min-height: 200px;">
+                                    <textarea asp-for="RequestBody.Text"></textarea>
                                     <div id="request-body-editor"></div>
                                 </div>
                             </div>
@@ -181,7 +193,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var param in Model.Params)
+                                @foreach (var param in Model.RequestParams)
                                 {
                                     <tr>
                                         <td class="align-middle"><input type="text" class="form-control form-control-sm"
@@ -194,7 +206,7 @@
                                             @(param.Required?"checked":"")>
                                         </td>
                                         <td class="align-middle"><input type="checkbox" class="form-check-input"
-                                            @(param.Exactly?"checked":"")>
+                                            @(param.MatchExactly?"checked":"")>
                                         </td>
                                         <td class="align-middle"><button class="btn"><i class="bi bi-trash"></i></button>
                                         </td>
@@ -215,7 +227,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var header in Model.Headers)
+                                @foreach (var header in Model.RequestHeaders)
                                 {
                                     <tr>
                                         <td class="align-middle"><input type="text" class="form-control form-control-sm"
@@ -228,7 +240,7 @@
                                             @(header.Required?"checked":"")>
                                         </td>
                                         <td class="align-middle"><input type="checkbox" class="form-check-input"
-                                            @(header.Exactly?"checked":"")>
+                                            @(header.MatchExactly?"checked":"")>
                                         </td>
                                         <td class="align-middle"><button class="btn"><i class="bi bi-trash"></i></button>
                                         </td>
@@ -262,15 +274,36 @@
 </div>
 <template id="requestParamRow">
     <tr>
-        <td class="align-middle"><input type="text" class="form-control form-control-sm param-key">
+        <td class="align-middle"><input type="text" name="key" class="form-control form-control-sm param-key"
+                placeholder="key">
         </td>
-        <td class="align-middle"><input type="text" class="form-control form-control-sm param-value">
+        <td class="align-middle"><input type="text" name="value" class="form-control form-control-sm param-value"
+                placeholder="value">
         </td>
-        <td class="align-middle"><input type="checkbox" class="form-check-input">
+        <td class="align-middle"><input type="checkbox" name="required" class="form-check-input param-required">
         </td>
-        <td class="align-middle"><input type="checkbox" class="form-check-input">
+        <td class="align-middle"><input type="checkbox" name="matchExactly"
+                class="form-check-input param-match-exactly">
         </td>
         <td class="align-middle"><button class="btn text-gray btn-show-on-hover param-delete"><i
+                    class="bi bi-trash"></i></button>
+        </td>
+    </tr>
+</template>
+<template id="requestHeaderRow">
+    <tr>
+        <td class="align-middle"><input type="text" name="name" class="form-control form-control-sm header-name"
+                placeholder="name">
+        </td>
+        <td class="align-middle"><input type="text" name="value" class="form-control form-control-sm header-value"
+                placeholder="value">
+        </td>
+        <td class="align-middle"><input type="checkbox" name="required" class="form-check-input header-required">
+        </td>
+        <td class="align-middle"><input type="checkbox" name="matchExactly"
+                class="form-check-input header-match-exactly">
+        </td>
+        <td class="align-middle"><button class="btn text-gray btn-show-on-hover header-delete"><i
                     class="bi bi-trash"></i></button>
         </td>
     </tr>
@@ -278,6 +311,12 @@
 <script>
     var requestBodyEditor = ace.edit("request-body-editor");
     requestBodyEditor.setShowPrintMargin("false");
+    var textarea = $('textarea[name="RequestBody.Text"]').hide();
+    requestBodyEditor.getSession().setValue(textarea.val());
+    requestBodyEditor.getSession().on('change', function () {
+            textarea.val(requestBodyEditor.getSession().getValue());
+            console.log(textarea.val());
+        });
     var responsetBodyEditor = ace.edit("response-body-editor");
     responsetBodyEditor.setShowPrintMargin("false");
 </script>
@@ -299,50 +338,152 @@
             requestBodyEditor.session.setMode("ace/mode/text");
         }
     }
+
     $(function () {
-        reoderTable();
         addTableEventListener();
     });
 
     function addTableEventListener() {
-        $('#request-params .param-key').off('keyup');
-        $('#request-params .param-value').off('keyup');
+        $('#request-params input[type=text]').off('keyup');
         $('#request-params .param-delete').off('click');
-        $('#request-params .param-key').keyup(function () {
-            var tr = $(this).parent('td').parent('tr');
-            changeRequestParamsTable(tr.data('order'));
-        });
-        $('#request-params .param-value').keyup(function () {
-            var tr = $(this).parent('td').parent('tr');
-            changeRequestParamsTable(tr.data('order'));
-        });
-        $('#request-params .param-delete').click(function () {
-            $(this).closest("tr").remove();
-            reoderTable();
-        });
-        reoderTable();
-    }
-    function reoderTable() {
-        $('#request-params tbody tr').each(function (index) {
-            const order = index + 1;
-            $(this).data('order', order);
-            $(this).attr('data-order', order);
-        });
-    }
-    function changeRequestParamsTable(order) {
-        if ('content' in document.createElement('template')) {
-            const rowCount = $('#request-params tbody tr').length;
-            if (order === rowCount) {
-                const template = document.querySelector('#requestParamRow');
-                let templateContent = template.content;
-                let tr = templateContent.querySelector('tr');
-                tr.dataset.order = rowCount + 1;
-                const tableBody = $('#request-params tbody');
-                tableBody.append(templateContent.cloneNode(true));
+
+        $('#request-params input[type=text]').keyup(function () {
+            const rowIndex = $('#request-params tbody tr').index($(this).closest('tr'));
+            if (rowIndex === $('#request-params tbody tr').length - 1) {
+                appendRequestParamRow();
                 addTableEventListener();
             }
+        });
+        $('#request-params .param-delete').click(function () {
+            $(this).off('click');
+            $(this).closest("tr").remove();
+            indexRow();
+        });
+    }
+    function indexRow() {
+        $('#request-params tbody tr').each(function (rowIndex) {
+            $("input.param-key", this).attr('name', 'RequestParams[' + rowIndex + '].Key');
+            $("input.param-value", this).attr('name', 'RequestParams[' + rowIndex + '].Value');
+            $("input.param-required", this).attr('name', 'RequestParams[' + rowIndex + '].Required');
+            $("input.param-match-exactly", this).attr('name', 'RequestParams[' + rowIndex + '].MatchExactly');
+        });
+    }
+    function appendRequestParamRow() {
+        if ('content' in document.createElement('template')) {
+            const template = document.querySelector('#requestParamRow');
+            let templateContent = template.content.cloneNode(true);
+            let tr = $(templateContent.querySelector('tr'));
+            const rowIndex = $('#request-params tbody tr').length;
+            $("input.param-key", tr).attr('name', 'RequestParams[' + rowIndex + '].Key');
+            $("input.param-value", tr).attr('name', 'RequestParams[' + rowIndex + '].Value');
+            $("input.param-required", tr).attr('name', 'RequestParams[' + rowIndex + '].Required');
+            $("input.param-match-exactly", tr).attr('name', 'RequestParams[' + rowIndex + '].MatchExactly');
+            $('#request-params tbody').append(tr);
         } else {
-            alert('HTML template element is not supported')
+            alert('HTML template element is not supported');
         }
     }
+</script>
+<script>
+    $(function () {
+        addRequestHeaderTableEventListener();
+    });
+    function addRequestHeaderTableEventListener() {
+        $('#request-header-table input[type=text]').off('keyup');
+        $('#request-header-table .header-delete').off('click');
+
+        $('#request-header-table input[type=text]').keyup(function () {
+            const rowIndex = $('#request-header-table tbody tr').index($(this).closest('tr'));
+            if (rowIndex === $('#request-header-table tbody tr').length - 1) {
+                appendRequestHeaderRow();
+                addRequestHeaderTableEventListener();
+            }
+        });
+        $('#request-header-table .header-delete').click(function () {
+            $(this).off('click');
+            $(this).closest("tr").remove();
+            $('#request-header-table tbody tr').each(function (rowIndex) {
+                $("input.header-key", this).attr('name', 'RequestHeaders[' + rowIndex + '].Name');
+                $("input.header-value", this).attr('name', 'RequestHeaders[' + rowIndex + '].Value');
+                $("input.header-required", this).attr('name', 'RequestHeaders[' + rowIndex + '].Required');
+                $("input.header-match-exactly", this).attr('name', 'RequestHeaders[' + rowIndex + '].MatchExactly');
+            });
+        });
+    }
+    function appendRequestHeaderRow() {
+        if ('content' in document.createElement('template')) {
+            const template = document.querySelector('#requestHeaderRow');
+            let templateContent = template.content.cloneNode(true);
+            let tr = $(templateContent.querySelector('tr'));
+            const rowIndex = $('#request-header-table tbody tr').length;
+            $("input.header-key", tr).attr('name', 'RequestHeaders[' + rowIndex + '].Name');
+            $("input.header-value", tr).attr('name', 'RequestHeaders[' + rowIndex + '].Value');
+            $("input.header-required", tr).attr('name', 'RequestHeaders[' + rowIndex + '].Required');
+            $("input.header-match-exactly", tr).attr('name', 'RequestHeaders[' + rowIndex + '].MatchExactly');
+            $('#request-header-table tbody').append(tr);
+        } else {
+            alert('HTML template element is not supported');
+        }
+    }
+</script>
+<script>
+    $(function () {
+        $('#btnSave').click(function () {
+            let params = [];
+            let headers = [];
+
+            let body = {
+                required: $("#request-body-tab input[name$='Required']").prop('checked'),
+                matchExactly: $("#request-body-tab input[name$='MatchExactly']").prop('checked'),
+                format: 'json',
+                text: $('textarea[name="RequestBody.Text"]').val()
+            };
+            $('#request-params tbody tr').each(function () {
+                const key = $("input[name$='Key']", this).val();
+                const value = $("input[name$='Value']", this).val();
+                const required = $("input[name$='Required']", this).prop('checked');
+                const matchExactly = $("input[name$='MatchExactly']", this).prop('checked');
+                if (key !== '' && value !== '') {
+                    params.push({
+                        key: key,
+                        value: value,
+                        required: required,
+                        matchExactly: matchExactly
+                    });
+                }
+            });
+            $('#request-header-table tbody tr').each(function () {
+                const name = $("input[name$='Name']", this).val();
+                const value = $("input[name$='Value']", this).val();
+                const required = $("input[name$='Required']", this).prop('checked');
+                const matchExactly = $("input[name$='MatchExactly']", this).prop('checked');
+                if (name !== '' && value !== '') {
+                    headers.push({
+                        name: name,
+                        value: value,
+                        required: required,
+                        matchExactly: matchExactly
+                    });
+                }
+            });
+            let fields = [];
+            fields[0] = '@nameof(Model.RequestParams)';
+            fields[1] = '@nameof(Model.RequestHeaders)';
+            fields[2] = '@nameof(Model.RequestBody)';
+            $.post({
+                url: '@Url.Action(nameof(RequestsController.ConfigFixedRequest), "Requests",new { projectName = Model.ProjectName,id = Model.Id})',
+                data: {
+                    fields: fields,
+                    RequestParams: params,
+                    RequestHeaders: headers,
+                    RequestBody: body
+                },
+                success: function (data) {
+                },
+                error: function (xhr, status, error) {
+                    alert(error);
+                }
+            });
+        });
+    });
 </script>

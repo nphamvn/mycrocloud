@@ -108,10 +108,11 @@ public class ProjectService : IProjectService
     {
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
-
         var request = await _requestRepository.Get(user.Id, name, requestId);
-
         var ret = _mapper.Map<RequestOpenViewModel>(request);
+        ret.RequestParams = (await _requestRepository.GetRequestParams(requestId)).ToList();
+        ret.RequestHeaders = (await _requestRepository.GetRequestHeaders(requestId)).ToList();
+        ret.RequestBody = await _requestRepository.GetRequestBody(requestId);
         ret.Username = user.Username;
         ret.ProjectName = name;
         return ret;

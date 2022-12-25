@@ -15,5 +15,11 @@ public interface IRequestRepository
     Task<int> Create(int userId, string projectName, Request request);
     Task<FixedRequest> GetFixedRequestConfig(int userId, string projectName, int id);
     Task SaveFixedRequestConfig(int userId, string projectName, int req, FixedRequest config);
+    Task UpdateRequestParams(int id, FixedRequest config);
+    Task UpdateRequestHeaders(int id, FixedRequest config);
+    Task UpdateRequestBody(int id, FixedRequest config);
     Task Delete(int userId, string projectName, int id);
+    Task<IEnumerable<RequestParam>> GetRequestParams(int id);
+    Task<IEnumerable<RequestHeader>> GetRequestHeaders(int id);
+    Task<RequestBody> GetRequestBody(int requestId);
 }

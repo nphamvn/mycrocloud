@@ -11,6 +11,6 @@ public interface IRequestService
     Task<int> Create(string projectName, CreateRequestViewModel request);
     Task<RequestItem> Get(string projectname, int id);
     Task<FixedRequestConfigViewModel> GetFixedRequestConfigViewModel(string projectname, int id);
-    Task SaveFixedRequestConfig(string projectname, int id, FixedRequestConfigViewModel config);
+    Task SaveFixedRequestConfig(string projectname, int id, string[] fields, FixedRequestConfigViewModel config);
     Task Delete(string projectname, int id);
 }

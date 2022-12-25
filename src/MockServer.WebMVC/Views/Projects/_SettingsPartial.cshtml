@@ -4,7 +4,7 @@
 <div class="p-3">
     <!-- Rename: Start-->
     <form asp-action="@nameof(ProjectsController.Rename)" asp-route-name="@Model.Name" method="post"
-        class="mb-2 border-bottom pb-3 border-1">
+        class="mb-2 border-bottom pb-3">
         <div class="row">
             <div class="col-3">
                 <strong for="newName" class="form-label font-semibold">Project name</strong>
@@ -65,7 +65,7 @@
         <div>
             <strong>Private key</strong>
             <form name="generateAccessKey" asp-action="@nameof(ProjectsController.GenerateKey)"
-                asp-route-name="@Model.Name" method="post" class="mb-3 pb-3 border-bottom border-1">
+                asp-route-name="@Model.Name" method="post" class="mb-3 pb-3 border-bottom">
                 <div class="d-flex">
                     <div class="input-group d-flex me-3" style="max-width: 500px;">
                         <input id="privateKey" type="text" class="form-control" value="@Model.PrivateKey" readonly>

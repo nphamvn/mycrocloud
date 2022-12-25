@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MockServer.Core.Entities.Requests;
 using MockServer.Core.Enums;
 using MockServer.WebMVC.Attributes;
 using MockServer.WebMVC.Extentions;
@@ -122,6 +123,8 @@ public class ProjectsController : BaseController
     {
         var vm = await _projectService.GetRequestOpenViewModel(name, id);
         vm.ProjectName = name;
+        vm.RequestParams.Add(new RequestParam());
+        vm.RequestHeaders.Add(new RequestHeader());
         return PartialView("Views/Projects/_RequestOpen.cshtml", vm);
     }
 }

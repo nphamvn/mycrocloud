@@ -4,18 +4,21 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using MockServer.Core.Entities.Requests;
 
 namespace MockServer.WebMVC.Models.Request;
 
 public class FixedRequestConfigViewModel
 {
+    public IList<RequestParam> RequestParams { get; set; }
+    public IList<RequestHeader> RequestHeaders { get; set; }
+    public RequestBody RequestBody { get; set; }
     public int ResponseStatusCode { get; set; }
     public string ResponseBody { get; set; }
     public Dictionary<string, string> ResponseHeaders { get; set; }
     public int RequestId { get; set; }
     public string ResponseContentType { get; set; }
     public int Delay { get; set; }
-
     public static ICollection<SelectListItem> CommonHttpStatusCode
          => GetCommonHttpStatusCode();
     private static ICollection<SelectListItem> GetCommonHttpStatusCode()

@@ -63,11 +63,24 @@ public class RequestService : IRequestService
         return mapper.Map<FixedRequestConfigViewModel>(request);
     }
 
-    public async Task SaveFixedRequestConfig(string projectname, int id, FixedRequestConfigViewModel config)
+    public async Task SaveFixedRequestConfig(string projectname, int id, string[] fields, FixedRequestConfigViewModel config)
     {
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
         var mapped = mapper.Map<Core.Entities.Requests.FixedRequest>(config);
-        await _requestRepository.SaveFixedRequestConfig(user.Id, projectname, id, mapped);
+        if (fields.Contains(nameof(config.RequestParams)))
+        {
+            await _requestRepository.UpdateRequestParams(id, mapped);
+        }
+
+        if (fields.Contains(nameof(config.RequestHeaders)))
+        {
+            await _requestRepository.UpdateRequestHeaders(id, mapped);
+        }
+
+        if (fields.Contains(nameof(config.RequestBody)))
+        {
+            await _requestRepository.UpdateRequestBody(id, mapped);
+        }
     }
 }

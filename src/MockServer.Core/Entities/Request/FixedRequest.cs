@@ -6,12 +6,9 @@ public class FixedRequest : BaseEntity
     public string ResponseBody { get; set; }
     public string ResponseContentType { get; set; }
     public int Delay { get; set; }
-}
-
-public class RequestConfiguration
-{
-    public ICollection<RequestHeader> Headers { get; set; }
-    public ICollection<RequestParam> Params { get; set; }
+    public IList<RequestHeader> RequestHeaders { get; set; }
+    public IList<RequestParam> RequestParams { get; set; }
+    public RequestBody RequestBody { get; set; }
 }
 
 public class ResponseConfiguration
@@ -39,20 +36,25 @@ public class ResponseParam : BaseEntity
 
 public class RequestHeader : BaseEntity
 {
-    public int Id { get; set; }
-    public int Order { get; set; }
     public string Name { get; set; }
     public string Value { get; set; }
     public bool Required { get; set; }
     public bool MatchExactly { get; set; }
+    public string Description { get; set; }
 }
 public class RequestParam : BaseEntity
 {
-    public int Id { get; set; }
-    public int Order { get; set; }
     public string Key { get; set; }
     public string Value { get; set; }
     public bool Required { get; set; }
     public bool MatchExactly { get; set; }
+    public string Description { get; set; }
 }
-
+public class RequestBody : BaseEntity
+{
+    public bool Required { get; set; }
+    public bool MatchExactly { get; set; }
+    public string Format { get; set; }
+    public string Text { get; set; }
+    public string Description { get; set; }
+}

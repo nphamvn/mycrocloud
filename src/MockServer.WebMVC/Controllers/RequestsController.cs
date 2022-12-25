@@ -74,10 +74,11 @@ public class RequestsController : Controller
         }
     }
 
+    [AjaxOnly]
     [HttpPost("{id:int}/config/fixed-request")]
-    public async Task<IActionResult> ConfigFixedRequest(string projectName, int id, FixedRequestConfigViewModel config)
+    public async Task<IActionResult> ConfigFixedRequest(string projectName, int id, string[] fields, FixedRequestConfigViewModel config)
     {
-        await _requestService.SaveFixedRequestConfig(projectName, id, config);
+        await _requestService.SaveFixedRequestConfig(projectName, id, fields, config);
         return Ok(config);
     }
 
