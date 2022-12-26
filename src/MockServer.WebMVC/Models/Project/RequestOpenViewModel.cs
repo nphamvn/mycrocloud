@@ -31,4 +31,6 @@ public class RequestOpenViewModel
     public IList<RequestParam> RequestParams { get; set; }
     public IList<RequestHeader> RequestHeaders { get; set; }
     public RequestBody RequestBody { get; set; }
+    public IList<ResponseHeader> ResponseHeaders { get; set; }
+    public ResponseBody ResponseBody { get; set; }
 }

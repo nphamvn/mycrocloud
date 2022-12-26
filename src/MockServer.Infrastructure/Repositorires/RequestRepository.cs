@@ -336,6 +336,44 @@ public class RequestRepository : IRequestRepository
         });
     }
 
+    public async Task<ResponseBody> GetResponseBody(int requestId)
+    {
+        var query =
+                   """
+                    SELECT
+                        Text
+                    FROM
+                        ResponseBody
+                    WHERE
+                        RequestId = @RequestId
+                   """;
+        using var connection = new SqliteConnection(_connectionString);
+        return await connection.QuerySingleOrDefaultAsync<ResponseBody>(query, new
+        {
+            RequestId = requestId
+        });
+    }
+
+    public async Task<IEnumerable<ResponseHeader>> GetResponseHeaders(int id)
+    {
+        var query =
+                      """
+                    SELECT
+                        Id,
+                        Name,
+                        Value
+                    FROM
+                        ResponseHeaders
+                    WHERE
+                        RequestId = @RequestId
+                   """;
+        using var connection = new SqliteConnection(_connectionString);
+        return await connection.QueryAsync<ResponseHeader>(query, new
+        {
+            RequestId = id
+        });
+    }
+
     public async Task SaveFixedRequestConfig(int userId, string projectName, int requestId, FixedRequest config)
     {
         var query =
@@ -514,6 +552,92 @@ public class RequestRepository : IRequestRepository
                             @Required,
                             @MatchExactly,
                             @Description
+                        )
+                        """;
+
+                await connection.ExecuteAsync(insertQuery, map, transaction);
+                await transaction.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+    }
+
+    public async Task UpdateResponseBody(int id, FixedRequest config)
+    {
+        if (config.ResponseBody is ResponseBody body)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
+            using var transaction = await connection.BeginTransactionAsync();
+            try
+            {
+                var deleteQuery = "DELETE FROM ResponseBody WHERE RequestId = @RequestId";
+                await connection.ExecuteAsync(deleteQuery, new
+                {
+                    RequestId = id,
+                }, transaction);
+                var insertQuery =
+                        """
+                         INSERT INTO ResponseBody (
+                            RequestId,
+                            Text
+                        ) VALUES(
+                            @RequestId,
+                            @Text
+                        )
+                        """;
+
+                await connection.ExecuteAsync(insertQuery, new
+                {
+                    RequestId = id,
+                    Text = body.Text
+                }, transaction);
+                await transaction.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+    }
+
+    public async Task UpdateResponseHeaders(int id, FixedRequest config)
+    {
+        if (config.ResponseHeaders is IList<ResponseHeader> headers)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
+            using var transaction = await connection.BeginTransactionAsync();
+            try
+            {
+                var deleteQuery = "DELETE FROM ResponseHeaders WHERE RequestId = @RequestId";
+                await connection.ExecuteAsync(deleteQuery, new
+                {
+                    RequestId = id,
+                }, transaction);
+
+                var map = headers.Select(h => new
+                {
+                    RequestId = id,
+                    Name = h.Name,
+                    Value = h.Value
+                })
+                .ToList();
+                var insertQuery =
+                        """
+                         INSERT INTO ResponseHeaders (
+                            RequestId,
+                            Name,
+                            Value
+                        ) VALUES(
+                            @RequestId,
+                            @Name,
+                            @Value
                         )
                         """;
 

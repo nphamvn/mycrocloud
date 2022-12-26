@@ -82,5 +82,14 @@ public class RequestService : IRequestService
         {
             await _requestRepository.UpdateRequestBody(id, mapped);
         }
+
+        if (fields.Contains(nameof(config.ResponseHeaders)))
+        {
+            await _requestRepository.UpdateResponseHeaders(id, mapped);
+        }
+        if (fields.Contains(nameof(config.ResponseBody)))
+        {
+            await _requestRepository.UpdateResponseBody(id, mapped);
+        }
     }
 }

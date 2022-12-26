@@ -13,9 +13,10 @@ public class FixedRequestConfigViewModel
     public IList<RequestParam> RequestParams { get; set; }
     public IList<RequestHeader> RequestHeaders { get; set; }
     public RequestBody RequestBody { get; set; }
+    public IList<ResponseHeader> ResponseHeaders { get; set; }
+    public ResponseBody ResponseBody { get; set; }
     public int ResponseStatusCode { get; set; }
-    public string ResponseBody { get; set; }
-    public Dictionary<string, string> ResponseHeaders { get; set; }
+    public string ResponseBodyText { get; set; }
     public int RequestId { get; set; }
     public string ResponseContentType { get; set; }
     public int Delay { get; set; }

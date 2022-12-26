@@ -113,6 +113,8 @@ public class ProjectService : IProjectService
         ret.RequestParams = (await _requestRepository.GetRequestParams(requestId)).ToList();
         ret.RequestHeaders = (await _requestRepository.GetRequestHeaders(requestId)).ToList();
         ret.RequestBody = await _requestRepository.GetRequestBody(requestId);
+        ret.ResponseHeaders = (await _requestRepository.GetResponseHeaders(requestId)).ToList();
+        ret.ResponseBody = await _requestRepository.GetResponseBody(requestId);
         ret.Username = user.Username;
         ret.ProjectName = name;
         return ret;

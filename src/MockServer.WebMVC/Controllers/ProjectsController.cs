@@ -125,6 +125,7 @@ public class ProjectsController : BaseController
         vm.ProjectName = name;
         vm.RequestParams.Add(new RequestParam());
         vm.RequestHeaders.Add(new RequestHeader());
+        vm.ResponseHeaders.Add(new ResponseHeader());
         return PartialView("Views/Projects/_RequestOpen.cshtml", vm);
     }
 }
