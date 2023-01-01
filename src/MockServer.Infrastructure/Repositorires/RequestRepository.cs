@@ -63,26 +63,32 @@ public class RequestRepository : IRequestRepository
         using var trans = await connection.BeginTransactionAsync();
         try
         {
-            var delete1 = "DELETE FROM CallbackRequest WHERE RequestId = @Id";
-            await connection.ExecuteAsync(delete1, new { Id = id }, trans);
+            var delete1 = "DELETE FROM CallbackRequest WHERE RequestId = @RequestId";
+            await connection.ExecuteAsync(delete1, new { RequestId = id }, trans);
 
-            var delete2 = "DELETE FROM FixedRequestBody WHERE RequestId = @Id";
-            await connection.ExecuteAsync(delete2, new { Id = id }, trans);
+            var delete2 = "DELETE FROM FixedRequestConfiguration WHERE RequestId = @RequestId";
+            await connection.ExecuteAsync(delete2, new { RequestId = id }, trans);
 
-            var delete3 = "DELETE FROM FixedRequestParams WHERE RequestId = @Id";
-            await connection.ExecuteAsync(delete3, new { Id = id }, trans);
+            var delete3 = "DELETE FROM ForwardingRequest WHERE RequestId = @RequestId";
+            await connection.ExecuteAsync(delete3, new { RequestId = id }, trans);
 
-            var delete4 = "DELETE FROM FixedRequestResponse WHERE RequestId = @Id";
-            await connection.ExecuteAsync(delete4, new { Id = id }, trans);
+            var delete4 = "DELETE FROM RequestBody WHERE RequestId = @RequestId";
+            await connection.ExecuteAsync(delete4, new { RequestId = id }, trans);
 
-            var delete5 = "DELETE FROM FixedResponseHeader WHERE RequestId = @Id";
-            await connection.ExecuteAsync(delete5, new { Id = id }, trans);
+            var delete5 = "DELETE FROM RequestHeaders WHERE RequestId = @RequestId";
+            await connection.ExecuteAsync(delete5, new { RequestId = id }, trans);
 
-            var delete6 = "DELETE FROM ForwardingRequest WHERE RequestId = @Id";
-            await connection.ExecuteAsync(delete6, new { Id = id }, trans);
+            var delete6 = "DELETE FROM RequestParams WHERE RequestId = @RequestId";
+            await connection.ExecuteAsync(delete6, new { RequestId = id }, trans);
 
-            var query = "DELETE FROM Requests WHERE Id = @Id;";
-            await connection.ExecuteAsync(query, new { Id = id }, trans);
+            var query = "DELETE FROM Response WHERE RequestId = @RequestId;";
+            await connection.ExecuteAsync(query, new { RequestId = id }, trans);
+
+            var delete7 = "DELETE FROM ResponseHeaders WHERE RequestId = @RequestId;";
+            await connection.ExecuteAsync(delete7, new { RequestId = id }, trans);
+
+            var delete = "DELETE FROM Requests WHERE Id = @Id;";
+            await connection.ExecuteAsync(delete, new { Id = id }, trans);
 
             await trans.CommitAsync();
         }
@@ -336,19 +342,22 @@ public class RequestRepository : IRequestRepository
         });
     }
 
-    public async Task<ResponseBody> GetResponseBody(int requestId)
+    public async Task<Response> GetResponse(int requestId)
     {
         var query =
                    """
                     SELECT
-                        Text
+                        StatusCode,
+                        BodyText,
+                        Delay,
+                        DelayTime
                     FROM
-                        ResponseBody
+                        Response
                     WHERE
                         RequestId = @RequestId
                    """;
         using var connection = new SqliteConnection(_connectionString);
-        return await connection.QuerySingleOrDefaultAsync<ResponseBody>(query, new
+        return await connection.QuerySingleOrDefaultAsync<Response>(query, new
         {
             RequestId = requestId
         });
@@ -371,39 +380,6 @@ public class RequestRepository : IRequestRepository
         return await connection.QueryAsync<ResponseHeader>(query, new
         {
             RequestId = id
-        });
-    }
-
-    public async Task SaveFixedRequestConfig(int userId, string projectName, int requestId, FixedRequest config)
-    {
-        var query =
-                """
-                INSERT INTO 
-                    FixedRequestResponse 
-                    (
-                        RequestId,
-                        StatusCode,
-                        ContentType,
-                        Body,
-                        Delay
-                     )
-                     VALUES (
-                         @RequestId,
-                         @StatusCode,
-                         @ContentType,
-                         @Body,
-                         @Delay
-                     );
-                """;
-
-        using var connection = new SqliteConnection(_connectionString);
-        await connection.ExecuteAsync(query, new
-        {
-            RequestId = requestId,
-            StatusCode = config.ResponseStatusCode,
-            ContentType = config.ResponseContentType,
-            Body = config.ResponseBody,
-            Delay = config.Delay
         });
     }
 
@@ -566,35 +542,43 @@ public class RequestRepository : IRequestRepository
         }
     }
 
-    public async Task UpdateResponseBody(int id, FixedRequest config)
+    public async Task UpdateResponse(int id, FixedRequest config)
     {
-        if (config.ResponseBody is ResponseBody body)
+        if (config.Response is Response response)
         {
             using var connection = new SqliteConnection(_connectionString);
             await connection.OpenAsync();
             using var transaction = await connection.BeginTransactionAsync();
             try
             {
-                var deleteQuery = "DELETE FROM ResponseBody WHERE RequestId = @RequestId";
+                var deleteQuery = "DELETE FROM Response WHERE RequestId = @RequestId";
                 await connection.ExecuteAsync(deleteQuery, new
                 {
                     RequestId = id,
                 }, transaction);
                 var insertQuery =
                         """
-                         INSERT INTO ResponseBody (
+                         INSERT INTO Response (
                             RequestId,
-                            Text
+                            StatusCode,
+                            BodyText,
+                            Delay,
+                            DelayTime
                         ) VALUES(
                             @RequestId,
-                            @Text
+                            @StatusCode,
+                            @BodyText,
+                            @Delay,
+                            @DelayTime
                         )
                         """;
-
                 await connection.ExecuteAsync(insertQuery, new
                 {
                     RequestId = id,
-                    Text = body.Text
+                    StatusCode = response.StatusCode,
+                    BodyText = response.BodyText,
+                    Delay = response.Delay,
+                    DelayTime = response.DelayTime
                 }, transaction);
                 await transaction.CommitAsync();
             }

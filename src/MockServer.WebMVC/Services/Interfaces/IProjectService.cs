@@ -12,6 +12,5 @@ public interface IProjectService
     Task Rename(string name, string newName);
     Task<string> GenerateKey(string name);
     Task Delete(string name);
-    Task<RequestOpenViewModel> GetRequestOpenViewModel(string projectName, int requestId);
     Task SetAccessibility(string name, ProjectAccessibility accessibility);
 }

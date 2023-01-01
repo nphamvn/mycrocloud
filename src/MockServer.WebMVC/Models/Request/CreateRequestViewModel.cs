@@ -7,7 +7,7 @@ using MockServer.Core.Enums;
 
 namespace MockServer.WebMVC.Models.Request;
 
-public class CreateRequestViewModel
+public class CreateUpdateRequestModel
 {
     public RequestType Type { get; set; }
     [Required]

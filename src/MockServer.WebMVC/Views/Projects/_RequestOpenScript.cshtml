@@ -1,0 +1,263 @@
+@using MockServer.WebMVC.Controllers
+<script>
+    var requestBodyEditor = ace.edit("request-body-editor");
+    requestBodyEditor.setShowPrintMargin("false");
+    var textarea = $('textarea[name="RequestBody.Text"]').hide();
+    requestBodyEditor.getSession().setValue(textarea.val());
+    requestBodyEditor.getSession().on('change', function () {
+        textarea.val(requestBodyEditor.getSession().getValue());
+    });
+    var responsetBodyEditor = ace.edit("response-body-editor");
+    responsetBodyEditor.setShowPrintMargin("false");
+    var responsetBodyTextArea = $('textarea[name="Response.BodyText"]').hide();
+    responsetBodyEditor.getSession().setValue(responsetBodyTextArea.val());
+    responsetBodyEditor.getSession().on('change', function () {
+        responsetBodyTextArea.val(responsetBodyEditor.getSession().getValue());
+    });
+</script>
+<script>
+    $(function () {
+        $('#request-body-type').change(function (e) {
+            var mode = $('option:selected', $(this)).val();
+            setEditorMode(mode);
+        }).change();
+        $('#response-body-type').change(function (e) {
+            var mode = $('option:selected', $(this)).val();
+            setResponseBodyEditorMode(mode);
+        }).change();
+    });
+
+    function setEditorMode(mode) {
+        if (mode === 'json') {
+            requestBodyEditor.session.setMode("ace/mode/json");
+        } else if (mode === 'xml') {
+            requestBodyEditor.session.setMode("ace/mode/xml");
+        } else if (mode === 'text') {
+            requestBodyEditor.session.setMode("ace/mode/text");
+        }
+    }
+
+    function setResponseBodyEditorMode(mode) {
+        if (mode === 'json') {
+            responsetBodyEditor.session.setMode("ace/mode/json");
+        } else if (mode === 'xml') {
+            responsetBodyEditor.session.setMode("ace/mode/xml");
+        } else if (mode === 'text') {
+            responsetBodyEditor.session.setMode("ace/mode/text");
+        }
+    }
+
+    $(function () {
+        addTableEventListener();
+    });
+
+    function addTableEventListener() {
+        $('#request-params input[type=text]').off('keyup');
+        $('#request-params .param-delete').off('click');
+
+        $('#request-params input[type=text]').keyup(function () {
+            const rowIndex = $('#request-params tbody tr').index($(this).closest('tr'));
+            if (rowIndex === $('#request-params tbody tr').length - 1) {
+                appendRequestParamRow();
+                addTableEventListener();
+            }
+        });
+        $('#request-params .param-delete').click(function () {
+            $(this).off('click');
+            $(this).closest("tr").remove();
+            indexRow();
+        });
+    }
+    function indexRow() {
+        $('#request-params tbody tr').each(function (rowIndex) {
+            $("input.param-key", this).attr('name', 'RequestParams[' + rowIndex + '].Key');
+            $("input.param-value", this).attr('name', 'RequestParams[' + rowIndex + '].Value');
+            $("input.param-required", this).attr('name', 'RequestParams[' + rowIndex + '].Required');
+            $("input.param-match-exactly", this).attr('name', 'RequestParams[' + rowIndex + '].MatchExactly');
+        });
+    }
+    function appendRequestParamRow() {
+        if ('content' in document.createElement('template')) {
+            const template = document.querySelector('#requestParamRow');
+            let templateContent = template.content.cloneNode(true);
+            let tr = $(templateContent.querySelector('tr'));
+            const rowIndex = $('#request-params tbody tr').length;
+            $("input.param-key", tr).attr('name', 'RequestParams[' + rowIndex + '].Key');
+            $("input.param-value", tr).attr('name', 'RequestParams[' + rowIndex + '].Value');
+            $("input.param-required", tr).attr('name', 'RequestParams[' + rowIndex + '].Required');
+            $("input.param-match-exactly", tr).attr('name', 'RequestParams[' + rowIndex + '].MatchExactly');
+            $('#request-params tbody').append(tr);
+        } else {
+            alert('HTML template element is not supported');
+        }
+    }
+</script>
+<script>
+    $(function () {
+        addRequestHeaderTableEventListener();
+    });
+    function addRequestHeaderTableEventListener() {
+        $('#request-header-table input[type=text]').off('keyup');
+        $('#request-header-table .header-delete').off('click');
+
+        $('#request-header-table input[type=text]').keyup(function () {
+            const rowIndex = $('#request-header-table tbody tr').index($(this).closest('tr'));
+            if (rowIndex === $('#request-header-table tbody tr').length - 1) {
+                appendRequestHeaderRow();
+                addRequestHeaderTableEventListener();
+            }
+        });
+        $('#request-header-table .header-delete').click(function () {
+            $(this).off('click');
+            $(this).closest("tr").remove();
+            $('#request-header-table tbody tr').each(function (rowIndex) {
+                $("input.header-key", this).attr('name', 'RequestHeaders[' + rowIndex + '].Name');
+                $("input.header-value", this).attr('name', 'RequestHeaders[' + rowIndex + '].Value');
+                $("input.header-required", this).attr('name', 'RequestHeaders[' + rowIndex + '].Required');
+                $("input.header-match-exactly", this).attr('name', 'RequestHeaders[' + rowIndex + '].MatchExactly');
+            });
+        });
+    }
+    function appendRequestHeaderRow() {
+        if ('content' in document.createElement('template')) {
+            const template = document.querySelector('#requestHeaderRow');
+            let templateContent = template.content.cloneNode(true);
+            let tr = $(templateContent.querySelector('tr'));
+            const rowIndex = $('#request-header-table tbody tr').length;
+            $("input.header-key", tr).attr('name', 'RequestHeaders[' + rowIndex + '].Name');
+            $("input.header-value", tr).attr('name', 'RequestHeaders[' + rowIndex + '].Value');
+            $("input.header-required", tr).attr('name', 'RequestHeaders[' + rowIndex + '].Required');
+            $("input.header-match-exactly", tr).attr('name', 'RequestHeaders[' + rowIndex + '].MatchExactly');
+            $('#request-header-table tbody').append(tr);
+        } else {
+            alert('HTML template element is not supported');
+        }
+    }
+</script>
+<script>
+    $(function () {
+        addResponseHeaderTableEventListener();
+        $("#response-header-table input[type=text]").autocomplete({
+            source: ["Option 1", "Option 2", "Option 3"]
+        });
+    });
+    function addResponseHeaderTableEventListener() {
+        $('#response-header-table input[type=text]').off('keyup');
+        $('#response-header-table .header-delete').off('click');
+
+        $('#response-header-table input[type=text]').keyup(function () {
+            const rowIndex = $('#response-header-table tbody tr').index($(this).closest('tr'));
+            if (rowIndex === $('#response-header-table tbody tr').length - 1) {
+                appendResponseHeaderRow();
+                addResponseHeaderTableEventListener();
+            }
+        });
+        $('#response-header-table .header-delete').click(function () {
+            $(this).off('click');
+            $(this).closest("tr").remove();
+            $('#response-header-table tbody tr').each(function (rowIndex) {
+                $("input.header-key", this).attr('name', 'ResponseHeaders[' + rowIndex + '].Name');
+                $("input.header-value", this).attr('name', 'ResponseHeaders[' + rowIndex + '].Value');
+            });
+        });
+    }
+    function appendResponseHeaderRow() {
+        if ('content' in document.createElement('template')) {
+            const template = document.querySelector('#responseHeaderRow');
+            let templateContent = template.content.cloneNode(true);
+            let tr = $(templateContent.querySelector('tr'));
+            const rowIndex = $('#response-header-table tbody tr').length;
+            $("input.header-name", tr).attr('name', 'ResponseHeaders[' + rowIndex + '].Name');
+            $("input.header-value", tr).attr('name', 'ResponseHeaders[' + rowIndex + '].Value');
+            $('#response-header-table tbody').append(tr);
+        } else {
+            alert('HTML template element is not supported');
+        }
+    }
+</script>
+<script>
+    $(function () {
+        $('#btnSave').click(function () {
+            let params = [];
+            let headers = [];
+
+            let body = {
+                required: $("#request-body-tab input[name$='Required']").prop('checked'),
+                matchExactly: $("#request-body-tab input[name$='MatchExactly']").prop('checked'),
+                format: 'json',
+                text: $('textarea[name="RequestBody.Text"]').val()
+            };
+            $('#request-params tbody tr').each(function () {
+                const key = $("input[name$='Key']", this).val();
+                const value = $("input[name$='Value']", this).val();
+                const required = $("input[name$='Required']", this).prop('checked');
+                const matchExactly = $("input[name$='MatchExactly']", this).prop('checked');
+                if (key !== '' && value !== '') {
+                    params.push({
+                        key: key,
+                        value: value,
+                        required: required,
+                        matchExactly: matchExactly
+                    });
+                }
+            });
+            $('#request-header-table tbody tr').each(function () {
+                const name = $("input[name$='Name']", this).val();
+                const value = $("input[name$='Value']", this).val();
+                const required = $("input[name$='Required']", this).prop('checked');
+                const matchExactly = $("input[name$='MatchExactly']", this).prop('checked');
+                if (name !== '' && value !== '') {
+                    headers.push({
+                        name: name,
+                        value: value,
+                        required: required,
+                        matchExactly: matchExactly
+                    });
+                }
+            });
+            let responseHeaders = [];
+            $('#response-header-table tbody tr').each(function () {
+                const name = $("input[name$='Name']", this).val();
+                const value = $("input[name$='Value']", this).val();
+                if (name !== '' && value !== '') {
+                    responseHeaders.push({
+                        name: name,
+                        value: value
+                    });
+                }
+            });
+
+            let response = {
+                statusCode: $('input[name="Response.StatusCode"]').val(),
+                bodyText: $('textarea[name="Response.BodyText"]').val(),
+                delay: $('input[name="Response.Delay"]').prop('checked'),
+                delayTime: $('input[name="Response.DelayTime"]').val()
+            };
+
+            let fields = [];
+            fields[0] = '@nameof(Model.RequestParams)';
+            fields[1] = '@nameof(Model.RequestHeaders)';
+            fields[2] = '@nameof(Model.RequestBody)';
+            fields[3] = '@nameof(Model.ResponseHeaders)';
+            fields[4] = '@nameof(Model.Response)';
+            const projectName = '@ViewData["ProjectName"]';
+            const requestId = @ViewData["RequestId"];
+            $.post({
+                url: '@Url.Action(nameof(RequestsController.ConfigFixedRequest), "Requests", new { projectName = ViewData["ProjectName"], id = ViewData["RequestId"]})',
+                data: {
+                    fields: fields,
+                    RequestParams: params,
+                    RequestHeaders: headers,
+                    RequestBody: body,
+                    ResponseHeaders: responseHeaders,
+                    response: response
+                },
+                success: function (data) {
+                },
+                error: function (xhr, status, error) {
+                    alert('Error:' + error);
+                }
+            });
+        });
+    });
+</script>

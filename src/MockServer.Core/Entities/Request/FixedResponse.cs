@@ -1,5 +1,4 @@
-﻿using System;
-namespace MockServer.Core.Entities.Requests
+﻿namespace MockServer.Core.Entities.Requests
 {
     public class FixedResponse : BaseEntity
     {

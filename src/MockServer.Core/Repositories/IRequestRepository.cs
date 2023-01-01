@@ -14,16 +14,15 @@ public interface IRequestRepository
     Task<IEnumerable<Request>> GetProjectRequests(int ProjectId);
     Task<int> Create(int userId, string projectName, Request request);
     Task<FixedRequest> GetFixedRequestConfig(int userId, string projectName, int id);
-    Task SaveFixedRequestConfig(int userId, string projectName, int req, FixedRequest config);
     Task UpdateRequestParams(int id, FixedRequest config);
     Task UpdateRequestHeaders(int id, FixedRequest config);
     Task UpdateRequestBody(int id, FixedRequest config);
     Task UpdateResponseHeaders(int id, FixedRequest config);
-    Task UpdateResponseBody(int id, FixedRequest config);
+    Task UpdateResponse(int id, FixedRequest config);
     Task Delete(int userId, string projectName, int id);
     Task<IEnumerable<RequestParam>> GetRequestParams(int id);
     Task<IEnumerable<RequestHeader>> GetRequestHeaders(int id);//GetResponseHeaders
     Task<RequestBody> GetRequestBody(int requestId);
     Task<IEnumerable<ResponseHeader>> GetResponseHeaders(int id);
-    Task<ResponseBody> GetResponseBody(int requestId);
+    Task<Response> GetResponse(int requestId);
 }

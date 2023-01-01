@@ -1,19 +1,18 @@
+@using MockServer.Core.Models
 @using MockServer.WebMVC.Controllers
+@using MockServer.WebMVC.Extentions
+
 @model MockServer.WebMVC.Models.Project.ProjectViewViewModel
 <div class="row h-100 p-2">
     <div class="col-3 h-100 overflow-scroll">
-        <div class="d-grid gap-2">
-            <button type="button" onclick="getCreateRequestPartial()" class="btn btn-sm bg-violet-500 text-white"
-                data-bs-toggle="modal" data-bs-target="#createRequestModalCenter">
-                New
-            </button>
+        <div class="d-grid mt-1">
+            <button id="btnNewRequest" type="button" class="btn btn-sm bg-violet-500 text-white">New</button>
         </div>
         <div class="request-container">
             <ul id="requests" class="list-group list-group-flush mt-2">
                 @foreach (var req in Model.Requests)
                 {
-                    <li data-request-id="@req.Id" id="request-@req.Id"
-                    class="request-list-item list-group-item px-2 rounded">
+                    <li data-request-id="@req.Id" id="request-@req.Id" class="request-list-item list-group-item px-2 py-1">
                         <div class="row">
                             <div class="col" onclick="openRequest(@req.Id)">
                                 <span class="text-base fw-light text-slate-700">@req.Name</span>
@@ -23,7 +22,7 @@
                                     <small class="text-muted">/@req.Path</small>
                                 </div>
                             </div>
-                            <div class="p-0" style="width: 40px;">
+                            <div class="p-0 my-auto" style="width: 40px;">
                                 <button class="btn btn-sm btn-context-menu" type="button">
                                     ...
                                 </button>
@@ -37,15 +36,7 @@
     <div class="col-9 h-100" id="RequestOpen">
     </div>
 </div>
-<!-- Modal -->
-<div class="modal fade" id="createRequestModalCenter" tabindex="-1" role="dialog"
-    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div id="createRequestModalContent" class="modal-content">
 
-        </div>
-    </div>
-</div>
 <template id="context-menu">
     <div class="context-menu-container">
         <div class="btn-group-vertical" role="group">
@@ -75,6 +66,68 @@
         </div>
     </div>
 </template>
+
+<script>
+    $(function () {
+        $('#btnNewRequest').click(function () {
+            loadPartial();
+        });
+    });
+    function loadPartial() {
+        $.get({
+            url: '@Url.Action("GetCreatePartial", "Requests", new {projectName = ViewData["ProjectName"]})',
+            success: function (data) {
+                const html = data;
+                const modal = $(html);
+                modal.on('shown.bs.modal', function () {
+                    $('#btnSave', modal).click(function () {
+                        let request = {
+                            Type: $('input[name=Type]:checked', modal).val(),
+                            Name: $('input[name=Name]', modal).val(),
+                            Description: $('input[name=Description]', modal).val(),
+                            Method: $('select[name=Method] option:selected', modal).val(),
+                            Path: $('input[name=Path]', modal).val()
+                        };
+                        $.post({
+                            url: '@Url.Action(nameof(RequestsController.CreateAjax), "Requests", new {projectName = ViewData["ProjectName"]})',
+                            data: request,
+                            success: function (data) {
+                                $('#btnSave', modal).off('click');
+                                const id = data;
+                                modal.data('id', id);
+                                modal.modal('hide');
+                            },
+                            error: function () {
+                                alert('something went wrong');
+                            }
+                        });
+                    });
+                    $('select[name=Method]').on('change', function () {
+                        generatePreviewUrl(modal);
+                    });
+                    $('input[name=Path]').on('keyup', function () {
+                        generatePreviewUrl(modal);
+                    });
+                });
+                modal.on('hidden.bs.modal', function (e) {
+                    if (modal.data('id') !== undefined) {
+                        console.log('TODO: open request id ' + modal.data('id'));
+                        location.reload();
+                    }
+                    modal.remove();
+                });
+                generatePreviewUrl(modal);
+                modal.modal('show');
+            }
+        });
+    }
+    let baseUrl = '@string.Format("https://{0}.{1}.mockserver.com", ViewData["ProjectName"], User.Parse<ApplicationUser>().Username)';
+    function generatePreviewUrl(modal) {
+        const method = $('select[name=Method] option:selected', modal).text();
+        const path = $('input[name=Path]', modal).val();
+        $('#previewUrl', modal).val(method + '  ' + baseUrl + '/' + path);
+    }
+</script>
 <script>
     const documentClickHandler = function (e) {
         const menu = $('.context-menu-container');
@@ -165,6 +218,4 @@
         selected.addClass('bg-gray');
         $('#RequestOpen').load('/Projects/@ViewData["ProjectName"]/Requests/' + id);
     }
-
-
 </script>

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MockServer.Core.Entities.Requests;
 using MockServer.Core.Enums;
 
@@ -14,7 +10,6 @@ public class RequestOpenViewModel
     public RequestMethod Method { get; set; }
     public string Path { get; set; }
     public string ProjectName { get; set; }
-    public int ProjectId { get; set; }
     public RequestType Type { get; set; }
     public string Username { get; set; }
     public string Description { get; set; }
@@ -28,9 +23,22 @@ public class RequestOpenViewModel
         RequestMethod.GET => "text-green",
         _ => "text-red"
     };
+    //public IList<RequestParam> RequestParams { get; set; }
+    //public IList<RequestHeader> RequestHeaders { get; set; }
+    //public RequestBody RequestBody { get; set; }
+    //public IList<ResponseHeader> ResponseHeaders { get; set; }
+    //public Response Response { get; set; }
+    public RequestConfiguration Configuration { get; set; }
+}
+public class RequestConfiguration
+{
+
+}
+public class FixedRequestConfiguration : RequestConfiguration
+{
     public IList<RequestParam> RequestParams { get; set; }
     public IList<RequestHeader> RequestHeaders { get; set; }
     public RequestBody RequestBody { get; set; }
     public IList<ResponseHeader> ResponseHeaders { get; set; }
-    public ResponseBody ResponseBody { get; set; }
+    public Response Response { get; set; }
 }

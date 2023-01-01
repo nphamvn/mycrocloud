@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MockServer.Core.Entities.Requests;
 
@@ -14,17 +11,9 @@ public class FixedRequestConfigViewModel
     public IList<RequestHeader> RequestHeaders { get; set; }
     public RequestBody RequestBody { get; set; }
     public IList<ResponseHeader> ResponseHeaders { get; set; }
-    public ResponseBody ResponseBody { get; set; }
-    public int ResponseStatusCode { get; set; }
-    public string ResponseBodyText { get; set; }
-    public int RequestId { get; set; }
-    public string ResponseContentType { get; set; }
-    public int Delay { get; set; }
+    public Response Response { get; set; }
     public static ICollection<SelectListItem> CommonHttpStatusCode
-         => GetCommonHttpStatusCode();
-    private static ICollection<SelectListItem> GetCommonHttpStatusCode()
-    {
-        return new List<SelectListItem>
+         => new List<SelectListItem>
         {
             new SelectListItem(nameof(HttpStatusCode.OK), ((int)HttpStatusCode.OK).ToString()),
             new SelectListItem(nameof(HttpStatusCode.Created), ((int)HttpStatusCode.Created).ToString()),
@@ -37,5 +26,4 @@ public class FixedRequestConfigViewModel
             new SelectListItem(nameof(HttpStatusCode.RequestTimeout), ((int)HttpStatusCode.RequestTimeout).ToString()),
             new SelectListItem(nameof(HttpStatusCode.InternalServerError), ((int)HttpStatusCode.InternalServerError).ToString()),
         };
-    }
 }

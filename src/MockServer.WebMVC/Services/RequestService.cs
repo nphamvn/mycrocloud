@@ -1,8 +1,10 @@
 using Ardalis.GuardClauses;
 using AutoMapper;
+using MockServer.Core.Enums;
 using MockServer.Core.Models;
 using MockServer.Core.Repositories;
 using MockServer.WebMVC.Extentions;
+using MockServer.WebMVC.Models.Project;
 using MockServer.WebMVC.Models.Request;
 using MockServer.WebMVC.Services.Interfaces;
 
@@ -12,7 +14,7 @@ public class RequestService : IRequestService
 {
     private readonly IHttpContextAccessor contextAccessor;
     private readonly IRequestRepository _requestRepository;
-    private readonly IMapper mapper;
+    private readonly IMapper _mapper;
 
     public RequestService(IHttpContextAccessor contextAccessor,
     IRequestRepository requestRepository,
@@ -20,9 +22,40 @@ public class RequestService : IRequestService
     {
         this.contextAccessor = contextAccessor;
         _requestRepository = requestRepository;
-        this.mapper = mapper;
+        _mapper = mapper;
     }
-    public async Task<int> Create(string projectName, CreateRequestViewModel request)
+    public async Task<RequestOpenViewModel> GetRequestOpenViewModel(string projectName, int requestId)
+    {
+        var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
+        Guard.Against.Null(user, nameof(ApplicationUser));
+        var request = await _requestRepository.Get(user.Id, projectName, requestId);
+        var vm = _mapper.Map<RequestOpenViewModel>(request);
+        vm.Configuration = await this.GetRequestConfiguration(request);
+        vm.Username = user.Username;
+        vm.ProjectName = projectName;
+        return vm;
+    }
+    private async Task<RequestConfiguration> GetRequestConfiguration(Core.Entities.Requests.Request request)
+    {
+        RequestConfiguration ret = null;
+        switch (request.Type)
+        {
+            case RequestType.Fixed:
+                ret = new FixedRequestConfiguration
+                {
+                    RequestParams = (await _requestRepository.GetRequestParams(request.Id)).ToList(),
+                    RequestHeaders = (await _requestRepository.GetRequestHeaders(request.Id)).ToList(),
+                    RequestBody = await _requestRepository.GetRequestBody(request.Id),
+                    ResponseHeaders = (await _requestRepository.GetResponseHeaders(request.Id)).ToList(),
+                    Response = await _requestRepository.GetResponse(request.Id)
+                };
+                break;
+            default:
+                break;
+        }
+        return ret;
+    }
+    public async Task<int> Create(string projectName, CreateUpdateRequestModel request)
     {
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
@@ -30,7 +63,7 @@ public class RequestService : IRequestService
         var existing = await _requestRepository.FindRequest(user.Id, projectName, request.Method, request.Path);
         if (existing == null)
         {
-            var mapped = mapper.Map<Core.Entities.Requests.Request>(request);
+            var mapped = _mapper.Map<Core.Entities.Requests.Request>(request);
             return await _requestRepository.Create(user.Id, projectName, mapped);
         }
         else
@@ -51,7 +84,7 @@ public class RequestService : IRequestService
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
         var request = await _requestRepository.Get(user.Id, projectname, id);
-        return mapper.Map<RequestItem>(request);
+        return _mapper.Map<RequestItem>(request);
     }
 
     public async Task<FixedRequestConfigViewModel> GetFixedRequestConfigViewModel(string projectname, int id)
@@ -60,14 +93,14 @@ public class RequestService : IRequestService
         Guard.Against.Null(user, nameof(ApplicationUser));
         var request = await _requestRepository.GetFixedRequestConfig(user.Id, projectname, id);
 
-        return mapper.Map<FixedRequestConfigViewModel>(request);
+        return _mapper.Map<FixedRequestConfigViewModel>(request);
     }
 
     public async Task SaveFixedRequestConfig(string projectname, int id, string[] fields, FixedRequestConfigViewModel config)
     {
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
-        var mapped = mapper.Map<Core.Entities.Requests.FixedRequest>(config);
+        var mapped = _mapper.Map<Core.Entities.Requests.FixedRequest>(config);
         if (fields.Contains(nameof(config.RequestParams)))
         {
             await _requestRepository.UpdateRequestParams(id, mapped);
@@ -87,9 +120,9 @@ public class RequestService : IRequestService
         {
             await _requestRepository.UpdateResponseHeaders(id, mapped);
         }
-        if (fields.Contains(nameof(config.ResponseBody)))
+        if (fields.Contains(nameof(config.Response)))
         {
-            await _requestRepository.UpdateResponseBody(id, mapped);
+            await _requestRepository.UpdateResponse(id, mapped);
         }
     }
 }

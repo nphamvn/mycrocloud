@@ -1,0 +1,20 @@
+@model MockServer.WebMVC.Models.Project.RequestOpenViewModel
+
+<div id="request-define">
+    <div class="mb-1">
+        <strong class="fw-bolder">@Model.Name</strong>
+    </div>
+    <div class="mb-2">
+        <small>@Model.Description</small>
+    </div>
+    <div class="mb-2">
+        <strong class="me-2 @Model.MethodTextColor" id="method">@Model.Method</strong>
+        <span id="path">@Model.Path</span>
+    </div>
+    <div class="input-group mb-3">
+        <input id="privateKey" type="text" class="form-control" value="@Model.Url" readonly>
+        <button id="btnCopyPrivateKeyToClipboard" type="button" class="input-group-text">
+            <i class="bi bi-clipboard">
+            </i></button>
+    </div>
+</div>

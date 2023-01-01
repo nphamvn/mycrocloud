@@ -2,6 +2,7 @@ using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using MockServer.Core.Entities.Requests;
 using MockServer.Core.Enums;
 using MockServer.WebMVC.Attributes;
 using MockServer.WebMVC.Models.Request;
@@ -17,8 +18,8 @@ public class RequestsController : Controller
     public RequestsController(IRequestService requestService)
     {
         _requestService = requestService;
-
     }
+
     [HttpGet("create")]
     public async Task<IActionResult> Create(string projectName)
     {
@@ -27,7 +28,7 @@ public class RequestsController : Controller
     }
 
     [HttpPost("create")]
-    public async Task<IActionResult> Create(string projectName, CreateRequestViewModel request)
+    public async Task<IActionResult> Create(string projectName, CreateUpdateRequestModel request)
     {
         if (!ModelState.IsValid)
         {
@@ -39,7 +40,7 @@ public class RequestsController : Controller
 
     [AjaxOnly]
     [HttpPost("create")]
-    public async Task<IActionResult> CreateAjax(string projectName, CreateRequestViewModel request)
+    public async Task<IActionResult> CreateAjax(string projectName, CreateUpdateRequestModel request)
     {
         if (!ModelState.IsValid)
         {
@@ -91,10 +92,20 @@ public class RequestsController : Controller
     }
 
     [AjaxOnly]
-    [HttpGet("/create")]
+    [HttpGet("create")]
     public async Task<IActionResult> GetCreatePartial(string projectName)
     {
         ViewData["ProjectName"] = projectName;
         return PartialView("Views/Requests/_CreateRequestPartial.cshtml");
+    }
+
+    [AjaxOnly]
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetOpenParital(string projectName, int id)
+    {
+        ViewData["ProjectName"] = projectName;
+        ViewData["RequestId"] = id;
+        var vm = await _requestService.GetRequestOpenViewModel(projectName, id);
+        return PartialView("Views/Projects/_RequestOpen.cshtml", vm);
     }
 }

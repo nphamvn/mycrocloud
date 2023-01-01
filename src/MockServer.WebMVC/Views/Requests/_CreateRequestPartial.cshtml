@@ -1,116 +1,83 @@
 @using MockServer.Core.Enums
-@using MockServer.Core.Models
-@using MockServer.WebMVC.Controllers
-@using MockServer.WebMVC.Extentions
-@model MockServer.WebMVC.Models.Request.CreateRequestViewModel
+@model MockServer.WebMVC.Models.Request.CreateUpdateRequestModel
 
-@* <form method="post" asp-action="Create" asp-controller="Requests" asp-route-projectName="@ViewData["ProjectName"]">
-*@
-<div class="modal-header">
-    <h1 class="modal-title fs-5" id="exampleModalLabel">Create new request</h1>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Create new request</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <div class="mb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" value="@((int)RequestType.Fixed)"
+                                asp-for="Type" checked>
+                            <label class="form-check-label" for="FIXED">Fixed</label>
+                        </div>
+                        <span id="emailHelp" class="form-text text-muted px-3">Return a "mock" response when a
+                            request matches an expectation</span>
+                    </div>
+                    <div class="mb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" value="@((int)RequestType.Forwarding)"
+                                asp-for="Type">
+                            <label class="form-check-label" for="FORWARD">Forward</label>
+                        </div>
+                        <small id="emailHelp" class="form-text text-muted px-3">Forward a request when the request
+                            matches an expectation (i.e. a dynamic port forwarding proxy)
+                        </small>
+                    </div>
+                    <div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" value="@((int)RequestType.Callback)"
+                                asp-for="Type">
+                            <label class="form-check-label" for="CALLBACK">Callback</label>
+                        </div>
+                        <small id="emailHelp" class="form-text text-muted px-3">Execute a callback when a request
+                            matches an expectation, allowing the response to be created dynamically
+                        </small>
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group mb-2">
+                        <label asp-for="Name"></label>
+                        <input class="form-control" type="text" asp-for="Name" autocomplete="off">
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label asp-for="Description"></label>
+                        <input class="form-control" type="text" asp-for="Description" autocomplete="off">
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="form-group col-3">
+                            <label asp-for="Method">Method</label>
+                            <select id="method" class="form-control" asp-for="Method">
+                                @foreach (var method in Enum.GetValues(typeof(RequestMethod)))
+                                {
+                                    <option value="@((int)method)">@method</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group col-9">
+                            <label asp-for="Path">Path</label>
+                            <input id="path" class="form-control" type="text" asp-for="Path" placeholder="foo"
+                                autocomplete="off">
+                            <span asp-validation-for="Path" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label>Url</label>
+                        <input readonly class="form-control" type="text" id="previewUrl">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="btnSave" type="button" class="btn btn-primary btn-save">Save</button>
+            </div>
+        </div>
+    </div>
 </div>
-<div class="modal-body">
-    <div class="mb-2">
-        <div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" asp-for="Type" value="@((int)RequestType.Fixed)" checked>
-                <label class="form-check-label" for="FIXED">Fixed</label>
-            </div>
-            <span id="emailHelp" class="form-text text-muted px-3">Return a "mock" response when a request matches
-                an
-                expectation</span>
-        </div>
-        <div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" asp-for="Type" value="@((int)RequestType.Forwarding)">
-                <label class="form-check-label" for="FORWARD">Forward</label>
-            </div>
-            <small id="emailHelp" class="form-text text-muted px-3">Forward a request when the request matches an
-                expectation
-                (i.e. a dynamic port forwarding proxy)
-            </small>
-        </div>
-        <div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" asp-for="Type" value="@((int)RequestType.Callback)">
-                <label class="form-check-label" for="CALLBACK">Callback</label>
-            </div>
-            <small id="emailHelp" class="form-text text-muted px-3">Execute a callback when a request matches an
-                expectation,
-                allowing the response to be created dynamically
-            </small>
-        </div>
-    </div>
-    <div class="form-group mb-2">
-        <label asp-for="Name"></label>
-        <input class="form-control" type="text" asp-for="Name">
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
-    <div class="form-group mb-2">
-        <label asp-for="Description"></label>
-        <input class="form-control" type="text" asp-for="Description">
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-    <div class="row mb-2">
-        <div class="form-group col-3">
-            <label asp-for="Method">Method</label>
-            <select id="method" class="form-control" asp-for="Method" onchange="generatePreviewUrl()">
-                @foreach (var method in Enum.GetValues(typeof(RequestMethod)))
-                {
-                    <option value="@((int)method)">@method</option>
-                }
-            </select>
-        </div>
-        <div class="form-group col-9">
-            <label asp-for="Path">Path</label>
-            <input id="path" class="form-control" type="text" asp-for="Path" placeholder="foo"
-                onkeypress="validatePathTyping(event)" onkeyup="generatePreviewUrl()">
-            <span asp-validation-for="Path" class="text-danger"></span>
-        </div>
-    </div>
-    <div class="form-group mb-3">
-        <label>Url</label>
-        <input readonly class="form-control" type="text" id="previewUrl">
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button id="btnSave" type="button" class="btn btn-primary">Save & Continue</button>
-    </div>
-</div>
-<script>
-    let baseUrl = 'https://' + '@(User.Parse<ApplicationUser>().Username)' + '.mockserver.com/' + '@ViewData["ProjectName"]' + '/';
-    function generatePreviewUrl() {
-        var method = $('select[name=Method] option:selected').text();
-        var path = $('#path').val();
-        $('#previewUrl').val(method + '     ' + baseUrl + path);
-    }
-    function validatePathTyping(event) {
-        if (event.which == 32) {
-            event.preventDefault();
-            return false;
-        }
-    }
-</script>
-<script>
-    $(function () {
-        generatePreviewUrl();
-        $('#btnSave').click(function () {
-            $.post({
-                url: '@Url.Action(nameof(RequestsController.Create), "Requests", new {projectName=@ViewData["ProjectName"]})',
-                data: {
-                    type: $('input[name=Type]:checked').val(),
-                    name: $('input[name=Name]').val(),
-                    description: $('input[name=Description]').val(),
-                    path: $('input[name=Path]').val(),
-                    method: $("select[name=Method] option:selected").val(),
-                },
-                success: function (data) {
-                    location.reload();
-                }, error: function (xhr, status, error) {
-                    alert(error);
-                }
-            })
-        });
-    });
-</script>
