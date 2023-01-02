@@ -1,7 +1,10 @@
 @using MockServer.Core.Enums
 @model MockServer.WebMVC.Models.Request.CreateUpdateRequestModel
-
+@{
+    string formMode = ViewData["FormMode"]?.ToString() ?? "Create";
+}
 <div class="modal fade">
+    <input type="hidden" name="formMode" value="@formMode">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -75,6 +78,7 @@
                 </div>
             </div>
             <div class="modal-footer">
+
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button id="btnSave" type="button" class="btn btn-primary btn-save">Save</button>
             </div>

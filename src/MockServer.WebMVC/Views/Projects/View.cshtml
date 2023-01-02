@@ -29,14 +29,13 @@
     <!-- Tab content -->
     <div class="tab-content h-100">
         <div id="requests-tab" class="tab-pane fade show active h-100">
-            <partial name="_RequestsPartial" model="Model" />
+            <partial name="_RequestsPartial.cshtml" model="Model" />
         </div>
         <div id="settings-tab" class="tab-pane fade h-100">
-            <partial name="_SettingsPartial" model="Model.ProjectInfo" />
+            <partial name="_SettingsPartial.cshtml" model="Model.ProjectInfo" />
         </div>
     </div>
 </div>
-
 @section Scripts
 {
 <script src="~/lib/json-editor.js"></script>

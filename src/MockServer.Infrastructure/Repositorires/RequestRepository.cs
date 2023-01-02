@@ -213,24 +213,6 @@ public class RequestRepository : IRequestRepository
         });
     }
 
-    public async Task<FixedResponse> GetFixedResponse(int requestId)
-    {
-        var query =
-                """
-                SELECT res.*
-                FROM FixedRequestResponse res
-                    INNER JOIN
-                    Requests req ON res.RequestId = req.Id
-                WHERE req.Id = @id;
-                """;
-
-        using var connection = new SqliteConnection(_connectionString);
-        return await connection.QuerySingleOrDefaultAsync<FixedResponse>(query, new
-        {
-            id = requestId
-        });
-    }
-
     public async Task<ForwardingRequest> GetForwardingRequest(int requestId)
     {
         var query =
@@ -349,6 +331,7 @@ public class RequestRepository : IRequestRepository
                     SELECT
                         StatusCode,
                         BodyText,
+                        BodyTextRenderEngine,
                         Delay,
                         DelayTime
                     FROM
@@ -380,6 +363,33 @@ public class RequestRepository : IRequestRepository
         return await connection.QueryAsync<ResponseHeader>(query, new
         {
             RequestId = id
+        });
+    }
+
+    public async Task Update(int userId, string projectName, int id, Request request)
+    {
+        var query =
+                    """
+                    UPDATE
+                        Requests
+                    SET
+                        Type = @Type,
+                        Name = @Name,
+                        Method = @Method,
+                        Path = @Path,
+                        Description = @Description
+                    WHERE
+                        Id = @Id
+                    """;
+        using var connection = new SqliteConnection(_connectionString);
+        await connection.ExecuteAsync(query, new
+        {
+            Id = id,
+            Type = (int)request.Type,
+            Name = request.Name,
+            Method = (int)request.Method,
+            Path = request.Path,
+            Description = request.Description
         });
     }
 
@@ -561,12 +571,14 @@ public class RequestRepository : IRequestRepository
                          INSERT INTO Response (
                             RequestId,
                             StatusCode,
+                            BodyTextRenderEngine,
                             BodyText,
                             Delay,
                             DelayTime
                         ) VALUES(
                             @RequestId,
                             @StatusCode,
+                            @BodyTextRenderEngine,
                             @BodyText,
                             @Delay,
                             @DelayTime
@@ -577,6 +589,7 @@ public class RequestRepository : IRequestRepository
                     RequestId = id,
                     StatusCode = response.StatusCode,
                     BodyText = response.BodyText,
+                    BodyTextRenderEngine = response.BodyTextRenderEngine,
                     Delay = response.Delay,
                     DelayTime = response.DelayTime
                 }, transaction);

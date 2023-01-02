@@ -1,5 +1,8 @@
 using System.Net;
+using MockServer.Core.Interfaces;
 using MockServer.Core.Repositories;
+using MockServer.Core.Services;
+using MockServer.ReverseProxyServer.Extentions;
 using MockServer.ReverseProxyServer.Interfaces;
 using MockServer.ReverseProxyServer.Models;
 
@@ -16,12 +19,30 @@ public class FixedRequestHandler : IRequestHandler
 
     public async Task<ResponseMessage> GetResponseMessage(AppRequest request)
     {
-        var response = await _requestRepository.GetFixedResponse(request.Id);
-
+        var response = await _requestRepository.GetResponse(request.Id);
+        string content = "";
+        if (response.BodyTextRenderEngine == 1)
+        {
+            //static
+            content = response.BodyText;
+        }
+        else if (response.BodyTextRenderEngine == 2)
+        {
+            //Handlebars
+            ITemplateRenderService renderService = new HandlebarsTemplateRenderService();
+            var data = new
+            {
+                ctx = new
+                {
+                    request = HttpContextExtentions.GetRequestDictionary(request.HttpContext)
+                }
+            };
+            content = renderService.Render(data, response.BodyText);
+        }
         return new ResponseMessage
         {
             StatusCode = (HttpStatusCode)response.StatusCode,
-            Content = new StringContent(response.Body)
+            Content = new StringContent(content)
         };
     }
 }

@@ -20,22 +20,22 @@ public class RequestsController : Controller
         _requestService = requestService;
     }
 
-    [HttpGet("create")]
-    public async Task<IActionResult> Create(string projectName)
+    [AjaxOnly]
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> Open(string projectName, int id)
     {
         ViewData["ProjectName"] = projectName;
-        return View("Views/Requests/Create.cshtml");
+        ViewData["RequestId"] = id;
+        var vm = await _requestService.GetRequestOpenViewModel(projectName, id);
+        return PartialView("Views/Projects/_RequestOpen.cshtml", vm);
     }
 
-    [HttpPost("create")]
-    public async Task<IActionResult> Create(string projectName, CreateUpdateRequestModel request)
+    [AjaxOnly]
+    [HttpGet("create")]
+    public async Task<IActionResult> GetCreatePartial(string projectName)
     {
-        if (!ModelState.IsValid)
-        {
-            return View("Views/Requests/Create.cshtml", request);
-        }
-        int id = await _requestService.Create(projectName, request);
-        return RedirectToAction(nameof(Config), new { projectName = projectName, id = id });
+        ViewData["ProjectName"] = projectName;
+        return PartialView("Views/Requests/_CreateRequestPartial.cshtml", new CreateUpdateRequestModel());
     }
 
     [AjaxOnly]
@@ -54,25 +54,27 @@ public class RequestsController : Controller
         });
     }
 
-    [HttpGet("{id:int}/config")]
-    public async Task<IActionResult> Config(string projectName, int id)
+    [AjaxOnly]
+    [HttpGet("{id:int}/edit")]
+    public async Task<IActionResult> GetEditPartial(string projectName, int id)
     {
-        var request = await _requestService.Get(projectName, id);
-        Guard.Against.Null(request);
+        var vm = await _requestService.GetRequestViewModel(projectName, id);
         ViewData["ProjectName"] = projectName;
-        ViewData["RequestId"] = id;
-        switch (request.Type)
+        ViewData["FormMode"] = "Edit";
+        return PartialView("Views/Requests/_CreateRequestPartial.cshtml", vm);
+    }
+
+    [AjaxOnly]
+    [HttpPost("{id:int}/edit")]
+    public async Task<IActionResult> Edit(string projectName, int id, CreateUpdateRequestModel request)
+    {
+        if (!await _requestService.ValidateEdit(projectName, id, request, ModelState))
         {
-            case RequestType.Fixed:
-                var vm = await _requestService.GetFixedRequestConfigViewModel(projectName, id);
-                return View("Views/Requests/FixedRequestConfig.cshtml", vm);
-            case RequestType.Forwarding:
-                return View("Views/Requests/ForwardingRequestConfig.cshtml", id);
-            case RequestType.Callback:
-                return View("Views/Requests/CallbackRequestConfig.cshtml", id);
-            default:
-                return View("Views/Shared/Error.cshtml");
+            IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
+            return BadRequest(allErrors);
         }
+        await _requestService.Edit(projectName, id, request);
+        return NoContent();
     }
 
     [AjaxOnly]
@@ -89,23 +91,5 @@ public class RequestsController : Controller
     {
         await _requestService.Delete(projectName, id);
         return Ok();
-    }
-
-    [AjaxOnly]
-    [HttpGet("create")]
-    public async Task<IActionResult> GetCreatePartial(string projectName)
-    {
-        ViewData["ProjectName"] = projectName;
-        return PartialView("Views/Requests/_CreateRequestPartial.cshtml");
-    }
-
-    [AjaxOnly]
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetOpenParital(string projectName, int id)
-    {
-        ViewData["ProjectName"] = projectName;
-        ViewData["RequestId"] = id;
-        var vm = await _requestService.GetRequestOpenViewModel(projectName, id);
-        return PartialView("Views/Projects/_RequestOpen.cshtml", vm);
     }
 }

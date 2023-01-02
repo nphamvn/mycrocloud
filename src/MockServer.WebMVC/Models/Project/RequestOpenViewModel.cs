@@ -23,11 +23,6 @@ public class RequestOpenViewModel
         RequestMethod.GET => "text-green",
         _ => "text-red"
     };
-    //public IList<RequestParam> RequestParams { get; set; }
-    //public IList<RequestHeader> RequestHeaders { get; set; }
-    //public RequestBody RequestBody { get; set; }
-    //public IList<ResponseHeader> ResponseHeaders { get; set; }
-    //public Response Response { get; set; }
     public RequestConfiguration Configuration { get; set; }
 }
 public class RequestConfiguration

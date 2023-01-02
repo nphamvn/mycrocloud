@@ -230,6 +230,7 @@
             let response = {
                 statusCode: $('input[name="Response.StatusCode"]').val(),
                 bodyText: $('textarea[name="Response.BodyText"]').val(),
+                bodyTextRenderEngine: $('select[name="Response.BodyTextRenderEngine"] option:selected').val(),
                 delay: $('input[name="Response.Delay"]').prop('checked'),
                 delayTime: $('input[name="Response.DelayTime"]').val()
             };
@@ -260,4 +261,60 @@
             });
         });
     });
+</script>
+<script>
+    $(function () {
+        $('#btnEdit').click(function () {
+            openEditor();
+        });
+    });
+    function openEditor() {
+        $.get({
+            url: '@Url.Action(nameof(RequestsController.GetEditPartial), "Requests", new {projectName = ViewData["ProjectName"], id = ViewData["RequestId"]})',
+            success: function (data) {
+                const html = data;
+                const modal = $(html);
+                modal.on('shown.bs.modal', function () {
+                    $('#btnSave', modal).click(function () {
+                        const formMode = $('input[name=formMode]').val();
+                        let request = {
+                            Type: $('input[name=Type]:checked', modal).val(),
+                            Name: $('input[name=Name]', modal).val(),
+                            Description: $('input[name=Description]', modal).val(),
+                            Method: $('select[name=Method] option:selected', modal).val(),
+                            Path: $('input[name=Path]', modal).val()
+                        };
+                        $.post({
+                            url: '@Url.Action(nameof(RequestsController.Edit), "Requests", new {projectName = ViewData["ProjectName"], id = ViewData["RequestId"]})',
+                            data: request,
+                            success: function (data) {
+                                $('#btnSave', modal).off('click');
+                                const id = data;
+                                modal.data('id', id);
+                                modal.modal('hide');
+                            },
+                            error: function () {
+                                alert('something went wrong');
+                            }
+                        });
+                    });
+                    $('select[name=Method]').on('change', function () {
+                        generatePreviewUrl(modal);
+                    });
+                    $('input[name=Path]').on('keyup', function () {
+                        generatePreviewUrl(modal);
+                    });
+                });
+                modal.on('hidden.bs.modal', function (e) {
+                    if (modal.data('id') !== undefined) {
+                        console.log('TODO: open request id ' + modal.data('id'));
+                        location.reload();
+                    }
+                    modal.remove();
+                });
+                generatePreviewUrl(modal);
+                modal.modal('show');
+            }
+        });
+    }
 </script>

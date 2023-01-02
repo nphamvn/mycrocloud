@@ -1,5 +1,6 @@
 using Ardalis.GuardClauses;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MockServer.Core.Enums;
 using MockServer.Core.Models;
 using MockServer.Core.Repositories;
@@ -91,7 +92,7 @@ public class RequestService : IRequestService
     {
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
-        var request = await _requestRepository.GetFixedRequestConfig(user.Id, projectname, id);
+        var request = await _requestRepository.Get(user.Id, projectname, id);
 
         return _mapper.Map<FixedRequestConfigViewModel>(request);
     }
@@ -123,6 +124,33 @@ public class RequestService : IRequestService
         if (fields.Contains(nameof(config.Response)))
         {
             await _requestRepository.UpdateResponse(id, mapped);
+        }
+    }
+
+    public async Task<CreateUpdateRequestModel> GetRequestViewModel(string projectName, int requestId)
+    {
+        var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
+        Guard.Against.Null(user, nameof(ApplicationUser));
+        var request = await _requestRepository.Get(user.Id, projectName, requestId);
+        var vm = _mapper.Map<CreateUpdateRequestModel>(request);
+        return vm;
+    }
+
+    public async Task<bool> ValidateEdit(string projectname, int id, CreateUpdateRequestModel request, ModelStateDictionary modelState)
+    {
+        return modelState.IsValid;
+    }
+
+    public async Task Edit(string projectName, int id, CreateUpdateRequestModel request)
+    {
+        var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
+        Guard.Against.Null(user, nameof(ApplicationUser));
+
+        var existing = await _requestRepository.Get(user.Id, projectName, id);
+        if (existing != null)
+        {
+            var mapped = _mapper.Map<Core.Entities.Requests.Request>(request);
+            await _requestRepository.Update(user.Id, projectName, id, mapped);
         }
     }
 }

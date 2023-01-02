@@ -20,4 +20,10 @@
     <Folder Include="Enums\" />
     <Folder Include="Entities\Request\" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Jint" Version="2.11.58" />
+  </ItemGroup>
+    <ItemGroup>
+    <Content Include="handlebars.min-v4.7.7.js" />
+  </ItemGroup>
 </Project>

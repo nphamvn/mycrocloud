@@ -1,8 +1,6 @@
 using System.Net;
 using MockServer.Core.Enums;
-using MockServer.Core.Interfaces;
 using MockServer.Core.Repositories;
-using MockServer.ReverseProxyServer.Interfaces;
 using MockServer.ReverseProxyServer.Models;
 
 namespace MockServer.ReverseProxyServer.Middlewares;

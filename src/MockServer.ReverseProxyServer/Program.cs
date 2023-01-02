@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using MockServer.Core.Interfaces;
 using MockServer.Core.Repositories;
+using MockServer.Core.Services;
 using MockServer.Core.Settings;
 using MockServer.Infrastructure.Repositories;
 using MockServer.ReverseProxyServer.Extentions;
@@ -24,7 +26,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-
+    app.MapTestPaths();
 }
 //Use RequestValidator to check if request is existing and check if request is allowed (private or public)
 app.UseRequestValidator();
