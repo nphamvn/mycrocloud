@@ -1,52 +1,57 @@
 @using MockServer.WebMVC.Controllers
 <script>
-    var requestBodyEditor = ace.edit("request-body-editor");
-    requestBodyEditor.setShowPrintMargin("false");
-    var textarea = $('textarea[name="RequestBody.Text"]').hide();
-    requestBodyEditor.getSession().setValue(textarea.val());
-    requestBodyEditor.getSession().on('change', function () {
-        textarea.val(requestBodyEditor.getSession().getValue());
-    });
-    var responsetBodyEditor = ace.edit("response-body-editor");
-    responsetBodyEditor.setShowPrintMargin("false");
-    var responsetBodyTextArea = $('textarea[name="Response.BodyText"]').hide();
-    responsetBodyEditor.getSession().setValue(responsetBodyTextArea.val());
-    responsetBodyEditor.getSession().on('change', function () {
-        responsetBodyTextArea.val(responsetBodyEditor.getSession().getValue());
-    });
-</script>
-<script>
     $(function () {
+        setUpRequestBodyEditor();
+        setUpResponseBodyEditor();
+        setUpResponseBodyScriptEditor();
+    });
+    function setUpRequestBodyEditor() {
+        var editor = ace.edit("request-body-editor");
+        editor.setShowPrintMargin("false");
+        var textarea = $('textarea[name="RequestBody.Text"]').hide();
+        editor.getSession().setValue(textarea.val());
+        editor.getSession().on('change', function () {
+            textarea.val(editor.getSession().getValue());
+        });
         $('#request-body-type').change(function (e) {
             var mode = $('option:selected', $(this)).val();
-            setEditorMode(mode);
+            setEditorMode(editor, mode);
         }).change();
+    }
+    function setUpResponseBodyEditor() {
+        var editor = ace.edit("response-body-editor");
+        editor.setShowPrintMargin("false");
+        var textarea = $('textarea[name="Response.BodyText"]').hide();
+        editor.getSession().setValue(textarea.val());
+        editor.getSession().on('change', function () {
+            textarea.val(editor.getSession().getValue());
+        });
         $('#response-body-type').change(function (e) {
             var mode = $('option:selected', $(this)).val();
-            setResponseBodyEditorMode(mode);
+            setEditorMode(editor, mode);
         }).change();
-    });
-
-    function setEditorMode(mode) {
+    }
+    function setUpResponseBodyScriptEditor() {
+        var editor = ace.edit("response-body-render-script");
+        editor.setShowPrintMargin('false');
+        var textarea = $('textarea[name="Response.BodyRenderScript"]').hide();
+        editor.getSession().setValue(textarea.val());
+        editor.getSession().on('change', function () {
+            textarea.val(editor.getSession().getValue());
+        });
+        editor.session.setMode("ace/mode/javascript");
+    }
+    function setEditorMode(editor, mode) {
         if (mode === 'json') {
-            requestBodyEditor.session.setMode("ace/mode/json");
+            editor.session.setMode("ace/mode/json");
         } else if (mode === 'xml') {
-            requestBodyEditor.session.setMode("ace/mode/xml");
+            editor.session.setMode("ace/mode/xml");
         } else if (mode === 'text') {
-            requestBodyEditor.session.setMode("ace/mode/text");
+            editor.session.setMode("ace/mode/text");
         }
     }
-
-    function setResponseBodyEditorMode(mode) {
-        if (mode === 'json') {
-            responsetBodyEditor.session.setMode("ace/mode/json");
-        } else if (mode === 'xml') {
-            responsetBodyEditor.session.setMode("ace/mode/xml");
-        } else if (mode === 'text') {
-            responsetBodyEditor.session.setMode("ace/mode/text");
-        }
-    }
-
+</script>
+<script>
     $(function () {
         addTableEventListener();
     });
@@ -231,6 +236,7 @@
                 statusCode: $('input[name="Response.StatusCode"]').val(),
                 bodyText: $('textarea[name="Response.BodyText"]').val(),
                 bodyTextRenderEngine: $('select[name="Response.BodyTextRenderEngine"] option:selected').val(),
+                bodyRenderScript: $('textarea[name="Response.BodyRenderScript"]').val(),
                 delay: $('input[name="Response.Delay"]').prop('checked'),
                 delayTime: $('input[name="Response.DelayTime"]').val()
             };

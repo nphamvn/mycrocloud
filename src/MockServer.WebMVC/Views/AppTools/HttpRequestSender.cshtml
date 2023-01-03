@@ -1,0 +1,136 @@
+@{
+    Layout = "/Views/Shared/_SimpleLayout.cshtml";
+}
+<style type="text/css" media="screen">
+    #request-body-editor {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+</style>
+
+<div class="mt-2 mx-auto w-75">
+    <h1 class="mb-2 fs-3">Http Request Sender</h1>
+    <form name="request-settings" class="mb-2">
+        <div class="d-flex">
+            <div>
+                <select name="method" class="form-select">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                </select>
+            </div>
+            <div class="flex-fill">
+                <input class="form-control" type="text" name="url" value="@ViewData["Url"]">
+            </div>
+            <div class="ms-auto">
+                <button class="btn btn-primary">Send</button>
+            </div>
+        </div>
+    </form>
+    <div>
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button type="button" class="nav-link active py-1" data-bs-toggle="tab"
+                    data-bs-target="#request-param-tab">Params</button>
+            </li>
+            <li class="nav-item">
+                <button type="button" class="nav-link py-1" data-bs-toggle="tab"
+                    data-bs-target="#request-header-tab">Headers</button>
+            </li>
+            <li class="nav-item">
+                <button type="button" class="nav-link py-1" data-bs-toggle="tab"
+                    data-bs-target="#request-body-tab">Body</button>
+            </li>
+        </ul>
+        <div class="tab-content" style="min-height: 200px;">
+            <div id="request-param-tab" class="tab-pane fade show active p-2" role="tabpanel">
+                <table id="request-params" class="table table-sm p-0 m-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 35%" scope="col">Key</th>
+                            <th style="width: 35%" scope="col">Value</th>
+                            <th style="width: 10%" scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div id="request-header-tab" class="tab-pane fade p-2" role="tabpanel">
+                <table id="request-header-table" class="table table-sm p-0 m-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 35%" scope="col">Header</th>
+                            <th style="width: 35%" scope="col">Value</th>
+                            <th style="width: 10%" scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+            <div id="request-body-tab" class="tab-pane fade p-2" role="tabpanel">
+                <div class="px-2 mt-1">
+                    <div>
+                        <div class="d-flex">
+                            <select id="request-body-type" class="form-select form-select-sm w-auto mb-1">
+                                <option value="json" selected>JSON</option>
+                                <option value="xml">XML</option>
+                                <option value="text">Text</option>
+                            </select>
+                            <div class="ms-auto">
+                                <button class="btn btn-sm btn-link text-decoration-none">Format</button>
+                            </div>
+                        </div>
+                        <div class="position-relative" style="min-height: 200px;">
+                            <textarea name="body"></textarea>
+                            <div id="request-body-editor"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+<script src="~/lib/json-editor.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.14.0/ace.js"
+    integrity="sha512-WYlXqL7GPpZL2ImDErTX0RMKy5hR17vGW5yY04p9Z+YhYFJcUUFRT31N29euNB4sLNNf/s0XQXZfzg3uKSoOdA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+}
+<script>
+    $(function () {
+        $('select[name=method]').val('@ViewData["Method"]');
+        setUpRequestBodyEditor();
+        $("form[name=request-settings]").submit(function (e) {
+            e.preventDefault();
+            alert('TODO: send request and render response');
+        });
+    });
+    function setUpRequestBodyEditor() {
+        var editor = ace.edit("request-body-editor");
+        editor.setShowPrintMargin("false");
+        var textarea = $('textarea[name="RequestBody.Text"]').hide();
+        editor.getSession().setValue(textarea.val());
+        editor.getSession().on('change', function () {
+            textarea.val(editor.getSession().getValue());
+        });
+        $('#request-body-type').change(function (e) {
+            var mode = $('option:selected', $(this)).val();
+            setEditorMode(editor, mode);
+        }).change();
+    }
+    function setEditorMode(editor, mode) {
+        if (mode === 'json') {
+            editor.session.setMode("ace/mode/json");
+        } else if (mode === 'xml') {
+            editor.session.setMode("ace/mode/xml");
+        } else if (mode === 'text') {
+            editor.session.setMode("ace/mode/text");
+        }
+    }
+</script>

@@ -7,7 +7,7 @@ public static class ApplicationBuilderExtentions
 {
     public static IApplicationBuilder MapTestPaths(this IApplicationBuilder app)
     {
-        app.Map("/test/print-request", app =>
+        app.Map("/dev/print-request", app =>
         {
             app.Run(async context =>
             {
@@ -16,20 +16,46 @@ public static class ApplicationBuilderExtentions
             });
         });
 
-        app.Map("/test/render-handlebars-template", app =>
+        app.Map("/dev/render-handlebars-template", app =>
         {
             app.Run(async context =>
             {
                 var request = HttpContextExtentions.GetRequestDictionary(context);
-                ITemplateRenderService renderService = new HandlebarsTemplateRenderService();
-                var data = new
+                IHandlebarsTemplateRenderer renderService = new HandlebarsTemplateRenderer();
+                var ctx = new
                 {
-                    ctx = new
-                    {
-                        request = request
-                    }
+                    request = request
                 };
-                var result = renderService.Render(data, context.Request.Headers["template"]);
+                var result = renderService.Render(ctx, context.Request.Headers["template"]);
+                await context.Response.WriteAsync(result);
+            });
+        });
+
+        app.Map("/dev/render-expression-template", app =>
+        {
+            app.Run(async context =>
+            {
+                var request = HttpContextExtentions.GetRequestDictionary(context);
+                IExpressionTemplateWithScriptRenderer renderService = new ExpressionTemplateWithScriptRenderer();
+                var ctx = new
+                {
+                    request = request
+                };
+                string template =
+                        """
+                        {
+                            "message": "the sum of @{number1} and @{number2} is @{add(number1, number2)}"
+                        }
+                        """;
+                string script =
+                        """
+                        const number1 = parseInt(ctx.request.headers.number1);
+                        const number2 = parseInt(ctx.request.headers.number2);
+                        const add = function(a, b) {
+                            return a + b;
+                        }
+                        """;
+                var result = renderService.Render(ctx, template, script);
                 await context.Response.WriteAsync(result);
             });
         });

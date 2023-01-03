@@ -2,7 +2,12 @@
 
 <div class="d-flex mb-1">
     <strong class="fw-bolder">@Model.Name</strong>
-    <button id="btnEdit" class="ms-auto btn-link text-decoration-none">Edit</button>
+    <button id="btnEdit" class="ms-auto me-2 btn-link text-decoration-none">Edit</button>
+    <form method="post" action="/tools/request-tester" target="_blank">
+        <input type="hidden" name="method" value="@Model.Method">
+        <input type="hidden" name="url" value="@Model.Url">
+        <button class="btn-link text-decoration-none">Test</button>
+    </form>
 </div>
 <div class="mb-2">
     <small>@Model.Description</small>

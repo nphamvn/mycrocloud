@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace  MNB.Web.Services
+namespace MNB.Web.Services
 {
     // todo なんでもCreateできちゃうが・・
     public interface IFactoryService

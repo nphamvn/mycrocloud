@@ -29,15 +29,12 @@ public class FixedRequestHandler : IRequestHandler
         else if (response.BodyTextRenderEngine == 2)
         {
             //Handlebars
-            ITemplateRenderService renderService = new HandlebarsTemplateRenderService();
-            var data = new
+            IHandlebarsTemplateRenderer renderService = new HandlebarsTemplateRenderer();
+            var ctx = new
             {
-                ctx = new
-                {
-                    request = HttpContextExtentions.GetRequestDictionary(request.HttpContext)
-                }
+                request = HttpContextExtentions.GetRequestDictionary(request.HttpContext)
             };
-            content = renderService.Render(data, response.BodyText);
+            content = renderService.Render(ctx, response.BodyText);
         }
         return new ResponseMessage
         {

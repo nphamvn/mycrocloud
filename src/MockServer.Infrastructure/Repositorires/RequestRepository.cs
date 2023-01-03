@@ -332,6 +332,7 @@ public class RequestRepository : IRequestRepository
                         StatusCode,
                         BodyText,
                         BodyTextRenderEngine,
+                        BodyRenderScript,
                         Delay,
                         DelayTime
                     FROM
@@ -561,18 +562,21 @@ public class RequestRepository : IRequestRepository
             using var transaction = await connection.BeginTransactionAsync();
             try
             {
-                var deleteQuery = "DELETE FROM Response WHERE RequestId = @RequestId";
-                await connection.ExecuteAsync(deleteQuery, new
+                var exists = await connection.ExecuteScalarAsync<bool>("SELECT COUNT(1) FROM Response WHERE RequestId = @RequestId",
+                new
                 {
-                    RequestId = id,
-                }, transaction);
-                var insertQuery =
+                    RequestId = id
+                });
+                if (!exists)
+                {
+                    var insert =
                         """
                          INSERT INTO Response (
                             RequestId,
                             StatusCode,
                             BodyTextRenderEngine,
                             BodyText,
+                            BodyRenderScript,
                             Delay,
                             DelayTime
                         ) VALUES(
@@ -580,19 +584,50 @@ public class RequestRepository : IRequestRepository
                             @StatusCode,
                             @BodyTextRenderEngine,
                             @BodyText,
+                            @BodyRenderScript,
                             @Delay,
                             @DelayTime
                         )
                         """;
-                await connection.ExecuteAsync(insertQuery, new
+                    await connection.ExecuteAsync(insert, new
+                    {
+                        RequestId = id,
+                        StatusCode = response.StatusCode,
+                        BodyText = response.BodyText,
+                        BodyTextRenderEngine = response.BodyTextRenderEngine,
+                        BodyRenderScript = response.BodyRenderScript,
+                        Delay = response.Delay,
+                        DelayTime = response.DelayTime
+                    }, transaction);
+                }
+                else
                 {
-                    RequestId = id,
-                    StatusCode = response.StatusCode,
-                    BodyText = response.BodyText,
-                    BodyTextRenderEngine = response.BodyTextRenderEngine,
-                    Delay = response.Delay,
-                    DelayTime = response.DelayTime
-                }, transaction);
+                    var update =
+                        """
+                        UPDATE
+                            Response
+                        SET
+                            StatusCode = @StatusCode,
+                            BodyTextRenderEngine = @BodyTextRenderEngine,
+                            BodyText = @BodyText,
+                            BodyRenderScript = @BodyRenderScript,
+                            Delay = @Delay,
+                            DelayTime = @DelayTime
+                        WHERE
+                            RequestId = @RequestId
+                        """;
+                    await connection.ExecuteAsync(update, new
+                    {
+                        RequestId = id,
+                        StatusCode = response.StatusCode,
+                        BodyText = response.BodyText,
+                        BodyTextRenderEngine = response.BodyTextRenderEngine,
+                        BodyRenderScript = response.BodyRenderScript,
+                        Delay = response.Delay,
+                        DelayTime = response.DelayTime
+                    }, transaction);
+                }
+
                 await transaction.CommitAsync();
             }
             catch (Exception)

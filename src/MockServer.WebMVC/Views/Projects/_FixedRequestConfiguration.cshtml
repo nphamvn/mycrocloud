@@ -2,7 +2,8 @@
 @model MockServer.WebMVC.Models.Project.FixedRequestConfiguration
 <style type="text/css" media="screen">
     #request-body-editor,
-    #response-body-editor {
+    #response-body-editor,
+    #response-body-render-script {
         position: absolute;
         top: 0;
         right: 0;
@@ -227,23 +228,33 @@
             </table>
         </div>
         <div id="response-body-tab" class="tab-pane fade p-2" role="tabpanel">
-            <div class="d-flex">
-                <select id="response-body-type" class="form-select form-select-sm w-auto mb-1">
-                    <option value="json" selected>JSON</option>
-                    <option value="xml">XML</option>
-                    <option value="text">Text</option>
-                </select>
-                <select class="form-select form-select-sm w-auto mb-1" asp-for="Response.BodyTextRenderEngine">
-                    <option value="1">Static</option>
-                    <option value="2">Handlebars</option>
-                </select>
-                <div class="ms-auto">
-                    <button class="btn btn-sm btn-link text-decoration-none">Format</button>
+            <div>
+                <div class="d-flex">
+                    <select id="response-body-type" class="form-select form-select-sm w-auto mb-1">
+                        <option value="json" selected>JSON</option>
+                        <option value="xml">XML</option>
+                        <option value="text">Text</option>
+                    </select>
+                    <select class="form-select form-select-sm w-auto mb-1" asp-for="Response.BodyTextRenderEngine">
+                        <option value="1">Static</option>
+                        <option value="2">Handlebars</option>
+                        <option value="3">Expression with script</option>
+                    </select>
+                    <div class="ms-auto">
+                        <button class="btn btn-sm btn-link text-decoration-none">Format</button>
+                    </div>
+                </div>
+                <div class="position-relative" style="min-height: 200px;">
+                    <textarea asp-for="Response.BodyText"></textarea>
+                    <div id="response-body-editor"></div>
                 </div>
             </div>
-            <div class="position-relative" style="min-height: 200px;">
-                <textarea asp-for="Response.BodyText"></textarea>
-                <div id="response-body-editor"></div>
+            <div>
+                <p>Script</p>
+                <div class="position-relative" style="min-height: 200px;">
+                    <textarea asp-for="Response.BodyRenderScript"></textarea>
+                    <div id="response-body-render-script"></div>
+                </div>
             </div>
         </div>
     </div>

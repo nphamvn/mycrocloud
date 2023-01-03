@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
-using Serilog;
 
 namespace MockServer.IdentityServer.Services;
 
@@ -18,8 +13,8 @@ public class ProfileService : IProfileService
 
         // your implementation to retrieve the requested information
         //var claims = GetRequestedClaims(user, requestedClaimsTypes);
-        //context.IssuedClaims.Add(new Claim("email", "nam@npham.me"));
-        //context.IssuedClaims.Add(new Claim("name", "npham"));
+        context.IssuedClaims.Add(new Claim("email", "nam@npham.me"));
+        context.IssuedClaims.Add(new Claim("name", "npham"));
         return Task.CompletedTask;
     }
 

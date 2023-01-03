@@ -19,7 +19,7 @@ public interface IRequestRepository
     Task UpdateResponse(int id, FixedRequest config);
     Task Delete(int userId, string projectName, int id);
     Task<IEnumerable<RequestParam>> GetRequestParams(int id);
-    Task<IEnumerable<RequestHeader>> GetRequestHeaders(int id);//GetResponseHeaders
+    Task<IEnumerable<RequestHeader>> GetRequestHeaders(int id);
     Task<RequestBody> GetRequestBody(int requestId);
     Task<IEnumerable<ResponseHeader>> GetResponseHeaders(int id);
     Task<Response> GetResponse(int requestId);
