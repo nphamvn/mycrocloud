@@ -45,7 +45,7 @@
                 </ul>
                 <div class="tab-content">
                     <div id="request-param-tab" class="tab-pane fade show active p-2" role="tabpanel">
-                        <table id="request-params" class="table table-sm p-0 m-0">
+                        <table id="request-param-table" class="table table-sm p-0 m-0">
                             <thead>
                                 <tr>
                                     <th style="width: 5%" scope="col"></th>
@@ -99,33 +99,35 @@
 </div>
 <template id="request-param-row-template">
     <tr>
-        <td>
-            <input type="checkbox" name="include" />
+        <td class="align-middle">
+            <input type="checkbox" name="include" class="form-check-input" />
         </td>
-        <td>
-            <input type="text" name="key" placeholder="key" />
+        <td class="align-middle">
+            <input type="text" name="key" class="form-control form-control-sm" placeholder="key" />
         </td>
-        <td>
-            <input type="text" name="value" placeholder="value" />
+        <td class="align-middle">
+            <input type="text" name="value" class="form-control form-control-sm" placeholder="value" />
         </td>
-        <td>
-            <button>Delete</button>
+        <td class="align-middle">
+            <button type="button" name="delete" class="btn btn-default red-on-hover"><i
+                    class="bi bi-trash"></i></button>
         </td>
     </tr>
 </template>
 <template id="request-header-row-template">
     <tr>
-        <td>
-            <input type="checkbox" name="include" />
+        <td class="align-middle">
+            <input type="checkbox" name="include" class="form-check-input" />
         </td>
-        <td>
-            <input type="text" name="name" placeholder="name" />
+        <td class="align-middle">
+            <input type="text" name="name" class="form-control form-control-sm" placeholder="name" />
         </td>
-        <td>
-            <input type="text" name="value" placeholder="value" />
+        <td class="align-middle">
+            <input type="text" name="value" class="form-control form-control-sm" placeholder="value" />
         </td>
-        <td>
-            <button>Delete</button>
+        <td class="align-middle">
+            <button type="button" name="delete" class="btn btn-default red-on-hover"><i
+                    class="bi bi-trash"></i></button>
         </td>
     </tr>
 </template>
@@ -157,7 +159,6 @@
             var editor = monaco.editor.create(
                 document.getElementById("request-body-editor"),
                 {
-                    value: '{\n\t"message": "hi"\n}',
                     language: "json",
                     automaticLayout: true
                 }
@@ -188,4 +189,40 @@
             })
         });
     });
+</script>
+<script>
+    $(function () {
+        $('#request-param-table tbody').append($($('#request-param-row-template').html()));
+        $('#request-header-table tbody').append($($('#request-header-row-template').html()));
+        bindTableInputEvent();
+    });
+
+    function bindTableInputEvent() {
+        $('#request-param-table tbody input[type=text]').keyup(function () {
+            var tr = $(this).closest('tr');
+            if (tr.index() === $('tr', tr.closest('tbody')).length - 1) {
+                $('#request-param-table tbody').append($($('#request-param-row-template').html()));
+                unbindTableInputEvent();
+                bindTableInputEvent();
+            }
+        });
+        $('#request-header-table tbody input[type=text]').keyup(function () {
+            var tr = $(this).closest('tr');
+            if (tr.index() === $('tr', tr.closest('tbody')).length - 1) {
+                $('#request-header-table tbody').append($($('#request-header-row-template').html()));
+                unbindTableInputEvent();
+                bindTableInputEvent();
+            }
+        });
+        $('table tbody button[name="delete"]').click(function () {
+            var tr = $(this).closest('tr');
+            if (tr.index() > 0) {
+                tr.remove();
+            }
+        });
+    }
+    function unbindTableInputEvent() {
+        $('#request-param-table tbody input[type=text]').off('keyup');
+        $('#request-header-table tbody input[type=text]').off('keyup');
+    }
 </script>
