@@ -2,7 +2,7 @@ using MockServer.Core.Enums;
 
 namespace MockServer.ReverseProxyServer.Models;
 
-public class AppRequest //: HttpRequestMessage
+public class AppRequest
 {
     public int Id { get; set; }
     public int ProjectId { get; set; }

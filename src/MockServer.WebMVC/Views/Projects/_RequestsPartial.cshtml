@@ -15,10 +15,10 @@
                     <li data-request-id="@req.Id" class="request-list-item list-group-item px-2 py-1">
                         <div class="row">
                             <div class="col request-info">
-                                <span class="text-base fw-light text-slate-700">@req.Name</span>
+                                <span class="tw-text-base">@req.Name</span>
                                 <div>
-                                    <small class="badge rounded-pill py-1 fw-normal text-white me-1 @req.MethodBadgeColor"
-                                    style="width: 50px;">@req.Method</small>
+                                    <small class="badge rounded-pill fw-bolder text-white me-1 @req.MethodBadgeColor"
+                                    style="width: 50px; font-size: 11px;">@req.Method</small>
                                     <small class="text-muted">/@req.Path</small>
                                 </div>
                             </div>
@@ -34,12 +34,16 @@
     <div class="col-9 h-100" id="RequestOpen">
     </div>
 </div>
-
-<template id="context-menu">
-    <div class="context-menu-container">
-        <div class="btn-group-vertical" role="group">
-            <button name="btnDelete" type="button" class="btn btn-default text-danger">Delete</button>
-        </div>
+<style>
+    .context-menu {
+        position: absolute;
+        width: 60px;
+    }
+</style>
+<template id="context-menu-template">
+    <div class="btn-group-vertical dropdown-menu context-menu" role="group">
+        <button name="btnCopy" type="button" class="dropdown-item btn btn-default">Copy</button>
+        <button name="btnDelete" type="button" class="dropdown-item btn btn-default text-danger">Delete</button>
     </div>
 </template>
 
@@ -136,29 +140,26 @@
     function showRequestContextMenu() {
         $('.btn-clicked').removeClass('btn-clicked');
         $(document).off('click', documentClickHandler);
-        $('.context-menu-container button[name=btnDelete]').off('click');
-        $('.context-menu-container').remove();
+        $('.context-menu button').off('click');
+        $('.context-menu').remove();
 
         const requestId = $(this).closest('li').data('request-id');
         $(this).addClass('btn-clicked');
         var position = $(this).offset();
-        const template = document.querySelector('#context-menu');
-        const instance = template.content.cloneNode(true);
-        var container = $('.context-menu-container', instance);
+        const container = $($('#context-menu-template').html());
         var left = (position.left - 70 + $(this).outerWidth()) + 'px';
         var top = (position.top + $(this).outerHeight()) + 'px';
         container.css({ 'left': left, 'top': top });
         $('.btn-group-vertical button', container).click(function () {
             $('.btn-clicked').removeClass('btn-clicked');
             $(document).off('click', documentClickHandler);
-            $('.context-menu-container button[name=btnDelete]').off('click');
-            $('.context-menu-container').remove();
+            $('.context-menu button').off('click');
+            $('.context-menu').remove();
         });
         const deleteButton = $('button[name=btnDelete]', container);
         deleteButton.click(function () {
             //show confirm modal
-            const modal = document.querySelector('#requestDeleteConfirmModalTemplate')
-                .content.cloneNode(true);
+            const modal = $($('#requestDeleteConfirmModalTemplate').html());
             $('body').append(modal);
 
             $("#requestDeleteConfirmModal button[name=btnDelete]").click(function () {
@@ -178,7 +179,7 @@
         $(document).click(documentClickHandler);
     }
     const documentClickHandler = function (e) {
-        const menu = $('.context-menu-container');
+        const menu = $('.context-menu');
         const button = $('.btn-clicked');
         // Check if the target of the click event is the context menu or one of its children
         if (e.target !== menu[0] && !menu.has(e.target).length && !$(e.target).is(button)) {
@@ -210,7 +211,7 @@
             selected.addClass('bg-gray');
             const id = selected.data('request-id');
             const tempUrl = '@Url.Action(nameof(RequestsController.Open), "Requests", new {projectName = ViewData["ProjectName"], id = -1})';
-            $('#RequestOpen').load(tempUrl.replace('-1', id));
+            $('#RequestOpen').load(tempUrl.replace('/-1', `/${id}`));
         });
     });
 </script>

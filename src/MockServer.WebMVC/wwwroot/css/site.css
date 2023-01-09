@@ -86,7 +86,7 @@ body {
 
 .text-base {
   font-size: 0.875rem;;
-  line-height: 1.25remrem;
+  line-height: 1.25rem;
 }
 .btn-light {
   color: #111827;
@@ -174,13 +174,9 @@ body {
 .btn-show-on-hover:hover {
   color: rgb(239 68 68);
 }
+
 .red-on-hover:hover {
   color: rgb(239 68 68);
-}
-
-.context-menu-container {
-  position: absolute;
-  width: 70px;
 }
 
 .bg-red {

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MockServer.Core.Entities.Requests;
 using MockServer.Core.Enums;
 using MockServer.WebMVC.Attributes;
 using MockServer.WebMVC.Extentions;

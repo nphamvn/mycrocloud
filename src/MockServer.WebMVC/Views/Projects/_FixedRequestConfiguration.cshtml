@@ -151,13 +151,13 @@
             <button type="button" class="nav-link active py-1" data-bs-toggle="tab"
                 data-bs-target="#response-basic-tab">Basic</button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button type="button" class="nav-link py-1" data-bs-toggle="tab"
-                data-bs-target="#response-header-tab">Headers</button>
-        </li>
         <li class="nav-item">
             <button type="button" class="nav-link py-1" data-bs-toggle="tab"
                 data-bs-target="#response-body-tab">Body</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button type="button" class="nav-link py-1" data-bs-toggle="tab"
+                data-bs-target="#response-header-tab">Headers</button>
         </li>
     </ul>
     <div class="tab-content" style="min-height: 200px;">
@@ -187,6 +187,37 @@
                     <div class="my-auto">
                         <label>miliseconds</label>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="response-body-tab" class="tab-pane fade p-2" role="tabpanel">
+            <div>
+                <div class="d-flex">
+                    <select id="response-body-type" class="form-select form-select-sm w-auto mb-1">
+                        <option value="json" selected>JSON</option>
+                        <option value="xml">XML</option>
+                        <option value="text">Text</option>
+                    </select>
+                    <select class="form-select form-select-sm w-auto mb-1" asp-for="Response.BodyTextRenderEngine">
+                        <option value="1">Static</option>
+                        <option value="2">Handlebars</option>
+                        <option value="3">Expression with script</option>
+                    </select>
+                    <div class="ms-auto">
+                        <button class="btn btn-sm btn-link text-decoration-none">Format</button>
+                    </div>
+                </div>
+                <div class="position-relative" style="min-height: 200px;">
+                    <textarea asp-for="Response.BodyText"></textarea>
+                    <div id="response-body-editor"></div>
+                </div>
+            </div>
+            <div>
+                <p>Script</p>
+                <div class="position-relative" style="min-height: 200px;">
+                    <textarea asp-for="Response.BodyRenderScript"></textarea>
+                    <div id="response-body-render-script"></div>
                 </div>
             </div>
         </div>
@@ -226,36 +257,6 @@
                     }
                 </tbody>
             </table>
-        </div>
-        <div id="response-body-tab" class="tab-pane fade p-2" role="tabpanel">
-            <div>
-                <div class="d-flex">
-                    <select id="response-body-type" class="form-select form-select-sm w-auto mb-1">
-                        <option value="json" selected>JSON</option>
-                        <option value="xml">XML</option>
-                        <option value="text">Text</option>
-                    </select>
-                    <select class="form-select form-select-sm w-auto mb-1" asp-for="Response.BodyTextRenderEngine">
-                        <option value="1">Static</option>
-                        <option value="2">Handlebars</option>
-                        <option value="3">Expression with script</option>
-                    </select>
-                    <div class="ms-auto">
-                        <button class="btn btn-sm btn-link text-decoration-none">Format</button>
-                    </div>
-                </div>
-                <div class="position-relative" style="min-height: 200px;">
-                    <textarea asp-for="Response.BodyText"></textarea>
-                    <div id="response-body-editor"></div>
-                </div>
-            </div>
-            <div>
-                <p>Script</p>
-                <div class="position-relative" style="min-height: 200px;">
-                    <textarea asp-for="Response.BodyRenderScript"></textarea>
-                    <div id="response-body-render-script"></div>
-                </div>
-            </div>
         </div>
     </div>
 </div>

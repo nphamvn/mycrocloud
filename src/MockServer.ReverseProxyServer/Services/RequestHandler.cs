@@ -8,27 +8,14 @@ public class RequestHandler
 {
     public async Task Handle(HttpContext context)
     {
-        var request = (IncomingRequest)context.Items[nameof(IncomingRequest)];
-
-        AppRequest appRequest = new AppRequest
-        {
-            Id = request.Id,
-            Path = request.Path
-        };
-        appRequest.HttpContext = context;
-
+        AppRequest req = (AppRequest)context.Items[nameof(AppRequest)];
+        req.HttpContext = context;
         IRequestHandler requestHandler = context.RequestServices
                                             .GetRequiredService<IRequestHandlerFactory>()
-                                            .GetInstance(request.RequestType);
+                                            .GetInstance(req.Type);
 
-        var response = await requestHandler.GetResponseMessage(appRequest);
+        var response = await requestHandler.GetResponseMessage(req);
 
         await context.WriteResponse(response);
-    }
-
-    private AppRequest Map(IncomingRequest request, HttpContext context)
-    {
-        var appRequest = new AppRequest();
-        return appRequest;
     }
 }

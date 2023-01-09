@@ -7,7 +7,6 @@ using MockServer.Infrastructure.Repositories;
 using MockServer.ReverseProxyServer.Extentions;
 using MockServer.ReverseProxyServer.Interfaces;
 using MockServer.ReverseProxyServer.Middlewares;
-using MockServer.ReverseProxyServer.Models;
 using MockServer.ReverseProxyServer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +18,7 @@ builder.Services.AddTransient<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IRequestHandler, FixedRequestHandler>();
 builder.Services.AddScoped<IRequestHandler, ForwardingRequestHandler>();
 builder.Services.AddScoped<IRequestHandlerFactory, RequestHandlerFactory>();
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<RequestHandler>();
 

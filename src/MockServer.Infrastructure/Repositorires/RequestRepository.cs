@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using MockServer.Core.Entities.Requests;
-using MockServer.Core.Enums;
 using MockServer.Core.Repositories;
 using MockServer.Core.Settings;
 namespace MockServer.Infrastructure.Repositories;
@@ -50,7 +48,7 @@ public class RequestRepository : IRequestRepository
             ProjectName = projectName,
             Type = (int)request.Type,
             Name = request.Name,
-            Method = (int)request.Method,
+            Method = request.Method,
             Path = request.Path,
             Description = request.Description
         });
@@ -99,7 +97,7 @@ public class RequestRepository : IRequestRepository
         }
     }
 
-    public async Task<Request> FindRequest(string username, string projectName, string method, string path)
+    public async Task<Request> Get(string username, string projectName, string method, string path)
     {
         var query =
                 """
@@ -134,7 +132,7 @@ public class RequestRepository : IRequestRepository
         });
     }
 
-    public async Task<Request> FindRequest(int userId, string projectName, RequestMethod method, string path)
+    public async Task<Request> Get(int userId, string projectName, string method, string path)
     {
         var query =
                 """
@@ -143,19 +141,17 @@ public class RequestRepository : IRequestRepository
                     r.Type,
                     r.Name,
                     r.Path,
+                    r.Method,
                     r.Description,
-                    m.Id,
                     r.ProjectId
                 FROM Requests r
                     INNER JOIN
                     Project p ON r.ProjectId = p.Id
                     INNER JOIN
                     Users u ON p.UserId = u.Id
-                    INNER JOIN
-                    Master_HttpMethod m ON r.Method = m.Id
                 WHERE u.Id = @userId AND 
                     upper(p.Name) = upper(@projectName) AND 
-                    m.Id = @method AND 
+                    upper(r.method) = upper(@method) AND 
                     upper(r.Path) = upper(@path);
                 """;
 
@@ -190,6 +186,32 @@ public class RequestRepository : IRequestRepository
             RequestId = id,
             UserId = userId,
             ProjectName = projectName
+        });
+    }
+
+    public async Task<Request> Get(int projectId, string method, string path)
+    {
+        var query =
+                """
+                SELECT
+                    r.Id,
+                    r.Type,
+                    r.Name,
+                    r.Path,
+                    r.Method,
+                    r.Description
+                FROM Requests r
+                WHERE r.ProjectId = @ProjectId AND 
+                    upper(r.Method) = upper(@Method) AND 
+                    upper(r.Path) = upper(@Path);
+                """;
+
+        using var connection = new SqliteConnection(_connectionString);
+        return await connection.QuerySingleOrDefaultAsync<Request>(query, new
+        {
+            ProjectId = projectId,
+            Method = method,
+            Path = path
         });
     }
 
@@ -388,7 +410,7 @@ public class RequestRepository : IRequestRepository
             Id = id,
             Type = (int)request.Type,
             Name = request.Name,
-            Method = (int)request.Method,
+            Method = request.Method,
             Path = request.Path,
             Description = request.Description
         });

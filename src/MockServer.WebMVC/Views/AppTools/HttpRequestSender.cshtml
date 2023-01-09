@@ -1,3 +1,4 @@
+@using MockServer.Core.Helpers;
 @{
     Layout = "/Views/Shared/_SimpleLayout.cshtml";
 }
@@ -17,8 +18,10 @@
             <div class="d-flex mb-2">
                 <div>
                     <select name="method" class="form-select">
-                        <option value="GET" selected>GET</option>
-                        <option value="POST">POST</option>
+                        @foreach (var method in HttpProtocol.CommonHttpMethods)
+                        {
+                            <option value="@method">@method</option>
+                        }
                     </select>
                 </div>
                 <div class="flex-fill">
@@ -92,8 +95,54 @@
     </div>
     <div class="mt-2 mx-auto w-50 px-2">
         <h2 class="mb-2 fs-6">Response</h2>
-        <div class="d-flex">
-            Status Code
+        <dl class="row">
+            <dt class="col-sm-1">Status:</dt>
+            <dd id="response-status" class="col-sm-2 ms-1 fw-bolder"></dd>
+            <dt class="col-sm-1">Size:</dt>
+            <dd id="response-size" class="col-sm-2 ms-1 fw-bolder tw-text-green-500"></dd>
+            <dt class="col-sm-1">Time:</dt>
+            <dd id="response-time" class="col-sm-2 ms-1 fw-bolder tw-text-green-500"></dd>
+        </dl>
+        <div>
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <button type="button" class="nav-link active py-1" data-bs-toggle="tab"
+                        data-bs-target="#response-body-tab">Body</button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link py-1" data-bs-toggle="tab"
+                        data-bs-target="#response-header-tab">Headers <span id="response-header-count"
+                            class="tw-text-green-500"></span></button>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div id="response-body-tab" class="tab-pane show active fade p-2" role="tabpanel">
+                    <div class="d-flex">
+                        <select id="response-body-type" class="form-select form-select-sm w-auto mb-1">
+                            <option value="json" selected>JSON</option>
+                            <option value="xml">XML</option>
+                            <option value="text">Text</option>
+                        </select>
+                        <div class="ms-auto">
+                            <button class="btn btn-sm btn-link text-decoration-none">Format</button>
+                        </div>
+                    </div>
+                    <div id="response-body-editor"></div>
+                </div>
+                <div id="response-header-tab" class="tab-pane fade p-2" role="tabpanel">
+                    <table id="response-header-table" class="table table-sm p-0 m-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 50%" scope="col">Name</th>
+                                <th style="width: 50%" scope="col">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -131,23 +180,13 @@
         </td>
     </tr>
 </template>
-<template id="response-param-row-template">
-    <tr>
-        <td>
-            <input type="text" name="key" placeholder="key" />
-        </td>
-        <td>
-            <input type="text" name="value" placeholder="value" />
-        </td>
-    </tr>
-</template>
 <template id="response-header-row-template">
     <tr>
-        <td>
-            <input type="text" name="name" placeholder="name" />
+        <td class="align-middle">
+            <input type="text" name="name" class="form-control form-control-sm" readonly />
         </td>
-        <td>
-            <input type="text" name="value" placeholder="value" />
+        <td class="align-middle">
+            <input type="text" name="value" class="form-control form-control-sm" readonly />
         </td>
     </tr>
 </template>
@@ -166,63 +205,212 @@
             window.editor1 = editor;
         });
     }
+    function setUpResponseBodyEditor() {
+        require(["vs/editor/editor.main"], function () {
+            var editor = monaco.editor.create(
+                document.getElementById("response-body-editor"),
+                {
+                    language: "json",
+                    automaticLayout: true
+                }
+            );
+            window.editor2 = editor;
+        });
+    }
 </script>
 <script>
     $(function () {
         $('select[name=method]').val('@ViewData["Method"]' !== '' ? '@ViewData["Method"]' : 'GET');
         setUpRequestBodyEditor();
+        setUpResponseBodyEditor();
         $("form[name=request-settings]").submit(function (e) {
             e.preventDefault();
+            let paramCollection = [];
+            $('#request-param-table tbody tr').each(function () {
+                const tr = $(this);
+                if (($('input[name=include]', tr).prop('checked') === true) && ($('input[name=key]', tr).val() !== '')) {
+                    paramCollection.push({
+                        key: $('input[name=key]', tr).val(),
+                        value: $('input[name=value]', tr).val()
+                    });
+                }
+            });
+            let params = $.map(paramCollection, function (param) {
+                return { [param.key]: param.value };
+            }).reduce(function (acc, param) {
+                return Object.assign(acc, param);
+            }, {});
+            let headerCollection = [];
+            $('#request-header-table tbody tr').each(function () {
+                const tr = $(this);
+                if (($('input[name=include]', tr).prop('checked') === true) && ($('input[name=name]', tr).val() !== '')) {
+                    headerCollection.push({
+                        name: $('input[name=name]', tr).val(),
+                        value: $('input[name=value]', tr).val()
+                    });
+                }
+            });
+            const headers = $.map(headerCollection, function (header) {
+                return { [header.name]: header.value };
+            }).reduce(function (acc, header) {
+                return Object.assign(acc, header);
+            }, {});
+            console.log('headers: ' + JSON.stringify(headers));
+            let response = {};
+            var startTime = performance.now();
+            console.log('send request');
             $.ajax({
                 type: $('select[name=method]').val(),
-                url: $('input[name=url]').val(),
-                headers: {
-                    'number1': 3,
-                    'number2': 2
+                url: $('input[name=url]').val() + '?' + $.param(params),
+                headers: headers,
+                success: function (data, textStatus, jqXHR) {
+                    console.log('success');
+                    var endTime = performance.now();
+                    response.status = jqXHR.status;
+                    var size = jqXHR.getResponseHeader('content-length');
+                    if (size === null) {
+                        size = jqXHR.responseText.length;
+                    }
+                    response.size = size;
+                    response.time = endTime - startTime;
+                    response.body = data;
+                    // Get the headers
+                    const headers = jqXHR.getAllResponseHeaders();
+                    // Split the headers into an array of strings
+                    const headersArray = headers.trim().split(/[\r\n]+/);
+                    response.headersCount = headersArray.length;
+                    // Map the headers to an object
+                    const headersObject = headersArray.reduce(function (acc, header) {
+                        const parts = header.split(': ');
+                        const key = parts.shift();
+                        const value = parts.join(': ');
+                        acc[key] = value;
+                        return acc;
+                    }, {});
+                    response.headers = headersObject;
+                }, error: function (jqXHR, textStatus, errorThrown) {
+                    console.log('error: ' + errorThrown);
+                    var endTime = performance.now();
+                    response.status = jqXHR.status;
+                    var size = jqXHR.getResponseHeader('content-length');
+                    if (size === null) {
+                        //size = jqXHR.responseText.length;
+                        size = 0;
+                    }
+                    response.size = size;
+                    response.time = endTime - startTime;
+                    response.body = $.parseJSON(jqXHR.responseText);
                 },
-                success: function (data) {
-                    alert(data);
-                },
-                error: function () {
-                    alert('something went wrong');
+                complete: function () {
+                    console.log('complete');
+                    renderResponse(response);
                 }
-            })
+            }).fail(function (xhr, status, error) {
+                console.log('failed');
+            });
         });
     });
+
+    function renderResponse(response) {
+        const status = commonStatusCodes.find(s => s.status == response.status);
+        $('#response-status').text(`${status.status} ${status.name}`);
+        if (status.type === 'success') {
+            $('#response-status').removeClass('tw-text-red-500').addClass('tw-text-green-500');
+        } else if (status.type === 'error') {
+            $('#response-status').removeClass('tw-text-green-500').addClass('tw-text-red-500');
+        }
+        $('#response-size').text(response.size !== null ? formatSize(response.size) : '-');
+        $('#response-time').text(formatResponseTime(response.time));
+        window.editor2.getModel().setValue(JSON.stringify(response.body, null, '\t'));
+        $('#response-header-count').text(`(${response.headersCount})`);
+        if (response.headers !== null) {
+            for (const name in response.headers) {
+                const tr = $($('#response-header-row-template').html());
+                $('input[name=name]', tr).val(name);
+                $('input[name=value]', tr).val(response.headers[name]);
+                $('#response-header-table tbody').append(tr);
+            }
+        }
+    }
+    function formatSize(v) {
+        const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'];
+        let i = 0;
+        while (v >= 1024 && i < units.length - 1) {
+            v /= 1024;
+            i++;
+        }
+        return `${v.toFixed(2)} ${units[i]}`;
+    }
+    function formatResponseTime(time) {
+        if (time < 1000) {
+            return Math.floor(time) + 'ms';
+        } else {
+            time = Math.floor(time / 1000);
+            if (time < 60) {
+                return time + 's';
+            } else {
+                time = Math.floor(time / 60);
+                if (time < 60) {
+                    return time + 'm';
+                } else {
+                    time = Math.floor(time / 60);
+                    return time + 'h';
+                }
+            }
+        }
+    }
 </script>
 <script>
     $(function () {
-        $('#request-param-table tbody').append($($('#request-param-row-template').html()));
-        $('#request-header-table tbody').append($($('#request-header-row-template').html()));
-        bindTableInputEvent();
+        const paramRow = $($('#request-param-row-template').html());
+        $('#request-param-table tbody').append(paramRow);
+        $('input[type=text]', paramRow).keyup(handler1);
+        const headerRow = $($('#request-header-row-template').html());
+        $('#request-header-table tbody').append(headerRow);
+        $('input[type=text]', headerRow).keyup(handler2);
+        $('input[name=name]', headerRow).autocomplete({
+            source: commonHeaders
+        });
     });
-
-    function bindTableInputEvent() {
-        $('#request-param-table tbody input[type=text]').keyup(function () {
-            var tr = $(this).closest('tr');
-            if (tr.index() === $('tr', tr.closest('tbody')).length - 1) {
-                $('#request-param-table tbody').append($($('#request-param-row-template').html()));
-                unbindTableInputEvent();
-                bindTableInputEvent();
-            }
-        });
-        $('#request-header-table tbody input[type=text]').keyup(function () {
-            var tr = $(this).closest('tr');
-            if (tr.index() === $('tr', tr.closest('tbody')).length - 1) {
-                $('#request-header-table tbody').append($($('#request-header-row-template').html()));
-                unbindTableInputEvent();
-                bindTableInputEvent();
-            }
-        });
-        $('table tbody button[name="delete"]').click(function () {
-            var tr = $(this).closest('tr');
-            if (tr.index() > 0) {
-                tr.remove();
-            }
-        });
+    function handler1() {
+        var tr = $(this).closest('tr');
+        if (tr.index() === $('tr', tr.closest('tbody')).length - 1) {
+            const paramRow = $($('#request-param-row-template').html());
+            $('#request-param-table tbody').append(paramRow);
+            $('input[type=text]', paramRow).keyup(handler1);
+            $('button[name="delete"]', paramRow).click(function () {
+                var tr = $(this).closest('tr');
+                if (tr.index() > 0) {
+                    $(this).off('click');
+                    $('input[type=text]', tr).off('keyup');
+                    tr.remove();
+                }
+            });
+        }
+        if ($('input[name=include]', tr).prop('checked') === false) {
+            $('input[name=include]', tr).prop('checked', true);
+        }
     }
-    function unbindTableInputEvent() {
-        $('#request-param-table tbody input[type=text]').off('keyup');
-        $('#request-header-table tbody input[type=text]').off('keyup');
+    function handler2() {
+        var tr = $(this).closest('tr');
+        if (tr.index() === $('tr', tr.closest('tbody')).length - 1) {
+            const headerRow = $($('#request-header-row-template').html());
+            $('#request-header-table tbody').append(headerRow);
+            $('input[type=text]', headerRow).keyup(handler2);
+            $('input[name=name]', headerRow).autocomplete({
+                source: commonHeaders
+            });
+            $('button[name="delete"]', headerRow).click(function () {
+                var tr = $(this).closest('tr');
+                if (tr.index() > 0) {
+                    $(this).off('click');
+                    $('input[type=text]', tr).off('keyup');
+                    tr.remove();
+                }
+            });
+        }
+        if ($('input[name=include]', tr).prop('checked') === false) {
+            $('input[name=include]', tr).prop('checked', true);
+        }
     }
 </script>

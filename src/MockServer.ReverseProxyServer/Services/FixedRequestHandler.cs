@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Repositories;
 using MockServer.Core.Services;
@@ -19,14 +20,18 @@ public class FixedRequestHandler : IRequestHandler
 
     public async Task<ResponseMessage> GetResponseMessage(AppRequest request)
     {
-        var response = await _requestRepository.GetResponse(request.Id);
-        string content = "";
-        if (response.BodyTextRenderEngine == 1)
+        var headers = await _requestRepository.GetResponseHeaders(request.Id);
+        foreach (var header in headers)
         {
-            //static
-            content = response.BodyText;
+            request.HttpContext.Response.Headers.Add(header.Name, header.Value);
         }
-        else if (response.BodyTextRenderEngine == 2)
+        var res = await _requestRepository.GetResponse(request.Id);
+        string body = "";
+        if (res.BodyTextRenderEngine == 1)
+        {
+            body = res.BodyText;
+        }
+        else if (res.BodyTextRenderEngine == 2)
         {
             //Handlebars
             IHandlebarsTemplateRenderer renderService = new HandlebarsTemplateRenderer();
@@ -34,12 +39,21 @@ public class FixedRequestHandler : IRequestHandler
             {
                 request = HttpContextExtentions.GetRequestDictionary(request.HttpContext)
             };
-            content = renderService.Render(ctx, response.BodyText);
+            body = renderService.Render(ctx, res.BodyText);
+        }
+        else if (res.BodyTextRenderEngine == 3)
+        {
+            var ctx = new
+            {
+                request = await HttpContextExtentions.GetRequestDictionary(request.HttpContext)
+            };
+            IExpressionTemplateWithScriptRenderer renderService = new ExpressionTemplateWithScriptRenderer();
+            body = renderService.Render(ctx, res.BodyText, res.BodyRenderScript);
         }
         return new ResponseMessage
         {
-            StatusCode = (HttpStatusCode)response.StatusCode,
-            Content = new StringContent(content)
+            StatusCode = (HttpStatusCode)res.StatusCode,
+            Content = new StringContent(body, Encoding.UTF8)
         };
     }
 }

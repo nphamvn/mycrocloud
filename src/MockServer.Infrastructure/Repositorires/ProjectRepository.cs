@@ -57,7 +57,7 @@ public class ProjectRepository : IProjectRepository
         });
     }
 
-    public async Task<Project> Find(int userId, string projectName)
+    public async Task<Project> Get(int userId, string projectName)
     {
         var query =
                 """
@@ -78,7 +78,7 @@ public class ProjectRepository : IProjectRepository
         });
     }
 
-    public async Task<Project> GetById(int id)
+    public async Task<Project> Get(int id)
     {
         var query =
                 """
@@ -95,6 +95,29 @@ public class ProjectRepository : IProjectRepository
         return await connection.QuerySingleOrDefaultAsync<Project>(query, new
         {
             id = id
+        });
+    }
+
+    public async Task<Project> Get(string username, string name)
+    {
+        var query =
+                """
+                SELECT 
+                    p.Id,
+                    p.Name,
+                    p.Description,
+                    p.Accessibility,
+                    p.PrivateKey
+                FROM Project p
+                INNER JOIN Users u ON p.UserId = u.Id
+                WHERE upper(u.Username) = upper(@Username) AND 
+                    upper(Name) = upper(@Name);               
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        return await connection.QuerySingleOrDefaultAsync<Project>(query, new
+        {
+            Username = username,
+            Name = name
         });
     }
 

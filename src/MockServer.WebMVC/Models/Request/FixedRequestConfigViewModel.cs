@@ -1,4 +1,3 @@
-using System;
 using System.Net;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MockServer.Core.Entities.Requests;

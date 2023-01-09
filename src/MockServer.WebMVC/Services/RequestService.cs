@@ -61,7 +61,7 @@ public class RequestService : IRequestService
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
 
-        var existing = await _requestRepository.FindRequest(user.Id, projectName, request.Method, request.Path);
+        var existing = await _requestRepository.Get(user.Id, projectName, request.Method, request.Path);
         if (existing == null)
         {
             var mapped = _mapper.Map<Core.Entities.Requests.Request>(request);

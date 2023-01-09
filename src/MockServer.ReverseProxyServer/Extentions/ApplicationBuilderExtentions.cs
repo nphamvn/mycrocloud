@@ -1,3 +1,4 @@
+using System.Text;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Services;
 
@@ -11,8 +12,11 @@ public static class ApplicationBuilderExtentions
         {
             app.Run(async context =>
             {
-                var request = HttpContextExtentions.GetRequestDictionary(context);
-                await context.Response.WriteAsJsonAsync(request);
+                var request = await HttpContextExtentions.GetRequestDictionary(context);
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    request = request
+                });
             });
         });
 
@@ -20,7 +24,7 @@ public static class ApplicationBuilderExtentions
         {
             app.Run(async context =>
             {
-                var request = HttpContextExtentions.GetRequestDictionary(context);
+                var request = await HttpContextExtentions.GetRequestDictionary(context);
                 IHandlebarsTemplateRenderer renderService = new HandlebarsTemplateRenderer();
                 var ctx = new
                 {
@@ -35,7 +39,7 @@ public static class ApplicationBuilderExtentions
         {
             app.Run(async context =>
             {
-                var request = HttpContextExtentions.GetRequestDictionary(context);
+                var request = await HttpContextExtentions.GetRequestDictionary(context);
                 IExpressionTemplateWithScriptRenderer renderService = new ExpressionTemplateWithScriptRenderer();
                 var ctx = new
                 {
@@ -44,19 +48,22 @@ public static class ApplicationBuilderExtentions
                 string template =
                         """
                         {
-                            "message": "the sum of @{number1} and @{number2} is @{add(number1, number2)}"
+                            "message": "the sum of @{a} and @{b} is @{add(a, b)}"
                         }
                         """;
                 string script =
                         """
-                        const number1 = parseInt(ctx.request.headers.number1);
-                        const number2 = parseInt(ctx.request.headers.number2);
+                        const a = parseInt(ctx.request.query.a);
+                        const b = parseInt(ctx.request.query.b);
                         const add = function(a, b) {
                             return a + b;
                         }
                         """;
                 var result = renderService.Render(ctx, template, script);
-                await context.Response.WriteAsync(result);
+                context.Response.StatusCode = 200;
+                var data = Encoding.UTF8.GetBytes(result);
+                context.Response.Headers["content-type"] = "application/json; charset=utf-8";
+                await context.Response.Body.WriteAsync(data, 0, data.Length);
             });
         });
         return app;

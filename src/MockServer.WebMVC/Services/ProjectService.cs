@@ -37,7 +37,7 @@ public class ProjectService : IProjectService
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
 
-        var existing = await projectRepository.Find(user.Id, project.Name);
+        var existing = await projectRepository.Get(user.Id, project.Name);
         if (existing != null)
         {
             return false;
@@ -53,7 +53,7 @@ public class ProjectService : IProjectService
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
 
-        var project = await projectRepository.Find(user.Id, name);
+        var project = await projectRepository.Get(user.Id, name);
         if (project != null)
         {
             await projectRepository.Delete(project.Id);
@@ -64,7 +64,7 @@ public class ProjectService : IProjectService
     {
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
-        var project = await projectRepository.Find(user.Id, name);
+        var project = await projectRepository.Get(user.Id, name);
         Guard.Against.Null(project);
         var key = _apiKeyService.GenerateApiKey();
         project.PrivateKey = key;
@@ -96,7 +96,7 @@ public class ProjectService : IProjectService
     {
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
-        var project = await projectRepository.Find(user.Id, name);
+        var project = await projectRepository.Get(user.Id, name);
         var vm = new ProjectViewViewModel();
         vm.ProjectInfo = _mapper.Map<ProjectIndexItem>(project);
         var requests = await _requestRepository.GetProjectRequests(project.Id);
@@ -108,7 +108,7 @@ public class ProjectService : IProjectService
     {
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
-        var project = await projectRepository.Find(user.Id, name);
+        var project = await projectRepository.Get(user.Id, name);
         if (project != null)
         {
             project.Name = newName;
@@ -120,7 +120,7 @@ public class ProjectService : IProjectService
     {
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
-        var project = await projectRepository.Find(user.Id, name);
+        var project = await projectRepository.Get(user.Id, name);
         if (project != null)
         {
             project.Accessibility = accessibility;
