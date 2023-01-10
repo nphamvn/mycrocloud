@@ -21,7 +21,6 @@ public static class HttpContextExtentions
         context.Request.EnableBuffering();
         var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
         context.Request.Body.Position = 0;
-        Console.WriteLine(body);
         return new Dictionary<string, object>()
             {
                 { "method", request.Method},
@@ -30,7 +29,7 @@ public static class HttpContextExtentions
                 { "headers", request.Headers.ToDictionary(h => h.Key, h => h.Value.FirstOrDefault())},
                 { "routeValues", request.RouteValues.ToDictionary(rv => rv.Key, rv => rv.Value)},
                 { "query", request.Query.ToDictionary(q=> q.Key, q => q.Value.FirstOrDefault())},
-                { "body", JsonSerializer.Deserialize<ExpandoObject>(body)}
+                { "body", !string.IsNullOrEmpty(body)? JsonSerializer.Deserialize<ExpandoObject>(body) : null }
             };
     }
 }

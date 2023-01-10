@@ -1,26 +1,28 @@
 using System.Net;
 using MockServer.Core.Enums;
 using MockServer.Core.Repositories;
+using MockServer.ReverseProxyServer.Interfaces;
 using MockServer.ReverseProxyServer.Models;
 
 namespace MockServer.ReverseProxyServer.Middlewares;
 
-public class RequestValidation
+public class RequestValidation : IMiddleware
 {
     private readonly IRequestRepository _requestRepository;
+    private readonly IRouteService _routeService;
     private readonly IProjectRepository _projectRepository;
-    private readonly RequestDelegate _next;
 
-    public RequestValidation(RequestDelegate next,
+    public RequestValidation(
             IRequestRepository requestRepository,
+            IRouteService routeService,
             IProjectRepository projectRepository)
     {
-        _next = next;
         _requestRepository = requestRepository;
         _projectRepository = projectRepository;
+        _routeService = routeService;
     }
 
-    public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         var req = GrabRequest(context.Request);
 
@@ -57,15 +59,14 @@ public class RequestValidation
                 return;
             }
         }
-
-        var r = await _requestRepository.Get(p.Id, req.Method, req.Path);
-        if (r == default)
+        var result = await _routeService.Resolve(req.Path, p.Id);
+        if (result == null)
         {
             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-            await context.Response.WriteAsync("NotFound");
+            await context.Response.WriteAsync($"No matching route found for path: {req.Path}");
             return;
         }
-
+        var r = await _requestRepository.Get(result.RequestId);
         if (r.Type == RequestType.Fixed)
         {
             var @params = await _requestRepository.GetRequestParams(r.Id);
@@ -136,13 +137,14 @@ public class RequestValidation
             }
         }
 
-        //context.Items[nameof(IncomingRequest)] = req;
+
         context.Items[nameof(AppRequest)] = new AppRequest()
         {
             Id = r.Id,
             Type = r.Type
         };
-        await _next.Invoke(context);
+        context.Request.RouteValues = result.RouteValues;
+        await next.Invoke(context);
     }
 
     private IncomingRequest GrabRequest(HttpRequest request)

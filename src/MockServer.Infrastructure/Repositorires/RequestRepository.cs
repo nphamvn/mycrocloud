@@ -215,6 +215,28 @@ public class RequestRepository : IRequestRepository
         });
     }
 
+    public async Task<Request> Get(int id)
+    {
+        var query =
+                """
+                SELECT
+                    r.Id,
+                    r.Type,
+                    r.Name,
+                    r.Path,
+                    r.Method,
+                    r.Description
+                FROM Requests r
+                WHERE r.Id = @Id
+                """;
+
+        using var connection = new SqliteConnection(_connectionString);
+        return await connection.QuerySingleOrDefaultAsync<Request>(query, new
+        {
+            Id = id
+        });
+    }
+
     public async Task<FixedRequest> GetFixedRequestConfig(int userId, string projectName, int id)
     {
         var query =

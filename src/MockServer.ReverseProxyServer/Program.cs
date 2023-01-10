@@ -1,8 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
-using MockServer.Core.Interfaces;
 using MockServer.Core.Repositories;
-using MockServer.Core.Services;
-using MockServer.Core.Settings;
 using MockServer.Infrastructure.Repositories;
 using MockServer.ReverseProxyServer.Extentions;
 using MockServer.ReverseProxyServer.Interfaces;
@@ -13,12 +9,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddGlobalSettings(builder.Configuration);
+builder.Services.AddScoped<RequestValidation>();
+builder.Services.AddMemoryCache();
 builder.Services.AddTransient<IRequestRepository, RequestRepository>();
 builder.Services.AddTransient<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IRequestHandler, FixedRequestHandler>();
 builder.Services.AddScoped<IRequestHandler, ForwardingRequestHandler>();
 builder.Services.AddScoped<IRequestHandlerFactory, RequestHandlerFactory>();
-
+builder.Services.AddScoped<ICacheService, MemoryCacheService>();
+builder.Services.AddScoped<IRouteService, RouteService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<RequestHandler>();
 

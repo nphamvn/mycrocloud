@@ -9,6 +9,7 @@ public interface IRequestRepository
     Task<Request> Get(string username, string projectName, string method, string path);
     Task<Request> Get(int userId, string projectName, string method, string path);
     Task<Request> Get(int projectId, string method, string path);
+    Task<Request> Get(int id);
     Task<ForwardingRequest> GetForwardingRequest(int requestId);
     Task<IEnumerable<Request>> GetProjectRequests(int ProjectId);
     Task<int> Create(int userId, string projectName, Request request);
