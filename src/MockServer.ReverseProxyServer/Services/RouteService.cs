@@ -1,6 +1,8 @@
 using System.Text.RegularExpressions;
 using MockServer.Core.Repositories;
 using MockServer.ReverseProxyServer.Interfaces;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Routing.Template;
 
 namespace MockServer.ReverseProxyServer.Services;
 
@@ -28,8 +30,10 @@ public class RouteService : IRouteService
         {
             await this.Map(projectId);
         }
-        var routes = await _cacheService.Get<Dictionary<string, int>>(projectId.ToString());
-        if (routes.TryGetValue(path, out int id))
+        var routeTemplates = await _cacheService.Get<Dictionary<string, int>>(projectId.ToString());
+        
+        //var matcher = new TemplateMatcher(routeTemplates, );
+        if (routeTemplates.TryGetValue(path, out int id))
         {
             return new RouteResolveResult
             {
@@ -38,7 +42,7 @@ public class RouteService : IRouteService
         }
         else
         {
-            foreach (var route in routes)
+            foreach (var route in routeTemplates)
             {
                 var pattern = route.Key.Replace("{", "(?<").Replace("}", ">.+)");
                 //"^" + route.Value + "$"
