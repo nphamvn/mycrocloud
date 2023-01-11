@@ -35,9 +35,10 @@ public class FixedRequestHandler : IRequestHandler
         {
             //Handlebars
             IHandlebarsTemplateRenderer renderService = new HandlebarsTemplateRenderer();
+            var req = await HttpContextExtentions.GetRequestDictionary(request.HttpContext);
             var ctx = new
             {
-                request = await HttpContextExtentions.GetRequestDictionary(request.HttpContext)
+                request = req
             };
             body = renderService.Render(ctx, res.BodyText);
         }

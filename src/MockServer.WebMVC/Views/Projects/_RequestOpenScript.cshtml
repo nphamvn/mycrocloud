@@ -142,9 +142,6 @@
 <script>
     $(function () {
         addResponseHeaderTableEventListener();
-        $("#response-header-table input[type=text]").autocomplete({
-            source: ["Option 1", "Option 2", "Option 3"]
-        });
     });
     function addResponseHeaderTableEventListener() {
         $('#response-header-table input[type=text]').off('keyup');

@@ -29,7 +29,7 @@ public static class HttpContextExtentions
                 { "headers", request.Headers.ToDictionary(h => h.Key, h => h.Value.FirstOrDefault())},
                 { "routeValues", request.RouteValues.ToDictionary(rv => rv.Key, rv => rv.Value)},
                 { "query", request.Query.ToDictionary(q=> q.Key, q => q.Value.FirstOrDefault())},
-                { "body", !string.IsNullOrEmpty(body)? JsonSerializer.Deserialize<ExpandoObject>(body) : null }
+                { "body", !string.IsNullOrEmpty(body)? new Dictionary<string, object>(JsonSerializer.Deserialize<ExpandoObject>(body)): null }
             };
     }
 }
