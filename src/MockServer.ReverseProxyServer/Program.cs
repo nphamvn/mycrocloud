@@ -17,7 +17,7 @@ builder.Services.AddScoped<IRequestHandler, FixedRequestHandler>();
 builder.Services.AddScoped<IRequestHandler, ForwardingRequestHandler>();
 builder.Services.AddScoped<IRequestHandlerFactory, RequestHandlerFactory>();
 builder.Services.AddScoped<ICacheService, MemoryCacheService>();
-builder.Services.AddScoped<IRouteService, RouteService>();
+builder.Services.AddScoped<IRouteService, TemplateParserMatcherRouteService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<RequestHandler>();
 
@@ -38,6 +38,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapTestPaths();
 }
+app.UseRouting();
 //Use RequestValidator to check if request is existing and check if request is allowed (private or public)
 app.UseRequestValidator();
 app.Run(async context =>

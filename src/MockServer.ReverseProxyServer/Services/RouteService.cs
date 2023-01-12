@@ -31,7 +31,7 @@ public class RouteService : IRouteService
             await this.Map(projectId);
         }
         var routeTemplates = await _cacheService.Get<Dictionary<string, int>>(projectId.ToString());
-        
+
         //var matcher = new TemplateMatcher(routeTemplates, );
         if (routeTemplates.TryGetValue(path, out int id))
         {
@@ -44,7 +44,8 @@ public class RouteService : IRouteService
         {
             foreach (var route in routeTemplates)
             {
-                var pattern = route.Key.Replace("{", "(?<").Replace("}", ">.+)");
+                //var pattern = route.Key.Replace("{", "(?<").Replace("}", ">.+)");
+                var pattern = route.Key.Replace("{", "(?<").Replace("}", ">.*)");
                 //"^" + route.Value + "$"
                 // check if the path matches the route template using a regular expression
                 var match = Regex.Match(path, pattern);

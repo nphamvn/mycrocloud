@@ -8,12 +8,8 @@ public interface IRouteService
 
 public class RouteResolveResult
 {
+    public string Name { get; set; }
     public int RequestId { get; set; }
-    public RouteValues RouteValues { get; set; } = new();
-}
-
-public class RouteValues : RouteValueDictionary
-{
-
+    public RouteValueDictionary RouteValues { get; set; } = new();
 }
 
