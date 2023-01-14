@@ -40,7 +40,7 @@ public class FixedRequestHandler : IRequestHandler
             {
                 request = req
             };
-            body = renderService.Render(ctx, res.BodyText);
+            body = renderService.Render(ctx, res.BodyText, res.BodyRenderScript);
         }
         else if (res.BodyTextRenderEngine == 3)
         {

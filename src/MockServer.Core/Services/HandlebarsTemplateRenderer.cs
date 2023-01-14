@@ -7,7 +7,7 @@ namespace MockServer.Core.Services;
 
 public class HandlebarsTemplateRenderer : IHandlebarsTemplateRenderer
 {
-    public string Render(object ctx, string source)
+    public string Render(object ctx, string source, string script)
     {
         var handlebars = File.ReadAllText("handlebars.min-v4.7.7.js");
         var engine = new Engine();
@@ -17,6 +17,7 @@ public class HandlebarsTemplateRenderer : IHandlebarsTemplateRenderer
         engine.SetValue("data", data);
         engine.SetValue("source", source);
         engine.Execute("const template = Handlebars.compile(source);");
+        engine.Execute(script);
         var result = engine.Execute("template(data)").GetCompletionValue();
         return result.ToString();
     }

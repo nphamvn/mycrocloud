@@ -50,7 +50,7 @@ public class ScriptGetterTest
             }
         };
         var template = "Hi {{ctx.request.headers.name}}";
-        var handlebars = _scriptGetter.Render(ctx, template);
+        var handlebars = _scriptGetter.Render(ctx, template, "");
         Assert.Equal("Hi Nam", handlebars);
     }
 }

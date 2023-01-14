@@ -30,7 +30,21 @@ public static class ApplicationBuilderExtentions
                 {
                     request = request
                 };
-                var result = renderService.Render(ctx, context.Request.Headers["template"]);
+                string template =
+                        """
+                        {
+                            "message": "the sum of @{a} and @{b} is @{add(a, b)}"
+                        }
+                        """;
+                string script =
+                        """
+                        const a = parseInt(ctx.request.query.a);
+                        const b = parseInt(ctx.request.query.b);
+                        const add = function(a, b) {
+                            return a + b;
+                        }
+                        """;
+                var result = renderService.Render(ctx, template, script);
                 await context.Response.WriteAsync(result);
             });
         });
