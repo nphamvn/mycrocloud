@@ -1,15 +1,15 @@
+using MockServer.ReverseProxyServer.Models;
+
 namespace MockServer.ReverseProxyServer.Interfaces;
 
-public interface IRouteService
+public interface IRouteResolver
 {
-    Task Map(int projectId);
-    Task<RouteResolveResult> Resolve(string path, int projectId);
+    Task<RouteResolveResult> Resolve(string method, string path, ICollection<AppRoute> routes);
 }
 
 public class RouteResolveResult
 {
-    public string Name { get; set; }
-    public int RequestId { get; set; }
+    public AppRoute Route { get; set; }
     public RouteValueDictionary RouteValues { get; set; } = new();
 }
 

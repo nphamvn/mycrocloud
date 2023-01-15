@@ -1,12 +1,11 @@
 using System.Text.RegularExpressions;
 using MockServer.Core.Repositories;
 using MockServer.ReverseProxyServer.Interfaces;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Routing.Template;
+using MockServer.ReverseProxyServer.Models;
 
 namespace MockServer.ReverseProxyServer.Services;
 
-public class RouteService : IRouteService
+public class RouteService : IRouteResolver
 {
     private readonly ICacheService _cacheService;
     private readonly IRequestRepository _requestRepository;
@@ -16,28 +15,15 @@ public class RouteService : IRouteService
         _cacheService = cacheService;
         _requestRepository = requestRepository;
     }
-    public async Task Map(int projectId)
+    public async Task<RouteResolveResult> Resolve(string method, string path, ICollection<AppRoute> routes)
     {
-        string key = projectId.ToString();
-        var paths = await _requestRepository.GetProjectRequests(projectId);
-        Dictionary<string, int> routes = paths.ToDictionary(r => r.Path, r => r.Id);
-        await _cacheService.Set(projectId.ToString(), routes);
-    }
+        var routeTemplates = new Dictionary<string, int>();
 
-    public async Task<RouteResolveResult> Resolve(string path, int projectId)
-    {
-        if (!await _cacheService.Exists(projectId.ToString()))
-        {
-            await this.Map(projectId);
-        }
-        var routeTemplates = await _cacheService.Get<Dictionary<string, int>>(projectId.ToString());
-
-        //var matcher = new TemplateMatcher(routeTemplates, );
         if (routeTemplates.TryGetValue(path, out int id))
         {
             return new RouteResolveResult
             {
-                RequestId = id
+                Route = routes.FirstOrDefault(r => r.Id == id)
             };
         }
         else
@@ -53,7 +39,7 @@ public class RouteService : IRouteService
                 {
                     var result = new RouteResolveResult
                     {
-                        RequestId = route.Value
+                        Route = routes.FirstOrDefault(r => r.Id == route.Value)
                     };
 
                     // Extract the route parameter names and values

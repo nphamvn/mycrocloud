@@ -17,7 +17,7 @@ builder.Services.AddScoped<IRequestHandler, FixedRequestHandler>();
 builder.Services.AddScoped<IRequestHandler, ForwardingRequestHandler>();
 builder.Services.AddScoped<IRequestHandlerFactory, RequestHandlerFactory>();
 builder.Services.AddScoped<ICacheService, MemoryCacheService>();
-builder.Services.AddScoped<IRouteService, TemplateParserMatcherRouteService>();
+builder.Services.AddScoped<IRouteResolver, TemplateParserMatcherRouteService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<RequestHandler>();
 

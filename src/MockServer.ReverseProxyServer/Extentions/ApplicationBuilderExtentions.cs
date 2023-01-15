@@ -1,6 +1,7 @@
 using System.Text;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Services;
+using MockServer.ReverseProxyServer.Constraints;
 
 namespace MockServer.ReverseProxyServer.Extentions;
 
@@ -8,6 +9,18 @@ public static class ApplicationBuilderExtentions
 {
     public static IApplicationBuilder MapTestPaths(this IApplicationBuilder app)
     {
+        app.Map("/dev/resolve-constraint", app =>
+        {
+            app.Run(async context =>
+            {
+                var map = ConstraintBuilder.GetDefaultConstraintMap();
+                var builder = new ConstraintBuilder(map);
+                builder.AddResolvedConstraint("int");
+                builder.AddResolvedConstraint("length(5)");
+                builder.Build();
+            });
+        });
+
         app.Map("/dev/print-request", app =>
         {
             app.Run(async context =>

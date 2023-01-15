@@ -40,8 +40,7 @@
                     <tr>
                         <th style="width: 35%" scope="col">Key</th>
                         <th style="width: 35%" scope="col">Value</th>
-                        <th style="width: 10%" scope="col">Required</th>
-                        <th style="width: 10%" scope="col">Exactly</th>
+                        <th style="width: 10%" scope="col">Constraints</th>
                         <th style="width: 10%" scope="col"></th>
                     </tr>
                 </thead>
@@ -58,11 +57,13 @@
                             <td class="align-middle"><input type="text" class="form-control form-control-sm param-value"
                                 asp-for="RequestParams[i].Value" placeholder="value" autocomplete="off">
                             </td>
-                            <td class="align-middle"><input type="checkbox" class="form-check-input param-required"
-                                asp-for="RequestParams[i].Required" checked=@Model.RequestParams[i].Required>
-                            </td>
-                            <td class="align-middle"><input type="checkbox" class="form-check-input param-match-exactly"
-                                asp-for="RequestParams[i].MatchExactly" checked=@Model.RequestParams[i].MatchExactly>
+                            <td class="align-middle">
+                                <div>
+                                    <input type="hidden" asp-for="RequestParams[i].Constraints">
+                                    <span name="ConstraintsCount">@Model.RequestParams[i].ConstraintsCount</span>
+                                    <button class="js-config-param-constraints"><i
+                                        class="bi bi-box-arrow-in-up-right"></i></button>
+                                </div>
                             </td>
                             <td class="align-middle"><button class="btn param-delete text-gray btn-show-on-hover"><i
                                     class="bi bi-trash"></i></button>
@@ -78,8 +79,7 @@
                     <tr>
                         <th style="width: 35%" scope="col">Header</th>
                         <th style="width: 35%" scope="col">Value</th>
-                        <th style="width: 10%" scope="col">Required</th>
-                        <th style="width: 10%" scope="col">Exactly</th>
+                        <th style="width: 10%" scope="col">Constraints</th>
                         <th style="width: 10%" scope="col"></th>
                     </tr>
                 </thead>
@@ -96,11 +96,7 @@
                             <td class="align-middle"><input type="text" class="form-control form-control-sm"
                                 asp-for="RequestHeaders[i].Value" placeholder="value">
                             </td>
-                            <td class="align-middle"><input type="checkbox" class="form-check-input"
-                                asp-for="RequestHeaders[i].Required" checked=@Model.RequestHeaders[i].Required>
-                            </td>
-                            <td class="align-middle"><input type="checkbox" class="form-check-input"
-                                asp-for="RequestHeaders[i].MatchExactly" checked=@Model.RequestHeaders[i].MatchExactly>
+                            <td class="align-middle"><input type="hidden" asp-for="RequestHeaders[i].Constraints">
                             </td>
                             <td class="align-middle"><button class="btn header-delete text-gray btn-show-on-hover"><i
                                     class="bi bi-trash"></i></button>
@@ -241,8 +237,8 @@
                                 class="form-control form-control-sm header-name" placeholder="name" autocomplete="off">
                             </td>
                             <td class="align-middle">
-                                    <input type="text" class="form-control form-control-sm header-value" asp-for="ResponseHeaders[i].Value"
-                                    placeholder="value">
+                                <input type="text" class="form-control form-control-sm header-value"
+                                asp-for="ResponseHeaders[i].Value" placeholder="value">
                             </td>
                             <td class="align-middle"><button class="btn header-delete text-gray btn-show-on-hover"><i
                                     class="bi bi-trash"></i></button>
@@ -303,4 +299,151 @@
             <button class="btn text-gray btn-show-on-hover header-delete"><i class="bi bi-trash"></i></button>
         </td>
     </tr>
+</template>
+<template id="requestParamConstraintsConfig">
+    <div class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Constraints</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="required" />
+                            <label class="form-check-label">Required</label>
+                        </div>
+                        <div class="form-text">Used to enforce that a non-parameter value is present</div>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="type" />
+                                <label class="form-check-label">Type</label>
+                            </div>
+                            <select class="ms-auto form-select form-select-sm" style="width: 100px;" name="type">
+                                <option value="int">Int</option>
+                                <option value="bool">Boolean</option>
+                                <option value="datetime">Datetime</option>
+                                <option value="decimal">Decimal</option>
+                                <option value="double">Double</option>
+                                <option value="float">Float</option>
+                                <option value="guid">GUID</option>
+                                <option value="long">Long</option>
+                            </select>
+                        </div>
+                        <p class="form-text">Used to enforce that a non-parameter value is present</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="minlength" />
+                                <label class="form-check-label">Minimum Length</label>
+                            </div>
+                            <input class="ms-auto form-control form-control-sm" style="width: 100px;" type="number"
+                                name="minlength" />
+                        </div>
+                        <p class="form-text">Used to enforce that a non-parameter value is present</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="maxlength" />
+                                <label class="form-check-label">Maximum Length</label>
+                            </div>
+                            <input class="ms-auto form-control form-control-sm" style="width: 100px;" type="number"
+                                name="maxlength" />
+                        </div>
+                        <p class="form-text">Used to enforce that a non-parameter value is present</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="length" />
+                                <label class="form-check-label">Length</label>
+                            </div>
+                            <input class="ms-auto form-control form-control-sm" style="width: 100px;" type="number"
+                                name="length" />
+                        </div>
+                        <p class="form-text">Constrains value to be a string of a given length or within a given range
+                            of lengths.</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="min" />
+                                <label class="form-check-label">Min</label>
+                            </div>
+                            <input class="ms-auto form-control form-control-sm" style="width: 100px;" type="number"
+                                name="min" />
+                        </div>
+                        <p class="form-text">Constrains a route parameter to be a long with a minimum value.</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="max" />
+                                <label class="form-check-label">Max</label>
+                            </div>
+                            <input class="ms-auto form-control form-control-sm" style="width: 100px;" type="number"
+                                name="max" />
+                        </div>
+                        <p class="form-text">Constrains a route parameter to be an integer with a maximum value.</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="range" />
+                                <label class="form-check-label">Range</label>
+                            </div>
+                            <div class="ms-auto d-flex">
+                                <input class="form-control form-control-sm" style="width: 100px;" type="number"
+                                    name="range-min" />
+                                <label class="form-label mx-2">~</label>
+                                <input class="form-control form-control-sm" style="width: 100px;" type="number"
+                                    name="range-max" />
+                            </div>
+                        </div>
+                        <p class="form-text">Constraints a route parameter to be an integer within a given range of
+                            values.</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="alpha" />
+                                <label class="form-check-label">Alpha</label>
+                            </div>
+                        </div>
+                        <p class="form-text">Constraints a route parameter to be an integer within a given range of
+                            values.</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="regex" />
+                                <label class="form-check-label">Regex</label>
+                            </div>
+                            <input class="ms-auto form-control form-control-sm w-50" type="text" name="expression" />
+                        </div>
+                        <p class="form-text">Constraints a route parameter to be an integer within a given range of
+                            values.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary js-save">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>

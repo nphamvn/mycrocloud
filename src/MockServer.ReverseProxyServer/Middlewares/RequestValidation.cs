@@ -1,24 +1,26 @@
 using System.Net;
 using MockServer.Core.Enums;
 using MockServer.Core.Repositories;
+using MockServer.ReverseProxyServer.Constraints;
 using MockServer.ReverseProxyServer.Interfaces;
 using MockServer.ReverseProxyServer.Models;
 
 namespace MockServer.ReverseProxyServer.Middlewares;
-
 public class RequestValidation : IMiddleware
 {
     private readonly IRequestRepository _requestRepository;
-    private readonly IRouteService _routeService;
+    private readonly IRouteResolver _routeService;
     private readonly IProjectRepository _projectRepository;
-
+    private readonly ICacheService _cacheService;
     public RequestValidation(
             IRequestRepository requestRepository,
-            IRouteService routeService,
+            ICacheService cacheService,
+            IRouteResolver routeService,
             IProjectRepository projectRepository)
     {
         _requestRepository = requestRepository;
         _projectRepository = projectRepository;
+        _cacheService = cacheService;
         _routeService = routeService;
     }
 
@@ -59,35 +61,59 @@ public class RequestValidation : IMiddleware
                 return;
             }
         }
-        var result = await _routeService.Resolve(req.Path, p.Id);
+        ICollection<AppRoute> routes;
+        string key = p.Id.ToString();
+        if (!await _cacheService.Exists(p.Id.ToString()))
+        {
+            var requests = await _requestRepository.GetProjectRequests(p.Id);
+            routes = requests.Select(r => new AppRoute
+            {
+                Id = r.Id,
+                Method = r.Method.ToLower(),
+                Path = r.Path.ToLower()
+            }).ToList();
+            await _cacheService.Set(key, routes);
+        }
+        else
+        {
+            routes = await _cacheService.Get<ICollection<AppRoute>>(key);
+        }
+        var result = await _routeService.Resolve(req.Method.ToLower(), req.Path, routes);
         if (result == null)
         {
             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
             await context.Response.WriteAsync($"No matching route found for path: {req.Path}");
             return;
         }
-        var r = await _requestRepository.Get(result.RequestId);
+        var r = await _requestRepository.Get(result.Route.Id);
         if (r.Type == RequestType.Fixed)
         {
             var @params = await _requestRepository.GetRequestParams(r.Id);
             foreach (var param in @params)
             {
-                if (param.Required)
+                var value = context.Request.Query[param.Key].ToString() ?? "";
+                if (!string.IsNullOrEmpty(param.Constraints))
                 {
-                    if (!context.Request.Query.ContainsKey(param.Key))
+                    List<IConstraint> constraints = BuildConstraints(param.Constraints.Split(":").ToList());
+                    foreach (var constraint in constraints)
                     {
-                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                        await context.Response.WriteAsync($"The '{param.Key}' parameter is required.");
-                        return;
-                    }
-                    if (param.MatchExactly)
-                    {
-                        if (context.Request.Query[param.Key].ToString() != param.Value)
+                        if (!constraint.Match(value, out string message))
                         {
                             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                            await context.Response.WriteAsync($"The value of '{param.Key}' parameter is not valid.");
+                            await context.Response.WriteAsync($"The '{param.Key}' parameter is not valid.");
+                            await context.Response.WriteAsync(message);
                             return;
                         }
+                    }
+                }
+
+                if (param.MatchExactly)
+                {
+                    if (context.Request.Query[param.Key].ToString() != param.Value)
+                    {
+                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                        await context.Response.WriteAsync($"The value of '{param.Key}' parameter is not valid.");
+                        return;
                     }
                 }
             }
@@ -145,6 +171,17 @@ public class RequestValidation : IMiddleware
         };
         context.Request.RouteValues = result.RouteValues;
         await next.Invoke(context);
+    }
+
+    private List<IConstraint> BuildConstraints(List<string> constraints)
+    {
+        var map = ConstraintBuilder.GetDefaultConstraintMap();
+        var builder = new ConstraintBuilder(map);
+        foreach (var constraintText in constraints)
+        {
+            builder.AddResolvedConstraint(constraintText);
+        }
+        return builder.Build();
     }
 
     private IncomingRequest GrabRequest(HttpRequest request)

@@ -355,7 +355,8 @@ public class RequestRepository : IRequestRepository
                         Value,
                         Required,
                         MatchExactly,
-                        Description
+                        Description,
+                        Constraints
                     FROM
                         RequestParams
                     WHERE
@@ -562,9 +563,9 @@ public class RequestRepository : IRequestRepository
                     RequestId = id,
                     Key = p.Key,
                     Value = p.Value,
-                    Required = p.Required,
                     MatchExactly = p.MatchExactly,
-                    Description = p.Description
+                    Description = p.Description,
+                    Constraints = p.Constraints
                 })
                 .ToList();
                 var insertQuery =
@@ -573,16 +574,14 @@ public class RequestRepository : IRequestRepository
                             RequestId,
                             Key,
                             Value,
-                            Required,
-                            MatchExactly,
-                            Description
+                            Description,
+                            Constraints
                         ) VALUES(
                             @RequestId,
                             @Key,
                             @Value,
-                            @Required,
-                            @MatchExactly,
-                            @Description
+                            @Description,
+                            @Constraints
                         )
                         """;
 

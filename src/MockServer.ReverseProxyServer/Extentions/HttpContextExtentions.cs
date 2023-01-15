@@ -21,9 +21,9 @@ public static class HttpContextExtentions
         context.Request.EnableBuffering();
         var bodyText = await new StreamReader(context.Request.Body).ReadToEndAsync();
         context.Request.Body.Position = 0;
-        var body = !string.IsNullOrEmpty(bodyText)? new Dictionary<string, object>(JsonSerializer.Deserialize<ExpandoObject>(bodyText)): null;
+        var body = !string.IsNullOrEmpty(bodyText) ? new Dictionary<string, object>(JsonSerializer.Deserialize<ExpandoObject>(bodyText)) : null;
         var headers = request.Headers.ToDictionary(h => h.Key, h => h.Value.FirstOrDefault());
-        var query = request.Query.ToDictionary(q=> q.Key, q => q.Value.FirstOrDefault());
+        var query = request.Query.ToDictionary(q => q.Key, q => q.Value.FirstOrDefault());
         var routeValues = request.RouteValues.ToDictionary(rv => rv.Key, rv => rv.Value);
         return new Dictionary<string, object>()
             {

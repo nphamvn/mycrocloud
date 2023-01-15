@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Routing.Template;
 using MockServer.Core.Repositories;
 using MockServer.ReverseProxyServer.Interfaces;
+using MockServer.ReverseProxyServer.Models;
 
 namespace MockServer.ReverseProxyServer.Services;
 
-public class TemplateParserMatcherRouteService : IRouteService
+public class TemplateParserMatcherRouteService : IRouteResolver
 {
     private readonly ICacheService _cacheService;
     private readonly IRequestRepository _requestRepository;
@@ -17,36 +14,26 @@ public class TemplateParserMatcherRouteService : IRouteService
         _cacheService = cacheService;
         _requestRepository = requestRepository;
     }
-    public async Task Map(int projectId)
-    {
-        string key = projectId.ToString();
-        var paths = await _requestRepository.GetProjectRequests(projectId);
-        Dictionary<string, int> routes = paths.ToDictionary(r => r.Path, r => r.Id);
-        await _cacheService.Set(projectId.ToString(), routes);
-    }
 
-    public async Task<RouteResolveResult> Resolve(string path, int projectId)
+    public async Task<RouteResolveResult> Resolve(string method, string path, ICollection<AppRoute> routes)
     {
         if (!path.StartsWith("/"))
         {
             path = "/" + path;
         }
-        if (!await _cacheService.Exists(projectId.ToString()))
+        int matchCount = 0;
+        foreach (var route in routes)
         {
-            await this.Map(projectId);
-        }
-        var routeTemplates = await _cacheService.Get<Dictionary<string, int>>(projectId.ToString());
-        foreach (var route in routeTemplates)
-        {
-            RouteTemplate template = TemplateParser.Parse(route.Key);
+            RouteTemplate template = TemplateParser.Parse(route.Path);
             TemplateMatcher matcher = new TemplateMatcher(template, new RouteValueDictionary());
             var values = new RouteValueDictionary();
             var match = matcher.TryMatch(new PathString(path), values);
-            if (match)
+            if (match && route.Method.Equals(method))
             {
+                matchCount++;
                 return new RouteResolveResult
                 {
-                    RequestId = route.Value,
+                    Route = route,
                     RouteValues = values
                 };
             }

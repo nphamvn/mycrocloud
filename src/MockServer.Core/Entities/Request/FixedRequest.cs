@@ -15,14 +15,18 @@ public class RequestHeader : BaseEntity
     public bool Required { get; set; }
     public bool MatchExactly { get; set; }
     public string Description { get; set; }
+    public string Constraints { get; set; }
 }
 public class RequestParam : BaseEntity
 {
     public string Key { get; set; }
     public string Value { get; set; }
-    public bool Required { get; set; }
+    //public bool Required { get; set; }
     public bool MatchExactly { get; set; }
     public string Description { get; set; }
+    public string Constraints { get; set; }
+    public int ConstraintsCount
+    => !string.IsNullOrEmpty(Constraints) ? Constraints.Split(":").Length : 0;
 }
 public class RequestBody : BaseEntity
 {
@@ -31,6 +35,7 @@ public class RequestBody : BaseEntity
     public string Format { get; set; }
     public string Text { get; set; }
     public string Description { get; set; }
+    public string Constraints { get; set; }
 }
 public class ResponseHeader : BaseEntity
 {

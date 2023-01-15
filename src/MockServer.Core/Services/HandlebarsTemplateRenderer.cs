@@ -12,13 +12,12 @@ public class HandlebarsTemplateRenderer : IHandlebarsTemplateRenderer
         var handlebars = File.ReadAllText("handlebars.min-v4.7.7.js");
         var engine = new Engine();
         engine.Execute(handlebars);
-        dynamic data = new ExpandoObject();
-        data.ctx = ctx;
-        engine.SetValue("data", data);
+        engine.SetValue("ctx", ctx);
         engine.SetValue("source", source);
-        engine.Execute("const template = Handlebars.compile(source);");
+        engine.Execute("let hb = {};");
         engine.Execute(script);
-        var result = engine.Execute("template(data)").GetCompletionValue();
+        engine.Execute("const template = Handlebars.compile(source);");
+        var result = engine.Execute("template(hb)").GetCompletionValue();
         return result.ToString();
     }
 }

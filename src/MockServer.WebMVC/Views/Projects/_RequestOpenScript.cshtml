@@ -194,12 +194,14 @@
                 const value = $("input[name$='Value']", this).val();
                 const required = $("input[name$='Required']", this).prop('checked');
                 const matchExactly = $("input[name$='MatchExactly']", this).prop('checked');
+                const constraints = $("input[name$='Constraints']", this).val();
                 if (key !== '' && value !== '') {
                     params.push({
                         key: key,
                         value: value,
                         required: required,
-                        matchExactly: matchExactly
+                        matchExactly: matchExactly,
+                        constraints: constraints
                     });
                 }
             });
@@ -320,4 +322,86 @@
             }
         });
     }
+</script>
+<script>
+    $(function () {
+        $('.js-config-param-constraints').click(function () {
+            const constraintsInput = $(this).siblings('input[name*=Constraints]');
+            const constraintsCountLabel = $(this).siblings('span[name=ConstraintsCount]');
+            const modal = $($('#requestParamConstraintsConfig').html());
+            split(constraintsInput.val());
+            $('body').append(modal);
+            $('.js-save', modal).click(function () {
+                var constraints = buildConstraintsToString();
+                constraintsInput.val(constraints);
+                constraintsCountLabel.text(constraints.split(':').length);
+                modal.modal('hide');
+            });
+            modal.modal('show');
+            function split(value) {
+                const constraints = value.split(':');
+                let regex;
+                regex = new RegExp('/\required\b/');
+                if (regex.test(value)) {
+                    $('input[name=required]', modal).prop('checked', true);
+                }
+                const types = ['int', 'bool', 'datetime', 'decimal', 'double', 'float', 'guid', 'long'];
+                types.forEach(type => {
+                    if (constraints.includes(`${type}`)) {
+                        $('input[name=type]', modal).prop('checked', true);
+                        $('select[name=type]', modal).val(type);
+                    }
+                });
+
+
+                if (constraints.includes('minlength')) {
+                    $('input[name=minlength]', modal).prop('checked', true);
+                    var indexOfFirstOpenParens = inlineConstraint.IndexOf('(');
+                }
+            }
+            function buildConstraintsToString() {
+                let constraints = [];
+                if ($('input[name=required]', modal).prop('checked')) {
+                    constraints.push('required');
+                }
+                if ($('input[name=type]', modal).prop('checked')) {
+                    const type = $('select[name=type] option:selected', modal).val();
+                    constraints.push(type);
+                }
+                if ($('input[name=minlength][type=checkbox]', modal).prop('checked')) {
+                    const minlength = $('input[name=minlength][type=number]', modal).val();
+                    constraints.push(`minlength(${minlength})`);
+                }
+                if ($('input[name=maxlength][type=checkbox]', modal).prop('checked')) {
+                    const maxlength = $('input[name=maxlength][type=number]', modal).val();
+                    constraints.push(`maxlength(${maxlength})`);
+                }
+                if ($('input[name=length][type=checkbox]', modal).prop('checked')) {
+                    const length = $('input[name=length][type=number]', modal).val();
+                    constraints.push(`length(${length})`);
+                }
+                if ($('input[name=min][type=checkbox]', modal).prop('checked')) {
+                    const min = $('input[name=min][type=number]', modal).val();
+                    constraints.push(`min(${min})`);
+                }
+                if ($('input[name=max][type=checkbox]', modal).prop('checked')) {
+                    const max = $('input[name=max][type=number]', modal).val();
+                    constraints.push(`max(${max})`);
+                }
+                if ($('input[name=range][type=checkbox]', modal).prop('checked')) {
+                    const min = $('input[name=range-min][type=number]', modal).val();
+                    const max = $('input[name=range-max][type=number]', modal).val();
+                    constraints.push(`range(${min},${max})`);
+                }
+                if ($('input[name=alpha]', modal).prop('checked')) {
+                    constraints.push('alpha');
+                }
+                if ($('input[name=regex][type=checkbox]', modal).prop('checked')) {
+                    const expression = $('input[name=expression]', modal).val();
+                    constraints.push(`regex(${expression})`);
+                }
+                return constraints.join(':');
+            }
+        });
+    });
 </script>
