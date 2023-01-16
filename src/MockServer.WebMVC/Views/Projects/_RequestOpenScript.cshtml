@@ -340,23 +340,53 @@
             modal.modal('show');
             function split(value) {
                 const constraints = value.split(':');
+                value = 'required:bool:minlength(5):maxlength(10):legth(10):min(1):max(10):range(1,10):alpha:regex(abc)';
                 let regex;
-                regex = new RegExp('/\required\b/');
-                if (regex.test(value)) {
+                regex = new RegExp('required');
+                if (value.match(regex) !== null) {
                     $('input[name=required]', modal).prop('checked', true);
                 }
                 const types = ['int', 'bool', 'datetime', 'decimal', 'double', 'float', 'guid', 'long'];
-                types.forEach(type => {
-                    if (constraints.includes(`${type}`)) {
-                        $('input[name=type]', modal).prop('checked', true);
-                        $('select[name=type]', modal).val(type);
-                    }
-                });
+                regex = new RegExp(types.join('|'));
+                if (value.match(regex) !== null) {
+                    $('input[name=type]', modal).prop('checked', true);
+                    $('select[name=type]', modal).val(value.match(regex));
+                }
 
-
-                if (constraints.includes('minlength')) {
+                regex = new RegExp('minlength\(\d*\)');
+                if (value.match(regex) !== null) {
+                    console.log(value.match(regex));
                     $('input[name=minlength]', modal).prop('checked', true);
-                    var indexOfFirstOpenParens = inlineConstraint.IndexOf('(');
+                }
+
+                regex = new RegExp('maxlength\(\d*\)');
+                if (regex.test(value)) {
+                    $('input[name=maxlength]', modal).prop('checked', true);
+                }
+                regex = new RegExp('length\(\d*\)');
+                if (regex.test(value)) {
+                    $('input[name=length]', modal).prop('checked', true);
+                }
+                regex = new RegExp('min\(\d*\)');
+                if (regex.test(value)) {
+                    $('input[name=min]', modal).prop('checked', true);
+                }
+                regex = new RegExp('max\(\d*\)');
+                if (regex.test(value)) {
+                    $('input[name=max]', modal).prop('checked', true);
+                }
+                regex = new RegExp('range\(\d*\,\d*\)');
+                if (regex.test(value)) {
+                    alert('range');
+                    $('input[name=range]', modal).prop('checked', true);
+                }
+                regex = new RegExp('alpha');
+                if (regex.test(value)) {
+                    $('input[name=alpha]', modal).prop('checked', true);
+                }
+                regex = new RegExp('regex\(...\)');
+                if (regex.test(value)) {
+                    $('input[name=regex]', modal).prop('checked', true);
                 }
             }
             function buildConstraintsToString() {
