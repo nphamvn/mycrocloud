@@ -1,5 +1,5 @@
 using MockServer.Core.Enums;
-using MockServer.WebMVC.DTOs.Project;
+using MockServer.Core.Models.Authorization;
 using MockServer.WebMVC.Models.Project;
 
 namespace MockServer.WebMVC.Services.Interfaces;
@@ -13,4 +13,5 @@ public interface IProjectService
     Task<string> GenerateKey(string name);
     Task Delete(string name);
     Task SetAccessibility(string name, ProjectAccessibility accessibility);
+    Task CreateJwtHandler(string name, JwtHandlerConfiguration configuration);
 }

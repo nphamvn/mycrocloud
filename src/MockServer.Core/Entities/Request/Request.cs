@@ -11,5 +11,6 @@ public class Request : BaseEntity
     public string Description { get; set; }
     public string Method { get; set; }
     public Project Project { get; set; }
+    public int Authorization { get; set; }
 }
 

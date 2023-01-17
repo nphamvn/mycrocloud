@@ -1,6 +1,8 @@
 using System.Net;
 using MockServer.Core.Enums;
+using MockServer.Core.Interfaces;
 using MockServer.Core.Repositories;
+using MockServer.Core.Services;
 using MockServer.ReverseProxyServer.Constraints;
 using MockServer.ReverseProxyServer.Interfaces;
 using MockServer.ReverseProxyServer.Models;
@@ -34,6 +36,41 @@ public class RequestValidation : IMiddleware
             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
             await context.Response.WriteAsync($"'{req.ProjectName}' project is not found");
             return;
+        }
+
+        if (p.Authorization == 1)
+        {
+            //JWT
+            var jwtConfiguration = await _projectRepository.GetJwtHandlerConfiguration(p.Id);
+            var tokenSource = jwtConfiguration.TokenSource; //header[name=Authorization,start=Bearer]
+            //TODO: Create instance with FactoryService
+            IJwtBearerAuthorization jwtBearerService = new JwtBearerAuthorization();
+            IHttpContextUtility utility = new HttpContextUtility();
+            var token = utility.Get(tokenSource, context) as string;
+            if (string.IsNullOrEmpty(token))
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                await context.Response.WriteAsync("No token found");
+                return;
+            }
+            JwtOptions options = new JwtOptions();
+            options.Claims = new Dictionary<string, string>();
+            foreach (var config in jwtConfiguration.ClaimConfigurations)
+            {
+                var value = utility.Get(config.BindingSource, context);
+                if (value != null)
+                {
+                    options.Claims[config.Type] = value as string;
+                }
+            }
+            var user = jwtBearerService.Validate(token, options);
+            if (user == null)
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                await context.Response.WriteAsync("Invalid token");
+                return;
+            }
+            context.User = user;
         }
 
         if (p.Accessibility == ProjectAccessibility.Private)

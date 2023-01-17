@@ -13,5 +13,6 @@ public class Project : BaseEntity
     public DateTime UpdatedAt { get; set; }
     public AppUser User { get; set; }
     public ICollection<Request> Requests { get; set; }
+    public int Authorization { get; set; }
 }
 

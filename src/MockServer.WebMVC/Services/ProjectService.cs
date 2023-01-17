@@ -3,6 +3,7 @@ using AutoMapper;
 using MockServer.Core.Enums;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Models;
+using MockServer.Core.Models.Authorization;
 using MockServer.Core.Repositories;
 using MockServer.WebMVC.Extentions;
 using MockServer.WebMVC.Models.Project;
@@ -46,6 +47,16 @@ public class ProjectService : IProjectService
         mapped.UserId = user.Id;
         await projectRepository.Add(mapped);
         return true;
+    }
+
+    public Task CreateJwtHandler(string name, JwtHandlerConfiguration configuration)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task CreateJwtHandler(string name, JwtHandlerConfiguration configuration)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task Delete(string name)

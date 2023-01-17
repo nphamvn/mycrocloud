@@ -1,6 +1,7 @@
 using Dapper;
 using Microsoft.Data.Sqlite;
 using MockServer.Core.Entities.Projects;
+using MockServer.Core.Models.Authorization;
 using MockServer.Core.Repositories;
 using MockServer.Core.Settings;
 
@@ -165,6 +166,11 @@ public class ProjectRepository : IProjectRepository
             Query = "%" + query + "%",
             Accessibility = accessibility
         });
+    }
+
+    public Task<JwtHandlerConfiguration> GetJwtHandlerConfiguration(int id)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task Update(Project project)
