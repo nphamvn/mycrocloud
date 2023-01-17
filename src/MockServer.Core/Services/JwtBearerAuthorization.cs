@@ -3,11 +3,12 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using MockServer.Core.Interfaces;
+using MockServer.Core.Models.Authorization;
 
 namespace MockServer.Core.Services;
 public class JwtBearerAuthorization : IJwtBearerAuthorization
 {
-    public string GenerateToken(JwtOptions options)
+    public string GenerateToken(JwtHandlerConfiguration options)
     {
         // Create a security key
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.SecretKey));
@@ -32,7 +33,7 @@ public class JwtBearerAuthorization : IJwtBearerAuthorization
         return jwtHandler.WriteToken(token);
     }
 
-    public ClaimsPrincipal Validate(string token, JwtOptions options)
+    public ClaimsPrincipal Validate(string token, JwtHandlerConfiguration options)
     {
         var jwtHandler = new JwtSecurityTokenHandler();
         // Create a security key

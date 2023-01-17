@@ -1,4 +1,5 @@
 using MockServer.Core.Entities.Projects;
+using MockServer.Core.Interfaces;
 using MockServer.Core.Models.Authorization;
 
 namespace MockServer.Core.Repositories;

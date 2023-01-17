@@ -41,8 +41,8 @@ public class RequestValidation : IMiddleware
         if (p.Authorization == 1)
         {
             //JWT
-            var jwtConfiguration = await _projectRepository.GetJwtHandlerConfiguration(p.Id);
-            var tokenSource = jwtConfiguration.TokenSource; //header[name=Authorization,start=Bearer]
+            var options = await _projectRepository.GetJwtHandlerConfiguration(p.Id);
+            var tokenSource = options.TokenBinderSource; //header[name=Authorization,start=Bearer]
             //TODO: Create instance with FactoryService
             IJwtBearerAuthorization jwtBearerService = new JwtBearerAuthorization();
             IHttpContextUtility utility = new HttpContextUtility();
@@ -53,14 +53,13 @@ public class RequestValidation : IMiddleware
                 await context.Response.WriteAsync("No token found");
                 return;
             }
-            JwtOptions options = new JwtOptions();
             options.Claims = new Dictionary<string, string>();
-            foreach (var config in jwtConfiguration.ClaimConfigurations)
+            foreach (var config in options.ClaimsBinderSource)
             {
-                var value = utility.Get(config.BindingSource, context);
+                var value = utility.Get(config.Value, context);
                 if (value != null)
                 {
-                    options.Claims[config.Type] = value as string;
+                    options.Claims[config.Key] = value as string;
                 }
             }
             var user = jwtBearerService.Validate(token, options);
