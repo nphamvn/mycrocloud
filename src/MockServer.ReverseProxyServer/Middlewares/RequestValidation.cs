@@ -14,16 +14,19 @@ public class RequestValidation : IMiddleware
     private readonly IRouteResolver _routeService;
     private readonly IProjectRepository _projectRepository;
     private readonly ICacheService _cacheService;
+    private readonly ModelBinderProvider _modelBinderProvider;
     public RequestValidation(
             IRequestRepository requestRepository,
             ICacheService cacheService,
             IRouteResolver routeService,
-            IProjectRepository projectRepository)
+            IProjectRepository projectRepository,
+            ModelBinderProvider modelBinderProvider)
     {
         _requestRepository = requestRepository;
         _projectRepository = projectRepository;
         _cacheService = cacheService;
         _routeService = routeService;
+        _modelBinderProvider = modelBinderProvider;
     }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -40,13 +43,11 @@ public class RequestValidation : IMiddleware
 
         if (p.Authorization == 1)
         {
-            //JWT
             var options = await _projectRepository.GetJwtHandlerConfiguration(p.Id);
-            var tokenSource = options.TokenBinderSource; //header[name=Authorization,start=Bearer]
-            //TODO: Create instance with FactoryService
-            IJwtBearerAuthorization jwtBearerService = new JwtBearerAuthorization();
-            IHttpContextUtility utility = new HttpContextUtility();
-            var token = utility.Get(tokenSource, context) as string;
+            var tokenSource = options.TokenBinderSource;
+
+            var binder = _modelBinderProvider.GetBinder(tokenSource);
+            var token = binder.Get(context) as string;
             if (string.IsNullOrEmpty(token))
             {
                 context.Response.StatusCode = (int)HttpStatusCode.NotFound;
@@ -56,12 +57,17 @@ public class RequestValidation : IMiddleware
             options.Claims = new Dictionary<string, string>();
             foreach (var config in options.ClaimsBinderSource)
             {
-                var value = utility.Get(config.Value, context);
+                var claimType = config.Key;
+                var binderSource = config.Value;
+                binder = _modelBinderProvider.GetBinder(binderSource);
+                var value = binder.Get(context);
                 if (value != null)
                 {
-                    options.Claims[config.Key] = value as string;
+                    options.Claims[claimType] = value as string;
                 }
             }
+            //TODO: Create instance with FactoryService
+            IJwtBearerAuthorization jwtBearerService = new JwtBearerAuthorization();
             var user = jwtBearerService.Validate(token, options);
             if (user == null)
             {

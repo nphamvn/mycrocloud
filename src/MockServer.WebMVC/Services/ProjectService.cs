@@ -54,11 +54,6 @@ public class ProjectService : IProjectService
         throw new NotImplementedException();
     }
 
-    public Task CreateJwtHandler(string name, JwtHandlerConfiguration configuration)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task Delete(string name)
     {
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();

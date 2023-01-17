@@ -9,6 +9,19 @@ public static class ApplicationBuilderExtentions
 {
     public static IApplicationBuilder MapTestPaths(this IApplicationBuilder app)
     {
+        app.Map("/dev/header-binder", app =>
+        {
+            app.Run(async context =>
+            {
+                var binderProvider = (ModelBinderProvider)context.RequestServices.GetService(typeof(ModelBinderProvider));
+                string key = "header(Name)";
+                var binder = binderProvider.GetBinder(key);
+                var value = binder.Get(context);
+                var name = value.ToString();
+                await context.Response.WriteAsync(name ?? "Name not found");
+            });
+        });
+
         app.Map("/dev/resolve-constraint", app =>
         {
             app.Run(async context =>

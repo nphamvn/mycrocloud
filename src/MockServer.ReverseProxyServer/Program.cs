@@ -1,4 +1,5 @@
 using MockServer.Core.Repositories;
+using MockServer.Core.Services;
 using MockServer.Infrastructure.Repositories;
 using MockServer.ReverseProxyServer.Extentions;
 using MockServer.ReverseProxyServer.Interfaces;
@@ -8,6 +9,7 @@ using MockServer.ReverseProxyServer.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddOptions();
 builder.Services.AddGlobalSettings(builder.Configuration);
 builder.Services.AddScoped<RequestValidation>();
 builder.Services.AddMemoryCache();
@@ -20,6 +22,10 @@ builder.Services.AddScoped<ICacheService, MemoryCacheService>();
 builder.Services.AddScoped<IRouteResolver, TemplateParserMatcherRouteService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<RequestHandler>();
+builder.Services.AddModelBinderProvider(options =>
+{
+    options = ModelBinderProviderOptions.Default;
+});
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
@@ -32,13 +38,14 @@ builder.Services.AddCors(options =>
     });
 });
 var app = builder.Build();
+
 app.UseCors(MyAllowSpecificOrigins);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapTestPaths();
 }
-app.UseRouting();
+
 //Use RequestValidator to check if request is existing and check if request is allowed (private or public)
 app.UseRequestValidator();
 app.Run(async context =>

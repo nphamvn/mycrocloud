@@ -32,28 +32,27 @@ public class ConstraintBuilder
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="inlineConstraint">A typical constraint looks like the following
+    /// <param name="constraint">A typical constraint looks like the following
     /// "exampleConstraint(arg1, arg2, 12)".</param>
     /// <returns></returns>
-    private IConstraint ResolveConstraint(string inlineConstraint)
+    private IConstraint ResolveConstraint(string constraint)
     {
-        //TODO:
         string argumentString;
-        string parameterPolicyKey;
-        var indexOfFirstOpenParens = inlineConstraint.IndexOf('(');
-        if (indexOfFirstOpenParens >= 0 && inlineConstraint.EndsWith(')'))
+        string key;
+        var indexOfFirstOpenParens = constraint.IndexOf('(');
+        if (indexOfFirstOpenParens >= 0 && constraint.EndsWith(')'))
         {
-            parameterPolicyKey = inlineConstraint.Substring(0, indexOfFirstOpenParens);
-            argumentString = inlineConstraint.Substring(
+            key = constraint.Substring(0, indexOfFirstOpenParens);
+            argumentString = constraint.Substring(
                 indexOfFirstOpenParens + 1,
-                inlineConstraint.Length - indexOfFirstOpenParens - 2);
+                constraint.Length - indexOfFirstOpenParens - 2);
         }
         else
         {
-            parameterPolicyKey = inlineConstraint;
+            key = constraint;
             argumentString = null;
         }
-        if (!_inlineConstraintMap.TryGetValue(parameterPolicyKey, out var parameterPolicyType))
+        if (!_inlineConstraintMap.TryGetValue(key, out var parameterPolicyType))
         {
             return default;
         }
@@ -72,7 +71,7 @@ public class ConstraintBuilder
         }
         try
         {
-            return (IConstraint)CreateParameterPolicy(parameterPolicyType, argumentString);
+            return (IConstraint)CreateConstraint(parameterPolicyType, argumentString);
         }
         catch (RouteCreationException)
         {
@@ -85,11 +84,11 @@ public class ConstraintBuilder
                 exception);
         }
     }
-    private static IConstraint CreateParameterPolicy(Type parameterPolicyType, string argumentString)
+    private static IConstraint CreateConstraint(Type type, string argumentString)
     {
         ConstructorInfo activationConstructor = null;
         object[] parameters = null;
-        var constructors = parameterPolicyType.GetConstructors();
+        var constructors = type.GetConstructors();
         // If there is only one constructor and it has a single parameter, pass the argument string directly
         // This is necessary for the Regex RouteConstraint to ensure that patterns are not split on commas.
         if (constructors.Length == 1 && GetNonConvertableParameterTypeCount(constructors[0].GetParameters()) == 1)
@@ -128,8 +127,6 @@ public class ConstraintBuilder
 
     private static int GetNonConvertableParameterTypeCount(ParameterInfo[] parameters)
     {
-        //return parameters.Length;
-
         var count = 0;
         for (var i = 0; i < parameters.Length; i++)
         {
