@@ -1,0 +1,33 @@
+@using MockServer.WebMVC.Controllers
+@model MockServer.WebMVC.Models.Project.ProjectIndexItem
+@{
+    var rv = new { name = ViewData["ProjectName"] };
+}
+<div class="row flex-nowrap">
+    <partial name="/Views/ProjectSettings/Shared/_SideBar.cshtml" model="@ViewData["ProjectName"]" />
+    <div class="col py-3">
+        <div class="w-75">
+            <h5>Create JWT Authentication</h5>
+            <form method="post" action="@Url.Action(nameof(ProjectSettingsController.CreateJwt), rv)">
+                <div class="mb-3">
+                    <label for="SecretKey" class="form-label">Secret Key</label>
+                    <input type="text" class="form-control" id="SecretKey" placeholder="">
+                </div>
+                <div class="mb-3">
+                    <label for="Issuer" class="form-label">Issuer</label>
+                    <input type="text" class="form-control" id="Issuer" placeholder="">
+                </div>
+                <div class="mb-3">
+                    <label for="Audience" class="form-label">Audience</label>
+                    <input type="text" class="form-control" id="Audience" placeholder="">
+                </div>
+                <div class="col-auto d-flex">
+                    <button type="button"
+                        onclick="location.href='@Url.Action(nameof(ProjectSettingsController.Auth), rv)'"
+                        class="btn btn-outline border mb-3">Back</button>
+                    <button type="submit" class="ms-2 btn btn-primary mb-3">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

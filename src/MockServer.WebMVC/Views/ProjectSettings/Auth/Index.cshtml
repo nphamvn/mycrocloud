@@ -1,0 +1,81 @@
+@using MockServer.WebMVC.Controllers
+@model MockServer.WebMVC.Models.Project.ProjectIndexItem
+@{
+    int count = 1;
+    var rv = new { name = Model.Name };
+}
+<div class="row flex-nowrap">
+    <partial name="/Views/ProjectSettings/Shared/_SideBar.cshtml" model="@Model.Name" />
+    <div class="col py-3">
+        <div class="w-75">
+            <div class="d-flex">
+                <h5>Authentication</h5>
+                <div class="ms-auto btn-group">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        Create
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item"
+                                href="@Url.Action(nameof(ProjectSettingsController.CreateJwt), rv)">JWT</a></li>
+                        <li><a class="dropdown-item" href="#">API Key</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-2">
+            @if (count == 0)
+            {
+                <div>
+                    There are no authentication schemes for this project.
+                </div>
+            }
+            else
+            {
+                <div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Settings Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>1</th>
+                                <td><a class="text-decoration-none"
+                                    href="@Url.Action(nameof(ProjectSettingsController.ViewJwt), new {name = Model.Name,id=1})">Jwt
+                                        1</a>
+                                </td>
+                                <td>JWT</td>
+                                <td>Default</td>
+                                <td>...</td>
+                            </tr>
+                            <tr>
+                                <th>2</th>
+                                <td><a class="text-decoration-none"
+                                    href="@Url.Action(nameof(ProjectSettingsController.ViewJwt), new {name = Model.Name, id=2})">API
+                                        Key</a></td>
+                                <td>API Key</td>
+                                <td>Set</td>
+                                <td>...</td>
+                            </tr>
+                            <tr>
+                                <th>3</th>
+                                <td><a class="text-decoration-none"
+                                    href="@Url.Action(nameof(ProjectSettingsController.ViewJwt), new {name = Model.Name,id=3})">Jwt
+                                        2</a>
+                                </td>
+                                <td>JWT</td>
+                                <td>Not Set</td>
+                                <td>...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using MockServer.Core.Enums;
 using MockServer.Core.Models.Authorization;
 using MockServer.WebMVC.Attributes;
-using MockServer.WebMVC.Extentions;
 using MockServer.WebMVC.Services.Interfaces;
 
 namespace MockServer.WebMVC.Controllers;
@@ -19,12 +18,48 @@ public class ProjectSettingsController : BaseController
         _projectService = projectService;
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Index(string name)
+    {
+        var vm = await _projectService.GetProjectViewViewModel(name);
+        ViewData["ProjectName"] = name;
+        return View("Views/ProjectSettings/Index.cshtml", vm.ProjectInfo);
+    }
+
+    [HttpGet("auth")]
+    public async Task<IActionResult> Auth(string name)
+    {
+        ViewData["ProjectName"] = name;
+        var vm = await _projectService.GetProjectViewViewModel(name);
+        return View("Views/ProjectSettings/Auth/Index.cshtml", vm.ProjectInfo);
+    }
+
+    [HttpGet("auth/jwt/create")]
+    public async Task<IActionResult> CreateJwt(string name)
+    {
+        ViewData["ProjectName"] = name;
+        return View("Views/ProjectSettings/Auth/JWT/Create.cshtml");
+    }
+
+    [HttpPost("auth/jwt/create")]
+    public async Task<IActionResult> CreateJwt(string name, JwtHandlerConfiguration configuration)
+    {
+        await _projectService.CreateJwtHandler(name, configuration);
+        return RedirectToAction(nameof(Auth), Request.RouteValues);
+    }
+
+    [HttpGet("auth/jwt/{id:int}")]
+    public async Task<IActionResult> ViewJwt(string name, int id)
+    {
+        ViewData["ProjectName"] = name;
+        return View("Views/ProjectSettings/Auth/JWT/Create.cshtml");
+    }
+
     [HttpPost("rename")]
     public async Task<IActionResult> Rename(string name, string newName)
     {
         await _projectService.Rename(name, newName);
-        return !Request.IsAjaxRequest() ? RedirectToAction(nameof(View), new { name = newName }) :
-        Ok();
+        return RedirectToAction(nameof(Index), new { name = newName });
     }
 
     [AjaxOnly]
@@ -49,11 +84,4 @@ public class ProjectSettingsController : BaseController
         return RedirectToAction(nameof(Index));
     }
 
-    [AjaxOnly]
-    [HttpPost("auth/jwt/create")]
-    public async Task<IActionResult> CreateJwtHandler(string name, JwtHandlerConfiguration configuration)
-    {
-        await _projectService.CreateJwtHandler(name, configuration);
-        return Ok();
-    }
 }

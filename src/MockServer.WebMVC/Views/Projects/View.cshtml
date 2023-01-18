@@ -1,4 +1,5 @@
 @using MockServer.Core.Models
+@using MockServer.WebMVC.Controllers
 @using MockServer.WebMVC.Extentions
 @model MockServer.WebMVC.Models.Project.ProjectViewViewModel
 @{
@@ -22,8 +23,8 @@
                 type="button" role="tab">Requests</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link py-1" data-bs-toggle="tab" data-bs-target="#settings-tab" type="button"
-                role="tab">Settings</button>
+            <a href="@Url.Action(nameof(ProjectSettingsController.Index), "ProjectSettings" ,new {name=Model.ProjectInfo.Name})"
+                class="nav-link py-1" role="tab">Settings</a>
         </li>
     </ul>
     <!-- Tab content -->
@@ -32,7 +33,7 @@
             <partial name="_RequestsPartial.cshtml" model="Model" />
         </div>
         <div id="settings-tab" class="tab-pane fade h-100">
-            <partial name="_SettingsPartial.cshtml" model="Model.ProjectInfo" />
+
         </div>
     </div>
 </div>

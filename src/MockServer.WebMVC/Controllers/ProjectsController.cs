@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MockServer.Core.Enums;
 using MockServer.WebMVC.Attributes;
-using MockServer.WebMVC.Extentions;
 using MockServer.WebMVC.Models.Common;
 using MockServer.WebMVC.Models.Project;
 using MockServer.WebMVC.Services.Interfaces;
@@ -84,35 +82,5 @@ public class ProjectsController : BaseController
         }
 
         return RedirectToAction(nameof(View), new { name = project.Name });
-    }
-
-    [HttpPost("{name}/settings/rename")]
-    public async Task<IActionResult> Rename(string name, string newName)
-    {
-        await _projectService.Rename(name, newName);
-        return !Request.IsAjaxRequest() ? RedirectToAction(nameof(View), new { name = newName }) :
-        Ok();
-    }
-
-    [AjaxOnly]
-    [HttpPost("{name}/settings/generate-key")]
-    public async Task<IActionResult> GenerateKey(string name)
-    {
-        string key = await _projectService.GenerateKey(name);
-        return Ok(new { key = key });
-    }
-
-    [HttpPost("{name}/settings/set-accessibility")]
-    public async Task<IActionResult> SetAccessibility(string name, ProjectAccessibility accessibility)
-    {
-        await _projectService.SetAccessibility(name, accessibility);
-        return RedirectToAction(nameof(View), Request.RouteValues);
-    }
-
-    [HttpPost("{name}/settings/delete")]
-    public async Task<IActionResult> Delete(string name)
-    {
-        await _projectService.Delete(name);
-        return RedirectToAction(nameof(Index));
     }
 }
