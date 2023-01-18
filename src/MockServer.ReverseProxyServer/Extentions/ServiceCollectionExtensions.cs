@@ -12,9 +12,9 @@ public static class ServiceCollectionExtentions
         services.AddSingleton<GlobalSettings>(s => settings);
     }
 
-    public static void AddModelBinderProvider(this IServiceCollection services, Action<ModelBinderProviderOptions> options)
+    public static void AddModelBinderProvider(this IServiceCollection services, Action<DataBinderProviderOptions> options)
     {
-        services.Configure<ModelBinderProviderOptions>(options);
-        services.AddSingleton<ModelBinderProvider>();
+        services.Configure<DataBinderProviderOptions>(options);
+        services.AddSingleton<DataBinderProvider>();
     }
 }

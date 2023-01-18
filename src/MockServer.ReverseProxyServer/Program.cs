@@ -11,7 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddOptions();
 builder.Services.AddGlobalSettings(builder.Configuration);
-builder.Services.AddScoped<RequestValidation>();
+builder.Services.AddScoped<RouteValidation>();
+builder.Services.AddScoped<Authentication>();
+builder.Services.AddScoped<ConstraintsValidation>();
 builder.Services.AddMemoryCache();
 builder.Services.AddTransient<IRequestRepository, RequestRepository>();
 builder.Services.AddTransient<IProjectRepository, ProjectRepository>();
@@ -24,7 +26,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<RequestHandler>();
 builder.Services.AddModelBinderProvider(options =>
 {
-    options = ModelBinderProviderOptions.Default;
+    options.Map = DataBinderProviderOptions.Default.Map;
 });
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -38,16 +40,19 @@ builder.Services.AddCors(options =>
     });
 });
 var app = builder.Build();
-
-app.UseCors(MyAllowSpecificOrigins);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapTestPaths();
 }
-
-//Use RequestValidator to check if request is existing and check if request is allowed (private or public)
-app.UseRequestValidator();
+//Enable CORSE
+app.UseCors(MyAllowSpecificOrigins);
+//Validate route
+app.UseRouteValidation();
+//Authenticate
+app.UseRequestAuthentication();
+//Validate
+app.UseConstraintsValidation();
 app.Run(async context =>
 {
     var handler = context.RequestServices.GetRequiredService<RequestHandler>();

@@ -13,7 +13,7 @@ public static class ApplicationBuilderExtentions
         {
             app.Run(async context =>
             {
-                var binderProvider = (ModelBinderProvider)context.RequestServices.GetService(typeof(ModelBinderProvider));
+                var binderProvider = (DataBinderProvider)context.RequestServices.GetService(typeof(DataBinderProvider));
                 string key = "header(Name)";
                 var binder = binderProvider.GetBinder(key);
                 var value = binder.Get(context);

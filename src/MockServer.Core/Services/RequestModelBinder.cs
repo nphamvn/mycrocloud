@@ -5,15 +5,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace MockServer.Core.Services;
-public class ModelBinderProviderOptions
+public class DataBinderProviderOptions
 {
     public Dictionary<string, Type> Map { get; set; }
-    public ModelBinderProviderOptions()
+    public DataBinderProviderOptions()
     {
         Map = GetDefaultMap();
     }
-    public static ModelBinderProviderOptions Default =>
-        new ModelBinderProviderOptions
+    public static DataBinderProviderOptions Default =>
+        new DataBinderProviderOptions
         {
             Map = GetDefaultMap()
         };
@@ -21,24 +21,24 @@ public class ModelBinderProviderOptions
     private static Dictionary<string, Type> GetDefaultMap()
     {
         Dictionary<string, Type> defaults = new();
-        AddMap<FromHeaderModelBinder>(defaults, "header");
+        AddMap<FromHeaderDataBinder>(defaults, "header");
         return defaults;
     }
-    private static void AddMap<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TModelBinder>(Dictionary<string, Type> map, string key) where TModelBinder : IRequestModelBinder
+    private static void AddMap<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDataBinder>(Dictionary<string, Type> map, string key) where TDataBinder : IDataBinder
     {
-        map[key] = typeof(TModelBinder);
+        map[key] = typeof(TDataBinder);
     }
 }
 
-public class ModelBinderProvider
+public class DataBinderProvider
 {
-    private readonly ModelBinderProviderOptions Options;
-    public ModelBinderProvider(IOptions<ModelBinderProviderOptions> options)
+    private readonly DataBinderProviderOptions Options;
+    public DataBinderProvider(IOptions<DataBinderProviderOptions> options)
     {
-        Console.WriteLine(nameof(ModelBinderProvider));
+        Console.WriteLine(nameof(DataBinderProvider));
         Options = options.Value;
     }
-    public IRequestModelBinder GetBinder(string name)
+    public IDataBinder GetBinder(string name)
     {
         string argumentString;
         string key;
@@ -60,9 +60,9 @@ public class ModelBinderProvider
         {
             return default;
         }
-        return (IRequestModelBinder)CreateBinder(type, argumentString);
+        return (IDataBinder)CreateBinder(type, argumentString);
     }
-    private static IRequestModelBinder CreateBinder(Type type, string argumentString)
+    private static IDataBinder CreateBinder(Type type, string argumentString)
     {
         ConstructorInfo activationConstructor = null;
         object[] parameters = null;
@@ -98,7 +98,7 @@ public class ModelBinderProvider
                 parameters = ConvertArguments(activationConstructor.GetParameters(), arguments);
             }
         }
-        return (IRequestModelBinder)activationConstructor.Invoke(parameters);
+        return (IDataBinder)activationConstructor.Invoke(parameters);
     }
     private static int GetNonConvertableParameterTypeCount(ParameterInfo[] parameters)
     {
@@ -128,20 +128,57 @@ public class ModelBinderProvider
         return parameters;
     }
 }
-public interface IRequestModelBinder
+public interface IDataBinder
 {
     object Get(HttpContext context);
 }
-public class FromHeaderModelBinder : IRequestModelBinder
+public class FromHeaderDataBinder : IDataBinder
 {
     public string Name { get; set; }
-    public FromHeaderModelBinder(string name)
+    public FromHeaderDataBinder()
+    {
+        
+    }
+    public FromHeaderDataBinder(string name)
     {
         Name = name;
     }
     public object Get(HttpContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(Name);
         context.Request.Headers.TryGetValue(Name, out var value);
         return value;
+    }
+}
+
+public class FromQueryDataBinder : IDataBinder
+{
+    public string Query { get; set; }
+    public FromQueryDataBinder()
+    {
+        
+    }
+    public FromQueryDataBinder(string query)
+    {
+        Query = query;
+    }
+    public object Get(HttpContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(Query);
+        context.Request.Query.TryGetValue(Query, out var value);
+        return value;
+    }
+}
+public class FromBodyDataBinder : IDataBinder
+{
+    public object Get(HttpContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        context.Request.EnableBuffering();
+        var text = new StreamReader(context.Request.Body).ReadToEnd();
+        context.Request.Body.Position = 0;
+        return text;
     }
 }
