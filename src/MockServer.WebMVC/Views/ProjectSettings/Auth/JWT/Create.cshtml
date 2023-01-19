@@ -1,4 +1,3 @@
-@using MockServer.WebMVC.Controllers
 @model MockServer.Core.Models.Authorization.JwtHandlerConfiguration
 @{
     var rv = new { name = ViewData["ProjectName"] };
@@ -8,60 +7,170 @@
     <div class="col py-3">
         <div class="w-75">
             <h5>Create JWT Authentication</h5>
-            <form method="post" action="@Url.Action(nameof(ProjectSettingsController.CreateJwt), rv)">
-                <div class="mb-3">
-                    <label asp-for="SecretKey" class="form-label">Secret Key</label>
-                    <input type="text" asp-for="SecretKey" class="form-control" id="SecretKey" placeholder="">
+            <form role="form">
+                <div class="card mb-2">
+                    <div class="card-header">
+                        Standard JWT Claims
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3 row">
+                            <label for="issuer" class="col-sm-2 col-form-label">Issuer</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="issuer">
+                            </div>
+                            @* <p class="col-sm-5 text-success">Identifier (or, name) of the server or system
+                                issuing
+                                the
+                                token. Typically a DNS name, but doesn't have to be.</p> *@
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="col-sm-2">
+                                <label for="issuedAt" class="col-form-label">Issued At</label>
+                                <button type="button" class="btn btn-sm pb-2 text-info" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" title="Tooltip on top">
+                                    <i class="bi bi-info-circle"></i>
+                                </button>
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="issuedAt">
+                            </div>
+                            <div class="col-sm-4">
+                                <button type="button" class="btn btn-success btn-xs">now</button>
+                            </div>
+                            @* <p class="text-success">Date/time when the token was issued. (defaults to now)
+                                &nbsp;&nbsp;
+                                <button type="button" class="btn btn-success btn-xs"
+                                data-bind="click:issuedAtSetNow">now</button>
+                                </p> *@
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="expiration" class="col-sm-2 col-form-label">Expiration</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="expiration">
+                            </div>
+                            <div class="col-sm-4">
+                                <button type="button" class="btn btn-success btn-xs">in 60 minutes</button>
+                                <button type="button" class="btn btn-success btn-xs">in 1 days</button>
+                            </div>
+                            @* <p class="text-success">Date/time at which point the token is no longer valid.
+                                (defaults
+                                to one year from now)
+                                &nbsp;&nbsp;
+                                <button type="button" class="btn btn-success btn-xs"
+                                data-bind="click:expirationSetNow">now</button>
+                                <button type="button" class="btn btn-success btn-xs"
+                                data-bind="click:expirationSetTwentyMinutes">in 20 minutes</button>
+                                <button type="button" class="btn btn-success btn-xs"
+                                data-bind="click:expirationSetOneYear">in 1 year</button>
+                                </p> *@
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="audience" class="col-sm-2 col-form-label">Audience</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="audience">
+                            </div>
+                            @* <p class="col-sm-5 text-success">Intended recipient of this token; can be any string, as
+                                long as the other end uses the same string when validating the token. Typically a
+                                DNS
+                                name.</p>*@
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="subject" class="col-sm-2 col-form-label">Subject</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="subject">
+                            </div>
+                            @* <p class="col-sm-5 text-success">Identifier (or, name) of the user this token
+                                represents.
+                                </p>*@
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label asp-for="Algorithm" class="form-label">Algorithm</label>
-                    <select asp-for="Algorithm" class="form-select" aria-label="Default select example">
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
-                    </select>
+                <div class="card mb-2">
+                    <div class="card-header">
+                        Additional Claims
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-7">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Claim Type</th>
+                                            <th>Value</th>
+                                            <th>&nbsp;</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- ko foreach:additionalClaims -->
+                                        <tr>
+                                            <td class="align-middle" style="width:150px">
+                                                <input type="text" class="form-control">
+
+                                            </td>
+                                            <td class="align-middle">
+                                                <input type="text" class="form-control">
+                                            </td>
+                                            <td class="align-middle">
+                                                <button type="button">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="alert alert-info col-5">
+                                Explain
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="Issuer" class="form-label">Issuer</label>
-                    <input type="text" class="form-control" id="Issuer" placeholder="">
+                <div class="card mb-2">
+                    <div class="card-header">
+                        Algorithm & Secret Key
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3 row">
+                            <label for="algorithm" class="col-sm-2 col-form-label">Algorithm</label>
+                            <div class="col-sm-10">
+                                <div class="dropdown">
+                                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                                        data-bs-toggle="dropdown">
+                                        <span>HS256</span>
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                                        <li><a class="dropdown-item" href="#">HS256</a></li>
+                                        <li><a class="dropdown-item" href="#">HS384</a></li>
+                                        <li><a class="dropdown-item" href="#">HS512</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="key" class="col-sm-2 col-form-label">Key</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="key">
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-success dropdown-toggle"
+                                        data-bs-toggle="dropdown">
+                                        <span class="caret">Generate</span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="#" class="dropdown-item">32-byte key</a></li>
+                                        <li><a href="#" class="dropdown-item">64-byte key</a></li>
+                                        <li><a href="#" class="dropdown-item">128-byte key</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="Audience" class="form-label">Audience</label>
-                    <input type="text" class="form-control" id="Audience" placeholder="">
+                <div>
+                    <button type="submit" class="btn btn-primary">Create</button>
                 </div>
-                <div class="col-auto d-flex">
-                    <button type="button"
-                        onclick="location.href='@Url.Action(nameof(ProjectSettingsController.Auth), rv)'"
-                        class="btn btn-outline border mb-3">Back</button>
-                    <button type="submit" class="ms-2 btn btn-primary mb-3">Save</button>
-                </div>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Claim Type</th>
-                            <th>Value Source</th>
-                            <th>&nbsp;</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- ko foreach:additionalClaims -->
-                        <tr>
-                            <td style="width:150px">
-                                <input type="text" class="form-control"
-                                    data-bind="value: claimType, valueUpdate:'afterkeydown'">
-                            </td>
-                            <td>
-                                <input type="text" class="form-control"
-                                    data-bind="value: value, valueUpdate:'afterkeydown'">
-                            </td>
-                            <td>
-                                <a href="#" title="delete claim" style="float:right"
-                                    data-bind="click: $parent.removeClaim"><i
-                                        class="glyphicon glyphicon-remove"></i></a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
             </form>
         </div>
     </div>
