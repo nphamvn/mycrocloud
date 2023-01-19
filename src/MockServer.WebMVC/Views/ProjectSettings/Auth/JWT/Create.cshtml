@@ -1,5 +1,5 @@
 @using MockServer.WebMVC.Controllers
-@model MockServer.WebMVC.Models.Project.ProjectIndexItem
+@model MockServer.Core.Models.Authorization.JwtHandlerConfiguration
 @{
     var rv = new { name = ViewData["ProjectName"] };
 }
@@ -10,8 +10,16 @@
             <h5>Create JWT Authentication</h5>
             <form method="post" action="@Url.Action(nameof(ProjectSettingsController.CreateJwt), rv)">
                 <div class="mb-3">
-                    <label for="SecretKey" class="form-label">Secret Key</label>
-                    <input type="text" class="form-control" id="SecretKey" placeholder="">
+                    <label asp-for="SecretKey" class="form-label">Secret Key</label>
+                    <input type="text" asp-for="SecretKey" class="form-control" id="SecretKey" placeholder="">
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Algorithm" class="form-label">Algorithm</label>
+                    <select asp-for="Algorithm" class="form-select" aria-label="Default select example">
+                        <option value="1">One</option>
+                        <option value="2">Two</option>
+                        <option value="3">Three</option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label for="Issuer" class="form-label">Issuer</label>
@@ -27,6 +35,33 @@
                         class="btn btn-outline border mb-3">Back</button>
                     <button type="submit" class="ms-2 btn btn-primary mb-3">Save</button>
                 </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Claim Type</th>
+                            <th>Value Source</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- ko foreach:additionalClaims -->
+                        <tr>
+                            <td style="width:150px">
+                                <input type="text" class="form-control"
+                                    data-bind="value: claimType, valueUpdate:'afterkeydown'">
+                            </td>
+                            <td>
+                                <input type="text" class="form-control"
+                                    data-bind="value: value, valueUpdate:'afterkeydown'">
+                            </td>
+                            <td>
+                                <a href="#" title="delete claim" style="float:right"
+                                    data-bind="click: $parent.removeClaim"><i
+                                        class="glyphicon glyphicon-remove"></i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </form>
         </div>
     </div>
