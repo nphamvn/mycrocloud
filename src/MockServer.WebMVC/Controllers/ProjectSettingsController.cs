@@ -38,7 +38,8 @@ public class ProjectSettingsController : BaseController
     public async Task<IActionResult> CreateJwt(string name)
     {
         ViewData["ProjectName"] = name;
-        return View("Views/ProjectSettings/Auth/JWT/Create.cshtml");
+        var vm = new JwtHandlerConfiguration();
+        return View("Views/ProjectSettings/Auth/JWT/Create.cshtml", vm);
     }
 
     [HttpPost("auth/jwt/create")]

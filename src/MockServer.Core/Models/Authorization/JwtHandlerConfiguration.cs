@@ -14,5 +14,6 @@ public class JwtHandlerConfiguration {
     public bool ValidateAudience { get; internal set; }
     public bool ValidateIssuerSigningKey { get; internal set; }
     public string TokenBinderSource { get; set; }
-    public Dictionary<string, string> ClaimsBinderSource { get; set; }
+    public IList<ClaimOption> AdditionalClaims { get; set; } = new List<ClaimOption>();
 }
+public record ClaimOption(string Type, string Value);

@@ -16,33 +16,33 @@
                         <div class="mb-3 row">
                             <label for="issuer" class="col-sm-2 col-form-label">Issuer</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="issuer">
+                                <input type="text" class="form-control" asp-for="Issuer">
                             </div>
                             @* <p class="col-sm-5 text-success">Identifier (or, name) of the server or system
                                 issuing
                                 the
                                 token. Typically a DNS name, but doesn't have to be.</p> *@
                         </div>
-                        <div class="mb-3 row">
+                        @* <div class="mb-3 row">
                             <div class="col-sm-2">
-                                <label for="issuedAt" class="col-form-label">Issued At</label>
-                                <button type="button" class="btn btn-sm pb-2 text-info" data-bs-toggle="tooltip"
-                                    data-bs-placement="top" title="Tooltip on top">
-                                    <i class="bi bi-info-circle"></i>
-                                </button>
+                            <label for="issuedAt" class="col-form-label">Issued At</label>
+                            <button type="button" class="btn btn-sm pb-2 text-info" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Tooltip on top">
+                            <i class="bi bi-info-circle"></i>
+                            </button>
                             </div>
                             <div class="col-sm-6">
-                                <input type="text" class="form-control" id="issuedAt">
+                            <input type="text" class="form-control" id="issuedAt">
                             </div>
                             <div class="col-sm-4">
-                                <button type="button" class="btn btn-success btn-xs">now</button>
+                            <button type="button" class="btn btn-success btn-xs">now</button>
                             </div>
-                            @* <p class="text-success">Date/time when the token was issued. (defaults to now)
-                                &nbsp;&nbsp;
-                                <button type="button" class="btn btn-success btn-xs"
-                                data-bind="click:issuedAtSetNow">now</button>
-                                </p> *@
-                        </div>
+                            <p class="text-success">Date/time when the token was issued. (defaults to now)
+                            &nbsp;&nbsp;
+                            <button type="button" class="btn btn-success btn-xs"
+                            data-bind="click:issuedAtSetNow">now</button>
+                            </p>
+                            </div> *@
                         <div class="mb-3 row">
                             <label for="expiration" class="col-sm-2 col-form-label">Expiration</label>
                             <div class="col-sm-6">
@@ -90,38 +90,50 @@
                         Additional Claims
                     </div>
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col-7">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Claim Type</th>
-                                            <th>Value</th>
-                                            <th>&nbsp;</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- ko foreach:additionalClaims -->
+                        <div class="alert alert-info">
+                            <ul>
+                                <li>To set a static value, use the format static[value]. For example, to set the claim
+                                    the value to
+                                    "example.com"　use
+                                    static[example.com]</li>
+                                <li>To set a dynamic value bound from a request data like header or query, use the
+                                    format [source][name].
+                                    For example, to set the value of 'x-user-id' header in the request, use
+                                    header[x-user-id]. header and query and
+                                    body are supported sources.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <table class="table" id="additional-claims-table">
+                                <thead>
+                                    <tr>
+                                        <th>Claim Type</th>
+                                        <th>Value</th>
+                                        <th>&nbsp;</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        Model.AdditionalClaims.Add(new("", ""));
+                                    }
+                                    @for (int i = 0; i < Model.AdditionalClaims.Count; i++)
+                                    {
                                         <tr>
                                             <td class="align-middle" style="width:150px">
-                                                <input type="text" class="form-control">
-
+                                                <input type="text" class="form-control js-claim-input js-claim-type" asp-for="AdditionalClaims[i].Type">
                                             </td>
                                             <td class="align-middle">
-                                                <input type="text" class="form-control">
+                                                <input type="text" class="form-control js-claim-input js-claim-name" asp-for="AdditionalClaims[i].Value">
                                             </td>
                                             <td class="align-middle">
-                                                <button type="button">
+                                                <button class="btn js-claim-delete" type="button">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </td>
                                         </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="alert alert-info col-5">
-                                Explain
-                            </div>
+                                    }
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -133,16 +145,20 @@
                         <div class="mb-3 row">
                             <label for="algorithm" class="col-sm-2 col-form-label">Algorithm</label>
                             <div class="col-sm-10">
+                                <input type="hidden" asp-for="Algorithm">
                                 <div class="dropdown">
-                                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                                    <button class="btn btn-default dropdown-toggle" type="button"
                                         data-bs-toggle="dropdown">
-                                        <span>HS256</span>
+                                        <span id="selectedAlgorithm">HS256</span>
                                         <span class="caret"></span>
                                     </button>
-                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                                        <li><a class="dropdown-item" href="#">HS256</a></li>
-                                        <li><a class="dropdown-item" href="#">HS384</a></li>
-                                        <li><a class="dropdown-item" href="#">HS512</a></li>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><button type="button" data-algorithm="HS256"
+                                                class="dropdown-item js-select-algorithm" href="#">HS256</button></li>
+                                        <li><button type="button" data-algorithm="HS384"
+                                                class="dropdown-item js-select-algorithm" href="#">HS384</button></li>
+                                        <li><button type="button" data-algorithm="HS512"
+                                                class="dropdown-item js-select-algorithm" href="#">HS512</button></li>
                                     </ul>
                                 </div>
                             </div>
@@ -155,13 +171,15 @@
                             <div class="col-sm-2">
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-success dropdown-toggle"
-                                        data-bs-toggle="dropdown">
-                                        <span class="caret">Generate</span>
+                                        data-bs-toggle="dropdown">Generate
                                     </button>
                                     <ul class="dropdown-menu" role="menu">
-                                        <li><a href="#" class="dropdown-item">32-byte key</a></li>
-                                        <li><a href="#" class="dropdown-item">64-byte key</a></li>
-                                        <li><a href="#" class="dropdown-item">128-byte key</a></li>
+                                        <li><button data-bytes="32" type="button"
+                                                class="dropdown-item js-generate-key">32-byte key</button></li>
+                                        <li><button data-bytes="64" type="button"
+                                                class="dropdown-item js-generate-key">64-byte key</button></li>
+                                        <li><button data-bytes="128" type="button"
+                                                class="dropdown-item js-generate-key">128-byte key</button></li>
                                     </ul>
                                 </div>
                             </div>
@@ -175,3 +193,41 @@
         </div>
     </div>
 </div>
+<template id="additional-claim-row-template">
+    <tr>
+        <td class="align-middle" style="width:150px">
+            <input type="text" class="form-control js-claim-input js-claim-type">
+        </td>
+        <td class="align-middle">
+            <input type="text" class="form-control js-claim-input js-claim-name">
+        </td>
+        <td class="align-middle">
+            <button class="btn js-claim-delete" type="button">
+                <i class="bi bi-trash"></i>
+            </button>
+        </td>
+    </tr>
+</template>
+<script>
+    $(function () {
+        $('.js-select-algorithm').click(function () {
+            $('input[name=Algorithm]').val($(this).data('algorithm'));
+            $('#selectedAlgorithm').html($(this).data('algorithm'));
+        });
+        $('.js-generate-key').click(function () {
+            
+        });
+
+        $('body').on('keyup', '.js-claim-input', function(e) {
+            const index = $(this).closest('tr').index();
+            if(index == $("#additional-claims-table tbody tr").length - 1) {
+                //TODO: append row
+            }
+        });
+
+        $('body').on('click', '.js-claim-delete', function(e) {
+            const tr = $(this).closest('tr');
+            tr.remove();
+        });
+    });
+</script>

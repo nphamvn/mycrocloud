@@ -39,9 +39,9 @@ public class Authentication : IMiddleware
             return;
         }
         options.Claims = new Dictionary<string, string>();
-        foreach (var config in options.ClaimsBinderSource)
+        foreach (var config in options.AdditionalClaims)
         {
-            var claimType = config.Key;
+            var claimType = config.Name;
             var binderSource = config.Value;
             binder = _modelBinderProvider.GetBinder(binderSource);
             var value = binder.Get(context);
