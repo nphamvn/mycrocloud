@@ -1,6 +1,8 @@
+using System.Text.Json;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using MockServer.Core.Entities.Requests;
+using MockServer.Core.Models.Auth;
 using MockServer.Core.Repositories;
 using MockServer.Core.Settings;
 namespace MockServer.Infrastructure.Repositories;
@@ -11,6 +13,7 @@ public class RequestRepository : IRequestRepository
     public RequestRepository(GlobalSettings settings)
     {
         _connectionString = settings.Sqlite.ConnectionString;
+        SqlMapper.AddTypeHandler(new AuthorizationJsonTypeHandler());
     }
 
     public async Task<int> Create(int userId, string projectName, Request request)
@@ -25,6 +28,7 @@ public class RequestRepository : IRequestRepository
                         Name,
                         Method,
                         Path,
+                        Authorization,
                         Description
                      )
                      VALUES (
@@ -36,6 +40,7 @@ public class RequestRepository : IRequestRepository
                         @Name,
                         @Method,
                         @Path,
+                        @Authorization,
                         @Description
                      );
                     SELECT last_insert_rowid();
@@ -50,6 +55,7 @@ public class RequestRepository : IRequestRepository
             Name = request.Name,
             Method = request.Method,
             Path = request.Path,
+            Authorization = request.Authorization,
             Description = request.Description
         });
     }
@@ -725,5 +731,18 @@ public class RequestRepository : IRequestRepository
                 throw;
             }
         }
+    }
+}
+
+public class AuthorizationJsonTypeHandler : SqlMapper.TypeHandler<AppAuthorization>
+{
+    public override AppAuthorization Parse(object value)
+    {
+        return JsonSerializer.Deserialize<AppAuthorization>(value.ToString());
+    }
+
+    public override void SetValue(System.Data.IDbDataParameter parameter, AppAuthorization value)
+    {
+        parameter.Value = JsonSerializer.Serialize((AppAuthorization)value);
     }
 }

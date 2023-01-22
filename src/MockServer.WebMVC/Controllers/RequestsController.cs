@@ -11,8 +11,8 @@ namespace MockServer.WebMVC.Controllers;
 [Route("projects/{projectName}/requests")]
 public class RequestsController : Controller
 {
-    private readonly IRequestService _requestService;
-    public RequestsController(IRequestService requestService)
+    private readonly IRequestWebService _requestService;
+    public RequestsController(IRequestWebService requestService)
     {
         _requestService = requestService;
     }

@@ -1,10 +1,9 @@
 using MockServer.Core.Enums;
-using MockServer.Core.Models.Authorization;
 using MockServer.WebMVC.Models.Project;
 
 namespace MockServer.WebMVC.Services.Interfaces;
 
-public interface IProjectService
+public interface IProjectWebService
 {
     Task<ProjectIndexViewModel> GetIndexViewModel(ProjectSearchModel searchModel);
     Task<bool> Create(CreateProjectViewModel project);
@@ -13,5 +12,4 @@ public interface IProjectService
     Task<string> GenerateKey(string name);
     Task Delete(string name);
     Task SetAccessibility(string name, ProjectAccessibility accessibility);
-    Task CreateJwtHandler(string name, JwtHandlerConfiguration configuration);
 }

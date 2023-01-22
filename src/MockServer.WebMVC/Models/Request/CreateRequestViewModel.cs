@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using MockServer.Core.Enums;
+using MockServer.Core.Models.Auth;
 
 namespace MockServer.WebMVC.Models.Request;
 
@@ -18,4 +15,5 @@ public class CreateUpdateRequestModel
     public string Path { get; set; }
     public string Method { get; set; }
     public string? Description { get; set; }
+    public AppAuthorization Authorization { get; set; } = new();
 }

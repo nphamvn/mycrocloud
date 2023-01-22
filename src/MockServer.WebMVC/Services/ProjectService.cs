@@ -3,7 +3,6 @@ using AutoMapper;
 using MockServer.Core.Enums;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Models;
-using MockServer.Core.Models.Authorization;
 using MockServer.Core.Repositories;
 using MockServer.WebMVC.Extentions;
 using MockServer.WebMVC.Models.Project;
@@ -12,7 +11,7 @@ using MockServer.WebMVC.Services.Interfaces;
 
 namespace MockServer.WebMVC.Services;
 
-public class ProjectService : IProjectService
+public class ProjectWebService : IProjectWebService
 {
     private readonly IHttpContextAccessor contextAccessor;
     private readonly IProjectRepository projectRepository;
@@ -20,7 +19,7 @@ public class ProjectService : IProjectService
     private readonly IRequestRepository _requestRepository;
     private readonly IApiKeyService _apiKeyService;
 
-    public ProjectService(IHttpContextAccessor contextAccessor,
+    public ProjectWebService(IHttpContextAccessor contextAccessor,
     IProjectRepository projectRepository,
     IRequestRepository requestRepository,
     IApiKeyService apiKeyService,
@@ -47,11 +46,6 @@ public class ProjectService : IProjectService
         mapped.UserId = user.Id;
         await projectRepository.Add(mapped);
         return true;
-    }
-
-    public Task CreateJwtHandler(string name, JwtHandlerConfiguration configuration)
-    {
-        throw new NotImplementedException();
     }
 
     public async Task Delete(string name)

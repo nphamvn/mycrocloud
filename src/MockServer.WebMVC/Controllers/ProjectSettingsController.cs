@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MockServer.Core.Enums;
-using MockServer.Core.Models.Authorization;
 using MockServer.WebMVC.Attributes;
+using MockServer.WebMVC.Models.ProjectSettings.Auth;
 using MockServer.WebMVC.Services.Interfaces;
 
 namespace MockServer.WebMVC.Controllers;
@@ -11,49 +11,70 @@ namespace MockServer.WebMVC.Controllers;
 [Route("projects/{name}/settings")]
 public class ProjectSettingsController : BaseController
 {
-    private readonly IProjectService _projectService;
-
-    public ProjectSettingsController(IProjectService projectService)
+    private readonly IProjectWebService _projectService;
+    private readonly IProjectSettingsWebService _settingsService;
+    public ProjectSettingsController(IProjectWebService projectService,
+        IProjectSettingsWebService settingsService)
     {
         _projectService = projectService;
+        _settingsService = settingsService;
     }
 
     [HttpGet]
+    [HttpGet("general")]
     public async Task<IActionResult> Index(string name)
     {
-        var vm = await _projectService.GetProjectViewViewModel(name);
-        ViewData["ProjectName"] = name;
-        return View("Views/ProjectSettings/Index.cshtml", vm.ProjectInfo);
+        var model = await _settingsService.GetIndexModel(name);
+        return View("Views/ProjectSettings/Index.cshtml", model);
     }
 
     [HttpGet("auth")]
     public async Task<IActionResult> Auth(string name)
     {
-        ViewData["ProjectName"] = name;
-        var vm = await _projectService.GetProjectViewViewModel(name);
-        return View("Views/ProjectSettings/Auth/Index.cshtml", vm.ProjectInfo);
+        var model = await _settingsService.GetAuthIndexModel(name);
+        return View("Views/ProjectSettings/Auth/Index.cshtml", model);
     }
 
-    [HttpGet("auth/jwt/create")]
-    public async Task<IActionResult> CreateJwt(string name)
+    [HttpGet("auth/jwtbearer/create")]
+    public async Task<IActionResult> CreateJwtBearer(string name)
     {
-        ViewData["ProjectName"] = name;
-        var vm = new JwtHandlerConfiguration();
-        return View("Views/ProjectSettings/Auth/JWT/Create.cshtml", vm);
+        var model = await _settingsService.GetJwtBearerAuthModel(name, 0);
+        return View("Views/ProjectSettings/Auth/JWT/Create.cshtml", model);
     }
 
-    [HttpPost("auth/jwt/create")]
-    public async Task<IActionResult> CreateJwt(string name, JwtHandlerConfiguration configuration)
+    [HttpPost("auth/jwtbearer/create")]
+    public async Task<IActionResult> CreateJwtBearer(string name, JwtBearerAuthModel model)
     {
-        await _projectService.CreateJwtHandler(name, configuration);
+        await _settingsService.CreateJwtBearerAuthentication(name, model);
         return RedirectToAction(nameof(Auth), Request.RouteValues);
     }
 
-    [HttpGet("auth/jwt/{id:int}")]
-    public async Task<IActionResult> ViewJwt(string name, int id)
+    [HttpGet("auth/jwtbearer/{id:int}")]
+    public async Task<IActionResult> ViewJwtBearer(string name, int id)
     {
-        ViewData["ProjectName"] = name;
-        return View("Views/ProjectSettings/Auth/JWT/Create.cshtml");
+        var model = await _settingsService.GetJwtBearerAuthModel(name, id);
+        return View("Views/ProjectSettings/Auth/JWT/Create.cshtml", model);
+    }
+
+    [HttpGet("auth/apikey/create")]
+    public async Task<IActionResult> CreateApiKey(string name)
+    {
+        var model = await _settingsService.GetApiKeyAuthModel(name, 0);
+        return View("Views/ProjectSettings/Auth/ApiKey/Create.cshtml", model);
+    }
+
+    [HttpPost("auth/apikey/create")]
+    public async Task<IActionResult> CreateApiKey(string name, ApiKeyAuthModel model)
+    {
+        await _settingsService.CreateApiKeyAuthentication(name, model);
+        return RedirectToAction(nameof(Auth), Request.RouteValues);
+    }
+
+    [HttpGet("auth/apikey/{id:int}")]
+    public async Task<IActionResult> ViewApiKey(string name, int id)
+    {
+        var model = await _settingsService.GetApiKeyAuthModel(name, id);
+        return View("Views/ProjectSettings/Auth/ApiKey/Create.cshtml", model);
     }
 
     [HttpPost("rename")]

@@ -22,8 +22,10 @@ namespace MockServer.WebMVC.Extentions
             services.AddHttpContextAccessor();
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<IRequestRepository, RequestRepository>();
-            services.AddScoped<IProjectService, ProjectService>();
-            services.AddScoped<IRequestService, RequestService>();
+            services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IProjectWebService, ProjectWebService>();
+            services.AddScoped<IProjectSettingsWebService, ProjectSettingsWebService>();
+            services.AddScoped<IRequestWebService, RequestWebService>();
         }
     }
 }

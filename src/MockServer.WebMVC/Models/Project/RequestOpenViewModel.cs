@@ -1,5 +1,6 @@
 using MockServer.Core.Entities.Requests;
 using MockServer.Core.Enums;
+using MockServer.Core.Models.Auth;
 
 namespace MockServer.WebMVC.Models.Project;
 
@@ -9,6 +10,7 @@ public class RequestOpenViewModel
     public string Name { get; set; }
     public string Method { get; set; }
     public string Path { get; set; }
+    public AppAuthorization Authorization { get; set; } = AppAuthorization.AllowAnonymous();
     public string ProjectName { get; set; }
     public RequestType Type { get; set; }
     public string Username { get; set; }

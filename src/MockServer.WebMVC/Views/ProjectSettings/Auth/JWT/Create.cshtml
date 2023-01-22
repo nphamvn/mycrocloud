@@ -1,22 +1,35 @@
-@model MockServer.Core.Models.Authorization.JwtHandlerConfiguration
+@model MockServer.WebMVC.Models.ProjectSettings.Auth.JwtBearerAuthModel
 @{
-    var rv = new { name = ViewData["ProjectName"] };
+    var project = Model.Project;
 }
 <div class="row flex-nowrap">
-    <partial name="/Views/ProjectSettings/Shared/_SideBar.cshtml" model="@ViewData["ProjectName"]" />
+    <partial name="/Views/ProjectSettings/Shared/_SideBar.cshtml" model="@project.Name" />
     <div class="col py-3">
         <div class="w-75">
             <h5>Create JWT Authentication</h5>
-            <form role="form">
+            <form method="post">
+                <div class="card mb-2">
+                    <div class="card-header">
+                        Definition
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3 row">
+                            <label for="SchemeName" class="col-sm-2 col-form-label">Name</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" asp-for="SchemeName">
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="card mb-2">
                     <div class="card-header">
                         Standard JWT Claims
                     </div>
                     <div class="card-body">
                         <div class="mb-3 row">
-                            <label for="issuer" class="col-sm-2 col-form-label">Issuer</label>
+                            <label asp-for="Options.Issuer" class="col-sm-2 col-form-label">Issuer</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" asp-for="Issuer">
+                                <input type="text" class="form-control" asp-for="Options.Issuer">
                             </div>
                             @* <p class="col-sm-5 text-success">Identifier (or, name) of the server or system
                                 issuing
@@ -44,9 +57,9 @@
                             </p>
                             </div> *@
                         <div class="mb-3 row">
-                            <label for="expiration" class="col-sm-2 col-form-label">Expiration</label>
+                            <label asp-for="Options.Expire" class="col-sm-2 col-form-label">Expiration</label>
                             <div class="col-sm-6">
-                                <input type="text" class="form-control" id="expiration">
+                                <input type="text" class="form-control" asp-for="Options.Expire">
                             </div>
                             <div class="col-sm-4">
                                 <button type="button" class="btn btn-success btn-xs">in 60 minutes</button>
@@ -65,24 +78,24 @@
                                 </p> *@
                         </div>
                         <div class="mb-3 row">
-                            <label for="audience" class="col-sm-2 col-form-label">Audience</label>
+                            <label asp-for="Options.Audience" class="col-sm-2 col-form-label">Audience</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="audience">
+                                <input type="text" class="form-control" asp-for="Options.Audience">
                             </div>
                             @* <p class="col-sm-5 text-success">Intended recipient of this token; can be any string, as
                                 long as the other end uses the same string when validating the token. Typically a
                                 DNS
                                 name.</p>*@
                         </div>
-                        <div class="mb-3 row">
+                        @* <div class="mb-3 row">
                             <label for="subject" class="col-sm-2 col-form-label">Subject</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="subject">
+                            <input type="text" class="form-control" id="subject">
                             </div>
-                            @* <p class="col-sm-5 text-success">Identifier (or, name) of the user this token
-                                represents.
-                                </p>*@
-                        </div>
+                            <p class="col-sm-5 text-success">Identifier (or, name) of the user this token
+                            represents.
+                            </p>
+                            </div> *@
                     </div>
                 </div>
                 <div class="card mb-2">
@@ -91,7 +104,7 @@
                     </div>
                     <div class="card-body">
                         <div class="alert alert-info">
-                            <ul>
+                            <ul style="list-style: initial;">
                                 <li>To set a static value, use the format static[value]. For example, to set the claim
                                     the value to
                                     "example.com"　use
@@ -114,16 +127,18 @@
                                 </thead>
                                 <tbody>
                                     @{
-                                        Model.AdditionalClaims.Add(new("", ""));
+                                        Model.Options.AdditionalClaims.Add(new());
                                     }
-                                    @for (int i = 0; i < Model.AdditionalClaims.Count; i++)
+                                    @for (int i = 0; i < Model.Options.AdditionalClaims.Count; i++)
                                     {
                                         <tr>
                                             <td class="align-middle" style="width:150px">
-                                                <input type="text" class="form-control js-claim-input js-claim-type" asp-for="AdditionalClaims[i].Type">
+                                                <input type="text" class="form-control js-claim-input js-claim-type"
+                                                asp-for="Options.AdditionalClaims[i].Type">
                                             </td>
                                             <td class="align-middle">
-                                                <input type="text" class="form-control js-claim-input js-claim-name" asp-for="AdditionalClaims[i].Value">
+                                                <input type="text" class="form-control js-claim-input js-claim-name"
+                                                asp-for="Options.AdditionalClaims[i].Value">
                                             </td>
                                             <td class="align-middle">
                                                 <button class="btn js-claim-delete" type="button">
@@ -145,7 +160,7 @@
                         <div class="mb-3 row">
                             <label for="algorithm" class="col-sm-2 col-form-label">Algorithm</label>
                             <div class="col-sm-10">
-                                <input type="hidden" asp-for="Algorithm">
+                                <input type="hidden" asp-for="Options.Algorithm">
                                 <div class="dropdown">
                                     <button class="btn btn-default dropdown-toggle" type="button"
                                         data-bs-toggle="dropdown">
@@ -164,9 +179,9 @@
                             </div>
                         </div>
                         <div class="mb-3 row">
-                            <label for="key" class="col-sm-2 col-form-label">Key</label>
+                            <label asp-for="Options.SecretKey" class="col-sm-2 col-form-label">Key</label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" id="key">
+                                <input type="text" class="form-control" asp-for="Options.SecretKey">
                             </div>
                             <div class="col-sm-2">
                                 <div class="btn-group">
@@ -215,17 +230,18 @@
             $('#selectedAlgorithm').html($(this).data('algorithm'));
         });
         $('.js-generate-key').click(function () {
-            
+
         });
 
-        $('body').on('keyup', '.js-claim-input', function(e) {
+        $('body').on('keyup', '.js-claim-input', function (e) {
             const index = $(this).closest('tr').index();
-            if(index == $("#additional-claims-table tbody tr").length - 1) {
-                //TODO: append row
+            if (index == $("#additional-claims-table tbody tr").length - 1) {
+                const tr = $($('#additional-claim-row-template').html());
+                $("#additional-claims-table tbody").append(tr);
             }
         });
 
-        $('body').on('click', '.js-claim-delete', function(e) {
+        $('body').on('click', '.js-claim-delete', function (e) {
             const tr = $(this).closest('tr');
             tr.remove();
         });

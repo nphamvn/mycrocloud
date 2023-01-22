@@ -11,13 +11,13 @@ using MockServer.WebMVC.Services.Interfaces;
 
 namespace MockServer.WebMVC.Services;
 
-public class RequestService : IRequestService
+public class RequestWebService : IRequestWebService
 {
     private readonly IHttpContextAccessor contextAccessor;
     private readonly IRequestRepository _requestRepository;
     private readonly IMapper _mapper;
 
-    public RequestService(IHttpContextAccessor contextAccessor,
+    public RequestWebService(IHttpContextAccessor contextAccessor,
     IRequestRepository requestRepository,
     IMapper mapper)
     {

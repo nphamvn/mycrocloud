@@ -4,7 +4,7 @@ using MockServer.WebMVC.Models.Request;
 
 namespace MockServer.WebMVC.Services.Interfaces;
 
-public interface IRequestService
+public interface IRequestWebService
 {
     Task<int> Create(string projectName, CreateUpdateRequestModel request);
     Task<bool> ValidateEdit(string projectname, int id, CreateUpdateRequestModel request, ModelStateDictionary modelState);

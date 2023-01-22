@@ -72,6 +72,28 @@
                             <span asp-validation-for="Path" class="text-danger"></span>
                         </div>
                     </div>
+                    <div class="row mb-2">
+                        <div class="form-group col-3">
+                            <label asp-for="Authorization.DisplayName">Name</label>
+                            <input type="hidden" asp-for="Authorization.DisplayName">
+                            <div class="dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <span id="selectedAuthorization">Authorize</span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><button type="button" data-authorization="Authorize"
+                                            class="dropdown-item js-select-authorization">Authorize</button></li>
+                                    <li><button type="button" data-authorization="HS384"
+                                            class="dropdown-item js-select-authorization">AllowAnonymous</button></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="form-group col-9">
+                            <label asp-for="Authorization.Policy"></label>
+                            <input class="form-control" type="text" asp-for="Authorization.Policy" autocomplete="off"
+                                disabled>
+                        </div>
+                    </div>
                     <div class="form-group mb-3">
                         <label>Url</label>
                         <input readonly class="form-control" type="text" id="previewUrl">
@@ -79,10 +101,19 @@
                 </div>
             </div>
             <div class="modal-footer">
-
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button id="btnSave" type="button" class="btn btn-primary btn-save">Save</button>
             </div>
         </div>
     </div>
 </div>
+<script>
+    console.log('lllll');
+    $(function () {
+        $('.js-select-authorization').click(function () {
+            console.log('lllll');
+            $('#Authorization_DisplayName').val($(this).data('authorization'));
+            $('#selectedAuthorization').html($(this).data('authorization'));
+        });
+    });
+</script>

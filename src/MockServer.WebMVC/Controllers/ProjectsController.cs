@@ -10,9 +10,9 @@ namespace MockServer.WebMVC.Controllers;
 [Authorize]
 public class ProjectsController : BaseController
 {
-    private readonly IProjectService _projectService;
+    private readonly IProjectWebService _projectService;
 
-    public ProjectsController(IProjectService projectService)
+    public ProjectsController(IProjectWebService projectService)
     {
         _projectService = projectService;
     }

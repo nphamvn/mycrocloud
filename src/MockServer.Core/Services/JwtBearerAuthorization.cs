@@ -3,12 +3,18 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using MockServer.Core.Interfaces;
-using MockServer.Core.Models.Authorization;
+using MockServer.Core.Models.Auth;
+using MockServer.Core.Services.Auth;
 
 namespace MockServer.Core.Services;
-public class JwtBearerAuthorization : IJwtBearerAuthorization
+public class JwtBearerAuthorization : IJwtBearerTokenService
 {
-    public string GenerateToken(JwtHandlerConfiguration options)
+    public JwtBearerAuthHandler BuildHandler(string token, JwtBearerAuthenticationOptions options)
+    {
+        return new JwtBearerAuthHandler(token, options);
+    }
+
+    public string GenerateToken(JwtBearerAuthenticationOptions options)
     {
         // Create a security key
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.SecretKey));
@@ -16,9 +22,9 @@ public class JwtBearerAuthorization : IJwtBearerAuthorization
         var signingCredentials = new SigningCredentials(securityKey, options.Algorithm);
         // Create a ClaimsIdentity object
         var claimsIdentity = new ClaimsIdentity();
-        foreach (var claim in options.Claims)
+        foreach (var claim in options.AdditionalClaims)
         {
-            claimsIdentity.AddClaim(new Claim(claim.Key, claim.Value));
+            claimsIdentity.AddClaim(new Claim(claim.Type, claim.Value));
         }
         // Create a JwtSecurityToken object
         var token = new JwtSecurityToken(
@@ -31,39 +37,5 @@ public class JwtBearerAuthorization : IJwtBearerAuthorization
         // Use the JwtSecurityTokenHandler to encode the token and create the JWT string
         var jwtHandler = new JwtSecurityTokenHandler();
         return jwtHandler.WriteToken(token);
-    }
-
-    public ClaimsPrincipal Validate(string token, JwtHandlerConfiguration options)
-    {
-        var jwtHandler = new JwtSecurityTokenHandler();
-        // Create a security key
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.SecretKey));
-        // Create a validation parameters object
-        var validationParameters = new TokenValidationParameters()
-        {
-            RequireExpirationTime = options.RequireExpirationTime,
-            ValidateLifetime = options.ValidateLifetime,
-            ValidateIssuer = options.ValidateIssuer,
-            ValidateAudience = options.ValidateAudience,
-            ValidateIssuerSigningKey = options.ValidateIssuerSigningKey,
-            ValidIssuer = options.Issuer,
-            ValidAudience = options.Audience,
-            IssuerSigningKey = securityKey
-        };
-        // Validate the token
-        ClaimsPrincipal principal = null;
-        try
-        {
-            principal = jwtHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
-        }
-        catch (SecurityTokenException ex)
-        {
-            Console.WriteLine("Invalid token: " + ex.Message);
-        }
-        if (principal != null)
-        {
-            Console.WriteLine("Token is valid!");
-        }
-        return principal;
     }
 }

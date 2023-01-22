@@ -1,11 +1,11 @@
+@using MockServer.Core.Enums
 @using MockServer.WebMVC.Controllers
-@model MockServer.WebMVC.Models.Project.ProjectIndexItem
+@model MockServer.WebMVC.Models.ProjectSettings.Auth.AuthIndexModel
 @{
-    int count = 1;
-    var rv = new { name = Model.Name };
+
 }
 <div class="row flex-nowrap">
-    <partial name="/Views/ProjectSettings/Shared/_SideBar.cshtml" model="@Model.Name" />
+    <partial name="/Views/ProjectSettings/Shared/_SideBar.cshtml" model="@Model.Project.Name" />
     <div class="col py-3">
         <div class="w-75">
             <div class="d-flex">
@@ -17,13 +17,16 @@
                     </button>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item"
-                                href="@Url.Action(nameof(ProjectSettingsController.CreateJwt), rv)">JWT</a></li>
-                        <li><a class="dropdown-item" href="#">API Key</a></li>
+                                href="@Url.Action(nameof(ProjectSettingsController.CreateJwtBearer), new { name = Model.Project.Name })">JWT</a>
+                        </li>
+                        <li><a class="dropdown-item"
+                                href="@Url.Action(nameof(ProjectSettingsController.CreateApiKey), new { name = Model.Project.Name })">API
+                                Key</a></li>
                     </ul>
                 </div>
             </div>
             <hr class="my-2">
-            @if (count == 0)
+            @if (Model.Authentications.Count() == 0)
             {
                 <div>
                     There are no authentication schemes for this project.
@@ -32,6 +35,9 @@
             else
             {
                 <div>
+                    @{
+                        var auths = Model.Authentications;
+                    }
                     <table class="table">
                         <thead>
                             <tr>
@@ -43,35 +49,38 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <th>1</th>
-                                <td><a class="text-decoration-none"
-                                    href="@Url.Action(nameof(ProjectSettingsController.ViewJwt), new {name = Model.Name,id=1})">Jwt
-                                        1</a>
-                                </td>
-                                <td>JWT</td>
-                                <td>Default</td>
-                                <td>...</td>
-                            </tr>
-                            <tr>
-                                <th>2</th>
-                                <td><a class="text-decoration-none"
-                                    href="@Url.Action(nameof(ProjectSettingsController.ViewJwt), new {name = Model.Name, id=2})">API
-                                        Key</a></td>
-                                <td>API Key</td>
-                                <td>Set</td>
-                                <td>...</td>
-                            </tr>
-                            <tr>
-                                <th>3</th>
-                                <td><a class="text-decoration-none"
-                                    href="@Url.Action(nameof(ProjectSettingsController.ViewJwt), new {name = Model.Name,id=3})">Jwt
-                                        2</a>
-                                </td>
-                                <td>JWT</td>
-                                <td>Not Set</td>
-                                <td>...</td>
-                            </tr>
+                            @{
+                                int no = 1;
+                            }
+                            @foreach (var auth in auths)
+                            {
+                                var link = "";
+                                if (auth.Type is AuthType.JwtBearer)
+                                {
+                                    link = @Url.Action(nameof(ProjectSettingsController.ViewJwtBearer), new
+                                    {
+                                        name = Model.Project.Name,
+                                        id = auth.Id
+                                    });
+                                }
+                                else if (auth.Type is AuthType.ApiKey)
+                                {
+                                    link = @Url.Action(nameof(ProjectSettingsController.ViewApiKey), new
+                                    {
+                                        name = Model.Project.Name,
+                                        id = auth.Id
+                                    });
+                                }
+                                <tr>
+                                    <th>@no</th>
+                                    <td><a class="text-decoration-none" href="@link">@auth.SchemeName</a>
+                                    </td>
+                                    <td>@auth.Type</td>
+                                    <td>@(auth.Order == 0 ? "Default" : auth.Order > 0 ? $"Set /{auth.Order}" : "Not Set")</td>
+                                    <td>...</td>
+                                </tr>
+                                no++;
+                            }
                         </tbody>
                     </table>
                 </div>

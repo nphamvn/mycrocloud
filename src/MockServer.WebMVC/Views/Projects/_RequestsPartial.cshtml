@@ -88,7 +88,11 @@
                             Name: $('input[name=Name]', modal).val(),
                             Description: $('input[name=Description]', modal).val(),
                             Method: $('select[name=Method] option:selected', modal).val(),
-                            Path: $('input[name=Path]', modal).val()
+                            Path: $('input[name=Path]', modal).val(),
+                            Authorization: {
+                                DisplayName: 'Authorize',
+                                Policy: 'none',
+                            }
                         };
                         $.post({
                             url: '@Url.Action(nameof(RequestsController.CreateAjax), "Requests", new {projectName = ViewData["ProjectName"]})',
@@ -113,7 +117,6 @@
                 });
                 modal.on('hidden.bs.modal', function (e) {
                     if (modal.data('id') !== undefined) {
-                        console.log('TODO: open request id ' + modal.data('id'));
                         location.reload();
                     }
                     modal.remove();
