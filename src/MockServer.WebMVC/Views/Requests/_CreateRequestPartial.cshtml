@@ -74,8 +74,8 @@
                     </div>
                     <div class="row mb-2">
                         <div class="form-group col-3">
-                            <label asp-for="Authorization.DisplayName">Name</label>
-                            <input type="hidden" asp-for="Authorization.DisplayName">
+                            <label asp-for="Authorization.Title">Name</label>
+                            <input type="hidden" asp-for="Authorization.Title">
                             <div class="dropdown">
                                 <button class="btn btn-default dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                     <span id="selectedAuthorization">Authorize</span>
@@ -83,7 +83,7 @@
                                 <ul class="dropdown-menu" role="menu">
                                     <li><button type="button" data-authorization="Authorize"
                                             class="dropdown-item js-select-authorization">Authorize</button></li>
-                                    <li><button type="button" data-authorization="HS384"
+                                    <li><button type="button" data-authorization="AllowAnonymous"
                                             class="dropdown-item js-select-authorization">AllowAnonymous</button></li>
                                 </ul>
                             </div>
@@ -107,13 +107,3 @@
         </div>
     </div>
 </div>
-<script>
-    console.log('lllll');
-    $(function () {
-        $('.js-select-authorization').click(function () {
-            console.log('lllll');
-            $('#Authorization_DisplayName').val($(this).data('authorization'));
-            $('#selectedAuthorization').html($(this).data('authorization'));
-        });
-    });
-</script>

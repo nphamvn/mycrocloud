@@ -121,6 +121,11 @@
                     }
                     modal.remove();
                 });
+                $('.js-select-authorization', modal).click(function () {
+                    console.log('authorization');
+                    $('#Authorization_DisplayName').val($(this).data('authorization'));
+                    $('#selectedAuthorization').html($(this).data('authorization'));
+                });
                 generatePreviewUrl(modal);
                 modal.modal('show');
             }

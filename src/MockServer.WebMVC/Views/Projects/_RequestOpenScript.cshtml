@@ -303,6 +303,11 @@
                             }
                         });
                     });
+                    $('.js-select-authorization', modal).click(function () {
+                        console.log('authorization');
+                        $('#Authorization_DisplayName').val($(this).data('authorization'));
+                        $('#selectedAuthorization').html($(this).data('authorization'));
+                    });
                     $('select[name=Method]').on('change', function () {
                         generatePreviewUrl(modal);
                     });
@@ -432,6 +437,15 @@
                 }
                 return constraints.join(':');
             }
+        });
+    });
+</script>
+<script>
+    $(function () {
+        $('.js-select-authorization').click(function () {
+            console.log('lllll');
+            $('#Authorization_DisplayName').val($(this).data('authorization'));
+            $('#selectedAuthorization').html($(this).data('authorization'));
         });
     });
 </script>
