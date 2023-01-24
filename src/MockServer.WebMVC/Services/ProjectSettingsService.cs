@@ -33,14 +33,14 @@ public class ProjectSettingsWebService : IProjectSettingsWebService
     public async Task CreateApiKeyAuthentication(string name, ApiKeyAuthModel model)
     {
         var project = await GetProjectByName(name);
-        var auth = _mapper.Map<Authentication>(model);
+        var auth = _mapper.Map<AppAuthentication>(model);
         await _authRepository.Add(project.Id, auth);
     }
 
     public async Task CreateJwtBearerAuthentication(string name, JwtBearerAuthModel model)
     {
         var project = await GetProjectByName(name);
-        var auth = _mapper.Map<Authentication>(model);
+        var auth = _mapper.Map<AppAuthentication>(model);
         await _authRepository.Add(project.Id, auth);
     }
 
@@ -103,8 +103,8 @@ public class ProjectSettingsAuthProfile : Profile
 {
     public ProjectSettingsAuthProfile()
     {
-        CreateMap<Authentication, JwtBearerAuthModel>().ReverseMap();
-        CreateMap<Authentication, ApiKeyAuthModel>().ReverseMap();
+        CreateMap<AppAuthentication, JwtBearerAuthModel>().ReverseMap();
+        CreateMap<AppAuthentication, ApiKeyAuthModel>().ReverseMap();
         CreateMap<MockServer.Core.Entities.Projects.Project, MockServer.Core.Models.Project>().ReverseMap();
     }
 }

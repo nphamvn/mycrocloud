@@ -3,7 +3,7 @@ using MockServer.Core.Models.Auth;
 
 namespace MockServer.Core.Entities.Auth;
 
-public class Authentication : BaseEntity
+public class AppAuthentication : BaseEntity
 {
     public string SchemeName { get; set; }
     public AuthType Type { get; set; }

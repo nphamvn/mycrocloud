@@ -4,16 +4,9 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Models.Auth;
-using MockServer.Core.Services.Auth;
-
 namespace MockServer.Core.Services;
 public class JwtBearerAuthorization : IJwtBearerTokenService
 {
-    public JwtBearerAuthHandler BuildHandler(string token, JwtBearerAuthenticationOptions options)
-    {
-        return new JwtBearerAuthHandler(token, options);
-    }
-
     public string GenerateToken(JwtBearerAuthenticationOptions options)
     {
         // Create a security key

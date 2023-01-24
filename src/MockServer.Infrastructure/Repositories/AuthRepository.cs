@@ -17,7 +17,7 @@ public class AuthRepository : IAuthRepository
     {
         _connectionString = settings.Sqlite.ConnectionString;
     }
-    public Task Add(int projectId, Authentication auth)
+    public Task Add(int projectId, AppAuthentication auth)
     {
         var query =
                 """
@@ -50,7 +50,7 @@ public class AuthRepository : IAuthRepository
         });
     }
 
-    public Task<IEnumerable<Authentication>> GetByProject(int id)
+    public Task<IEnumerable<AppAuthentication>> GetByProject(int id)
     {
         var query =
                 """
@@ -63,13 +63,13 @@ public class AuthRepository : IAuthRepository
                     ProjectAuthentication
                 """;
         using var connection = new SqliteConnection(_connectionString);
-        return connection.QueryAsync<Authentication>(query, new
+        return connection.QueryAsync<AppAuthentication>(query, new
         {
             Id = id
         });
     }
 
-    public Task<Authentication> GetAs(int id, AuthType type)
+    public Task<AppAuthentication> GetAs(int id, AuthType type)
     {
         var query =
                 """
@@ -85,10 +85,15 @@ public class AuthRepository : IAuthRepository
                 """;
         using var connection = new SqliteConnection(_connectionString);
         SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(type));
-        return connection.QuerySingleOrDefaultAsync<Authentication>(query, new
+        return connection.QuerySingleOrDefaultAsync<AppAuthentication>(query, new
         {
             Id = id
         });
+    }
+
+    public Task<AppAuthorization> GetRequestAuthorization(int requestId)
+    {
+        throw new NotImplementedException();
     }
 }
 

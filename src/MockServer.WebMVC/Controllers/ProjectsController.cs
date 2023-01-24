@@ -8,6 +8,7 @@ using MockServer.WebMVC.Services.Interfaces;
 namespace MockServer.WebMVC.Controllers;
 
 [Authorize]
+[Authorize(AuthenticationSchemes ="", Policy ="")]
 public class ProjectsController : BaseController
 {
     private readonly IProjectWebService _projectService;

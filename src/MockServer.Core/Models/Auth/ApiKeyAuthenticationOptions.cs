@@ -2,6 +2,7 @@ namespace MockServer.Core.Models.Auth;
 
 public class ApiKeyAuthenticationOptions : AuthOptions
 {
+    public string Header { get; set; }
     public List<ApiKey> Keys { get; set; } = new();
 }
 public class ApiKey

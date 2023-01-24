@@ -1,9 +1,8 @@
-using System.Net;
-using System.Security.Claims;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Models.Auth;
 using MockServer.Core.Repositories;
 using MockServer.Core.Services;
+using MockServer.Core.Services.Auth;
 
 namespace MockServer.ReverseProxyServer.Middlewares;
 
@@ -13,6 +12,7 @@ public class Authentication : IMiddleware
     private readonly IProjectRepository _projectRepository;
     private readonly IAuthRepository _authRepository;
     private readonly DataBinderProvider _modelBinderProvider;
+
     public Authentication(
             IRequestRepository requestRepository,
             IProjectRepository projectRepository,
@@ -28,90 +28,61 @@ public class Authentication : IMiddleware
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         ArgumentNullException.ThrowIfNull(context.Items["ProjectId"]);
-        ArgumentNullException.ThrowIfNull(context.Items["RequestId"]);
-        ClaimsPrincipal user = null;
         var projectId = Convert.ToInt32(context.Items["ProjectId"]);
-        var requestId = Convert.ToInt32(context.Items["RequestId"]);
-        var auths = (await _projectRepository.Get(projectId)).Authentications;
-        var @default = auths.FirstOrDefault(a => a.Order == 0);
-        if (@default is Core.Entities.Auth.Authentication auth)
+        var schemes = await _authRepository.GetByProject(projectId);
+        var defaultScheme = schemes.FirstOrDefault(a => a.Order == 0);
+        IAppAuthenticationHandlerProvider handlerProvider = new AppAuthenticationHandlerProvider();
+        IAppAuthenticationHandler handler;
+        AppAuthenticateResult result;
+        if (defaultScheme is Core.Entities.Auth.AppAuthentication auth)
         {
-            if (@default.Type == Core.Enums.AuthType.JwtBearer)
+            handler = handlerProvider.GetHandler(auth);
+            //TODO: Modify header value
+            result = await handler.AuthenticateAsync(context);
+            if (result.Succeeded)
             {
-                var options = (await _authRepository.GetAs(projectId, Core.Enums.AuthType.JwtBearer)).Options as JwtBearerAuthenticationOptions;
-                const string source = "header[Authorization]";
-                var binder = _modelBinderProvider.GetBinder(source);
-                var token = binder.Get(context) as string;
-                if (string.IsNullOrEmpty(token))
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                    await context.Response.WriteAsync("No token found");
-                    return;
-                }
-                const string Bearer = "Bearer";
-                if (!token.StartsWith(Bearer))
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                    await context.Response.WriteAsync("Invalid token");
-                    return;
-                }
-                token = token.Substring(Bearer.Length).Trim();
-
-                foreach (var claim in options.AdditionalClaims)
-                {
-                    binder = _modelBinderProvider.GetBinder(claim.Value);
-                    claim.Value = binder.Get(context) as string;
-                }
-
-                //TODO: Create instance with FactoryService
-                IJwtBearerTokenService jwtBearerService = new JwtBearerAuthorization();
-                var handler = jwtBearerService.BuildHandler(token, options);
-                var result = await handler.AuthenticateAsync();
-                if (!result.Succeeded)
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                    await context.Response.WriteAsync("Invalid token");
-                    return;
-                }
-                user = result.Ticket.Principal;
+                context.User = result.Ticket.Principal;
             }
-            else if (@default.Type == Core.Enums.AuthType.ApiKey)
+            else
             {
-                user = null;
+                // Try to authenticate the user using each scheme
+                var otherSchemes = schemes.Where(s => s.Id != defaultScheme.Id);
+                foreach (var scheme in otherSchemes)
+                {
+                    handler = handlerProvider.GetHandler(scheme);
+                    //TODO: Modify header value
+                    result = await handler.AuthenticateAsync(context);
+                    if (result.Succeeded)
+                    {
+                        // The scheme successfully authenticated the user
+                        context.User = result.Principal;
+                        break;
+                    }
+                }
             }
         }
         else
         {
-
+            foreach (var scheme in schemes)
+            {
+                handler = handlerProvider.GetHandler(scheme);
+                //TODO: Modify header value
+                result = await handler.AuthenticateAsync(context);
+                if (result.Succeeded)
+                {
+                    // The scheme successfully authenticated the user
+                    context.User = result.Principal;
+                    break;
+                }
+            }
         }
-        context.User = user;
+        if (context.User == null)
+        {
+            // No scheme succeeded in authenticating the user, return a 401 Unauthorized
+            context.Response.StatusCode = 401;
+            return;
+        }
         await next.Invoke(context);
-    }
-
-    private void ApiKeyAuthorization()
-    {
-        // if (!context.Request.Headers.TryGetValue("X-Access-Key", out var accessKeys))
-        //     {
-        //         context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-        //         await context.Response.WriteAsync("Unauthorized");
-        //         return;
-        //     }
-
-        //     bool isValidAccess = false;
-        //     for (int i = 0; i < accessKeys.Count; i++)
-        //     {
-        //         if (!string.IsNullOrEmpty(accessKeys[i]) && accessKeys[i] == p.PrivateKey)
-        //         {
-        //             isValidAccess = true;
-        //             break;
-        //         }
-        //     }
-        //     if (!isValidAccess)
-        //     {
-        //         context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-        //         await context.Response.WriteAsync("Unauthorized");
-        //         return;
-        //     }
     }
 }
 
