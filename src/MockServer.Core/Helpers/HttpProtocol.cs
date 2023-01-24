@@ -1,6 +1,6 @@
 namespace MockServer.Core.Helpers;
 
-public static class HttpProtocol
+public static class HttpProtocolExtensions
 {
     public static List<string> CommonHttpMethods
         => new List<string>

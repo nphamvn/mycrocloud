@@ -18,7 +18,7 @@
             <div class="d-flex mb-2">
                 <div>
                     <select name="method" class="form-select">
-                        @foreach (var method in HttpProtocol.CommonHttpMethods)
+                        @foreach (var method in HttpProtocolExtensions.CommonHttpMethods)
                         {
                             <option value="@method">@method</option>
                         }

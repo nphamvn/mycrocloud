@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace MockServer.WebMVC.Controllers;
 
@@ -32,5 +28,13 @@ public class AccountController : Controller
     public async Task<IActionResult> Logout()
     {
         return SignOut("Cookies", "oidc");
+    }
+
+    [Authorize]
+    [HttpGet("user")]
+    public IActionResult GetUser()
+    {
+        var user = HttpContext.User;
+        return Ok(JsonSerializer.Serialize(user));
     }
 }

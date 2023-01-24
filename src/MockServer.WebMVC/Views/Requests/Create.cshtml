@@ -2,7 +2,7 @@
 @using MockServer.Core.Models
 @using MockServer.WebMVC.Extentions
 @using MockServer.Core.Helpers
-@model MockServer.WebMVC.Models.Request.CreateUpdateRequestModel
+@model MockServer.WebMVC.Models.Request.CreateUpdateRequestViewModel
 @{
     ViewData["Title"] = "Create new request";
 }
@@ -50,7 +50,7 @@
     <div class="form-group col-3">
         <label asp-for="Method">Method</label>
         <select id="method" class="form-control" asp-for="Method" onchange="generatePreviewUrl()">
-            @foreach (var method in HttpProtocol.CommonHttpMethods)
+            @foreach (var method in HttpProtocolExtensions.CommonHttpMethods)
                 {
                     <option value="@method">@method</option>
                 }

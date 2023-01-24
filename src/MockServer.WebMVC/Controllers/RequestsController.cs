@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using MockServer.Core.Helpers;
 using MockServer.WebMVC.Attributes;
 using MockServer.WebMVC.Models.Request;
 using MockServer.WebMVC.Services.Interfaces;
@@ -32,12 +34,13 @@ public class RequestsController : Controller
     public async Task<IActionResult> GetCreatePartial(string projectName)
     {
         ViewData["ProjectName"] = projectName;
-        return PartialView("Views/Requests/_CreateRequestPartial.cshtml", new CreateUpdateRequestModel());
+        var model = await _requestService.GetCreateRequestViewModel(projectName);
+        return PartialView("Views/Requests/_CreateRequestPartial.cshtml", model);
     }
 
     [AjaxOnly]
     [HttpPost("create")]
-    public async Task<IActionResult> CreateAjax(string projectName, CreateUpdateRequestModel request)
+    public async Task<IActionResult> CreateAjax(string projectName, CreateUpdateRequestViewModel request)
     {
         if (!ModelState.IsValid)
         {
@@ -55,7 +58,7 @@ public class RequestsController : Controller
     [HttpGet("{id:int}/edit")]
     public async Task<IActionResult> GetEditPartial(string projectName, int id)
     {
-        var vm = await _requestService.GetRequestViewModel(projectName, id);
+        var vm = await _requestService.GetRequestModel(projectName, id);
         ViewData["ProjectName"] = projectName;
         ViewData["FormMode"] = "Edit";
         return PartialView("Views/Requests/_CreateRequestPartial.cshtml", vm);
@@ -63,7 +66,7 @@ public class RequestsController : Controller
 
     [AjaxOnly]
     [HttpPost("{id:int}/edit")]
-    public async Task<IActionResult> Edit(string projectName, int id, CreateUpdateRequestModel request)
+    public async Task<IActionResult> Edit(string projectName, int id, CreateUpdateRequestViewModel request)
     {
         if (!await _requestService.ValidateEdit(projectName, id, request, ModelState))
         {
