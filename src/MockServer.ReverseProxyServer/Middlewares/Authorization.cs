@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Text.Json;
 using Jint;
+using MockServer.Core.Models.Auth;
 using MockServer.Core.Repositories;
 
 namespace MockServer.ReverseProxyServer.Middlewares;
@@ -52,11 +53,10 @@ public class Authorization : IMiddleware
                 }
             }
 
-            if (!string.IsNullOrEmpty(auth.Expression))
+            if (auth.Requirements.Any())
             {
-                var requirements = auth.Expression.Split(';');
                 IAppAuthorizationService authorizationService = new AppAuthorizationService();
-                foreach (var requirement in requirements)
+                foreach (var requirement in auth.Requirements)
                 {
                     //Hanlde requirement
                     if (!authorizationService.CheckRequirement(requirement, context.User))
@@ -73,7 +73,7 @@ public class Authorization : IMiddleware
 
 public interface IAppAuthorizationService
 {
-    bool CheckRequirement(string expression, ClaimsPrincipal user);
+    bool CheckRequirement(Requirement requirement, ClaimsPrincipal user);
 }
 
 public class AppAuthorizationService : IAppAuthorizationService
@@ -83,9 +83,10 @@ public class AppAuthorizationService : IAppAuthorizationService
     {
         _engine = new Engine();
     }
-    public bool CheckRequirement(string expression, ClaimsPrincipal user)
+    public bool CheckRequirement(Requirement requirement, ClaimsPrincipal user)
     {
+        //TODO: Fix
         _engine.SetValue("User", JsonSerializer.Serialize(user));
-        return Convert.ToBoolean(_engine.Execute(string.Format("const result = {0}", expression)).GetCompletionValue().ToString());
+        return Convert.ToBoolean(_engine.Execute(string.Format("const result = {0}", requirement.ConditionalExpression)).GetCompletionValue().ToString());
     }
 }

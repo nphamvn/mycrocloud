@@ -1,44 +1,40 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace MNB.Web.Services
+﻿namespace MockServer.WebMVC.Services;
+public interface IUserAgentService
 {
-    public interface IUserAgentService
+    Platform GetPlatform();
+}
+
+public class UserAgentService : IUserAgentService
+{
+    private readonly string _userAgent;
+
+    public UserAgentService(IHttpContextAccessor httpContextAccessor)
     {
-        Platform GetPlatform();
+        _userAgent = httpContextAccessor.HttpContext.Request.Headers.UserAgent.ToString();
     }
 
-    public class UserAgentService : IUserAgentService
+    public Platform GetPlatform()
     {
-        private readonly string _userAgent;
-
-        public UserAgentService(IHttpContextAccessor httpContextAccessor)
+        if (_userAgent.Contains("Mac OS"))
         {
-            _userAgent = httpContextAccessor.HttpContext.Request.Headers.UserAgent.ToString();
+            return Platform.Mac;
         }
 
-        public Platform GetPlatform()
+        if (_userAgent.Contains("Windows NT"))
         {
-            if (_userAgent.Contains("Mac OS"))
-            {
-                return Platform.Mac;
-            }
-
-            if (_userAgent.Contains("Windows NT"))
-            {
-                return Platform.Windows;
-            }
-
-            return Platform.Others;
+            return Platform.Windows;
         }
-    }
 
-    public enum Platform
-    {
-        Windows,
-        Mac,
-        iOS,
-        iPadOS,
-        Android,
-        Others
+        return Platform.Others;
     }
+}
+
+public enum Platform
+{
+    Windows,
+    Mac,
+    iOS,
+    iPadOS,
+    Android,
+    Others
 }
