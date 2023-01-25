@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Api", "MockServer.ReverseProxyServer\MockServer.Api.csproj", "{13D6A2C2-FB19-4898-AAA7-C88C51A208FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Api", "MockServer.Api\MockServer.Api.csproj", "{13D6A2C2-FB19-4898-AAA7-C88C51A208FE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Core", "MockServer.Core\MockServer.Core.csproj", "{883671FE-3C30-4ECA-9882-ACCF237138E7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Infrastructure", "MockServer.Infrastructure\MockServer.Infrastructure.csproj", "{6F834257-C6F3-47BA-BD5D-0F512D552136}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Web", "MockServer.WebMVC\MockServer.Web.csproj", "{52E99DAE-CC99-44B9-ADD2-26462B29E1D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Web", "MockServer.Web\MockServer.Web.csproj", "{52E99DAE-CC99-44B9-ADD2-26462B29E1D7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.CallbackExecutor", "MockServer.CallbackExecutor\MockServer.CallbackExecutor.csproj", "{076482F6-3892-4FFA-9ABC-04F49C0E1AA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Function", "MockServer.Function\MockServer.Function.csproj", "{076482F6-3892-4FFA-9ABC-04F49C0E1AA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.IdentityServer", "MockServer.IdentityServer\MockServer.IdentityServer.csproj", "{51CBE00E-8F34-41CA-AC8B-57474A3A65B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Identity", "MockServer.Identity\MockServer.Identity.csproj", "{51CBE00E-8F34-41CA-AC8B-57474A3A65B4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.UnitTest", "MockServer.UnitTest\MockServer.UnitTest.csproj", "{BABDBCFD-B9B8-4D27-BEAF-82DDB2AFD68E}"
 EndProject
