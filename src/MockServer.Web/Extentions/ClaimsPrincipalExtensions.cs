@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using MockServer.Core.Models;
 
-namespace MockServer.WebMVC.Extentions
+namespace MockServer.Web.Extentions
 {
     public static class ClaimsPrincipalExtensions
     {

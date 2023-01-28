@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MockServer.WebMVC.Attributes;
-using MockServer.WebMVC.Models.Common;
-using MockServer.WebMVC.Models.Project;
-using MockServer.WebMVC.Services.Interfaces;
+using MockServer.Web.Attributes;
+using MockServer.Web.Models.Common;
+using MockServer.Web.Models.Project;
+using MockServer.Web.Services.Interfaces;
 
-namespace MockServer.WebMVC.Controllers;
+namespace MockServer.Web.Controllers;
 
 [Authorize]
-[Authorize(AuthenticationSchemes ="", Policy ="")]
+[Authorize(AuthenticationSchemes = "", Policy = "")]
 public class ProjectsController : BaseController
 {
     private readonly IProjectWebService _projectService;

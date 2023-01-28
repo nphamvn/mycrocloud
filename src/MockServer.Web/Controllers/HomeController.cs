@@ -2,9 +2,9 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MockServer.WebMVC.Models;
+using MockServer.Web.Models;
 
-namespace MockServer.WebMVC.Controllers;
+namespace MockServer.Web.Controllers;
 
 public class HomeController : Controller
 {

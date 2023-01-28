@@ -1,4 +1,4 @@
-﻿namespace MockServer.WebMVC.Services;
+﻿namespace MockServer.Web.Services;
 public interface IUserAgentService
 {
     Platform GetPlatform();

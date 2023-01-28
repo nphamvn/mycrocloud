@@ -1,6 +1,6 @@
-using MockServer.WebMVC.Models.Request;
+using MockServer.Web.Models.Request;
 
-namespace MockServer.WebMVC.Models.Project;
+namespace MockServer.Web.Models.Project;
 
 public class ProjectViewViewModel
 {

@@ -1,9 +1,10 @@
-@model MockServer.WebMVC.Models.Project.RequestOpenViewModel
+@model MockServer.Web.Models.Project.RequestOpenViewModel
 <div class="row h-100">
     <div class="col-9 h-100 overflow-scroll">
         <div id="request-define">
             <partial name="_RequestDefinitionPartial.cshtml" model="@Model" />
         </div>
+        <hr>
         <div id="request-config">
             <partial name="_FixedRequestConfiguration.cshtml" model="@Model.Configuration" />
         </div>

@@ -9,11 +9,11 @@ public class AppAuthenticationHandlerProvider : IAppAuthenticationHandlerProvide
 {
     public IAppAuthenticationHandler GetHandler(AppAuthentication scheme)
     {
-        if (scheme.Type is AuthType.JwtBearer)
+        if (scheme.Type is AuthenticationType.JwtBearer)
         {
             return new JwtBearerAuthHandler((JwtBearerAuthenticationOptions)scheme.Options);
         }
-        else if (scheme.Type is AuthType.ApiKey)
+        else if (scheme.Type is AuthenticationType.ApiKey)
         {
             return new ApiKeyAuthHandler((ApiKeyAuthenticationOptions)scheme.Options);
         }

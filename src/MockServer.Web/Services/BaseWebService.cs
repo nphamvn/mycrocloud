@@ -1,7 +1,7 @@
 using MockServer.Core.Models;
-using MockServer.WebMVC.Extentions;
+using MockServer.Web.Extentions;
 
-namespace MockServer.WebMVC.Services;
+namespace MockServer.Web.Services;
 
 public class BaseWebService
 {

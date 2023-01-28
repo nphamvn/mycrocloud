@@ -1,4 +1,4 @@
-namespace MockServer.WebMVC.Models.ProjectSettings;
+namespace MockServer.Web.Models.ProjectSettings;
 
 public class ProjectSettingsBaseModel
 {

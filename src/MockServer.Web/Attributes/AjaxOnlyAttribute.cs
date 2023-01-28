@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
-using MockServer.WebMVC.Extentions;
+using MockServer.Web.Extentions;
 
-namespace MockServer.WebMVC.Attributes;
+namespace MockServer.Web.Attributes;
 
 public class AjaxOnlyAttribute : ActionMethodSelectorAttribute
 {

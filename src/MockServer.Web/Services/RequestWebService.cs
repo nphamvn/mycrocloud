@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using MockServer.Core.Enums;
 using MockServer.Core.Helpers;
 using MockServer.Core.Repositories;
-using MockServer.WebMVC.Models.Project;
-using MockServer.WebMVC.Models.Request;
-using MockServer.WebMVC.Services.Interfaces;
+using MockServer.Web.Models.Project;
+using MockServer.Web.Models.Request;
+using MockServer.Web.Services.Interfaces;
 
-namespace MockServer.WebMVC.Services;
+namespace MockServer.Web.Services;
 
 public class RequestWebService : BaseWebService, IRequestWebService
 {
@@ -116,10 +116,12 @@ public class RequestWebService : BaseWebService, IRequestWebService
         }
     }
 
-    public async Task<CreateUpdateRequestViewModel> GetRequestModel(string projectName, int requestId)
+    public async Task<CreateUpdateRequestViewModel> GetGetCreateRequestViewModel(string projectName, int requestId)
     {
         var request = await _requestRepository.Get(AuthUser.Id, projectName, requestId);
         var vm = _mapper.Map<CreateUpdateRequestViewModel>(request);
+        vm.HttpMethods = HttpProtocolExtensions.CommonHttpMethods
+                            .Select(m => new SelectListItem(m, m));
         return vm;
     }
 
@@ -144,8 +146,25 @@ public class RequestWebService : BaseWebService, IRequestWebService
         var vm = new CreateUpdateRequestViewModel();
         vm.HttpMethods = HttpProtocolExtensions.CommonHttpMethods
                             .Select(m => new SelectListItem(m, m));
-        var authenticationSchemes = await _authRepository.GetByProject(project.Id);
-        vm.AuthenticationSchemes = authenticationSchemes.Select(s => new SelectListItem(s.Id.ToString(), s.SchemeName));
+        //var authenticationSchemes = await _authRepository.GetByProject(project.Id);
+        //vm.AuthenticationSchemes = authenticationSchemes.Select(s => new SelectListItem(s.SchemeName, s.Id.ToString()));
         return vm;
+    }
+
+    public async Task<AuthorizationConfigViewModel> GetAuthorizationConfigViewModel(string projectName, int requestId)
+    {
+        var authorization = await _authRepository.GetRequestAuthorization(requestId);
+        var vm = authorization != null ? _mapper.Map<AuthorizationConfigViewModel>(authorization)
+                                        : new AuthorizationConfigViewModel();
+        var project = await _projectRepository.Get(AuthUser.Id, projectName);
+        vm.AuthenticationSchemeSelectList = await _authRepository.GetByProject(project.Id);
+        //vm.AuthenticationSchemeSelectList = authenticationSchemes.Select(s => new SelectListItem(s.SchemeName, s.Id.ToString(), s.Order > 0));
+        return vm;
+    }
+
+    public async Task UpdateRequestAuthorizationConfig(string projectName, int requestId, AuthorizationConfigViewModel auth)
+    {
+        var authorization = _mapper.Map<Core.Models.Auth.AppAuthorization>(auth);
+        await _authRepository.SetRequestAuthorization(requestId, authorization);
     }
 }

@@ -1,10 +1,10 @@
 using MockServer.Core.Enums;
 using MockServer.Core.Models.Auth;
 
-namespace MockServer.WebMVC.Models.ProjectSettings.Auth;
+namespace MockServer.Web.Models.ProjectSettings.Auth;
 
 public class JwtBearerAuthModel : AuthBaseModel
 {
-    public AuthType Type { get; set; } = AuthType.JwtBearer;
+    public AuthenticationType Type { get; set; } = AuthenticationType.JwtBearer;
     public JwtBearerAuthenticationOptions Options { get; set; } = new();
 }

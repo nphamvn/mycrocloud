@@ -4,12 +4,12 @@ using MockServer.Core.Enums;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Models;
 using MockServer.Core.Repositories;
-using MockServer.WebMVC.Extentions;
-using MockServer.WebMVC.Models.Project;
-using MockServer.WebMVC.Models.Request;
-using MockServer.WebMVC.Services.Interfaces;
+using MockServer.Web.Extentions;
+using MockServer.Web.Models.Project;
+using MockServer.Web.Models.Request;
+using MockServer.Web.Services.Interfaces;
 
-namespace MockServer.WebMVC.Services;
+namespace MockServer.Web.Services;
 
 public class ProjectWebService : IProjectWebService
 {

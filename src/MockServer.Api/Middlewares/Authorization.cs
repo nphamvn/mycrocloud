@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Text.Json;
 using Jint;
+using MockServer.Core.Enums;
 using MockServer.Core.Models.Auth;
 using MockServer.Core.Repositories;
 
@@ -27,12 +28,12 @@ public class Authorization : IMiddleware
         }
 
         //AllowAnonymous
-        if (auth.Title == "AllowAnonymous")
+        if (auth.Type == AuthorizationType.AllowAnonymous)
         {
             await next.Invoke(context);
             return;
         }
-        else if (auth.Title == "Authorize")
+        else if (auth.Type == AuthorizationType.Authorize)
         {
             if (context.User == null || !context.User.Identity.IsAuthenticated)
             {
@@ -40,13 +41,13 @@ public class Authorization : IMiddleware
                 return;
             }
 
-            if (!string.IsNullOrEmpty(auth.AuthenticationSchemes))
+            if (auth.AuthenticationSchemes.Count > 0)
             {
                 //allowedSchemes: "1,2,3,4,5"
-                var allowedSchemes = auth.AuthenticationSchemes.Split(',');
-                var authScheme = (string)context.Items["AuthSchemeId"];
+                var allowedSchemes = auth.AuthenticationSchemes;
+                var authSchemeId = Convert.ToInt32(context.Items["AuthSchemeId"]);
                 // check if the scheme is in the allowed list of scheme
-                if (!allowedSchemes.Contains(authScheme))
+                if (!allowedSchemes.Contains(authSchemeId))
                 {
                     context.Response.StatusCode = 403; // Forbidden
                     return;

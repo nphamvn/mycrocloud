@@ -2,13 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "MockServer.IdentityServer",
+            "name": "MockServer.Identity",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/MockServer.IdentityServer/bin/Debug/net6.0/MockServer.IdentityServer.dll",
+            "program": "${workspaceFolder}/MockServer.Identity/bin/Debug/net6.0/MockServer.Identity.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/MockServer.IdentityServer",
+            "cwd": "${workspaceFolder}/MockServer.Identity",
             "stopAtEntry": false,
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
@@ -20,13 +20,13 @@
             "requireExactSource": false
         },
         {
-            "name": "MockServer.WebMVC",
+            "name": "MockServer.Web",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/MockServer.WebMVC/bin/Debug/net6.0/MockServer.WebMVC.dll",
+            "preLaunchTask": "build_web",
+            "program": "${workspaceFolder}/MockServer.Web/bin/Debug/net6.0/MockServer.Web.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/MockServer.WebMVC",
+            "cwd": "${workspaceFolder}/MockServer.Web",
             "stopAtEntry": false,
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
@@ -41,14 +41,14 @@
             // Use IntelliSense to find out which attributes exist for C# debugging
             // Use hover for the description of the existing attributes
             // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-            "name": "MockServer.ReverseProxyServer",
+            "name": "MockServer.Api",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build_api",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/MockServer.ReverseProxyServer/bin/Debug/net6.0/MockServer.ReverseProxyServer.dll",
+            "program": "${workspaceFolder}/MockServer.Api/bin/Debug/net6.0/MockServer.Api.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/MockServer.ReverseProxyServer",
+            "cwd": "${workspaceFolder}/MockServer.Api",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             "serverReadyAction": {
@@ -61,11 +61,6 @@
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
             }
-        },
-        {
-            "name": ".NET Core Attach",
-            "type": "coreclr",
-            "request": "attach"
         }
     ]
 }

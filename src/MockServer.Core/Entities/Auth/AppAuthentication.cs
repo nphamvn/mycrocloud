@@ -6,7 +6,7 @@ namespace MockServer.Core.Entities.Auth;
 public class AppAuthentication : BaseEntity
 {
     public string SchemeName { get; set; }
-    public AuthType Type { get; set; }
+    public AuthenticationType Type { get; set; }
     /// <summary>
     /// -1: Not set
     /// 0: Default

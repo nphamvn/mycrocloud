@@ -1,0 +1,16 @@
+@model string
+@using MockServer.Web.Controllers
+@{
+    var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
+    var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
+}
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a href="@Url.Action(nameof(ProjectsController.View), "Projects" ,new {name=Model})"
+            class="nav-link @(controller== "projects" && action == "view"?"active":"") py-1" role="tab">Requests</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a href="@Url.Action(nameof(ProjectSettingsController.Index), "ProjectSettings", new {name=Model})"
+            class="nav-link @(controller== "projectsettings"?"active":"") py-1" role="tab">Settings</a>
+    </li>
+</ul>

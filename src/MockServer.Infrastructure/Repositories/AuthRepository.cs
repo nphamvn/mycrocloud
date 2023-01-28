@@ -58,9 +58,12 @@ public class AuthRepository : IAuthRepository
                     Id,
                     SchemeName,
                     Type,
+                    [Order],
                     Description
                 FROM
                     ProjectAuthentication
+                WHERE
+                    ProjectId = @Id
                 """;
         using var connection = new SqliteConnection(_connectionString);
         return connection.QueryAsync<AppAuthentication>(query, new
@@ -69,7 +72,7 @@ public class AuthRepository : IAuthRepository
         });
     }
 
-    public Task<AppAuthentication> GetAs(int id, AuthType type)
+    public Task<AppAuthentication> GetAs(int id, AuthenticationType type)
     {
         var query =
                 """
@@ -91,28 +94,105 @@ public class AuthRepository : IAuthRepository
         });
     }
 
-    public Task<AppAuthorization> GetRequestAuthorization(int requestId)
+    public async Task<AppAuthorization> GetRequestAuthorization(int requestId)
     {
-        throw new NotImplementedException();
+        var query =
+                """
+                SELECT
+                    Authorization
+                FROM
+                    Requests
+                WHERE
+                    Id = @Id
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        var json = await connection.QuerySingleOrDefaultAsync<string>(query, new
+        {
+            Id = requestId
+        });
+        return !string.IsNullOrEmpty(json) ? JsonSerializer.Deserialize<AppAuthorization>(json) : null;
+    }
+
+    public async Task SetRequestAuthorization(int requestId, AppAuthorization authorization)
+    {
+        var query =
+                """
+                UPDATE 
+                    Requests
+                SET
+                    Authorization = @Authorization
+                WHERE
+                    Id = @Id
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        await connection.ExecuteAsync(query, new
+        {
+            Id = requestId,
+            Authorization = JsonSerializer.Serialize(authorization)
+        });
+    }
+
+    public async Task Update(int id, AppAuthentication auth)
+    {
+        var query =
+                """
+                UPDATE
+                    ProjectAuthentication
+                SET
+                    SchemeName = @SchemeName,
+                    Options = @Options,
+                    Description = @Description
+                WHERE
+                    Id = @Id
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(auth.Type));
+        int type = (int)auth.Type;
+        await connection.ExecuteAsync(query, new
+        {
+            Id = id,
+            SchemeName = auth.SchemeName,
+            Options = auth.Options,
+            Description = auth.Description,
+        });
+    }
+
+    public Task SetOrder(int id, int order)
+    {
+        var query =
+                """
+                UPDATE 
+                    Requests
+                SET
+                    Order = @Order
+                WHERE
+                    Id = @Id
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        return connection.ExecuteAsync(query, new
+        {
+            Id = id,
+            Order = order
+        });
     }
 }
 
 public class AuthenticationOptionsJsonTypeHandler : SqlMapper.TypeHandler<AuthOptions>
 {
-    private readonly AuthType _type;
+    private readonly AuthenticationType _type;
 
-    public AuthenticationOptionsJsonTypeHandler(AuthType type)
+    public AuthenticationOptionsJsonTypeHandler(AuthenticationType type)
     {
         _type = type;
     }
     public override AuthOptions Parse(object value)
     {
         var stringValue = value.ToString();
-        if (_type is AuthType.JwtBearer)
+        if (_type is AuthenticationType.JwtBearer)
         {
             return JsonSerializer.Deserialize<JwtBearerAuthenticationOptions>(stringValue);
         }
-        else if (_type is AuthType.ApiKey)
+        else if (_type is AuthenticationType.ApiKey)
         {
             return JsonSerializer.Deserialize<ApiKeyAuthenticationOptions>(stringValue);
         }
@@ -124,11 +204,11 @@ public class AuthenticationOptionsJsonTypeHandler : SqlMapper.TypeHandler<AuthOp
 
     public override void SetValue(IDbDataParameter parameter, AuthOptions value)
     {
-        if (_type is AuthType.JwtBearer)
+        if (_type is AuthenticationType.JwtBearer)
         {
             parameter.Value = JsonSerializer.Serialize((JwtBearerAuthenticationOptions)value);
         }
-        else if (_type is AuthType.ApiKey)
+        else if (_type is AuthenticationType.ApiKey)
         {
             parameter.Value = JsonSerializer.Serialize((ApiKeyAuthenticationOptions)value);
         }

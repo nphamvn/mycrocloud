@@ -1,90 +1,282 @@
 @using MockServer.Core.Enums
-@using MockServer.WebMVC.Controllers
-@model MockServer.WebMVC.Models.ProjectSettings.Auth.AuthIndexModel
+@using MockServer.Web.Controllers
+@model MockServer.Web.Models.ProjectSettings.Auth.AuthIndexModel
 @{
-
+    var availableSchemes = Model.AuthenticationSchemes.Where(s => s.Order == 0);
+    var selectedSchemes = Model.AuthenticationSchemes.Where(s => s.Order > 0);
 }
+<style>
+    .dragSortableItems .sortable-list {
+        list-style: none;
+        margin: 0;
+        min-height: 20px;
+        padding: 0px;
+    }
+
+    .dragSortableItems .sortable-item {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        display: block;
+        margin-bottom: -1px;
+        padding: 10px;
+        cursor: move;
+        position: relative;
+        padding-left: 8px;
+    }
+
+    .dragSortableItems .sortable-item .icon-drag {
+        color: #ccc;
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .dragSortableItems .sortable-item .sortable-item-input {
+        visibility: hidden;
+        pointer-events: none;
+        position: absolute;
+    }
+
+    .dragSortableItems .placeholder {
+        border: 1px dashed #666;
+        height: 45px;
+        margin-bottom: 5px;
+    }
+
+    .dragSortableItems .fixed-panel {
+        max-height: 500px;
+        overflow-y: auto;
+        padding-bottom: 1px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 7px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #888;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+</style>
+<partial name="/Views/Projects/_NavTabs.cshtml" model="Model.Project.Name" />
 <div class="row flex-nowrap">
     <partial name="/Views/ProjectSettings/Shared/_SideBar.cshtml" model="@Model.Project.Name" />
     <div class="col py-3">
-        <div class="w-75">
-            <div class="d-flex">
+        <form method="post">
+            <div class="w-75">
                 <h5>Authentication</h5>
-                <div class="ms-auto btn-group">
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Create
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item"
-                                href="@Url.Action(nameof(ProjectSettingsController.CreateJwtBearer), new { name = Model.Project.Name })">JWT</a>
-                        </li>
-                        <li><a class="dropdown-item"
-                                href="@Url.Action(nameof(ProjectSettingsController.CreateApiKey), new { name = Model.Project.Name })">API
-                                Key</a></li>
-                    </ul>
+                <div class="alert alert-info small mt-4">
+                    <i class="bi bi-info-circle"></i>
+                    &nbsp;&nbsp;Drag &amp; Drop schemes from the left over to the right side in the
+                    desired location on your dashboard.
+                </div>
+                <span name="el_validationErrorFields" class="text-danger"></span>
+                <div class="row dragSortableItems dragSortableItem_0 dragableMultiselect mb-2">
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-header d-flex">
+                                <div>
+                                    <i class="bi bi-list"></i> Available Schemes
+                                </div>
+                                <div class="ms-auto btn-group">
+                                    <button type="button" class="btn btn-primary btn-sm dropdown-toggle"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        Create
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item"
+                                                href="@Url.Action(nameof(ProjectSettingsController.ViewJwtBearer), new { name = Model.Project.Name })">JWT</a>
+                                        </li>
+                                        <li><a class="dropdown-item"
+                                                href="@Url.Action(nameof(ProjectSettingsController.CreateApiKey), new { name = Model.Project.Name })">API
+                                                Key</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <ul class="in_available_fields custom-scrollbar sortable-list fixed-panel ui-sortable">
+                                    @{
+                                        int index = 0;
+                                        foreach (var scheme in availableSchemes)
+                                        {
+                                            var link = "";
+                                            if (scheme.Type is AuthenticationType.JwtBearer)
+                                            {
+                                                link = @Url.Action(nameof(ProjectSettingsController.ViewJwtBearer), new
+                                                {
+                                                    name = Model.Project.Name,
+                                                    id = scheme.Id
+                                                });
+                                            }
+                                            else if (scheme.Type is AuthenticationType.ApiKey)
+                                            {
+                                                link = @Url.Action(nameof(ProjectSettingsController.ViewApiKey), new
+                                                {
+                                                    name = Model.Project.Name,
+                                                    id = scheme.Id
+                                                });
+                                            }
+                                            <li class="sortable-item allowPrimary sortable-item-@index ui-sortable-handle"
+                                            data-fid="@scheme.Id">
+                                                <i class="fa-solid fa-grip-vertical me-2"></i><input type="checkbox"
+                                                name="page_contents[]" class="sortable-item-input"><a
+                                                class="text-decoration-none" href="@link">@scheme.SchemeName</a>
+                                            </li>
+                                            index++;
+                                        }
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="card primaryPanel">
+                            <div class="card-header"><i class="bi bi-list-check"></i> Selected Schemes</div>
+                            <div class="card-body">
+                                <div class="alert alert-warning small text-center mb-0" style="display: none;">No Fields
+                                    Selected</div>
+                                <ul class="in_primary_fields sortable-list selectedDropzone fixed-panel ui-sortable">
+                                    @{
+                                        int i = 0;
+                                        foreach (var scheme in selectedSchemes)
+                                        {
+                                            var link = "";
+                                            if (scheme.Type is AuthenticationType.JwtBearer)
+                                            {
+                                                link = @Url.Action(nameof(ProjectSettingsController.ViewJwtBearer), new
+                                                {
+                                                    name = Model.Project.Name,
+                                                    id = scheme.Id
+                                                });
+                                            }
+                                            else if (scheme.Type is AuthenticationType.ApiKey)
+                                            {
+                                                link = @Url.Action(nameof(ProjectSettingsController.ViewApiKey), new
+                                                {
+                                                    name = Model.Project.Name,
+                                                    id = scheme.Id
+                                                });
+                                            }
+                                            <li class="sortable-item allowPrimary sortable-item-@i ui-sortable-handle"
+                                            data-fid="@scheme.Id">
+                                                <i class="fa-solid fa-grip-vertical me-2"></i><input type="checkbox"
+                                                name="page_contents[]" class="sortable-item-input"><a
+                                                class="text-decoration-none" href="@link">@scheme.SchemeName</a>
+                                            </li>
+                                            i++;
+                                        }
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-primary">Save</button>
                 </div>
             </div>
-            <hr class="my-2">
-            @if (Model.Authentications.Count() == 0)
-            {
-                <div>
-                    There are no authentication schemes for this project.
-                </div>
-            }
-            else
-            {
-                <div>
-                    @{
-                        var auths = Model.Authentications;
-                    }
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Name</th>
-                                <th>Type</th>
-                                <th>Settings Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @{
-                                int no = 1;
-                            }
-                            @foreach (var auth in auths)
-                            {
-                                var link = "";
-                                if (auth.Type is AuthType.JwtBearer)
-                                {
-                                    link = @Url.Action(nameof(ProjectSettingsController.ViewJwtBearer), new
-                                    {
-                                        name = Model.Project.Name,
-                                        id = auth.Id
-                                    });
-                                }
-                                else if (auth.Type is AuthType.ApiKey)
-                                {
-                                    link = @Url.Action(nameof(ProjectSettingsController.ViewApiKey), new
-                                    {
-                                        name = Model.Project.Name,
-                                        id = auth.Id
-                                    });
-                                }
-                                <tr>
-                                    <th>@no</th>
-                                    <td><a class="text-decoration-none" href="@link">@auth.SchemeName</a>
-                                    </td>
-                                    <td>@auth.Type</td>
-                                    <td>@(auth.Order == 0 ? "Default" : auth.Order > 0 ? $"Set /{auth.Order}" : "Not Set")</td>
-                                    <td>...</td>
-                                </tr>
-                                no++;
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-        </div>
+        </form>
     </div>
 </div>
+<script>
+    $(function () {
+        // On ready
+        $(document).ready(function () {
+            const dragableMultiselect = $('.dragableMultiselect');
+            dragableMultiselect.length && dragableMultiselect.each((index, value) => {
+                const $this = $(value);
+
+                $dragSortableItem = $('.dragSortableItem_' + index);
+                let $mainWrapper = $dragSortableItem.closest('.dragSortableItems'),
+                    $in_available_fields = $mainWrapper.find('.in_available_fields'),
+                    $selectedDropzone = $mainWrapper.find('.selectedDropzone');
+
+                checkFields($mainWrapper);
+
+                // Set up our dropzone
+                $in_available_fields.sortable({
+                    connectWith: '.sortable-list',
+                    placeholder: 'placeholder',
+                    start: function (event, ui) {
+                        if (!$(ui.item).hasClass("allowPrimary")) {
+                            $mainWrapper.find(".primaryPanel").removeClass('panel-primary').addClass("panel-danger");
+                        }
+                        checkFields($mainWrapper)
+                    },
+                    receive: function (event, ui) {
+                        $(ui.item).find('.sortable-item-input').prop('checked', false);
+                    },
+                    stop: function (event, ui) {
+                        if (!$(ui.item).hasClass("allowPrimary")) {
+                            $mainWrapper.find(".primaryPanel").removeClass("panel-danger").addClass('panel-primary');
+                        }
+                    },
+                    change: function (event, ui) {
+                        checkFields($mainWrapper);
+                    },
+                    update: function (event, ui) {
+                        checkFields($mainWrapper);
+                    },
+                    out: function (event, ui) {
+                        checkFields($mainWrapper);
+                    }
+                }).disableSelection();
+
+                // Enable dropzone for primary fields
+                $selectedDropzone.sortable({
+                    connectWith: '.sortable-list',
+                    placeholder: 'placeholder',
+                    receive: function (event, ui) {
+                        // If we dont allow primary fields here, cancel
+                        if (!$(ui.item).hasClass("allowPrimary")) {
+                            $(ui.placeholder).css('display', 'none');
+                            $(ui.sender).sortable("cancel");
+                        } else {
+                            $(ui.item).find('.sortable-item-input').prop('checked', true);
+                        }
+                    },
+                    over: function (event, ui) {
+                        if (!$(ui.item).hasClass("allowPrimary")) {
+                            $(ui.placeholder).css('display', 'none');
+                        } else {
+                            $(ui.placeholder).css('display', '');
+                        }
+                    },
+                    start: function (event, ui) {
+                        checkFields($mainWrapper)
+                    },
+                    change: function (event, ui) {
+                        checkFields($mainWrapper);
+                    },
+                    update: function (event, ui) {
+                        checkFields($mainWrapper);
+                    },
+                    out: function (event, ui) {
+                        checkFields($mainWrapper);
+                    }
+                }).disableSelection();
+            });
+        });
+
+        // Checks to see if the fields section has fields selected. If not, shows a placeholder
+        function checkFields($this) {
+            if ($this.find('.selectedDropzone').find('li').length >= 1) {
+                $this.find('.primaryPanel').find('.alert').hide();
+            } else {
+                $this.find('.primaryPanel').find('.alert').show();
+            }
+        }
+    });
+</script>

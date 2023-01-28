@@ -1,6 +1,6 @@
 using MockServer.Core.Enums;
 
-namespace MockServer.WebMVC.DTOs.Project;
+namespace MockServer.Web.DTOs.Project;
 
 public class CreateProjectDto
 {

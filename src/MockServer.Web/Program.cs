@@ -1,5 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
-using MockServer.WebMVC.Extentions;
+using MockServer.Web.Extentions;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);

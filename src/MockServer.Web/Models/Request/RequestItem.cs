@@ -1,6 +1,6 @@
 using MockServer.Core.Enums;
 
-namespace MockServer.WebMVC.Models.Request;
+namespace MockServer.Web.Models.Request;
 
 public class RequestItem
 {

@@ -1,6 +1,8 @@
-@model MockServer.WebMVC.Models.ProjectSettings.Auth.JwtBearerAuthModel
+@using MockServer.Web.Common
+@model MockServer.Web.Models.ProjectSettings.Auth.JwtBearerAuthModel
 @{
     var project = Model.Project;
+    var formMode = FormMode.Edit;
 }
 <div class="row flex-nowrap">
     <partial name="/Views/ProjectSettings/Shared/_SideBar.cshtml" model="@project.Name" />
@@ -31,31 +33,7 @@
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" asp-for="Options.Issuer">
                             </div>
-                            @* <p class="col-sm-5 text-success">Identifier (or, name) of the server or system
-                                issuing
-                                the
-                                token. Typically a DNS name, but doesn't have to be.</p> *@
                         </div>
-                        @* <div class="mb-3 row">
-                            <div class="col-sm-2">
-                            <label for="issuedAt" class="col-form-label">Issued At</label>
-                            <button type="button" class="btn btn-sm pb-2 text-info" data-bs-toggle="tooltip"
-                            data-bs-placement="top" title="Tooltip on top">
-                            <i class="bi bi-info-circle"></i>
-                            </button>
-                            </div>
-                            <div class="col-sm-6">
-                            <input type="text" class="form-control" id="issuedAt">
-                            </div>
-                            <div class="col-sm-4">
-                            <button type="button" class="btn btn-success btn-xs">now</button>
-                            </div>
-                            <p class="text-success">Date/time when the token was issued. (defaults to now)
-                            &nbsp;&nbsp;
-                            <button type="button" class="btn btn-success btn-xs"
-                            data-bind="click:issuedAtSetNow">now</button>
-                            </p>
-                            </div> *@
                         <div class="mb-3 row">
                             <label asp-for="Options.Expire" class="col-sm-2 col-form-label">Expiration</label>
                             <div class="col-sm-6">
@@ -65,37 +43,13 @@
                                 <button type="button" class="btn btn-success btn-xs">in 60 minutes</button>
                                 <button type="button" class="btn btn-success btn-xs">in 1 days</button>
                             </div>
-                            @* <p class="text-success">Date/time at which point the token is no longer valid.
-                                (defaults
-                                to one year from now)
-                                &nbsp;&nbsp;
-                                <button type="button" class="btn btn-success btn-xs"
-                                data-bind="click:expirationSetNow">now</button>
-                                <button type="button" class="btn btn-success btn-xs"
-                                data-bind="click:expirationSetTwentyMinutes">in 20 minutes</button>
-                                <button type="button" class="btn btn-success btn-xs"
-                                data-bind="click:expirationSetOneYear">in 1 year</button>
-                                </p> *@
                         </div>
                         <div class="mb-3 row">
                             <label asp-for="Options.Audience" class="col-sm-2 col-form-label">Audience</label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" asp-for="Options.Audience">
                             </div>
-                            @* <p class="col-sm-5 text-success">Intended recipient of this token; can be any string, as
-                                long as the other end uses the same string when validating the token. Typically a
-                                DNS
-                                name.</p>*@
                         </div>
-                        @* <div class="mb-3 row">
-                            <label for="subject" class="col-sm-2 col-form-label">Subject</label>
-                            <div class="col-sm-10">
-                            <input type="text" class="form-control" id="subject">
-                            </div>
-                            <p class="col-sm-5 text-success">Identifier (or, name) of the user this token
-                            represents.
-                            </p>
-                            </div> *@
                     </div>
                 </div>
                 <div class="card mb-2">
@@ -107,7 +61,7 @@
                             <ul style="list-style: initial;">
                                 <li>To set a static value, use the format static[value]. For example, to set the claim
                                     the value to
-                                    "example.com"　use
+                                    "example.com" use
                                     static[example.com]</li>
                                 <li>To set a dynamic value bound from a request data like header or query, use the
                                     format [source][name].
@@ -204,7 +158,7 @@
                 <div>
                     <button type="button" class="btn btn-secondary me-2"
                         onclick="location.href='@Context.Request.Headers["Referer"].ToString()'">Back</button>
-                    <button type="submit" class="btn btn-primary">Create</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </form>
         </div>

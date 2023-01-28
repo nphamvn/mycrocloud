@@ -1,4 +1,4 @@
-namespace MockServer.WebMVC.Extentions;
+namespace MockServer.Web.Extentions;
 
 public static class HttpRequestExtensions
 {

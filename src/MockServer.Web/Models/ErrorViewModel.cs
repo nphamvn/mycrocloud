@@ -1,4 +1,4 @@
-namespace MockServer.WebMVC.Models;
+namespace MockServer.Web.Models;
 
 public class ErrorViewModel
 {

@@ -2,7 +2,7 @@ using System.Net;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MockServer.Core.Entities.Requests;
 
-namespace MockServer.WebMVC.Models.Request;
+namespace MockServer.Web.Models.Request;
 
 public class FixedRequestConfigViewModel
 {

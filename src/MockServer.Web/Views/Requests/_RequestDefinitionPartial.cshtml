@@ -1,4 +1,4 @@
-@model MockServer.WebMVC.Models.Project.RequestOpenViewModel
+@model MockServer.Web.Models.Project.RequestOpenViewModel
 
 <div class="d-flex mb-1">
     <strong class="fw-bolder">@Model.Name</strong>
@@ -22,6 +22,15 @@
         <i class="bi bi-clipboard">
         </i></button>
 </div>
-<div class="mb-2">
-    <p>Authorization: <span>@Model.Authorization?.Title</span></p>
+<div class="mb-2 border rounded p-2">
+    <div class="d-flex">
+        Authorization
+        <button class="btn btn-link text-decoration-none py-0 js-config-auth">Configure</button>
+    </div>
+    <dl class="row">
+        <dt class="col-sm-1">Attribute:</dt>
+        <dd class="col-sm-2 ms-1 fw-bolder"></dd>
+        <dt class="col-sm-1">Size:</dt>
+        <dd class="col-sm-2 ms-1 fw-bolder"></dd>
+    </dl>
 </div>

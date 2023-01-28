@@ -1,7 +1,7 @@
 @using MockServer.Core.Models
-@using MockServer.WebMVC.Controllers
-@using MockServer.WebMVC.Extentions
-@model MockServer.WebMVC.Models.Project.ProjectViewViewModel
+@using MockServer.Web.Controllers
+@using MockServer.Web.Extentions
+@model MockServer.Web.Models.Project.ProjectViewViewModel
 @{
     ViewData["Title"] = Model.ProjectInfo.Name;
     ViewData["ProjectName"] = Model.ProjectInfo.Name;
@@ -17,16 +17,7 @@
 </div>
 
 <div style="height: calc(100vh - 180px);">
-    <ul class="nav nav-tabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button id="default-tab" class="nav-link active py-1" data-bs-toggle="tab" data-bs-target="#requests-tab"
-                type="button" role="tab">Requests</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a href="@Url.Action(nameof(ProjectSettingsController.Index), "ProjectSettings" ,new {name=Model.ProjectInfo.Name})"
-                class="nav-link py-1" role="tab">Settings</a>
-        </li>
-    </ul>
+    <partial name="_NavTabs.cshtml" model="Model.ProjectInfo.Name" />
     <!-- Tab content -->
     <div class="tab-content h-100">
         <div id="requests-tab" class="tab-pane fade show active h-100">

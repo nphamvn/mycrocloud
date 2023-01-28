@@ -1,8 +1,8 @@
 @using MockServer.Core.Models
-@using MockServer.WebMVC.Controllers
-@using MockServer.WebMVC.Extentions
+@using MockServer.Web.Controllers
+@using MockServer.Web.Extentions
 
-@model MockServer.WebMVC.Models.Project.ProjectViewViewModel
+@model MockServer.Web.Models.Project.ProjectViewViewModel
 <div class="row h-100 p-2">
     <div class="col-3 h-100 overflow-scroll">
         <div class="d-grid mt-1">
@@ -14,7 +14,7 @@
                 {
                     <li data-request-id="@req.Id" class="request-list-item list-group-item px-2 py-1">
                         <div class="row">
-                            <div class="col request-info">
+                            <div class="col js-open-request">
                                 <span class="tw-text-base">@req.Name</span>
                                 <div>
                                     <small class="badge rounded-pill fw-bolder text-white me-1 @req.MethodBadgeColor"
@@ -23,7 +23,8 @@
                                 </div>
                             </div>
                             <div class="p-0 my-auto" style="width: 40px;">
-                                <button class="btn btn-sm btn-context-menu" type="button">...</button>
+                                <button class="btn btn-sm btn-context-menu" type="button"><i
+                                    class="bi bi-three-dots"></i></button>
                             </div>
                         </div>
                     </li>
@@ -31,7 +32,7 @@
             </ul>
         </div>
     </div>
-    <div class="col-9 h-100" id="RequestOpen">
+    <div class="col-9 h-100" id="RequestOpenContent">
     </div>
 </div>
 <style>
@@ -81,39 +82,33 @@
             success: function (data) {
                 const html = data;
                 const modal = $(html);
-                modal.on('shown.bs.modal', function () {
-                    $('#btnSave', modal).click(function () {
-                        let request = {
-                            Type: $('input[name=Type]:checked', modal).val(),
-                            Name: $('input[name=Name]', modal).val(),
-                            Description: $('input[name=Description]', modal).val(),
-                            Method: $('select[name=Method] option:selected', modal).val(),
-                            Path: $('input[name=Path]', modal).val(),
-                            Authorization: {
-                                DisplayName: 'Authorize',
-                                Policy: 'none',
-                            }
-                        };
-                        $.post({
-                            url: '@Url.Action(nameof(RequestsController.CreateAjax), "Requests", new {projectName = ViewData["ProjectName"]})',
-                            data: request,
-                            success: function (data) {
-                                $('#btnSave', modal).off('click');
-                                const id = data;
-                                modal.data('id', id);
-                                modal.modal('hide');
-                            },
-                            error: function () {
-                                alert('something went wrong');
-                            }
-                        });
+                $('#btnSave', modal).click(function () {
+                    let request = {
+                        Type: $('input[name=Type]:checked', modal).val(),
+                        Name: $('input[name=Name]', modal).val(),
+                        Description: $('input[name=Description]', modal).val(),
+                        Method: $('select[name=Method] option:selected', modal).val(),
+                        Path: $('input[name=Path]', modal).val()
+                    };
+                    $.post({
+                        url: '@Url.Action(nameof(RequestsController.CreateAjax), "Requests", new {projectName = ViewData["ProjectName"]})',
+                        data: request,
+                        success: function (data) {
+                            $('#btnSave', modal).off('click');
+                            const id = data;
+                            modal.data('id', id);
+                            modal.modal('hide');
+                        },
+                        error: function () {
+                            alert('something went wrong');
+                        }
                     });
-                    $('select[name=Method]').on('change', function () {
-                        generatePreviewUrl(modal);
-                    });
-                    $('input[name=Path]').on('keyup', function () {
-                        generatePreviewUrl(modal);
-                    });
+                });
+                $('select[name=Method]').on('change', function () {
+                    generatePreviewUrl(modal);
+                });
+                $('input[name=Path]').on('keyup', function () {
+                    generatePreviewUrl(modal);
                 });
                 modal.on('hidden.bs.modal', function (e) {
                     if (modal.data('id') !== undefined) {
@@ -122,9 +117,8 @@
                     modal.remove();
                 });
                 $('.js-select-authorization', modal).click(function () {
-                    console.log('authorization');
                     $('#Authorization_DisplayName').val($(this).data('authorization'));
-                    $('#selectedAuthorization').html($(this).data('authorization'));
+                    $('#selectedAuthorization').html($(this).text());
                 });
                 generatePreviewUrl(modal);
                 modal.modal('show');
@@ -213,13 +207,13 @@
 <!-- Open request: Start -->
 <script>
     $(function () {
-        $('#requests div.request-info').click(function () {
+        const tempUrl = '@Url.Action(nameof(RequestsController.Open), "Requests", new {projectName = ViewData["ProjectName"], id = -1})';
+        $('.js-open-request').click(function () {
             const selected = $(this).closest('li');
             selected.parent().find('li').removeClass('bg-gray');
             selected.addClass('bg-gray');
             const id = selected.data('request-id');
-            const tempUrl = '@Url.Action(nameof(RequestsController.Open), "Requests", new {projectName = ViewData["ProjectName"], id = -1})';
-            $('#RequestOpen').load(tempUrl.replace('/-1', `/${id}`));
+            $('#RequestOpenContent').load(tempUrl.replace('/-1', `/${id}`));
         });
     });
 </script>

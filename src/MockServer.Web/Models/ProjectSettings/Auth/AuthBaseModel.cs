@@ -1,4 +1,4 @@
-namespace MockServer.WebMVC.Models.ProjectSettings.Auth;
+namespace MockServer.Web.Models.ProjectSettings.Auth;
 
 public class AuthBaseModel
 {

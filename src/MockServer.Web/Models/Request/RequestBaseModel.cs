@@ -1,6 +1,6 @@
-namespace MockServer.WebMVC.Models.Request;
-
+namespace MockServer.Web.Models.Request;
+using Project = MockServer.Core.Models.Project;
 public class BaseRequestViewModel
 {
-    public MockServer.Core.Models.Project Project { get; set; }
+    public Project? Project { get; set; }
 }

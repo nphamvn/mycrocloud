@@ -1,8 +1,8 @@
 using AutoMapper;
 using MockServer.Core.Entities.Projects;
-using MockServer.WebMVC.Models.Project;
+using MockServer.Web.Models.Project;
 
-namespace MockServer.WebMVC.Profiles;
+namespace MockServer.Web.Profiles;
 
 public class ProjectProfile : Profile
 {

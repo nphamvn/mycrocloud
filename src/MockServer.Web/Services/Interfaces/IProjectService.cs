@@ -1,7 +1,7 @@
 using MockServer.Core.Enums;
-using MockServer.WebMVC.Models.Project;
+using MockServer.Web.Models.Project;
 
-namespace MockServer.WebMVC.Services.Interfaces;
+namespace MockServer.Web.Services.Interfaces;
 
 public interface IProjectWebService
 {

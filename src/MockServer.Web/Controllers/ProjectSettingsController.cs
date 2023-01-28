@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MockServer.Core.Enums;
-using MockServer.WebMVC.Attributes;
-using MockServer.WebMVC.Models.ProjectSettings.Auth;
-using MockServer.WebMVC.Services.Interfaces;
+using MockServer.Web.Attributes;
+using MockServer.Web.Models.ProjectSettings.Auth;
+using MockServer.Web.Services.Interfaces;
 
-namespace MockServer.WebMVC.Controllers;
+namespace MockServer.Web.Controllers;
 
 [Authorize]
 [Route("projects/{name}/settings")]
@@ -35,25 +35,26 @@ public class ProjectSettingsController : BaseController
         return View("Views/ProjectSettings/Auth/Index.cshtml", model);
     }
 
-    [HttpGet("auth/jwtbearer/create")]
-    public async Task<IActionResult> CreateJwtBearer(string name)
+    [HttpGet("auth/jwtbearer/{id:int?}")]
+    public async Task<IActionResult> ViewJwtBearer(string name, int? id)
     {
-        var model = await _settingsService.GetJwtBearerAuthModel(name, 0);
+        var model = await _settingsService.GetJwtBearerAuthModel(name, id ?? 0);
         return View("Views/ProjectSettings/Auth/JWT/Create.cshtml", model);
     }
 
-    [HttpPost("auth/jwtbearer/create")]
-    public async Task<IActionResult> CreateJwtBearer(string name, JwtBearerAuthModel model)
+    [HttpPost("auth/jwtbearer/{id:int?}")]
+    public async Task<IActionResult> CreateJwtBearer(string name, int? id, JwtBearerAuthModel model)
     {
-        await _settingsService.CreateJwtBearerAuthentication(name, model);
+        if (id is not int)
+        {
+            await _settingsService.CreateJwtBearerAuthentication(name, model);
+        }
+        else
+        {
+            Request.RouteValues.Remove("id");
+            await _settingsService.EditJwtBearerAuthentication(id.Value, model);
+        }
         return RedirectToAction(nameof(Auth), Request.RouteValues);
-    }
-
-    [HttpGet("auth/jwtbearer/{id:int}")]
-    public async Task<IActionResult> ViewJwtBearer(string name, int id)
-    {
-        var model = await _settingsService.GetJwtBearerAuthModel(name, id);
-        return View("Views/ProjectSettings/Auth/JWT/Create.cshtml", model);
     }
 
     [HttpGet("auth/apikey/create")]

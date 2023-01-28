@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MockServer.WebMVC.Controllers;
+namespace MockServer.Web.Controllers;
 
 [Route("[controller]")]
 public class AccountController : Controller

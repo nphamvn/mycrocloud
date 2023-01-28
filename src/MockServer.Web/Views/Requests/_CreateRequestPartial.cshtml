@@ -1,142 +1,104 @@
 @using MockServer.Core.Enums
-@model MockServer.WebMVC.Models.Request.CreateUpdateRequestViewModel
+@model MockServer.Web.Models.Request.CreateUpdateRequestViewModel
 @{
     string formMode = ViewData["FormMode"]?.ToString() ?? "Create";
-    var commonHttpMethods = ViewData["CommonHttpMethods"] as List<string>;
+    ViewData["ModalTitle"] = formMode == "Create" ? "Create request" : "Edit request";
 }
-<div class="modal fade">
+<div class="modal fade js-save-request-modal">
     <input type="hidden" name="formMode" value="@formMode">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5">Create new request</h1>
+                <h1 class="modal-title fs-5">@ViewData["ModalTitle"]</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="card">
-                    <div class="card-header">
-                        Basic
-                    </div>
-                    <div class="card-body">
-                        <div>
-                            <div class="mb-2 row">
-                                <label class="col-sm-2 col-form-label" asp-for="Name"></label>
-                                <div class="col-sm-10">
-                                    <input class="form-control" type="text" asp-for="Name" autocomplete="off">
-                                </div>
-                            </div>
-                            <span asp-validation-for="Name" class="text-danger"></span>
-                        </div>
-                        <div>
-                            <div class="mb-2 row">
-                                <label class="col-sm-2 col-form-label" asp-for="Description"></label>
-                                <div class="col-sm-10">
-                                    <input class="form-control" type="text" asp-for="Description" autocomplete="off">
-                                </div>
-                            </div>
-                            <span asp-validation-for="Description" class="text-danger"></span>
-                        </div>
+                <div>
+                    <div>
                         <div class="mb-2 row">
-                            <label class="col-sm-2 col-form-label" asp-for="Method"></label>
+                            <label class="col-sm-2 col-form-label" asp-for="Name"></label>
                             <div class="col-sm-10">
-                                <select id="method" class="form-control" asp-for="Method">
-                                    @foreach (var method in Model.HttpMethods)
-                                    {
-                                        <option value="@method.Value">@method.Text</option>
-                                    }
-                                </select>
+                                <input class="form-control" type="text" asp-for="Name" autocomplete="off">
                             </div>
-                            <span asp-validation-for="Method" class="text-danger"></span>
                         </div>
-                        <div>
-                            <div class="mb-2 row">
-                                <label class="col-sm-2 col-form-label" asp-for="Path"></label>
-                                <div class="col-sm-10">
-                                    <input id="path" class="form-control" type="text" asp-for="Path" placeholder="foo"
-                                        autocomplete="off">
-                                </div>
-                            </div>
-                            <span asp-validation-for="Path" class="text-danger"></span>
-                        </div>
-                        <div>
-                            <div class="mb-2 row">
-                                <label class="col-sm-2 col-form-label pt-0" asp-for="Type"></label>
-                                <div class="col-sm-10 form-group">
-                                    <div class="mb-1">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" value="@((int)RequestType.Fixed)"
-                                                asp-for="Type" checked>
-                                            <label class="form-check-label" for="FIXED">Fixed</label>
-                                        </div>
-                                        <span id="emailHelp" class="form-text text-muted ps-4">Return a "mock" response when a
-                                            request matches an expectation</span>
-                                    </div>
-                                    <div class="mb-1">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" value="@((int)RequestType.Forwarding)"
-                                                asp-for="Type">
-                                            <label class="form-check-label" for="FORWARD">Forward</label>
-                                        </div>
-                                        <small id="emailHelp" class="form-text text-muted ps-4">Forward a request when the request
-                                            matches an expectation (i.e. a dynamic port forwarding proxy)
-                                        </small>
-                                    </div>
-                                    <div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" value="@((int)RequestType.Callback)"
-                                                asp-for="Type">
-                                            <label class="form-check-label" for="CALLBACK">Callback</label>
-                                        </div>
-                                        <small id="emailHelp" class="form-text text-muted ps-4">Execute a callback when a request
-                                            matches an expectation, allowing the response to be created dynamically
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-                            <span asp-validation-for="Type" class="text-danger"></span>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label>Url</label>
-                            <input readonly class="form-control" type="text" id="previewUrl">
-                        </div>
+                        <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        Authorization
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <label class="col-form-label col-sm-2" asp-for="Authorization.Title">Name</label>
-                            <div class="col-sm-10">
-                                <input type="hidden" asp-for="Authorization.Title">
-                                <div class="dropdown">
-                                    <button class="btn btn-default dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                        <span id="selectedAuthorization">Authorize</span>
-                                    </button>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <li><button type="button" data-authorization="Authorize"
-                                                class="dropdown-item js-select-authorization">Authorize</button></li>
-                                        <li><button type="button" data-authorization="AllowAnonymous"
-                                                class="dropdown-item js-select-authorization">Allow Anonymous</button></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+                    <div>
                         <div class="mb-2 row">
-                            <label class="col-sm-2 col-form-label" asp-for="Authorization.AuthenticationSchemes"></label>
+                            <label class="col-sm-2 col-form-label" asp-for="Description"></label>
                             <div class="col-sm-10">
-                                @foreach (var method in Model.AuthenticationSchemes)
+                                <input class="form-control" type="text" asp-for="Description" autocomplete="off">
+                            </div>
+                        </div>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <div class="mb-2 row">
+                        <label class="col-sm-2 col-form-label" asp-for="Method"></label>
+                        <div class="col-sm-10">
+                            <select id="method" class="form-control" asp-for="Method">
+                                @foreach (var method in Model.HttpMethods)
                                 {
                                     <option value="@method.Value">@method.Text</option>
                                 }
-                            </div>
-                            <span asp-validation-for="Method" class="text-danger"></span>
+                            </select>
                         </div>
-                        <div class="row">
-                            <label asp-for="Authorization.Policy"></label>
-                            <input class="form-control" type="text" asp-for="Authorization.Policy" autocomplete="off"
-                                disabled>
+                        <span asp-validation-for="Method" class="text-danger"></span>
+                    </div>
+                    </div>
+                    <div>
+                        <div class="mb-2 row">
+                            <label class="col-sm-2 col-form-label" asp-for="Path"></label>
+                            <div class="col-sm-10">
+                                <input id="path" class="form-control" type="text" asp-for="Path" placeholder="foo"
+                                    autocomplete="off">
+                            </div>
+                        </div>
+                        <span asp-validation-for="Path" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <div class="row mb-2">
+                        <label class="col-sm-2 col-form-label pt-0" asp-for="Type">Response</label>
+                           <div class="col-sm-10 form-group">
+                                <div class="mb-1">
+                                <div class="form-check">
+                                        <input class="form-check-input" type="radio" value="@((int)RequestType.Fixed)"
+                                            asp-for="Type" checked>
+                                        <label class="form-check-label">Mock Response</label>
+                                    </div>
+                                    <span id="emailHelp" class="form-text text-muted ps-4">Return a "mock" response when a
+                                        request matches an expectation</span>
+                                </div>
+                                <div class="mb-1">
+                                    <div class="form-check">
+                                            <input class="form-check-input" type="radio" value="@((int)RequestType.Forwarding)"
+                                                    asp-for="Type">
+                                                <label class="form-check-label">From Forward</label>
+                                            </div>
+                                            <small id="emailHelp" class="form-text text-muted ps-4">Forward a request when the request
+                                                matches an expectation (i.e. a dynamic port forwarding proxy)
+                                                </small>
+                                                </div>
+                                                    <div>
+                                                        <div class="form-check">
+                                        <input class="form-check-input" type="radio" value="@((int)RequestType.Callback)"
+                                            asp-for="Type">
+                                        <label class="form-check-label">Function</label>
+                                    </div>
+                                    <small id="emailHelp" class="form-text text-muted ps-4">Execute a callback when a request
+                                        matches an expectation, allowing the response to be created dynamically
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <span asp-validation-for="Type" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <div class="row mb-2">
+                            <label class="col-sm-2 col-form-label">Preview Url</label>
+                            <div class="col-sm-10">
+                                <input class="form-control" readonly type="text" id="previewUrl">
+                            </div>
                         </div>
                     </div>
                 </div>

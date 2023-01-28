@@ -1,4 +1,5 @@
-@using MockServer.WebMVC.Controllers
+@using MockServer.Web.Controllers
+@using MockServer.Web.Models.Request
 <script>
     $(function () {
         setUpRequestBodyEditor();
@@ -442,10 +443,79 @@
 </script>
 <script>
     $(function () {
-        $('.js-select-authorization').click(function () {
-            console.log('lllll');
-            $('#Authorization_DisplayName').val($(this).data('authorization'));
-            $('#selectedAuthorization').html($(this).data('authorization'));
+        $('.js-config-auth').click(function () {
+            $.get({
+                url: '@Url.Action(nameof(RequestsController.GetAuthorizationPartial), "Requests", new {projectName = ViewData["ProjectName"], id = ViewData["RequestId"]})',
+                success: function (data) {
+                    const html = data;
+                    const modal = $(html);
+                    $('#btnSave', modal).click(function () {
+                        const selectedSchemes = $("#selected-schemes").sortable("toArray", {
+                            attribute: 'data-scheme-id'
+                        });
+                        let requirements = [];
+                        $('#requirements tbody tr', modal).each(function (index, elem) {
+                            const name = $('input.js-name', elem).val();
+                            const expression = $('input.js-express', elem).val();
+                            const status = $('input.js-status', elem).prop('checked');
+                            if (name !== '' && expression !== '') {
+                                requirements.push({
+                                    name: name,
+                                    ConditionalExpression: expression,
+                                    Active: status
+                                });
+                            }
+                        });
+                        let auth = {
+                            Type: $('input[name=Type]', modal).val(),
+                            AuthenticationSchemes: selectedSchemes,
+                            Requirements: requirements
+                        };
+                        $.post({
+                            url: '@Url.Action(nameof(RequestsController.ConfigAuthorization), "Requests", new {projectName = ViewData["ProjectName"], id = ViewData["RequestId"]})',
+                            data: auth,
+                            success: function (data) {
+                                $('#btnSave', modal).off('click');
+                                const id = 1;
+                                modal.data('id', id);
+                                modal.modal('hide');
+                            },
+                            error: function () {
+                                alert('something went wrong');
+                            }
+                        });
+                    });
+                    $("#available-schemes, #selected-schemes", modal).sortable({
+                        connectWith: ".connectedSortable"
+                    }).disableSelection();
+
+                    $('.js-select-authorization', modal).click(function () {
+                        $('input[name=Type]').val($(this).data('authorization'));
+                        $('#selectedAuthorization').html($(this).text());
+                        update(modal);
+                    });
+                    modal.on('shown.bs.modal', function (e) {
+                        update(modal);
+                    });
+                    modal.on('hidden.bs.modal', function (e) {
+                        if (modal.data('id') !== undefined) {
+                            location.reload();
+                        }
+                        modal.remove();
+                    });
+                    modal.modal('show');
+                    function update(modal) {
+                        const title = $('input[name=Type]').val();
+                        if (title === 'None' || title === 'AllowAnonymous') {
+                            $('.js-auth-schemes', modal).find('input, textarea, button, select').attr('disabled', true);
+                            $('.js-requirements', modal).find('input, textarea, button, select').attr('disabled', true);
+                        } else {
+                            $('.js-auth-schemes', modal).find('input, textarea, button, select').attr('disabled', false);
+                            $('.js-requirements', modal).find('input, textarea, button, select').attr('disabled', false);
+                        }
+                    }
+                }
+            });
         });
     });
 </script>

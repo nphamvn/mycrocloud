@@ -1,6 +1,6 @@
 using MockServer.Core.Enums;
 
-namespace MockServer.WebMVC.Models.Project;
+namespace MockServer.Web.Models.Project;
 
 public class ProjectIndexItem
 {

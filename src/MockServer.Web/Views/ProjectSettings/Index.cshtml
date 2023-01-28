@@ -1,8 +1,8 @@
 @using MockServer.Core.Enums
 @using MockServer.Core.Models
-@using MockServer.WebMVC.Controllers
-@using MockServer.WebMVC.Extentions
-@model MockServer.WebMVC.Models.ProjectSettings.IndexModel
+@using MockServer.Web.Controllers
+@using MockServer.Web.Extentions
+@model MockServer.Web.Models.ProjectSettings.IndexModel
 @{
     var rv = new { name = ViewData["ProjectName"] };
     var project = Model.Project;
@@ -14,16 +14,7 @@
     <strong><a class="text-decoration-none" href="@Url.Action("View", rv)">@ViewData["ProjectName"]</a></strong>
     <span class="badge py-0 rounded-pill bg-light text-sm fw-bolder text-gray border border-secondary">Private</span>
 </div>
-<ul class="nav nav-tabs" role="tablist">
-    <li class="nav-item" role="presentation">
-        <a class="nav-link py-1" href="@Url.Action(nameof(ProjectsController.View), "Projects",rv)"
-            role="tab">Requests</a>
-    </li>
-    <li class="nav-item" role="presentation">
-        <a href="@Url.Action(nameof(ProjectSettingsController.Index),rv)" class="nav-link active py-1"
-            role="tab">Settings</a>
-    </li>
-</ul>
+<partial name="/Views/Projects/_NavTabs.cshtml" model="Model.Project.Name" />
 <div class="row flex-nowrap">
     <partial name="Shared/_SideBar.cshtml" model="@project.Name" />
     <div class="col py-3">

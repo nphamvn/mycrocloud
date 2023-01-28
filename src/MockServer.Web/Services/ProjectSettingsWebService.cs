@@ -4,12 +4,12 @@ using MockServer.Core.Entities.Auth;
 using MockServer.Core.Enums;
 using MockServer.Core.Models;
 using MockServer.Core.Repositories;
-using MockServer.WebMVC.Extentions;
-using MockServer.WebMVC.Models.ProjectSettings;
-using MockServer.WebMVC.Models.ProjectSettings.Auth;
-using MockServer.WebMVC.Services.Interfaces;
+using MockServer.Web.Extentions;
+using MockServer.Web.Models.ProjectSettings;
+using MockServer.Web.Models.ProjectSettings.Auth;
+using MockServer.Web.Services.Interfaces;
 
-namespace MockServer.WebMVC.Services;
+namespace MockServer.Web.Services;
 
 public class ProjectSettingsWebService : IProjectSettingsWebService
 {
@@ -44,12 +44,18 @@ public class ProjectSettingsWebService : IProjectSettingsWebService
         await _authRepository.Add(project.Id, auth);
     }
 
+    public async Task EditJwtBearerAuthentication(int id, JwtBearerAuthModel model)
+    {
+        var auth = _mapper.Map<AppAuthentication>(model);
+        await _authRepository.Update(id, auth);
+    }
+
     public async Task<ApiKeyAuthModel> GetApiKeyAuthModel(string name, int id)
     {
         ApiKeyAuthModel model;
         if (id > 0)
         {
-            var auth = await _authRepository.GetAs(id, AuthType.ApiKey);
+            var auth = await _authRepository.GetAs(id, AuthenticationType.ApiKey);
             model = _mapper.Map<ApiKeyAuthModel>(auth);
         }
         else
@@ -64,7 +70,8 @@ public class ProjectSettingsWebService : IProjectSettingsWebService
     {
         var model = new AuthIndexModel();
         model.Project = await GetProjectByName(name);
-        model.Authentications = await _authRepository.GetByProject(model.Project.Id);
+        //model.AllAuthenticationSchemes = await _authRepository.GetByProject(model.Project.Id);
+        model.AuthenticationSchemes = await _authRepository.GetByProject(model.Project.Id);
         return model;
     }
 
@@ -80,7 +87,7 @@ public class ProjectSettingsWebService : IProjectSettingsWebService
         JwtBearerAuthModel model;
         if (id > 0)
         {
-            var auth = await _authRepository.GetAs(id, AuthType.JwtBearer);
+            var auth = await _authRepository.GetAs(id, AuthenticationType.JwtBearer);
             model = _mapper.Map<JwtBearerAuthModel>(auth);
         }
         else

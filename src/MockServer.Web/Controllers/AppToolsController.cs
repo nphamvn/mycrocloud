@@ -2,7 +2,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MockServer.WebMVC.Controllers;
+namespace MockServer.Web.Controllers;
 
 public class AppToolsController : BaseController
 {

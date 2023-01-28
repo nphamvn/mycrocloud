@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using MockServer.WebMVC.Models.Common;
-using MockServer.WebMVC.Services.Interfaces;
+using MockServer.Web.Models.Common;
+using MockServer.Web.Services.Interfaces;
 
-namespace MockServer.WebMVC.Controllers.Api;
+namespace MockServer.Web.Controllers.Api;
 
 public class TestController : ApiController
 {

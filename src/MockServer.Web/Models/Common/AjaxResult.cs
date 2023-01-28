@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace MockServer.WebMVC.Models.Common;
+namespace MockServer.Web.Models.Common;
 
 // [JsonConverter(typeof(AjaxResultConverter<object>))]
 public class AjaxResult

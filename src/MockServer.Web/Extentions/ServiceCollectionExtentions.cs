@@ -3,10 +3,10 @@ using MockServer.Core.Repositories;
 using MockServer.Core.Services;
 using MockServer.Core.Settings;
 using MockServer.Infrastructure.Repositories;
-using MockServer.WebMVC.Services;
-using MockServer.WebMVC.Services.Interfaces;
+using MockServer.Web.Services;
+using MockServer.Web.Services.Interfaces;
 
-namespace MockServer.WebMVC.Extentions
+namespace MockServer.Web.Extentions
 {
     public static class ServiceCollectionExtentions
     {

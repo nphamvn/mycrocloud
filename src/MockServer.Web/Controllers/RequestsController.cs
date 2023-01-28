@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using MockServer.Core.Helpers;
-using MockServer.WebMVC.Attributes;
-using MockServer.WebMVC.Models.Request;
-using MockServer.WebMVC.Services.Interfaces;
+using MockServer.Web.Attributes;
+using MockServer.Web.Models.Request;
+using MockServer.Web.Services.Interfaces;
 
-namespace MockServer.WebMVC.Controllers;
+namespace MockServer.Web.Controllers;
 
 [Authorize]
 [Route("projects/{projectName}/requests")]
@@ -26,7 +24,7 @@ public class RequestsController : Controller
         ViewData["ProjectName"] = projectName;
         ViewData["RequestId"] = id;
         var vm = await _requestService.GetRequestOpenViewModel(projectName, id);
-        return PartialView("Views/Projects/_RequestOpen.cshtml", vm);
+        return PartialView("Views/Requests/_RequestOpen.cshtml", vm);
     }
 
     [AjaxOnly]
@@ -58,8 +56,7 @@ public class RequestsController : Controller
     [HttpGet("{id:int}/edit")]
     public async Task<IActionResult> GetEditPartial(string projectName, int id)
     {
-        var vm = await _requestService.GetRequestModel(projectName, id);
-        ViewData["ProjectName"] = projectName;
+        var vm = await _requestService.GetGetCreateRequestViewModel(projectName, id);
         ViewData["FormMode"] = "Edit";
         return PartialView("Views/Requests/_CreateRequestPartial.cshtml", vm);
     }
@@ -74,6 +71,22 @@ public class RequestsController : Controller
             return BadRequest(allErrors);
         }
         await _requestService.Edit(projectName, id, request);
+        return NoContent();
+    }
+
+    [AjaxOnly]
+    [HttpGet("{id:int}/authorization")]
+    public async Task<IActionResult> GetAuthorizationPartial(string projectName, int id)
+    {
+        var vm = await _requestService.GetAuthorizationConfigViewModel(projectName, id);
+        return PartialView("Views/Requests/_AuthorizationConfigPartial.cshtml", vm);
+    }
+
+    [AjaxOnly]
+    [HttpPost("{id:int}/authorization")]
+    public async Task<IActionResult> ConfigAuthorization(string projectName, int id, AuthorizationConfigViewModel auth)
+    {
+        await _requestService.UpdateRequestAuthorizationConfig(projectName, id, auth);
         return NoContent();
     }
 

@@ -1,5 +1,5 @@
 @using MockServer.Core.Enums
-@model MockServer.WebMVC.Models.Project.CreateProjectViewModel
+@model MockServer.Web.Models.Project.CreateProjectViewModel
 @{
     ViewData["Title"] = "Create new project";
 }
@@ -24,8 +24,7 @@
                             value="@((int)ProjectAccessibility.Public)" checked>
                         <label class="form-check-label ms-1" for="pulic">Public</label>
                     </div>
-                    <small class="form-text text-muted ps-3">Anyone can send any requests in this
-                        project.</small>
+                    <small class="form-text text-muted ps-3">Anyone can see this project.</small>
                 </div>
                 <div>
                     <div>
@@ -34,10 +33,7 @@
                         <label class="form-check-label ms-1" for="private">Private</label>
                     </div>
                     <div class="ps-3">
-                        <small class="form-text text-muted">Only you can see this project.
-                            To call the requests in this project, you'll need to add an <code>x-private-key</code>
-                            header to
-                            your requests. You can get and change the key in the settings page.</small>
+                        <small class="form-text text-muted">Only you can see this project.</small>
                     </div>
                 </div>
             </div>
