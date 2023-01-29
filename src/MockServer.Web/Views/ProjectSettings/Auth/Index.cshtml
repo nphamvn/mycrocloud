@@ -131,8 +131,9 @@
                                             <li class="sortable-item allowPrimary sortable-item-@index ui-sortable-handle"
                                             data-fid="@scheme.Id">
                                                 <i class="fa-solid fa-grip-vertical me-2"></i><input type="checkbox"
-                                                name="page_contents[]" class="sortable-item-input"><a
-                                                class="text-decoration-none" href="@link">@scheme.SchemeName</a>
+                                                class="sortable-item-input"><a class="text-decoration-none"
+                                                href="@link">@scheme.SchemeName</a>
+                                                <input class="js-scheme-id" type="hidden" value="@scheme.Id">
                                             </li>
                                             index++;
                                         }
@@ -172,8 +173,9 @@
                                             <li class="sortable-item allowPrimary sortable-item-@i ui-sortable-handle"
                                             data-fid="@scheme.Id">
                                                 <i class="fa-solid fa-grip-vertical me-2"></i><input type="checkbox"
-                                                name="page_contents[]" class="sortable-item-input"><a
-                                                class="text-decoration-none" href="@link">@scheme.SchemeName</a>
+                                                class="sortable-item-input"><a class="text-decoration-none"
+                                                href="@link">@scheme.SchemeName</a>
+                                                <input class="js-scheme-id" type="hidden" value="@scheme.Id">
                                             </li>
                                             i++;
                                         }
@@ -239,6 +241,7 @@
                     connectWith: '.sortable-list',
                     placeholder: 'placeholder',
                     receive: function (event, ui) {
+                        //console.log('selectedDropzone: receive');
                         // If we dont allow primary fields here, cancel
                         if (!$(ui.item).hasClass("allowPrimary")) {
                             $(ui.placeholder).css('display', 'none');
@@ -248,6 +251,7 @@
                         }
                     },
                     over: function (event, ui) {
+                        //console.log('selectedDropzone: over');
                         if (!$(ui.item).hasClass("allowPrimary")) {
                             $(ui.placeholder).css('display', 'none');
                         } else {
@@ -255,15 +259,22 @@
                         }
                     },
                     start: function (event, ui) {
+                        //console.log('selectedDropzone: start');
                         checkFields($mainWrapper)
                     },
                     change: function (event, ui) {
+                        //console.log('selectedDropzone: change');
                         checkFields($mainWrapper);
                     },
                     update: function (event, ui) {
+                        $selectedDropzone.find('.sortable-item').each((index, value) => {
+                            console.log(index);
+                            $(value).find('input.js-scheme-id').attr('name', `AuthenticationSchemes[${index}].Id`)
+                        });
                         checkFields($mainWrapper);
                     },
                     out: function (event, ui) {
+                        //console.log('selectedDropzone: out');
                         checkFields($mainWrapper);
                     }
                 }).disableSelection();

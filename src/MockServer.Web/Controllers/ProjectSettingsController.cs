@@ -34,6 +34,12 @@ public class ProjectSettingsController : BaseController
         var model = await _settingsService.GetAuthIndexModel(name);
         return View("Views/ProjectSettings/Auth/Index.cshtml", model);
     }
+    [HttpPost("auth")]
+    public async Task<IActionResult> SaveAuth(string name, AuthIndexModel model)
+    {
+        await _settingsService.SaveAuthIndexModel(name, model);
+        return RedirectToAction(nameof(Auth), new { name = name });
+    }
 
     [HttpGet("auth/jwtbearer/{id:int?}")]
     public async Task<IActionResult> ViewJwtBearer(string name, int? id)

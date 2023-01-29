@@ -7,6 +7,7 @@ public interface IProjectSettingsWebService
 {
     Task<IndexModel> GetIndexModel(string name);
     Task<AuthIndexModel> GetAuthIndexModel(string name);
+    Task SaveAuthIndexModel(string name, AuthIndexModel model);
     Task CreateJwtBearerAuthentication(string name, JwtBearerAuthModel model);
     Task EditJwtBearerAuthentication(int id, JwtBearerAuthModel model);
     Task CreateApiKeyAuthentication(string name, ApiKeyAuthModel model);

@@ -98,6 +98,14 @@ public class ProjectSettingsWebService : IProjectSettingsWebService
         return model;
     }
 
+    public async Task SaveAuthIndexModel(string name, AuthIndexModel model)
+    {
+        var user = _contextAccessor.HttpContext.User.Parse<ApplicationUser>();
+        Guard.Against.Null(user, nameof(ApplicationUser));
+        var project = await _projectRepository.Get(user.Id, name);
+        await _authRepository.SetProjectAuthentication(project.Id, model.AuthenticationSchemes.Select(s => s.Id).ToList());
+    }
+
     private async Task<MockServer.Core.Models.Project> GetProjectByName(string name)
     {
         var user = _contextAccessor.HttpContext.User.Parse<ApplicationUser>();

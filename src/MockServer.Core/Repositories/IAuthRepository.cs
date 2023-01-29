@@ -8,7 +8,7 @@ public interface IAuthRepository
 {
     Task Add(int projectId, AppAuthentication option);
     Task Update(int id, AppAuthentication option);
-    Task SetOrder(int id, int order);
+    Task SetProjectAuthentication(int projectId, List<int> schemes);
     Task<AppAuthentication> GetAs(int id, AuthenticationType type);
     Task<IEnumerable<AppAuthentication>> GetByProject(int projectId);
     Task<AppAuthorization> GetRequestAuthorization(int requestId);

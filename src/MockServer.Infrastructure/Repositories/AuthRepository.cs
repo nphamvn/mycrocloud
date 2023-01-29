@@ -157,23 +157,39 @@ public class AuthRepository : IAuthRepository
         });
     }
 
-    public Task SetOrder(int id, int order)
+    public async Task SetProjectAuthentication(int projectId, List<int> schemeIds)
     {
-        var query =
-                """
-                UPDATE 
-                    Requests
-                SET
-                    Order = @Order
-                WHERE
-                    Id = @Id
-                """;
         using var connection = new SqliteConnection(_connectionString);
-        return connection.ExecuteAsync(query, new
+
+        var reset = """
+                    UPDATE ProjectAuthentication SET [Order] = null WHERE ProjectId = @ProjectId;
+                    """;
+        await connection.ExecuteAsync(reset, new
         {
-            Id = id,
-            Order = order
+            ProjectId = projectId
         });
+        foreach (var id in schemeIds)
+        {
+            var set =
+                    """
+                    UPDATE 
+                        ProjectAuthentication 
+                    SET 
+                        [Order] = (
+                            SELECT 
+                                (coalesce(MAX([Order]), 0) + 1) 
+                            FROM 
+                                ProjectAuthentication 
+                            WHERE 
+                                ProjectId = @ProjectId) 
+                    WHERE Id = @Id
+                    """;
+            await connection.ExecuteAsync(set, new
+            {
+                ProjectId = projectId,
+                Id = id
+            });
+        }
     }
 }
 

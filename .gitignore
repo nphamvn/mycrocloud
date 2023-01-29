@@ -453,3 +453,4 @@ $RECYCLE.BIN/
 !.vscode/launch.json
 !.vscode/extensions.json
 src/MockServer.Web/wwwroot/css/tailwind.css
+src/MockServer.Identity/keys/is-signing-key-653262E0D40EA62F56A0EEA362FCAB1D.json
