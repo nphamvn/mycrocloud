@@ -63,6 +63,8 @@ public class RouteValidation : IMiddleware
     }
     private IncomingRequest GrabRequest(HttpRequest request)
     {
+        string url = $"{request.Scheme}://{request.Host}:{request.Host.Port ?? 80}";
+        string pattern = "{scheme}://{username}.{app}.{domain}:port";
         var username = request.Host.Host.Split('.')[1];
         var projectName = request.Host.Host.Split('.')[0];
         var path = request.Path.Value.Remove(0, 1);

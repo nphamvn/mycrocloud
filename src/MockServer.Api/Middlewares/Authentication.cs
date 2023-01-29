@@ -29,8 +29,8 @@ public class Authentication : IMiddleware
     {
         ArgumentNullException.ThrowIfNull(context.Items["ProjectId"]);
         var projectId = Convert.ToInt32(context.Items["ProjectId"]);
-        var schemes = await _authRepository.GetByProject(projectId);
-        var defaultScheme = schemes.FirstOrDefault(a => a.Order == 0);
+        var schemes = await _authRepository.GetProjectAuthenticationSchemes(projectId);
+        var defaultScheme = schemes.FirstOrDefault(a => a.Order == 1);
         IAppAuthenticationHandlerProvider handlerProvider = new AppAuthenticationHandlerProvider();
         IAppAuthenticationHandler handler;
         AppAuthenticateResult result;

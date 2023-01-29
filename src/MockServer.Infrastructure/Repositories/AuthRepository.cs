@@ -17,7 +17,7 @@ public class AuthRepository : IAuthRepository
     {
         _connectionString = settings.Sqlite.ConnectionString;
     }
-    public Task Add(int projectId, AppAuthentication auth)
+    public Task AddProjectAuthenticationScheme(int projectId, AppAuthentication auth)
     {
         var query =
                 """
@@ -50,7 +50,7 @@ public class AuthRepository : IAuthRepository
         });
     }
 
-    public Task<IEnumerable<AppAuthentication>> GetByProject(int id)
+    public Task<IEnumerable<AppAuthentication>> GetProjectAuthenticationSchemes(int id)
     {
         var query =
                 """
@@ -72,7 +72,7 @@ public class AuthRepository : IAuthRepository
         });
     }
 
-    public Task<AppAuthentication> GetAs(int id, AuthenticationType type)
+    public Task<AppAuthentication> GetAuthenticationScheme(int id, AuthenticationType type)
     {
         var query =
                 """
@@ -132,7 +132,7 @@ public class AuthRepository : IAuthRepository
         });
     }
 
-    public async Task Update(int id, AppAuthentication auth)
+    public async Task UpdateProjectAuthenticationScheme(int id, AppAuthentication auth)
     {
         var query =
                 """
@@ -157,7 +157,7 @@ public class AuthRepository : IAuthRepository
         });
     }
 
-    public async Task SetProjectAuthentication(int projectId, List<int> schemeIds)
+    public async Task ActivateProjectAuthenticationSchemes(int projectId, List<int> schemeIds)
     {
         using var connection = new SqliteConnection(_connectionString);
 
@@ -190,6 +190,59 @@ public class AuthRepository : IAuthRepository
                 Id = id
             });
         }
+    }
+
+    public Task<AppAuthentication> GetAuthenticationScheme<TAuthOptions>(int id) where TAuthOptions : AuthOptions
+    {
+        Type type = typeof(TAuthOptions);
+        if (typeof(JwtBearerAuthenticationOptions).IsEquivalentTo(type))
+        {
+            SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(AuthenticationType.JwtBearer));
+        }
+        else if (typeof(ApiKeyAuthenticationOptions).IsEquivalentTo(type))
+        {
+            SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(AuthenticationType.ApiKey));
+        }
+        var query =
+                """
+                SELECT
+                    Id,
+                    SchemeName,
+                    Options,
+                    Description
+                FROM
+                    ProjectAuthentication
+                WHERE
+                    Id = @Id
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        return connection.QuerySingleOrDefaultAsync<AppAuthentication>(query, new
+        {
+            Id = id
+        });
+    }
+
+    public async Task<AppAuthentication> GetAuthenticationScheme(int id)
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        var type = await connection.QuerySingleOrDefaultAsync<AuthenticationType>("SELECT Type FROM ProjectAuthentication WHERE Id = @Id", new { Id = id });
+        var query =
+                """
+                SELECT
+                    Id,
+                    SchemeName,
+                    Options,
+                    Description
+                FROM
+                    ProjectAuthentication
+                WHERE
+                    Id = @Id
+                """;
+        SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(type));
+        return await connection.QuerySingleOrDefaultAsync<AppAuthentication>(query, new
+        {
+            Id = id
+        });
     }
 }
 

@@ -6,11 +6,13 @@ namespace MockServer.Core.Repositories;
 
 public interface IAuthRepository
 {
-    Task Add(int projectId, AppAuthentication option);
-    Task Update(int id, AppAuthentication option);
-    Task SetProjectAuthentication(int projectId, List<int> schemes);
-    Task<AppAuthentication> GetAs(int id, AuthenticationType type);
-    Task<IEnumerable<AppAuthentication>> GetByProject(int projectId);
+    Task AddProjectAuthenticationScheme(int projectId, AppAuthentication option);
+    Task UpdateProjectAuthenticationScheme(int projectId, AppAuthentication option);
+    Task ActivateProjectAuthenticationSchemes(int projectId, List<int> schemeIds);
+    Task<IEnumerable<AppAuthentication>> GetProjectAuthenticationSchemes(int projectId);
+    Task<AppAuthentication> GetAuthenticationScheme(int id);
+    Task<AppAuthentication> GetAuthenticationScheme(int id, AuthenticationType type);
+    Task<AppAuthentication> GetAuthenticationScheme<TAuthOptions>(int id) where TAuthOptions : AuthOptions;
     Task<AppAuthorization> GetRequestAuthorization(int requestId);
     Task SetRequestAuthorization(int requestId, AppAuthorization authorization);
 }

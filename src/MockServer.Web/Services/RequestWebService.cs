@@ -157,7 +157,7 @@ public class RequestWebService : BaseWebService, IRequestWebService
         var vm = authorization != null ? _mapper.Map<AuthorizationConfigViewModel>(authorization)
                                         : new AuthorizationConfigViewModel();
         var project = await _projectRepository.Get(AuthUser.Id, projectName);
-        vm.AuthenticationSchemeSelectList = await _authRepository.GetByProject(project.Id);
+        vm.AuthenticationSchemeSelectList = await _authRepository.GetProjectAuthenticationSchemes(project.Id);
         //vm.AuthenticationSchemeSelectList = authenticationSchemes.Select(s => new SelectListItem(s.SchemeName, s.Id.ToString(), s.Order > 0));
         return vm;
     }
