@@ -1,10 +1,11 @@
 using Ardalis.GuardClauses;
 using AutoMapper;
 using MockServer.Core.Entities.Auth;
-using MockServer.Core.Enums;
+using MockServer.Core.Interfaces;
 using MockServer.Core.Models;
 using MockServer.Core.Models.Auth;
 using MockServer.Core.Repositories;
+using MockServer.Core.Services;
 using MockServer.Web.Extentions;
 using MockServer.Web.Models.ProjectSettings;
 using MockServer.Web.Models.ProjectSettings.Auth;
@@ -49,6 +50,16 @@ public class ProjectSettingsWebService : IProjectSettingsWebService
     {
         var auth = _mapper.Map<AppAuthentication>(model);
         await _authRepository.UpdateProjectAuthenticationScheme(id, auth);
+    }
+
+    public async Task<JwtBearerTokenGenerateModel> GenerateJwtBearerToken(string projectName, int schemeId, JwtBearerTokenGenerateModel model)
+    {
+        var auth = await _authRepository.GetAuthenticationScheme<JwtBearerAuthenticationOptions>(schemeId);
+        var options = (JwtBearerAuthenticationOptions)auth.Options;
+        options.AdditionalClaims = model.Claims.Select(c => new AppClaim { Type = c.Key, Value = c.Value }).ToList();
+        IJwtBearerTokenService jwtBearerTokenService = new JwtBearerTokenService();
+        model.Token = jwtBearerTokenService.GenerateToken(options);
+        return model;
     }
 
     public async Task<ApiKeyAuthModel> GetApiKeyAuthModel(string name, int id)

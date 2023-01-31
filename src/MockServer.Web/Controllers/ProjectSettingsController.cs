@@ -63,6 +63,20 @@ public class ProjectSettingsController : BaseController
         return RedirectToAction(nameof(Auth), Request.RouteValues);
     }
 
+    [HttpGet("auth/jwtbearer/{id:int}/generate-token")]
+    public async Task<IActionResult> GenerateJwtBearerToken(string name, int id)
+    {
+        var model = new JwtBearerTokenGenerateModel();
+        return View("Views/ProjectSettings/Auth/JWT/GenerateToken.cshtml", model);
+    }
+
+    [HttpPost("auth/jwtbearer/{id:int}/generate-token")]
+    public async Task<IActionResult> GenerateJwtBearerToken(string name, int id, JwtBearerTokenGenerateModel model)
+    {
+        var token = await _settingsService.GenerateJwtBearerToken(name, id, model);
+        return View("Views/ProjectSettings/Auth/JWT/GenerateToken.cshtml", token);
+    }
+
     [HttpGet("auth/apikey/create")]
     public async Task<IActionResult> CreateApiKey(string name)
     {

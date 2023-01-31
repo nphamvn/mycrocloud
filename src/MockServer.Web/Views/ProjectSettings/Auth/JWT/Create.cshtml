@@ -118,7 +118,7 @@
                                 <div class="dropdown">
                                     <button class="btn btn-default dropdown-toggle" type="button"
                                         data-bs-toggle="dropdown">
-                                        <span id="selectedAlgorithm">HS256</span>
+                                        <span id="selectedAlgorithm">@(Model.Options?.Algorithm??"HS256")</span>
                                         <span class="caret"></span>
                                     </button>
                                     <ul class="dropdown-menu" role="menu">
@@ -159,6 +159,7 @@
                     <button type="button" class="btn btn-secondary me-2"
                         onclick="location.href='@Context.Request.Headers["Referer"].ToString()'">Back</button>
                     <button type="submit" class="btn btn-primary">Save</button>
+                    <a></a>
                 </div>
             </form>
         </div>
@@ -182,11 +183,23 @@
 <script>
     $(function () {
         $('.js-select-algorithm').click(function () {
-            $('input[name=Algorithm]').val($(this).data('algorithm'));
+            $('input[name="Options.Algorithm"]').val($(this).data('algorithm'));
             $('#selectedAlgorithm').html($(this).data('algorithm'));
         });
         $('.js-generate-key').click(function () {
+            const bytes = $(this).data('bytes');
+            const key = createKey(bytes);
+            $('input[name="Options.SecretKey"]').val(key);
+            function createKey(charCount) {
+                var key = "";
+                var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
+                for (var i = 0; i < charCount; i++) {
+                    key += possible.charAt(Math.floor(Math.random() * possible.length));
+                }
+
+                return key;
+            }
         });
 
         $('body').on('keyup', '.js-claim-input', function (e) {

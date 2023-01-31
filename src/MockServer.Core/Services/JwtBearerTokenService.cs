@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Models.Auth;
 namespace MockServer.Core.Services;
-public class JwtBearerAuthorization : IJwtBearerTokenService
+public class JwtBearerTokenService : IJwtBearerTokenService
 {
     public string GenerateToken(JwtBearerAuthenticationOptions options)
     {
@@ -30,5 +30,25 @@ public class JwtBearerAuthorization : IJwtBearerTokenService
         // Use the JwtSecurityTokenHandler to encode the token and create the JWT string
         var jwtHandler = new JwtSecurityTokenHandler();
         return jwtHandler.WriteToken(token);
+    }
+
+    public ClaimsPrincipal ValidateToken(string token, JwtBearerAuthenticationOptions options)
+    {
+        var jwtHandler = new JwtSecurityTokenHandler();
+        // Create a security key
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.SecretKey));
+        // Create a validation parameters object
+        var validationParameters = new TokenValidationParameters()
+        {
+            RequireExpirationTime = options.RequireExpirationTime,
+            ValidateLifetime = options.ValidateLifetime,
+            ValidateIssuer = options.ValidateIssuer,
+            ValidateAudience = options.ValidateAudience,
+            ValidateIssuerSigningKey = options.ValidateIssuerSigningKey,
+            ValidIssuer = options.Issuer,
+            ValidAudience = options.Audience,
+            IssuerSigningKey = securityKey
+        };
+        return jwtHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
     }
 }
