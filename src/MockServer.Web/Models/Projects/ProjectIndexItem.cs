@@ -1,6 +1,6 @@
 using MockServer.Core.Enums;
 
-namespace MockServer.Web.Models.Project;
+namespace MockServer.Web.Models.Projects;
 
 public class ProjectIndexItem
 {
@@ -8,7 +8,6 @@ public class ProjectIndexItem
     public string Name { get; set; }
     public string Description { get; set; }
     public ProjectAccessibility Accessibility { get; set; }
-    public string PrivateKey { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public int RequestCount { get; set; }

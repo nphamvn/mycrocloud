@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MockServer.Web.Attributes;
-using MockServer.Web.Models.Request;
+using MockServer.Web.Models.Requests;
 using MockServer.Web.Services.Interfaces;
 
 namespace MockServer.Web.Controllers;

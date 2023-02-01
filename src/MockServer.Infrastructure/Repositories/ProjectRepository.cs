@@ -1,7 +1,7 @@
 using Dapper;
 using Microsoft.Data.Sqlite;
-using MockServer.Core.Entities.Projects;
 using MockServer.Core.Models.Auth;
+using MockServer.Core.Models.Projects;
 using MockServer.Core.Repositories;
 using MockServer.Core.Settings;
 
@@ -177,12 +177,12 @@ public class ProjectRepository : IProjectRepository
     {
         var query =
                 """
-                UPDATE Project
+                UPDATE 
+                    Project
                 SET
                     Name = @Name,
                     Description = @Description,
                     Accessibility = @Accessibility,
-                    PrivateKey = @PrivateKey,
                     UpdatedAt = datetime('now','localtime')
                 WHERE Id = @Id;
                 """;
@@ -192,8 +192,7 @@ public class ProjectRepository : IProjectRepository
             Id = project.Id,
             Name = project.Name,
             Description = project.Description,
-            Accessibility = (int)project.Accessibility,
-            PrivateKey = project.PrivateKey ?? null
+            Accessibility = (int)project.Accessibility
         });
     }
 }

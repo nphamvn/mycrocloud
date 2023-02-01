@@ -1,4 +1,4 @@
-namespace MockServer.Web.Models.Project;
+namespace MockServer.Web.Models.Projects;
 public class ProjectIndexViewModel
 {
     public ProjectSearchModel Search { get; set; } = new ProjectSearchModel();

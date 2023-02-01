@@ -91,6 +91,13 @@ public class ProjectSettingsController : BaseController
         return RedirectToAction(nameof(Auth), Request.RouteValues);
     }
 
+    [HttpPost("auth/apikey/{id:int}/generate-key")]
+    public async Task<IActionResult> GenerateApiKey(string name, int id)
+    {
+        string key = await _projectService.GenerateKey(name);
+        return RedirectToAction(nameof(Auth), Request.RouteValues);
+    }
+
     [HttpGet("auth/apikey/{id:int}")]
     public async Task<IActionResult> ViewApiKey(string name, int id)
     {
@@ -103,14 +110,6 @@ public class ProjectSettingsController : BaseController
     {
         await _projectService.Rename(name, newName);
         return RedirectToAction(nameof(Index), new { name = newName });
-    }
-
-    [AjaxOnly]
-    [HttpPost("generate-key")]
-    public async Task<IActionResult> GenerateKey(string name)
-    {
-        string key = await _projectService.GenerateKey(name);
-        return Ok(new { key = key });
     }
 
     [HttpPost("set-accessibility")]
@@ -126,5 +125,4 @@ public class ProjectSettingsController : BaseController
         await _projectService.Delete(name);
         return RedirectToAction(nameof(Index));
     }
-
 }

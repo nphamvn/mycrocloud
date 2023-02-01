@@ -1,6 +1,6 @@
-namespace MockServer.ReverseProxyServer.Models;
+namespace MockServer.Api.Models;
 
-public class AppRoute
+public class Route
 {
     public int Id { get; set; }
     public string Method { get; set; }

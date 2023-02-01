@@ -1,4 +1,4 @@
-namespace MockServer.ReverseProxyServer.Interfaces;
+namespace MockServer.Api.Interfaces;
 
 public interface ICacheService
 {

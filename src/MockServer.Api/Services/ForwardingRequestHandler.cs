@@ -1,8 +1,8 @@
 using MockServer.Core.Repositories;
-using MockServer.ReverseProxyServer.Interfaces;
-using MockServer.ReverseProxyServer.Models;
+using MockServer.Api.Interfaces;
+using MockServer.Api.Models;
 
-namespace MockServer.ReverseProxyServer.Services;
+namespace MockServer.Api.Services;
 
 public class ForwardingRequestHandler : IRequestHandler
 {
@@ -12,7 +12,7 @@ public class ForwardingRequestHandler : IRequestHandler
     {
         _requestRepository = requestRepository;
     }
-    public async Task<ResponseMessage> GetResponseMessage(AppRequest request)
+    public async Task<ResponseMessage> GetResponseMessage(Request request)
     {
         var req = await _requestRepository.GetForwardingRequest(request.Id);
         var message = new HttpRequestMessage();

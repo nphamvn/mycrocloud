@@ -5,7 +5,7 @@ using MockServer.Core.Enums;
 using MockServer.Core.Models.Auth;
 using MockServer.Core.Repositories;
 
-namespace MockServer.ReverseProxyServer.Middlewares;
+namespace MockServer.Api.Middlewares;
 
 public class Authorization : IMiddleware
 {

@@ -2,7 +2,6 @@ using System.Data;
 using System.Text.Json;
 using Dapper;
 using Microsoft.Data.Sqlite;
-using MockServer.Core.Entities.Auth;
 using MockServer.Core.Enums;
 using MockServer.Core.Models.Auth;
 using MockServer.Core.Repositories;

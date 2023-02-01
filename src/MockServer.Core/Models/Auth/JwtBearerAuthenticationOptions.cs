@@ -18,7 +18,7 @@ public class JwtBearerAuthenticationOptions : AuthOptions
     public bool ValidateIssuer { get; set; }
     public bool ValidateAudience { get; set; }
     public bool ValidateIssuerSigningKey { get; set; }
-    public string Header { get; set; }
+    public string BinderSource { get; set; }
     public IList<AppClaim> AdditionalClaims { get; set; } = new List<AppClaim>();
     public string Description { get; set; }
 }

@@ -1,8 +1,8 @@
-using MockServer.Core.Entities.Requests;
+using MockServer.Core.Models.Requests;
 using MockServer.Core.Enums;
 using MockServer.Core.Models.Auth;
 
-namespace MockServer.Web.Models.Project;
+namespace MockServer.Web.Models.Requests;
 
 public class RequestOpenViewModel
 {

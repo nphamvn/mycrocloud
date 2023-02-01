@@ -1,6 +1,6 @@
-﻿using MockServer.ReverseProxyServer.Models.Docker;
+﻿using MockServer.Api.Models.Docker;
 
-namespace MockServer.ReverseProxyServer.Interfaces
+namespace MockServer.Api.Interfaces
 {
     public interface IDockerServices
     {

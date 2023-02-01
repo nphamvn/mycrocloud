@@ -1,4 +1,4 @@
-namespace MockServer.ReverseProxyServer.Constraints;
+namespace MockServer.Api.Constraints;
 
 public class MinConstraint : IConstraint
 {

@@ -2,13 +2,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MockServer.Web.Attributes;
 using MockServer.Web.Models.Common;
-using MockServer.Web.Models.Project;
+using MockServer.Web.Models.Projects;
 using MockServer.Web.Services.Interfaces;
 
 namespace MockServer.Web.Controllers;
 
 [Authorize]
-[Authorize(AuthenticationSchemes = "", Policy = "")]
 public class ProjectsController : BaseController
 {
     private readonly IProjectWebService _projectService;
@@ -18,21 +17,11 @@ public class ProjectsController : BaseController
         _projectService = projectService;
     }
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> Index(ProjectIndexViewModel fm)
     {
         var vm = await _projectService.GetIndexViewModel(fm.Search);
         return View("Views/Projects/Index.cshtml", vm);
-    }
-
-    [AjaxOnly]
-    [HttpGet]
-    public async Task<IActionResult> AjaxIndex(ProjectIndexViewModel fm)
-    {
-        var vm = await _projectService.GetIndexViewModel(fm.Search);
-        return Ok(new AjaxResult<ProjectIndexViewModel>
-        {
-            Data = vm
-        });
     }
 
     [HttpGet("{name}")]

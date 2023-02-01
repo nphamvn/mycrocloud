@@ -1,5 +1,5 @@
 @using MockServer.Core.Enums
-@model MockServer.Web.Models.Request.CreateUpdateRequestViewModel
+@model MockServer.Web.Models.Requests.CreateUpdateRequestViewModel
 @{
     string formMode = ViewData["FormMode"]?.ToString() ?? "Create";
     ViewData["ModalTitle"] = formMode == "Create" ? "Create request" : "Edit request";

@@ -1,13 +1,13 @@
-using MockServer.ReverseProxyServer.Models;
+using MockServer.Api.Models;
 
-namespace MockServer.ReverseProxyServer.Interfaces;
+namespace MockServer.Api.Interfaces;
 
 public interface IRequestHandler
 {
-    Task<ResponseMessage> GetResponseMessage(AppRequest request);
+    Task<ResponseMessage> GetResponseMessage(Request request);
 }
 
-public interface IRequestHandler<T> : IRequestHandler where T : AppRequest
+public interface IRequestHandler<T> : IRequestHandler where T : Request
 {
 
 }

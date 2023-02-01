@@ -1,4 +1,4 @@
-﻿namespace MockServer.Core.Entities.Requests;
+﻿namespace MockServer.Core.Models.Requests;
 public class FixedRequest
 {
     public IList<RequestHeader> RequestHeaders { get; set; }

@@ -1,7 +1,6 @@
 using MockServer.Core.Enums;
-using MockServer.Core.Models.Auth;
 
-namespace MockServer.Core.Entities.Auth;
+namespace MockServer.Core.Models.Auth;
 
 public class AppAuthentication : BaseEntity
 {

@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
-using MockServer.ReverseProxyServer.Interfaces;
-using MockServer.ReverseProxyServer.Models;
-using MockServer.ReverseProxyServer.Models.Docker;
+using MockServer.Api.Interfaces;
+using MockServer.Api.Models;
+using MockServer.Api.Models.Docker;
 
-namespace MockServer.ReverseProxyServer.Services
+namespace MockServer.Api.Services
 {
     public class ExpectionCallbackExecutor : IRequestHandler
     {
@@ -15,7 +15,7 @@ namespace MockServer.ReverseProxyServer.Services
             _dockerServices = dockerServices;
         }
 
-        public async Task<ResponseMessage> GetResponseMessage(AppRequest request)
+        public async Task<ResponseMessage> GetResponseMessage(Request request)
         {
             //1: Prepare source file by replacing user's class file to template source (username, requestId)
 

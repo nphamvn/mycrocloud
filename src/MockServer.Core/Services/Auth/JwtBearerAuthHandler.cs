@@ -14,7 +14,7 @@ public class JwtBearerAuthHandler : AppAuthenticationHandler<JwtBearerAuthentica
     }
     protected override Task<AppAuthenticateResult> HandleAuthenticateAsync(HttpContext context)
     {
-        context.Request.Headers.TryGetValue(options.Header, out var value);
+        context.Request.Headers.TryGetValue(options.BinderSource, out var value);
         const string Bearer = "Bearer";
         if (string.IsNullOrEmpty(value) && !value.ToString().StartsWith(Bearer))
         {

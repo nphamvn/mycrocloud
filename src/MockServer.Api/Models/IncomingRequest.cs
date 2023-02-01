@@ -1,7 +1,7 @@
 using System.Text;
 using MockServer.Core.Enums;
 
-namespace MockServer.ReverseProxyServer.Models;
+namespace MockServer.Api.Models;
 
 public class IncomingRequest
 {
@@ -10,7 +10,6 @@ public class IncomingRequest
     public string Method { get; set; }
     public string Path { get; set; }
     public RequestType RequestType { get; set; }
-    public int Id { get; set; }
 
     public override string ToString()
     {

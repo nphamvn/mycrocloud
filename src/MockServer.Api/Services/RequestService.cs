@@ -1,11 +1,11 @@
-using MockServer.ReverseProxyServer.Interfaces;
-using MockServer.ReverseProxyServer.Models;
+using MockServer.Api.Interfaces;
+using MockServer.Api.Models;
 using Dapper;
 using Microsoft.Data.Sqlite;
-using MockServer.Core.Entities.Requests;
+using MockServer.Core.Models.Requests;
 using AutoMapper;
 
-namespace MockServer.ReverseProxyServer.Services;
+namespace MockServer.Api.Services;
 
 public class RequestServices : IRequestServices
 {
@@ -17,7 +17,7 @@ public class RequestServices : IRequestServices
         _mapper = mapper;
     }
 
-    public async Task<AppRequest> FindRequest(IncomingRequest model)
+    public async Task<Models.Request> FindRequest(IncomingRequest model)
     {
         var sql =
                 """
@@ -36,7 +36,7 @@ public class RequestServices : IRequestServices
                 """;
 
         using var connection = new SqliteConnection(_connectionString);
-        var request = await connection.QuerySingleAsync<Request>(sql, new
+        var request = await connection.QuerySingleAsync<Core.Models.Requests.Request>(sql, new
         {
             username = model.Username,
             projectName = model.ProjectName,
@@ -44,16 +44,16 @@ public class RequestServices : IRequestServices
             path = model.Path
         });
 
-        return _mapper.Map<AppRequest>(request);
+        return _mapper.Map<Models.Request>(request);
     }
 
-    public async Task<AppRequest> GetRequest(IncomingRequest model)
+    public async Task<Models.Request> GetRequest(IncomingRequest model)
     {
-        AppRequest appRequest = null;
+        Models.Request appRequest = null;
 
         if ("type" == "fixed")
         {
-            appRequest = new MockServer.ReverseProxyServer.Models.FixedRequest();
+            appRequest = new MockServer.Api.Models.FixedRequest();
         }
         return appRequest;
     }

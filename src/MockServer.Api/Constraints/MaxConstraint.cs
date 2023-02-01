@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace MockServer.ReverseProxyServer.Constraints;
+namespace MockServer.Api.Constraints;
 
 /// <summary>
 /// Constrains a route parameter to be an integer with a maximum value.

@@ -1,5 +1,5 @@
 using MockServer.Core.Enums;
-using MockServer.Web.Models.Project;
+using MockServer.Web.Models.Projects;
 
 namespace MockServer.Web.Services.Interfaces;
 

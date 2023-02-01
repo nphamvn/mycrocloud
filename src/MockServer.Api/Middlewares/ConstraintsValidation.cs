@@ -2,11 +2,11 @@ using System.Net;
 using MockServer.Core.Enums;
 using MockServer.Core.Repositories;
 using MockServer.Core.Services;
-using MockServer.ReverseProxyServer.Constraints;
-using MockServer.ReverseProxyServer.Interfaces;
-using MockServer.ReverseProxyServer.Models;
+using MockServer.Api.Constraints;
+using MockServer.Api.Interfaces;
+using MockServer.Api.Models;
 
-namespace MockServer.ReverseProxyServer.Middlewares;
+namespace MockServer.Api.Middlewares;
 public class ConstraintsValidation : IMiddleware
 {
     private readonly IRequestRepository _requestRepository;
@@ -115,7 +115,7 @@ public class ConstraintsValidation : IMiddleware
             }
         }
 
-        context.Items[nameof(AppRequest)] = new AppRequest()
+        context.Items[nameof(Request)] = new Request()
         {
             Id = r.Id,
             Type = r.Type

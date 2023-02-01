@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MockServer.ReverseProxyServer.Constraints;
+namespace MockServer.Api.Constraints;
 
 public class DecimalConstraint : IConstraint
 {

@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using MockServer.Core.Enums;
 
-namespace MockServer.Web.Models.Project;
+namespace MockServer.Web.Models.Projects;
 
 public class CreateProjectViewModel
 {

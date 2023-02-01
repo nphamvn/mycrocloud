@@ -1,4 +1,4 @@
-using MockServer.Core.Models;
+using MockServer.Core.Models.Projects;
 
 namespace MockServer.Core.Interfaces;
 

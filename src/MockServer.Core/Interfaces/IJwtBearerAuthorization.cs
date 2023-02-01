@@ -5,6 +5,6 @@ namespace MockServer.Core.Interfaces;
 
 public interface IJwtBearerTokenService
 {
-    string GenerateToken(JwtBearerAuthenticationOptions options);
+    string GenerateToken(JwtBearerAuthenticationOptions options, List<Claim> claims);
     ClaimsPrincipal ValidateToken(string token, JwtBearerAuthenticationOptions options);
 }

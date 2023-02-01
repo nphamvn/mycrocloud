@@ -7,7 +7,7 @@ using MockServer.Core.Models.Auth;
 namespace MockServer.Core.Services;
 public class JwtBearerTokenService : IJwtBearerTokenService
 {
-    public string GenerateToken(JwtBearerAuthenticationOptions options)
+    public string GenerateToken(JwtBearerAuthenticationOptions options, List<Claim> claims)
     {
         // Create a security key
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.SecretKey));
@@ -15,7 +15,7 @@ public class JwtBearerTokenService : IJwtBearerTokenService
         var signingCredentials = new SigningCredentials(securityKey, options.Algorithm);
         // Create a ClaimsIdentity object
         var claimsIdentity = new ClaimsIdentity();
-        foreach (var claim in options.AdditionalClaims)
+        foreach (var claim in claims)
         {
             claimsIdentity.AddClaim(new Claim(claim.Type, claim.Value));
         }

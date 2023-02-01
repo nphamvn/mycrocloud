@@ -1,9 +1,9 @@
 using System.Text.RegularExpressions;
 using MockServer.Core.Repositories;
-using MockServer.ReverseProxyServer.Interfaces;
-using MockServer.ReverseProxyServer.Models;
+using MockServer.Api.Interfaces;
+using MockServer.Api.Models;
 
-namespace MockServer.ReverseProxyServer.Services;
+namespace MockServer.Api.Services;
 
 public class RouteService : IRouteResolver
 {
@@ -15,7 +15,7 @@ public class RouteService : IRouteResolver
         _cacheService = cacheService;
         _requestRepository = requestRepository;
     }
-    public async Task<RouteResolveResult> Resolve(string method, string path, ICollection<AppRoute> routes)
+    public async Task<RouteResolveResult> Resolve(string method, string path, ICollection<Models.Route> routes)
     {
         var routeTemplates = new Dictionary<string, int>();
 

@@ -1,7 +1,7 @@
 using MockServer.Core.Enums;
-using MockServer.ReverseProxyServer.Interfaces;
+using MockServer.Api.Interfaces;
 
-namespace MockServer.ReverseProxyServer.Services;
+namespace MockServer.Api.Services;
 
 public class RequestHandlerFactory : IRequestHandlerFactory
 {

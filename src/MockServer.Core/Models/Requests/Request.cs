@@ -1,8 +1,8 @@
 ﻿using MockServer.Core.Enums;
-using MockServer.Core.Entities.Projects;
 using MockServer.Core.Models.Auth;
+using MockServer.Core.Models.Projects;
 
-namespace MockServer.Core.Entities.Requests;
+namespace MockServer.Core.Models.Requests;
 public class Request : BaseEntity
 {
     public int ProjectId { get; set; }

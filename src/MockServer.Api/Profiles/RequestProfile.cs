@@ -1,12 +1,12 @@
 using AutoMapper;
-using MockServer.ReverseProxyServer.Models;
+using MockServer.Api.Models;
 
-namespace MockServer.ReverseProxyServer.Profiles;
+namespace MockServer.Api.Profiles;
 
 public class RequestProfile : Profile
 {
     public RequestProfile()
     {
-        CreateMap<MockServer.Core.Entities.Requests.Request, AppRequest>();
+        CreateMap<MockServer.Core.Models.Requests.Request, Request>();
     }
 }

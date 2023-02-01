@@ -1,6 +1,6 @@
-namespace MockServer.ReverseProxyServer.Models;
+namespace MockServer.Api.Models;
 
-public class CallbackRequest : AppRequest
+public class CallbackRequest : Request
 {
 
 }

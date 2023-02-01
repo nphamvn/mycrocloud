@@ -1,7 +1,6 @@
-using MockServer.Core.Entities.Auth;
+using MockServer.Core.Models.Auth;
 using MockServer.Core.Enums;
 using MockServer.Core.Interfaces;
-using MockServer.Core.Models.Auth;
 
 namespace MockServer.Core.Services.Auth;
 

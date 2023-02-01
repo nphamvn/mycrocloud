@@ -1,15 +1,15 @@
-using MockServer.ReverseProxyServer.Models;
+using MockServer.Api.Models;
 
-namespace MockServer.ReverseProxyServer.Interfaces;
+namespace MockServer.Api.Interfaces;
 
 public interface IRouteResolver
 {
-    Task<RouteResolveResult> Resolve(string method, string path, ICollection<AppRoute> routes);
+    Task<RouteResolveResult> Resolve(string method, string path, ICollection<Models.Route> routes);
 }
 
 public class RouteResolveResult
 {
-    public AppRoute Route { get; set; }
+    public Models.Route Route { get; set; }
     public RouteValueDictionary RouteValues { get; set; } = new();
 }
 

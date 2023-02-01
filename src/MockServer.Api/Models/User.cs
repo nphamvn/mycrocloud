@@ -1,4 +1,4 @@
-namespace MockServer.ReverseProxyServer.Models;
+namespace MockServer.Api.Models;
 
 public class User
 {

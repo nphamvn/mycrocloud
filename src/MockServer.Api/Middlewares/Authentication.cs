@@ -4,7 +4,7 @@ using MockServer.Core.Repositories;
 using MockServer.Core.Services;
 using MockServer.Core.Services.Auth;
 
-namespace MockServer.ReverseProxyServer.Middlewares;
+namespace MockServer.Api.Middlewares;
 
 public class Authentication : IMiddleware
 {
@@ -34,7 +34,7 @@ public class Authentication : IMiddleware
         IAppAuthenticationHandlerProvider handlerProvider = new AppAuthenticationHandlerProvider();
         IAppAuthenticationHandler handler;
         AppAuthenticateResult result;
-        if (defaultScheme is Core.Entities.Auth.AppAuthentication auth)
+        if (defaultScheme is Core.Models.Auth.AppAuthentication auth)
         {
             handler = handlerProvider.GetHandler(auth);
             //TODO: Modify header value

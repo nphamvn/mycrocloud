@@ -1,9 +1,10 @@
 using System.Net;
 using MockServer.Core.Repositories;
-using MockServer.ReverseProxyServer.Interfaces;
-using MockServer.ReverseProxyServer.Models;
+using MockServer.Api.Interfaces;
+using MockServer.Api.Models;
+using Route = MockServer.Api.Models.Route;
 
-namespace MockServer.ReverseProxyServer.Middlewares;
+namespace MockServer.Api.Middlewares;
 public class RouteValidation : IMiddleware
 {
     private readonly IRequestRepository _requestRepository;
@@ -32,12 +33,12 @@ public class RouteValidation : IMiddleware
             await context.Response.WriteAsync($"'{req.ProjectName}' project is not found");
             return;
         }
-        ICollection<AppRoute> routes;
+        ICollection<Route> routes;
         string key = p.Id.ToString();
         if (!await _cacheService.Exists(p.Id.ToString()))
         {
             var requests = await _requestRepository.GetProjectRequests(p.Id);
-            routes = requests.Select(r => new AppRoute
+            routes = requests.Select(r => new Route
             {
                 Id = r.Id,
                 Method = r.Method.ToLower(),
@@ -47,7 +48,7 @@ public class RouteValidation : IMiddleware
         }
         else
         {
-            routes = await _cacheService.Get<ICollection<AppRoute>>(key);
+            routes = await _cacheService.Get<ICollection<Models.Route>>(key);
         }
         var result = await _routeService.Resolve(req.Method.ToLower(), req.Path, routes);
         if (result == null)
@@ -64,7 +65,6 @@ public class RouteValidation : IMiddleware
     private IncomingRequest GrabRequest(HttpRequest request)
     {
         string url = $"{request.Scheme}://{request.Host}:{request.Host.Port ?? 80}";
-        string pattern = "{scheme}://{username}.{app}.{domain}:port";
         var username = request.Host.Host.Split('.')[1];
         var projectName = request.Host.Host.Split('.')[0];
         var path = request.Path.Value.Remove(0, 1);

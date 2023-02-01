@@ -2,7 +2,7 @@ using System.Dynamic;
 using System.Text;
 using System.Text.Json;
 
-namespace MockServer.ReverseProxyServer.Extentions;
+namespace MockServer.Api.Extentions;
 
 public static class HttpContextExtentions
 {

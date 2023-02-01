@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 
-namespace MockServer.ReverseProxyServer.Constraints;
+namespace MockServer.Api.Constraints;
 
 public class ConstraintBuilder
 {

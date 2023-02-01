@@ -1,10 +1,10 @@
 using MockServer.Core.Repositories;
 using MockServer.Core.Services;
 using MockServer.Infrastructure.Repositories;
-using MockServer.ReverseProxyServer.Extentions;
-using MockServer.ReverseProxyServer.Interfaces;
-using MockServer.ReverseProxyServer.Middlewares;
-using MockServer.ReverseProxyServer.Services;
+using MockServer.Api.Extentions;
+using MockServer.Api.Interfaces;
+using MockServer.Api.Middlewares;
+using MockServer.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

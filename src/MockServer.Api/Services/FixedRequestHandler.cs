@@ -3,11 +3,11 @@ using System.Text;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Repositories;
 using MockServer.Core.Services;
-using MockServer.ReverseProxyServer.Extentions;
-using MockServer.ReverseProxyServer.Interfaces;
-using MockServer.ReverseProxyServer.Models;
+using MockServer.Api.Extentions;
+using MockServer.Api.Interfaces;
+using MockServer.Api.Models;
 
-namespace MockServer.ReverseProxyServer.Services;
+namespace MockServer.Api.Services;
 
 public class FixedRequestHandler : IRequestHandler
 {
@@ -18,7 +18,7 @@ public class FixedRequestHandler : IRequestHandler
         _requestRepository = requestRepository;
     }
 
-    public async Task<ResponseMessage> GetResponseMessage(AppRequest request)
+    public async Task<ResponseMessage> GetResponseMessage(Request request)
     {
         var headers = await _requestRepository.GetResponseHeaders(request.Id);
         foreach (var header in headers)

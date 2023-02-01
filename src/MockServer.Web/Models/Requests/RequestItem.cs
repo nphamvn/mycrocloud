@@ -1,16 +1,15 @@
 using MockServer.Core.Enums;
 
-namespace MockServer.Web.Models.Request;
+namespace MockServer.Web.Models.Requests;
 
-public class RequestItem
+public class RequestIndexItem
 {
     public int Id { get; set; }
-    public RequestType Type { get; set; }
     public string Name { get; set; }
+    public RequestType Type { get; set; }
     public string Path { get; set; }
     public string Method { get; set; }
     public string Description { get; set; }
-
     public string MethodBadgeColor
     => Method switch
     {

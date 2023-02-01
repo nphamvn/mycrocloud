@@ -1,4 +1,4 @@
-@model MockServer.Web.Models.Request.AuthorizationConfigViewModel
+@model MockServer.Web.Models.Requests.AuthorizationConfigViewModel
 @{
     var availableSchemes = Model.AuthenticationSchemeSelectList
             .Where(s => !Model.AuthenticationSchemes?.Contains(s.Id) ?? true);
@@ -47,7 +47,7 @@
                                         class="connectedSortable list-group list-group-flush p-1 pb-2"
                                         style="min-height: 20px;">
                                         @foreach (var scheme in availableSchemes ??
-                                        Enumerable.Empty<MockServer.Core.Entities.Auth.AppAuthentication>())
+                                        Enumerable.Empty<MockServer.Core.Models.Auth.AppAuthentication>())
                                         {
                                             <li data-scheme-id="@scheme.Id" class="list-group-item bg-light border">
                                                 @scheme.SchemeName</li>
@@ -59,7 +59,7 @@
                                     <ul id="selected-schemes" class="connectedSortable list-group p-1 pb-2"
                                         style="min-height: 20px;">
                                         @foreach (var scheme in selectedSchemes ??
-                                        Enumerable.Empty<MockServer.Core.Entities.Auth.AppAuthentication>())
+                                        Enumerable.Empty<MockServer.Core.Models.Auth.AppAuthentication>())
                                         {
                                             <li data-scheme-id="@scheme.Id" class="list-group-item bg-light border">
                                                 @scheme.SchemeName</li>

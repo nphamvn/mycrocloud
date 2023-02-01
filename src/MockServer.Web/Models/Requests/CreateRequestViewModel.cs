@@ -1,11 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MockServer.Core.Enums;
-using MockServer.Core.Models.Auth;
 
-namespace MockServer.Web.Models.Request;
+namespace MockServer.Web.Models.Requests;
 
-public class CreateUpdateRequestViewModel : BaseRequestViewModel
+public class CreateUpdateRequestViewModel
 {
     [Required]
     public RequestType Type { get; set; }

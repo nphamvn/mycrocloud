@@ -1,4 +1,4 @@
-﻿namespace MockServer.Core.Entities.Requests;
+﻿namespace MockServer.Core.Models.Requests;
 public class ForwardingRequest : BaseEntity
 {
     public int RequestId { get; set; }

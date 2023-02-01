@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using MockServer.Web.Models.Project;
-using MockServer.Web.Models.Request;
+using MockServer.Web.Models.Requests;
 
 namespace MockServer.Web.Services.Interfaces;
 

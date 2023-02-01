@@ -1,6 +1,6 @@
-using MockServer.ReverseProxyServer.Interfaces;
+using MockServer.Api.Interfaces;
 
-namespace MockServer.ReverseProxyServer.Services;
+namespace MockServer.Api.Services;
 
 public class LiteDBCacheService : ICacheService
 {

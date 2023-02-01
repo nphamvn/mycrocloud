@@ -1,9 +1,9 @@
 using System.Text;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Services;
-using MockServer.ReverseProxyServer.Constraints;
+using MockServer.Api.Constraints;
 
-namespace MockServer.ReverseProxyServer.Extentions;
+namespace MockServer.Api.Extentions;
 
 public static class ApplicationBuilderExtentions
 {

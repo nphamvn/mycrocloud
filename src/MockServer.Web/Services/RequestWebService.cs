@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using MockServer.Core.Enums;
 using MockServer.Core.Helpers;
 using MockServer.Core.Repositories;
-using MockServer.Web.Models.Project;
-using MockServer.Web.Models.Request;
+using MockServer.Web.Models.Projects;
+using MockServer.Web.Models.Requests;
 using MockServer.Web.Services.Interfaces;
 
 namespace MockServer.Web.Services;
@@ -37,7 +37,7 @@ public class RequestWebService : BaseWebService, IRequestWebService
         vm.ProjectName = projectName;
         return vm;
     }
-    private async Task<RequestConfiguration> GetRequestConfiguration(Core.Entities.Requests.Request request)
+    private async Task<RequestConfiguration> GetRequestConfiguration(Core.Models.Requests.Request request)
     {
         RequestConfiguration ret = null;
         switch (request.Type)
@@ -62,7 +62,7 @@ public class RequestWebService : BaseWebService, IRequestWebService
         var existing = await _requestRepository.Get(AuthUser.Id, projectName, request.Method, request.Path);
         if (existing == null)
         {
-            var mapped = _mapper.Map<Core.Entities.Requests.Request>(request);
+            var mapped = _mapper.Map<Core.Models.Requests.Request>(request);
             return await _requestRepository.Create(AuthUser.Id, projectName, mapped);
         }
         else
@@ -76,10 +76,10 @@ public class RequestWebService : BaseWebService, IRequestWebService
         await _requestRepository.Delete(AuthUser.Id, projectname, id);
     }
 
-    public async Task<RequestItem> Get(string projectname, int id)
+    public async Task<RequestIndexItem> Get(string projectname, int id)
     {
         var request = await _requestRepository.Get(AuthUser.Id, projectname, id);
-        return _mapper.Map<RequestItem>(request);
+        return _mapper.Map<RequestIndexItem>(request);
     }
 
     public async Task<FixedRequestConfigViewModel> GetFixedRequestConfigViewModel(string projectname, int id)
@@ -90,7 +90,7 @@ public class RequestWebService : BaseWebService, IRequestWebService
 
     public async Task SaveFixedRequestConfig(string projectname, int id, string[] fields, FixedRequestConfigViewModel config)
     {
-        var mapped = _mapper.Map<Core.Entities.Requests.FixedRequest>(config);
+        var mapped = _mapper.Map<Core.Models.Requests.FixedRequest>(config);
         if (fields.Contains(nameof(config.RequestParams)))
         {
             await _requestRepository.UpdateRequestParams(id, mapped);
@@ -135,7 +135,7 @@ public class RequestWebService : BaseWebService, IRequestWebService
         var existing = await _requestRepository.Get(AuthUser.Id, projectName, id);
         if (existing != null)
         {
-            var mapped = _mapper.Map<Core.Entities.Requests.Request>(request);
+            var mapped = _mapper.Map<Core.Models.Requests.Request>(request);
             await _requestRepository.Update(AuthUser.Id, projectName, id, mapped);
         }
     }

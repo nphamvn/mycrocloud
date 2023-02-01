@@ -1,9 +1,10 @@
-using MockServer.Core.Entities.Auth;
+using MockServer.Core.Models.Auth;
+using MockServer.Web.Models.Projects;
 
 namespace MockServer.Web.Models.ProjectSettings.Auth;
 
-public class AuthIndexModel : ProjectSettingsBaseModel
+public class AuthIndexModel
 {
-    //public IEnumerable<AppAuthentication> AllAuthenticationSchemes { get; set; }
+    public Project Project { get; set; }
     public IEnumerable<AppAuthentication> AuthenticationSchemes { get; set; }
 }

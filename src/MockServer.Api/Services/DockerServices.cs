@@ -1,9 +1,9 @@
 ﻿using DockerServiceClient;
 using Grpc.Net.Client;
-using MockServer.ReverseProxyServer.Interfaces;
-using MockServer.ReverseProxyServer.Models.Docker;
+using MockServer.Api.Interfaces;
+using MockServer.Api.Models.Docker;
 
-namespace MockServer.ReverseProxyServer.Services
+namespace MockServer.Api.Services
 {
     public class DockerServices : IDockerServices
     {

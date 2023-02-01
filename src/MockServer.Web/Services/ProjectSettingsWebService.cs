@@ -1,9 +1,9 @@
+using System.Security.Claims;
 using Ardalis.GuardClauses;
 using AutoMapper;
-using MockServer.Core.Entities.Auth;
+using MockServer.Core.Models.Auth;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Models;
-using MockServer.Core.Models.Auth;
 using MockServer.Core.Repositories;
 using MockServer.Core.Services;
 using MockServer.Web.Extentions;
@@ -56,9 +56,9 @@ public class ProjectSettingsWebService : IProjectSettingsWebService
     {
         var auth = await _authRepository.GetAuthenticationScheme<JwtBearerAuthenticationOptions>(schemeId);
         var options = (JwtBearerAuthenticationOptions)auth.Options;
-        options.AdditionalClaims = model.Claims.Select(c => new AppClaim { Type = c.Key, Value = c.Value }).ToList();
+        var claims = model.Claims.Select(c => new Claim(c.Type, c.Value)).ToList();
         IJwtBearerTokenService jwtBearerTokenService = new JwtBearerTokenService();
-        model.Token = jwtBearerTokenService.GenerateToken(options);
+        model.Token = jwtBearerTokenService.GenerateToken(options, claims);
         return model;
     }
 
@@ -120,12 +120,12 @@ public class ProjectSettingsWebService : IProjectSettingsWebService
         await _authRepository.ActivateProjectAuthenticationSchemes(project.Id, model.AuthenticationSchemes.Select(s => s.Id).ToList());
     }
 
-    private async Task<MockServer.Core.Models.Project> GetProjectByName(string name)
+    private async Task<MockServer.Web.Models.Projects.Project> GetProjectByName(string name)
     {
         var user = _contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
         var project = await _projectRepository.Get(user.Id, name);
-        return _mapper.Map<MockServer.Core.Models.Project>(project);
+        return _mapper.Map<MockServer.Web.Models.Projects.Project>(project);
     }
 }
 public class ProjectSettingsAuthProfile : Profile
@@ -134,6 +134,6 @@ public class ProjectSettingsAuthProfile : Profile
     {
         CreateMap<AppAuthentication, JwtBearerAuthModel>().ReverseMap();
         CreateMap<AppAuthentication, ApiKeyAuthModel>().ReverseMap();
-        CreateMap<MockServer.Core.Entities.Projects.Project, MockServer.Core.Models.Project>().ReverseMap();
+        CreateMap<MockServer.Core.Models.Projects.Project, MockServer.Web.Models.Projects.Project>().ReverseMap();
     }
 }
