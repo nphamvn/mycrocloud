@@ -1,3 +1,4 @@
+using System.Dynamic;
 using System.Security.Claims;
 using System.Text.Json;
 using Jint;
@@ -71,7 +72,13 @@ public class Authorization : IMiddleware
         await next.Invoke(context);
     }
 }
-
+public static class AuthorizationnExtensions
+{
+    public static IApplicationBuilder UseAppAuthorization(this IApplicationBuilder builder)
+    {
+        return builder.UseMiddleware<Authorization>();
+    }
+}
 public interface IAppAuthorizationService
 {
     bool CheckRequirement(Requirement requirement, ClaimsPrincipal user);
@@ -86,8 +93,15 @@ public class AppAuthorizationService : IAppAuthorizationService
     }
     public bool CheckRequirement(Requirement requirement, ClaimsPrincipal user)
     {
-        //TODO: Fix
-        _engine.SetValue("User", JsonSerializer.Serialize(user));
-        return Convert.ToBoolean(_engine.Execute(string.Format("const result = {0}", requirement.ConditionalExpression)).GetCompletionValue().ToString());
+        var u = new Dictionary<string, object>();
+        foreach (var claim in user.Claims)
+        {
+            u[claim.Type] = claim.Value;
+        }
+        object p = u;
+        _engine.SetValue("user", u);
+        _engine.Execute($"let user = {JsonSerializer.Serialize(u)};");
+        var result = _engine.Execute(string.Format("eval({0})", requirement.ConditionalExpression)).GetCompletionValue().AsBoolean();
+        return result;
     }
 }

@@ -14,6 +14,7 @@ public class JwtBearerAuthHandler : AppAuthenticationHandler<JwtBearerAuthentica
     }
     protected override Task<AppAuthenticateResult> HandleAuthenticateAsync(HttpContext context)
     {
+        options.BinderSource = "Authorization";
         context.Request.Headers.TryGetValue(options.BinderSource, out var value);
         const string Bearer = "Bearer";
         if (string.IsNullOrEmpty(value) && !value.ToString().StartsWith(Bearer))
@@ -27,7 +28,11 @@ public class JwtBearerAuthHandler : AppAuthenticationHandler<JwtBearerAuthentica
         {
             var principal = service.ValidateToken(token, options);
             var ticket = new AuthenticationTicket(principal, "AppJwtBearer");
-            return Task.FromResult(((AppAuthenticateResult)AppAuthenticateResult.Success(ticket)));
+            return Task.FromResult(new AppAuthenticateResult()
+            {
+                Succeeded = true,
+                Ticket = ticket
+            });
         }
         catch (Exception)
         {

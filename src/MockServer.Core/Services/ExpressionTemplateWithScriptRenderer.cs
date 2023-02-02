@@ -12,6 +12,8 @@ public class ExpressionTemplateWithScriptRenderer : IExpressionTemplateWithScrip
     {
         var engine = new Engine();
         engine.SetValue("ctx", ctx);
+        engine.SetValue("read", new Func<string, object>(ReadData));
+        engine.SetValue("write", new Action<string, object>(WriteData));
         engine.Execute(script);
         string pattern = @"@{(.*?)}";
         RegexOptions options = RegexOptions.Singleline;
@@ -27,5 +29,14 @@ public class ExpressionTemplateWithScriptRenderer : IExpressionTemplateWithScrip
             }
         }, options);
         return output;
+    }
+
+    private object ReadData(string name)
+    {
+        return new object();
+    }
+    private void WriteData(string name, object data)
+    {
+
     }
 }

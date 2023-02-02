@@ -13,15 +13,17 @@ builder.Services.AddOptions();
 builder.Services.AddGlobalSettings(builder.Configuration);
 builder.Services.AddScoped<RouteValidation>();
 builder.Services.AddScoped<Authentication>();
+builder.Services.AddScoped<Authorization>();
 builder.Services.AddScoped<ConstraintsValidation>();
-builder.Services.AddMemoryCache();
-builder.Services.AddTransient<IRequestRepository, RequestRepository>();
-builder.Services.AddTransient<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IRequestRepository, RequestRepository>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IRequestHandler, FixedRequestHandler>();
 builder.Services.AddScoped<IRequestHandler, ForwardingRequestHandler>();
 builder.Services.AddScoped<IRequestHandlerFactory, RequestHandlerFactory>();
 builder.Services.AddScoped<ICacheService, MemoryCacheService>();
 builder.Services.AddScoped<IRouteResolver, TemplateParserMatcherRouteService>();
+builder.Services.AddMemoryCache();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<RequestHandler>();
 builder.Services.AddModelBinderProvider(options =>
@@ -48,9 +50,11 @@ if (app.Environment.IsDevelopment())
 //Enable CORSE
 app.UseCors(MyAllowSpecificOrigins);
 //Validate route
-app.UseRouteValidation();
+app.UseAppRoute();
 //Authenticate
-app.UseRequestAuthentication();
+app.UseAppAuthentication();
+//Authorize
+app.UseAppAuthorization();
 //Validate
 app.UseConstraintsValidation();
 app.Run(async context =>

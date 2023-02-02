@@ -33,14 +33,17 @@ public class Authentication : IMiddleware
         var defaultScheme = schemes.FirstOrDefault(a => a.Order == 1);
         IAppAuthenticationHandlerProvider handlerProvider = new AppAuthenticationHandlerProvider();
         IAppAuthenticationHandler handler;
+        AppAuthentication auth;
         AppAuthenticateResult result;
-        if (defaultScheme is Core.Models.Auth.AppAuthentication auth)
+        if (defaultScheme != null)
         {
+            auth = await _authRepository.GetAuthenticationScheme(defaultScheme.Id, defaultScheme.Type);
             handler = handlerProvider.GetHandler(auth);
             //TODO: Modify header value
             result = await handler.AuthenticateAsync(context);
             if (result.Succeeded)
             {
+                context.Items["AuthSchemeId"] = auth.Id;
                 context.User = result.Ticket.Principal;
             }
             else
@@ -65,12 +68,13 @@ public class Authentication : IMiddleware
         {
             foreach (var scheme in schemes)
             {
-                handler = handlerProvider.GetHandler(scheme);
+                auth = await _authRepository.GetAuthenticationScheme(scheme.Id, scheme.Type);
+                handler = handlerProvider.GetHandler(auth);
                 //TODO: Modify header value
                 result = await handler.AuthenticateAsync(context);
                 if (result.Succeeded)
                 {
-                    // The scheme successfully authenticated the user
+                    context.Items["AuthSchemeId"] = auth.Id;
                     context.User = result.Principal;
                     break;
                 }
@@ -88,7 +92,7 @@ public class Authentication : IMiddleware
 
 public static class AuthenticationExtensions
 {
-    public static IApplicationBuilder UseRequestAuthentication(this IApplicationBuilder builder)
+    public static IApplicationBuilder UseAppAuthentication(this IApplicationBuilder builder)
     {
         return builder.UseMiddleware<Authentication>();
     }

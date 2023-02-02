@@ -78,6 +78,7 @@ public class AuthRepository : IAuthRepository
                 SELECT
                     Id,
                     SchemeName,
+                    Type,
                     Options,
                     Description
                 FROM
@@ -217,6 +218,7 @@ public class AuthRepository : IAuthRepository
                 SELECT
                     Id,
                     SchemeName,
+                    Type,
                     Options,
                     Description
                 FROM

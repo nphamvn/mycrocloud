@@ -79,7 +79,7 @@ public class RouteValidation : IMiddleware
 }
 public static class RouteValidationExtensions
 {
-    public static IApplicationBuilder UseRouteValidation(this IApplicationBuilder builder)
+    public static IApplicationBuilder UseAppRoute(this IApplicationBuilder builder)
     {
         return builder.UseMiddleware<RouteValidation>();
     }
