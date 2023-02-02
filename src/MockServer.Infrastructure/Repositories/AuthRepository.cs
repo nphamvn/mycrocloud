@@ -159,18 +159,21 @@ public class AuthRepository : IAuthRepository
     public async Task ActivateProjectAuthenticationSchemes(int projectId, List<int> schemeIds)
     {
         using var connection = new SqliteConnection(_connectionString);
-
-        var reset = """
+        await connection.OpenAsync();
+        var transaction = await connection.BeginTransactionAsync();
+        try
+        {
+            var reset = """
                     UPDATE ProjectAuthentication SET [Order] = null WHERE ProjectId = @ProjectId;
                     """;
-        await connection.ExecuteAsync(reset, new
-        {
-            ProjectId = projectId
-        });
-        foreach (var id in schemeIds)
-        {
-            var set =
-                    """
+            await connection.ExecuteAsync(reset, new
+            {
+                ProjectId = projectId
+            }, transaction);
+            foreach (var id in schemeIds)
+            {
+                var set =
+                        """
                     UPDATE 
                         ProjectAuthentication 
                     SET 
@@ -183,11 +186,18 @@ public class AuthRepository : IAuthRepository
                                 ProjectId = @ProjectId) 
                     WHERE Id = @Id
                     """;
-            await connection.ExecuteAsync(set, new
-            {
-                ProjectId = projectId,
-                Id = id
-            });
+                await connection.ExecuteAsync(set, new
+                {
+                    ProjectId = projectId,
+                    Id = id
+                }, transaction);
+            }
+            await transaction.CommitAsync();
+        }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync();
+            throw;
         }
     }
 
