@@ -33,7 +33,7 @@ public class ConstraintsValidation : IMiddleware
         ArgumentNullException.ThrowIfNull(context.Items["RequestId"]);
         int id = Convert.ToInt32(context.Items["RequestId"]);
 
-        var r = await _requestRepository.Get(id);
+        var r = await _requestRepository.GetById(id);
         if (r.Type == RequestType.Fixed)
         {
             var @params = await _requestRepository.GetRequestParams(r.Id);

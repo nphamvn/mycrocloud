@@ -1,14 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MockServer.Core.Enums;
-using MockServer.Web.Attributes;
+using MockServer.Web.Filters;
 using MockServer.Web.Models.ProjectSettings.Auth;
 using MockServer.Web.Services.Interfaces;
-
+using RouteName = MockServer.Web.Common.Constants.RouteName;
 namespace MockServer.Web.Controllers;
 
 [Authorize]
-[Route("projects/{name}/settings")]
+[Route("projects/{ProjectName}/settings")]
+[GetAuthUserProjectId(RouteName.ProjectName, RouteName.ProjectId)]
 public class ProjectSettingsController : BaseController
 {
     private readonly IProjectWebService _projectService;
@@ -22,23 +23,23 @@ public class ProjectSettingsController : BaseController
 
     [HttpGet]
     [HttpGet("general")]
-    public async Task<IActionResult> Index(string name)
+    public async Task<IActionResult> Index(int ProjectId)
     {
-        var model = await _settingsService.GetIndexModel(name);
+        var model = await _settingsService.GetIndexModel(ProjectId);
         return View("Views/ProjectSettings/Index.cshtml", model);
     }
 
     [HttpGet("auth")]
-    public async Task<IActionResult> Auth(string name)
+    public async Task<IActionResult> Auth(int ProjectId)
     {
-        var model = await _settingsService.GetAuthIndexModel(name);
+        var model = await _settingsService.GetAuthIndexModel(ProjectId);
         return View("Views/ProjectSettings/Auth/Index.cshtml", model);
     }
     [HttpPost("auth")]
-    public async Task<IActionResult> SaveAuth(string name, AuthIndexModel model)
+    public async Task<IActionResult> SaveAuth(string ProjectName, int ProjectId, AuthIndexModel model)
     {
-        await _settingsService.SaveAuthIndexModel(name, model);
-        return RedirectToAction(nameof(Auth), new { name = name });
+        await _settingsService.SaveAuthIndexModel(ProjectId, model);
+        return RedirectToAction(nameof(Auth), new { name = ProjectName });
     }
 
     [HttpGet("auth/jwtbearer/{id:int?}")]
@@ -53,7 +54,7 @@ public class ProjectSettingsController : BaseController
     {
         if (id is not int)
         {
-            await _settingsService.CreateJwtBearerAuthentication(name, model);
+            await _settingsService.CreateJwtBearerAuthentication(ProjectId, model);
         }
         else
         {
@@ -94,7 +95,7 @@ public class ProjectSettingsController : BaseController
     [HttpPost("auth/apikey/{id:int}/generate-key")]
     public async Task<IActionResult> GenerateApiKey(string name, int id)
     {
-        string key = await _projectService.GenerateKey(name);
+        string key = await _projectService.GenerateKey(ProjectId);
         return RedirectToAction(nameof(Auth), Request.RouteValues);
     }
 
@@ -106,9 +107,9 @@ public class ProjectSettingsController : BaseController
     }
 
     [HttpPost("rename")]
-    public async Task<IActionResult> Rename(string name, string newName)
+    public async Task<IActionResult> Rename(int ProjectId, string newName)
     {
-        await _projectService.Rename(name, newName);
+        await _projectService.Rename(ProjectId, newName);
         return RedirectToAction(nameof(Index), new { name = newName });
     }
 

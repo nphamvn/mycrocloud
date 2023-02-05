@@ -5,10 +5,10 @@ namespace MockServer.Web.Services.Interfaces;
 
 public interface IProjectSettingsWebService
 {
-    Task<IndexModel> GetIndexModel(string name);
-    Task<AuthIndexModel> GetAuthIndexModel(string name);
-    Task SaveAuthIndexModel(string name, AuthIndexModel model);
-    Task CreateJwtBearerAuthentication(string name, JwtBearerAuthModel model);
+    Task<IndexModel> GetIndexModel(int projectId);
+    Task<AuthIndexModel> GetAuthIndexModel(int projectId);
+    Task SaveAuthIndexModel(int projectId, AuthIndexModel model);
+    Task CreateJwtBearerAuthentication(int projectId, JwtBearerAuthModel model);
     Task EditJwtBearerAuthentication(int id, JwtBearerAuthModel model);
     Task CreateApiKeyAuthentication(string name, ApiKeyAuthModel model);
     Task<JwtBearerAuthModel> GetJwtBearerAuthModel(string name, int id);

@@ -98,7 +98,6 @@ public class AppAuthorizationService : IAppAuthorizationService
         {
             u[claim.Type] = claim.Value;
         }
-        object p = u;
         _engine.SetValue("user", u);
         _engine.Execute($"let user = {JsonSerializer.Serialize(u)};");
         var result = _engine.Execute(string.Format("eval({0})", requirement.ConditionalExpression)).GetCompletionValue().AsBoolean();

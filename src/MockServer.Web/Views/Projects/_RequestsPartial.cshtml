@@ -151,7 +151,7 @@
         const container = $($('#context-menu-template').html());
         var left = (position.left - 70 + $(this).outerWidth()) + 'px';
         var top = (position.top + $(this).outerHeight()) + 'px';
-        container.css({ 'left': left, 'top': top });
+        container.css({'left': left, 'top': top});
         $('.btn-group-vertical button', container).click(function () {
             $('.btn-clicked').removeClass('btn-clicked');
             $(document).off('click', documentClickHandler);
@@ -207,12 +207,13 @@
 <!-- Open request: Start -->
 <script>
     $(function () {
-        const tempUrl = '@Url.Action(nameof(RequestsController.Open), "Requests", new {projectName = ViewData["ProjectName"], id = -1})';
+        const tempUrl = '@Url.Action(nameof(RequestsController.Open), "Requests", new {ProjectName = ViewData["ProjectName"], RequestId = -1})';
         $('.js-open-request').click(function () {
             const selected = $(this).closest('li');
             selected.parent().find('li').removeClass('bg-gray');
             selected.addClass('bg-gray');
             const id = selected.data('request-id');
+            console.log('url: ' + tempUrl.replace('/-1', `/${id}`));
             $('#RequestOpenContent').load(tempUrl.replace('/-1', `/${id}`));
         });
     });

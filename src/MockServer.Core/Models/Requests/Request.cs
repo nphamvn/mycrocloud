@@ -13,5 +13,7 @@ public class Request : BaseEntity
     public string Method { get; set; }
     public Project Project { get; set; }
     public AppAuthorization Authorization { get; set; }
+    public IList<RequestHeader> Headers { get; set; }
+    public IList<RequestParam> Parameters { get; set; }
 }
 

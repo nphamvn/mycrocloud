@@ -83,14 +83,17 @@ public class ProjectRepository : IProjectRepository
     {
         var query =
                 """
-                    SELECT Id,
+                    SELECT 
+                        Id,
                         UserId,
                         Name,
                         Description,
                         PrivateAccess,
                         PrivateKey
-                    FROM Project
-                    WHERE Id = @id;
+                    FROM 
+                        Project
+                    WHERE 
+                        Id = @id;
                 """;
         using var connection = new SqliteConnection(_connectionString);
         return await connection.QuerySingleOrDefaultAsync<Project>(query, new
@@ -122,7 +125,7 @@ public class ProjectRepository : IProjectRepository
         });
     }
 
-    public async Task<IEnumerable<Project>> GetByUserId(int userId, string query, int accessibility, string sort)
+    public async Task<IEnumerable<Project>> Search(int userId, string query, int accessibility, string sort)
     {
         var sql =
                 """

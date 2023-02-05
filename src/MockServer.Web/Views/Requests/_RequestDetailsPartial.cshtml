@@ -1,0 +1,57 @@
+@model MockServer.Web.Models.Requests.RequestOpenViewModel
+
+<div class="card">
+    <div class="card-header d-flex">
+        Request Details
+        <button id="btnEdit" class="btn btn-light btn-sm py-1 ms-auto my-0">Edit</button>
+    </div>
+    <div class="card-body">
+        <div class="d-flex mb-1">
+            <strong class="fw-bolder">@Model.Name</strong>
+        </div>
+        <div class="mb-2">
+            <small>@Model.Description</small>
+        </div>
+        <div class="mb-2">
+            <strong class="me-2 @Model.MethodTextColor" id="method">@Model.Method</strong>
+            <span id="path">@Model.Path</span>
+        </div>
+        <div class="input-group mb-3">
+            <input id="privateKey" type="text" class="form-control" value="@Model.Url" readonly>
+            <button id="btnCopyPrivateKeyToClipboard" type="button" class="input-group-text">
+                <i class="bi bi-clipboard">
+                </i></button>
+        </div>
+    </div>
+</div>
+<div class="card mt-1">
+    <div class="card-header d-flex">
+        Authorization
+        <button class="btn btn-light btn-sm py-1 ms-auto my-0 js-config-auth">Configure</button>
+    </div>
+    <div class="card-body">
+        @if (Model.Authorization != null)
+        {
+            <table class="table table-borderless">
+                <thead>
+                    <tr>
+                        <th scope="col">Authorization Type</th>
+                        <th scope="col">Authentication Schemes</th>
+                        <th scope="col">Policies</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td scope="row">@Model.Authorization.Type</td>
+                        <td>@Model.Authorization.AuthenticationSchemes.Count</td>
+                        <td>@Model.Authorization.Requirements.Count</td>
+                    </tr>
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>No authorization attached to this request.</p>
+        }
+    </div>
+</div>

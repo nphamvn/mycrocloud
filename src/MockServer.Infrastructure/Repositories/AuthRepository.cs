@@ -113,7 +113,7 @@ public class AuthRepository : IAuthRepository
         return !string.IsNullOrEmpty(json) ? JsonSerializer.Deserialize<AppAuthorization>(json) : null;
     }
 
-    public async Task SetRequestAuthorization(int requestId, AppAuthorization authorization)
+    public async Task UpdateRequestAuthorization(int requestId, AppAuthorization authorization)
     {
         var query =
                 """

@@ -87,10 +87,11 @@ public class ProjectSettingsWebService : IProjectSettingsWebService
         return model;
     }
 
-    public async Task<IndexModel> GetIndexModel(string name)
+    public async Task<IndexModel> GetIndexModel(int projectId)
     {
         var model = new IndexModel();
-        model.Project = await GetProjectByName(name);
+        var project = await _projectRepository.Get(projectId);
+        model.Project = _mapper.Map<MockServer.Web.Models.Projects.Project>(project);
         return model;
     }
 

@@ -8,21 +8,17 @@ public class FixedRequest
     public Response Response { get; set; }
 }
 
-public class RequestHeader : BaseEntity
+public class RequestHeader
 {
     public string Name { get; set; }
     public string Value { get; set; }
-    public bool Required { get; set; }
-    public bool MatchExactly { get; set; }
     public string Description { get; set; }
     public string Constraints { get; set; }
 }
-public class RequestParam : BaseEntity
+public class RequestParam
 {
     public string Key { get; set; }
     public string Value { get; set; }
-    //public bool Required { get; set; }
-    public bool MatchExactly { get; set; }
     public string Description { get; set; }
     public string Constraints { get; set; }
     public int ConstraintsCount

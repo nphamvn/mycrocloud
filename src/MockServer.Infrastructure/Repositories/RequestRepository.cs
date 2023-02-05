@@ -13,10 +13,9 @@ public class RequestRepository : IRequestRepository
     public RequestRepository(GlobalSettings settings)
     {
         _connectionString = settings.Sqlite.ConnectionString;
-        SqlMapper.AddTypeHandler(new AuthorizationJsonTypeHandler());
     }
 
-    public async Task<int> Create(int userId, string projectName, Request request)
+    public async Task<int> Create(int projectId, Request request)
     {
         var query =
                 """
@@ -32,10 +31,7 @@ public class RequestRepository : IRequestRepository
                         Description
                      )
                      VALUES (
-                        (SELECT Id
-                          FROM Project
-                          WHERE UserId = @UserId AND 
-                            Name = @ProjectName),
+                        @ProjectId,
                         @Type,
                         @Name,
                         @Method,
@@ -49,8 +45,7 @@ public class RequestRepository : IRequestRepository
         using var connection = new SqliteConnection(_connectionString);
         return await connection.QuerySingleAsync<int>(query, new
         {
-            UserId = userId,
-            ProjectName = projectName,
+            ProjectId = projectId,
             Type = (int)request.Type,
             Name = request.Name,
             Method = request.Method,
@@ -60,37 +55,13 @@ public class RequestRepository : IRequestRepository
         });
     }
 
-    public async Task Delete(int userId, string projectName, int id)
+    public async Task Delete(int id)
     {
         using var connection = new SqliteConnection(_connectionString);
         await connection.OpenAsync();
         using var trans = await connection.BeginTransactionAsync();
         try
         {
-            var delete1 = "DELETE FROM CallbackRequest WHERE RequestId = @RequestId";
-            await connection.ExecuteAsync(delete1, new { RequestId = id }, trans);
-
-            var delete2 = "DELETE FROM FixedRequestConfiguration WHERE RequestId = @RequestId";
-            await connection.ExecuteAsync(delete2, new { RequestId = id }, trans);
-
-            var delete3 = "DELETE FROM ForwardingRequest WHERE RequestId = @RequestId";
-            await connection.ExecuteAsync(delete3, new { RequestId = id }, trans);
-
-            var delete4 = "DELETE FROM RequestBody WHERE RequestId = @RequestId";
-            await connection.ExecuteAsync(delete4, new { RequestId = id }, trans);
-
-            var delete5 = "DELETE FROM RequestHeaders WHERE RequestId = @RequestId";
-            await connection.ExecuteAsync(delete5, new { RequestId = id }, trans);
-
-            var delete6 = "DELETE FROM RequestParams WHERE RequestId = @RequestId";
-            await connection.ExecuteAsync(delete6, new { RequestId = id }, trans);
-
-            var query = "DELETE FROM Response WHERE RequestId = @RequestId;";
-            await connection.ExecuteAsync(query, new { RequestId = id }, trans);
-
-            var delete7 = "DELETE FROM ResponseHeaders WHERE RequestId = @RequestId;";
-            await connection.ExecuteAsync(delete7, new { RequestId = id }, trans);
-
             var delete = "DELETE FROM Requests WHERE Id = @Id;";
             await connection.ExecuteAsync(delete, new { Id = id }, trans);
 
@@ -103,42 +74,7 @@ public class RequestRepository : IRequestRepository
         }
     }
 
-    public async Task<Request> Get(string username, string projectName, string method, string path)
-    {
-        var query =
-                """
-                SELECT
-                    r.Id,
-                    r.Type,
-                    r.Name,
-                    r.Path,
-                    r.Description,
-                    m.UpperCaseName AS Method,
-                    r.ProjectId
-                FROM Requests r
-                    INNER JOIN
-                    Project p ON r.ProjectId = p.Id
-                    INNER JOIN
-                    Users u ON p.UserId = u.Id
-                    INNER JOIN
-                    Master_HttpMethod m ON r.Method = m.Id
-                WHERE upper(u.Username) = upper(@username) AND 
-                    upper(p.Name) = upper(@projectName) AND 
-                    m.UpperCaseName = upper(@method) AND 
-                    upper(r.Path) = upper(@path);
-                """;
-
-        using var connection = new SqliteConnection(_connectionString);
-        return await connection.QuerySingleOrDefaultAsync<Request>(query, new
-        {
-            username = username,
-            projectName = projectName,
-            method = method,
-            path = path
-        });
-    }
-
-    public async Task<Request> Get(int userId, string projectName, string method, string path)
+    public async Task<Request> Find(int projectId, string method, string path)
     {
         var query =
                 """
@@ -148,15 +84,11 @@ public class RequestRepository : IRequestRepository
                     r.Name,
                     r.Path,
                     r.Method,
-                    r.Description,
-                    r.ProjectId
+                    r.Description
                 FROM Requests r
                     INNER JOIN
-                    Project p ON r.ProjectId = p.Id
-                    INNER JOIN
-                    Users u ON p.UserId = u.Id
-                WHERE u.Id = @userId AND 
-                    upper(p.Name) = upper(@projectName) AND 
+                        Project p ON r.ProjectId = p.Id AND r.ProjectId = @ProjectId
+                WHERE
                     upper(r.method) = upper(@method) AND 
                     upper(r.Path) = upper(@path);
                 """;
@@ -164,100 +96,35 @@ public class RequestRepository : IRequestRepository
         using var connection = new SqliteConnection(_connectionString);
         return await connection.QuerySingleOrDefaultAsync<Request>(query, new
         {
-            userId = userId,
-            projectName = projectName,
+            ProjectId = projectId,
             method = method,
             path = path
         });
     }
 
-    public async Task<Request> Get(int userId, string projectName, int id)
-    {
-        var query =
-                """
-                SELECT r.*
-                FROM Requests r
-                    INNER JOIN
-                    Project p ON r.ProjectId = p.Id
-                    INNER JOIN
-                    Users u ON p.UserId = u.Id
-                WHERE r.Id = @RequestId AND 
-                    u.Id = @UserId AND 
-                    lower(p.Name) = lower(@ProjectName);
-                """;
-
-        using var connection = new SqliteConnection(_connectionString);
-        return await connection.QuerySingleOrDefaultAsync<Request>(query, new
-        {
-            RequestId = id,
-            UserId = userId,
-            ProjectName = projectName
-        });
-    }
-
-    public async Task<Request> Get(int projectId, string method, string path)
+    public async Task<Request> GetById(int id)
     {
         var query =
                 """
                 SELECT
                     r.Id,
+                    r.ProjectId,
                     r.Type,
                     r.Name,
                     r.Path,
                     r.Method,
-                    r.Description
-                FROM Requests r
-                WHERE r.ProjectId = @ProjectId AND 
-                    upper(r.Method) = upper(@Method) AND 
-                    upper(r.Path) = upper(@Path);
-                """;
-
-        using var connection = new SqliteConnection(_connectionString);
-        return await connection.QuerySingleOrDefaultAsync<Request>(query, new
-        {
-            ProjectId = projectId,
-            Method = method,
-            Path = path
-        });
-    }
-
-    public async Task<Request> Get(int id)
-    {
-        var query =
-                """
-                SELECT
-                    r.Id,
-                    r.Type,
-                    r.Name,
-                    r.Path,
-                    r.Method,
-                    r.Description
+                    r.Description,
+                    r.Authorization,
+                    r.Parameters,
+                    r.Headers
                 FROM Requests r
                 WHERE r.Id = @Id
                 """;
-
         using var connection = new SqliteConnection(_connectionString);
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<AppAuthorization>());
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RequestHeader>>());
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RequestParam>>());
         return await connection.QuerySingleOrDefaultAsync<Request>(query, new
-        {
-            Id = id
-        });
-    }
-
-    public async Task<FixedRequest> GetFixedRequestConfig(int userId, string projectName, int id)
-    {
-        var query =
-                """
-                SELECT res.RequestId,
-                    res.StatusCode ResponseStatusCode,
-                    res.Body ResponseBody
-                FROM FixedRequestResponse res
-                    INNER JOIN
-                    Requests req ON res.RequestId = req.Id
-                WHERE req.Id = @Id;
-                """;
-
-        using var connection = new SqliteConnection(_connectionString);
-        return await connection.QuerySingleOrDefaultAsync<FixedRequest>(query, new
         {
             Id = id
         });
@@ -284,11 +151,12 @@ public class RequestRepository : IRequestRepository
         });
     }
 
-    public async Task<IEnumerable<Request>> GetProjectRequests(int ProjectId)
+    public async Task<IEnumerable<Request>> GetByProjectId(int ProjectId)
     {
         var query =
                 """
-                SELECT r.Id,
+                SELECT 
+                    r.Id,
                     r.ProjectId,
                     r.Type,
                     r.Name,
@@ -296,7 +164,7 @@ public class RequestRepository : IRequestRepository
                     r.Path
                 FROM Requests r
                     INNER JOIN
-                    Project p ON r.ProjectId = p.Id
+                        Project p ON r.ProjectId = p.Id
                 WHERE p.Id = @ProjectId;
                 """;
 
@@ -325,53 +193,6 @@ public class RequestRepository : IRequestRepository
         return await connection.QuerySingleOrDefaultAsync<RequestBody>(query, new
         {
             RequestId = requestId
-        });
-    }
-
-    public async Task<IEnumerable<RequestHeader>> GetRequestHeaders(int id)
-    {
-        var query =
-                      """
-                    SELECT
-                        Id,
-                        Name,
-                        Value,
-                        Required,
-                        MatchExactly,
-                        Description
-                    FROM
-                        RequestHeaders
-                    WHERE
-                        RequestId = @RequestId
-                   """;
-        using var connection = new SqliteConnection(_connectionString);
-        return await connection.QueryAsync<RequestHeader>(query, new
-        {
-            RequestId = id
-        });
-    }
-
-    public async Task<IEnumerable<RequestParam>> GetRequestParams(int id)
-    {
-        var query =
-                   """
-                    SELECT
-                        Id,
-                        Key,
-                        Value,
-                        Required,
-                        MatchExactly,
-                        Description,
-                        Constraints
-                    FROM
-                        RequestParams
-                    WHERE
-                        RequestId = @RequestId
-                   """;
-        using var connection = new SqliteConnection(_connectionString);
-        return await connection.QueryAsync<RequestParam>(query, new
-        {
-            RequestId = id
         });
     }
 
@@ -418,7 +239,7 @@ public class RequestRepository : IRequestRepository
         });
     }
 
-    public async Task Update(int userId, string projectName, int id, Request request)
+    public async Task Update(int id, Request request)
     {
         var query =
                     """
@@ -494,111 +315,63 @@ public class RequestRepository : IRequestRepository
         }
     }
 
-    public async Task UpdateRequestHeaders(int id, FixedRequest config)
+    public async Task UpdateRequestHeaders(int id, IList<RequestHeader> headers)
     {
-        if (config.RequestHeaders is IList<RequestHeader> headers)
+        using var connection = new SqliteConnection(_connectionString);
+        await connection.OpenAsync();
+        using var transaction = await connection.BeginTransactionAsync();
+        try
         {
-            using var connection = new SqliteConnection(_connectionString);
-            await connection.OpenAsync();
-            using var transaction = await connection.BeginTransactionAsync();
-            try
+            const string query =
+                            """
+                                UPDATE
+                                    Requests
+                                SET
+                                    Headers = @Headers
+                                WHERE
+                                    Id = @Id
+                                """;
+            SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RequestHeader>>());
+            await connection.ExecuteAsync(query, new
             {
-                var deleteQuery = "DELETE FROM RequestHeaders WHERE RequestId = @RequestId";
-                await connection.ExecuteAsync(deleteQuery, new
-                {
-                    RequestId = id,
-                }, transaction);
-
-                var map = headers.Select(h => new
-                {
-                    RequestId = id,
-                    Name = h.Name,
-                    Value = h.Value,
-                    Required = h.Required,
-                    MatchExactly = h.MatchExactly,
-                    Description = h.Description
-                })
-                .ToList();
-                var insertQuery =
-                        """
-                         INSERT INTO RequestHeaders (
-                            RequestId,
-                            Name,
-                            Value,
-                            Required,
-                            MatchExactly,
-                            Description
-                        ) VALUES(
-                            @RequestId,
-                            @Name,
-                            @Value,
-                            @Required,
-                            @MatchExactly,
-                            @Description
-                        )
-                        """;
-
-                await connection.ExecuteAsync(insertQuery, map, transaction);
-                await transaction.CommitAsync();
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+                Headers = headers
+            }, transaction);
+            await transaction.CommitAsync();
+        }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync();
+            throw;
         }
     }
 
-    public async Task UpdateRequestParams(int id, FixedRequest config)
+    public async Task UpdateRequestParams(int id, IList<RequestParam> parameters)
     {
-        if (config.RequestParams is IList<RequestParam> @params)
+        using var connection = new SqliteConnection(_connectionString);
+        await connection.OpenAsync();
+        using var transaction = await connection.BeginTransactionAsync();
+        try
         {
-            using var connection = new SqliteConnection(_connectionString);
-            await connection.OpenAsync();
-            using var transaction = await connection.BeginTransactionAsync();
-            try
+            const string query =
+                                """
+                                UPDATE
+                                    Requests
+                                SET
+                                    Parameters = @Parameters
+                                WHERE
+                                    Id = @Id
+                                """;
+            SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RequestParam>>());
+            await connection.ExecuteAsync(query, new
             {
-                var deleteQuery = "DELETE FROM RequestParams WHERE RequestId = @RequestId";
-                await connection.ExecuteAsync(deleteQuery, new
-                {
-                    RequestId = id,
-                }, transaction);
-
-                var map = @params.Select(p => new
-                {
-                    RequestId = id,
-                    Key = p.Key,
-                    Value = p.Value,
-                    MatchExactly = p.MatchExactly,
-                    Description = p.Description,
-                    Constraints = p.Constraints
-                })
-                .ToList();
-                var insertQuery =
-                        """
-                         INSERT INTO RequestParams (
-                            RequestId,
-                            Key,
-                            Value,
-                            Description,
-                            Constraints
-                        ) VALUES(
-                            @RequestId,
-                            @Key,
-                            @Value,
-                            @Description,
-                            @Constraints
-                        )
-                        """;
-
-                await connection.ExecuteAsync(insertQuery, map, transaction);
-                await transaction.CommitAsync();
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+                Parameters = JsonSerializer.Serialize(parameters)
+            }, transaction);
+            await transaction.CommitAsync();
+        }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync();
+            throw;
         }
     }
 
@@ -733,16 +506,20 @@ public class RequestRepository : IRequestRepository
         }
     }
 }
-
-public class AuthorizationJsonTypeHandler : SqlMapper.TypeHandler<AppAuthorization>
+public class JsonTypeHandler<T> : SqlMapper.TypeHandler<T>
 {
-    public override AppAuthorization Parse(object value)
+    public override void SetValue(System.Data.IDbDataParameter parameter, T value)
     {
-        return JsonSerializer.Deserialize<AppAuthorization>(value.ToString());
+        parameter.Value = JsonSerializer.Serialize(value);
     }
 
-    public override void SetValue(System.Data.IDbDataParameter parameter, AppAuthorization value)
+    public override T Parse(object value)
     {
-        parameter.Value = JsonSerializer.Serialize((AppAuthorization)value);
+        if (value is string json)
+        {
+            return JsonSerializer.Deserialize<T>(json);
+        }
+
+        return default(T);
     }
 }

@@ -48,23 +48,18 @@ public class ProjectWebService : IProjectWebService
         return true;
     }
 
-    public async Task Delete(string name)
+    public async Task Delete(int projectId)
     {
-        var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
-        Guard.Against.Null(user, nameof(ApplicationUser));
-
-        var project = await projectRepository.Get(user.Id, name);
+        var project = await projectRepository.Get(projectId);
         if (project != null)
         {
             await projectRepository.Delete(project.Id);
         }
     }
 
-    public async Task<string> GenerateKey(string name)
+    public async Task<string> GenerateKey(int projectId)
     {
-        var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
-        Guard.Against.Null(user, nameof(ApplicationUser));
-        var project = await projectRepository.Get(user.Id, name);
+        var project = await projectRepository.Get(projectId);
         Guard.Against.Null(project);
         return _apiKeyService.GenerateApiKey();
     }
@@ -74,7 +69,7 @@ public class ProjectWebService : IProjectWebService
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
         Enum.TryParse<ProjectAccessibility>(searchModel.Accessibility, out ProjectAccessibility accessibility);
-        var projects = await projectRepository.GetByUserId(user.Id, searchModel.Query, (int)accessibility, searchModel.Sort);
+        var projects = await projectRepository.Search(user.Id, searchModel.Query, (int)accessibility, searchModel.Sort);
 
         var vm = new ProjectIndexViewModel();
         vm.Projects = projects.Select(p => new ProjectIndexItem
@@ -89,23 +84,19 @@ public class ProjectWebService : IProjectWebService
         return vm;
     }
 
-    public async Task<ProjectViewViewModel> GetProjectViewViewModel(string name)
+    public async Task<ProjectViewViewModel> GetProjectViewViewModel(int projectId)
     {
-        var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
-        Guard.Against.Null(user, nameof(ApplicationUser));
-        var project = await projectRepository.Get(user.Id, name);
+        var project = await projectRepository.Get(projectId);
         var vm = new ProjectViewViewModel();
         vm.ProjectInfo = _mapper.Map<ProjectIndexItem>(project);
-        var requests = await _requestRepository.GetProjectRequests(project.Id);
+        var requests = await _requestRepository.GetByProjectId(project.Id);
         vm.Requests = _mapper.Map<IEnumerable<RequestIndexItem>>(requests);
         return vm;
     }
 
-    public async Task Rename(string name, string newName)
+    public async Task Rename(int projectId, string newName)
     {
-        var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
-        Guard.Against.Null(user, nameof(ApplicationUser));
-        var project = await projectRepository.Get(user.Id, name);
+        var project = await projectRepository.Get(projectId);
         if (project != null)
         {
             project.Name = newName;
@@ -113,11 +104,9 @@ public class ProjectWebService : IProjectWebService
         }
     }
 
-    public async Task SetAccessibility(string name, ProjectAccessibility accessibility)
+    public async Task SetAccessibility(int projectId, ProjectAccessibility accessibility)
     {
-        var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
-        Guard.Against.Null(user, nameof(ApplicationUser));
-        var project = await projectRepository.Get(user.Id, name);
+        var project = await projectRepository.Get(projectId);
         if (project != null)
         {
             project.Accessibility = accessibility;

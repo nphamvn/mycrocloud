@@ -2,13 +2,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MockServer.Web.Attributes;
+using MockServer.Web.Filters;
 using MockServer.Web.Models.Requests;
 using MockServer.Web.Services.Interfaces;
-
+using RouteName = MockServer.Web.Common.Constants.RouteName;
 namespace MockServer.Web.Controllers;
 
 [Authorize]
-[Route("projects/{projectName}/requests")]
+[Route("projects/{ProjectName}/requests")]
+[GetAuthUserProjectId(RouteName.ProjectName, RouteName.ProjectId)]
 public class RequestsController : Controller
 {
     private readonly IRequestWebService _requestService;
@@ -18,34 +20,32 @@ public class RequestsController : Controller
     }
 
     [AjaxOnly]
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> Open(string projectName, int id)
+    [HttpGet("{RequestId:int}")]
+    [ValidateProjectRequest(RouteName.ProjectId, RouteName.RequestId)]
+    public async Task<IActionResult> Open(int ProjectId, int RequestId)
     {
-        ViewData["ProjectName"] = projectName;
-        ViewData["RequestId"] = id;
-        var vm = await _requestService.GetRequestOpenViewModel(projectName, id);
+        var vm = await _requestService.GetRequestOpenViewModel(RequestId);
         return PartialView("Views/Requests/_RequestOpen.cshtml", vm);
     }
 
     [AjaxOnly]
     [HttpGet("create")]
-    public async Task<IActionResult> GetCreatePartial(string projectName)
+    public async Task<IActionResult> GetCreatePartial(int ProjectId)
     {
-        ViewData["ProjectName"] = projectName;
-        var model = await _requestService.GetCreateRequestViewModel(projectName);
+        var model = await _requestService.GetCreateRequestViewModel(ProjectId);
         return PartialView("Views/Requests/_CreateRequestPartial.cshtml", model);
     }
 
     [AjaxOnly]
     [HttpPost("create")]
-    public async Task<IActionResult> CreateAjax(string projectName, CreateUpdateRequestViewModel request)
+    public async Task<IActionResult> CreateAjax(int ProjectId, CreateUpdateRequestViewModel request)
     {
         if (!ModelState.IsValid)
         {
             IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
             return BadRequest(allErrors);
         }
-        int id = await _requestService.Create(projectName, request);
+        int id = await _requestService.Create(ProjectId, request);
         return Ok(new
         {
             id = id
@@ -53,56 +53,62 @@ public class RequestsController : Controller
     }
 
     [AjaxOnly]
-    [HttpGet("{id:int}/edit")]
-    public async Task<IActionResult> GetEditPartial(string projectName, int id)
+    [HttpGet("{RequestId:int}/edit")]
+    [ValidateProjectRequest(RouteName.ProjectId, RouteName.RequestId)]
+    public async Task<IActionResult> GetEditPartial(int ProjectId, int RequestId)
     {
-        var vm = await _requestService.GetGetCreateRequestViewModel(projectName, id);
+        var vm = await _requestService.GetCreateRequestViewModel(RequestId);
         ViewData["FormMode"] = "Edit";
         return PartialView("Views/Requests/_CreateRequestPartial.cshtml", vm);
     }
 
     [AjaxOnly]
-    [HttpPost("{id:int}/edit")]
-    public async Task<IActionResult> Edit(string projectName, int id, CreateUpdateRequestViewModel request)
+    [HttpPost("{RequestId:int}/edit")]
+    [ValidateProjectRequest(RouteName.ProjectId, RouteName.RequestId)]
+    public async Task<IActionResult> Edit(int RequestId, CreateUpdateRequestViewModel request)
     {
-        if (!await _requestService.ValidateEdit(projectName, id, request, ModelState))
+        if (!await _requestService.ValidateEdit(RequestId, request, ModelState))
         {
             IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
             return BadRequest(allErrors);
         }
-        await _requestService.Edit(projectName, id, request);
+        await _requestService.Edit(RequestId, request);
         return NoContent();
     }
 
     [AjaxOnly]
     [HttpGet("{id:int}/authorization")]
-    public async Task<IActionResult> GetAuthorizationPartial(string projectName, int id)
+    [ValidateProjectRequest(RouteName.ProjectId, RouteName.RequestId)]
+    public async Task<IActionResult> GetAuthorizationPartial(int ProjectId, int id)
     {
-        var vm = await _requestService.GetAuthorizationConfigViewModel(projectName, id);
+        var vm = await _requestService.GetAuthorizationConfigViewModel(ProjectId, id);
         return PartialView("Views/Requests/_AuthorizationConfigPartial.cshtml", vm);
     }
 
     [AjaxOnly]
-    [HttpPost("{id:int}/authorization")]
-    public async Task<IActionResult> ConfigAuthorization(string projectName, int id, AuthorizationConfigViewModel auth)
+    [HttpPost("{RequestId:int}/authorization")]
+    [ValidateProjectRequest(RouteName.ProjectId, RouteName.RequestId)]
+    public async Task<IActionResult> ConfigAuthorization(int ProjectId, int RequestId, AuthorizationConfigViewModel auth)
     {
-        await _requestService.UpdateRequestAuthorizationConfig(projectName, id, auth);
+        await _requestService.ConfigureRequestAuthorization(RequestId, auth);
         return NoContent();
     }
 
     [AjaxOnly]
-    [HttpPost("{id:int}/config/fixed-request")]
-    public async Task<IActionResult> ConfigFixedRequest(string projectName, int id, string[] fields, FixedRequestConfigViewModel config)
+    [HttpPost("{RequestId:int}/config/fixed-request")]
+    [ValidateProjectRequest(RouteName.ProjectId, RouteName.RequestId)]
+    public async Task<IActionResult> ConfigFixedRequest(int ProjectId, int RequestId, string[] fields, FixedRequestConfigViewModel config)
     {
-        await _requestService.SaveFixedRequestConfig(projectName, id, fields, config);
+        await _requestService.SaveFixedRequestConfig(RequestId, fields, config);
         return Ok(config);
     }
 
     [AjaxOnly]
     [HttpPost("{id:int}/delete")]
-    public async Task<IActionResult> Delete(string projectName, int id)
+    [ValidateProjectRequest(RouteName.ProjectId, RouteName.RequestId)]
+    public async Task<IActionResult> Delete(int RequestId)
     {
-        await _requestService.Delete(projectName, id);
+        await _requestService.Delete(RequestId);
         return Ok();
     }
 }

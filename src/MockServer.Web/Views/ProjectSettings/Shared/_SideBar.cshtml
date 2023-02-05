@@ -1,7 +1,10 @@
 @model string
 @using MockServer.Web.Controllers
+@using RouteName = MockServer.Web.Common.Constants.RouteName;
 @{
-    var rv = new { name = Model };
+    var rv = new RouteValueDictionary {
+{RouteName.ProjectName, Model}
+};
 }
 <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0">
     <div class="d-flex flex-column align-items-center align-items-sm-start px-3 text-white min-vh-100">

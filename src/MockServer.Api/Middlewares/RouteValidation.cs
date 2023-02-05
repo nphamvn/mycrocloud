@@ -37,7 +37,7 @@ public class RouteValidation : IMiddleware
         string key = p.Id.ToString();
         if (!await _cacheService.Exists(p.Id.ToString()))
         {
-            var requests = await _requestRepository.GetProjectRequests(p.Id);
+            var requests = await _requestRepository.GetByProjectId(p.Id);
             routes = requests.Select(r => new Route
             {
                 Id = r.Id,

@@ -13,5 +13,5 @@ public interface IAuthRepository
     Task<AppAuthentication> GetAuthenticationScheme(int id, AuthenticationType type);
     Task<AppAuthentication> GetAuthenticationScheme<TAuthOptions>(int id) where TAuthOptions : AuthOptions;
     Task<AppAuthorization> GetRequestAuthorization(int requestId);
-    Task SetRequestAuthorization(int requestId, AppAuthorization authorization);
+    Task UpdateRequestAuthorization(int requestId, AppAuthorization authorization);
 }
