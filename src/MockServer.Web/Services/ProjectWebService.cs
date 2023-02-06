@@ -37,7 +37,7 @@ public class ProjectWebService : IProjectWebService
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
 
-        var existing = await projectRepository.Get(user.Id, project.Name);
+        var existing = await projectRepository.Find(user.Id, project.Name);
         if (existing != null)
         {
             return false;

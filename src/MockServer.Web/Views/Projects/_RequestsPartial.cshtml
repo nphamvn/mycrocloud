@@ -213,7 +213,7 @@
             selected.parent().find('li').removeClass('bg-gray');
             selected.addClass('bg-gray');
             const id = selected.data('request-id');
-            console.log('url: ' + tempUrl.replace('/-1', `/${id}`));
+            //console.log('url: ' + tempUrl.replace('/-1', `/${id}`));
             $('#RequestOpenContent').load(tempUrl.replace('/-1', `/${id}`));
         });
     });

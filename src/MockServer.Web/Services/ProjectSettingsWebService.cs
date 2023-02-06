@@ -39,11 +39,10 @@ public class ProjectSettingsWebService : IProjectSettingsWebService
         await _authRepository.AddProjectAuthenticationScheme(project.Id, auth);
     }
 
-    public async Task CreateJwtBearerAuthentication(string name, JwtBearerAuthModel model)
+    public async Task CreateJwtBearerAuthentication(int projectId, JwtBearerAuthModel model)
     {
-        var project = await GetProjectByName(name);
         var auth = _mapper.Map<AppAuthentication>(model);
-        await _authRepository.AddProjectAuthenticationScheme(project.Id, auth);
+        await _authRepository.AddProjectAuthenticationScheme(projectId, auth);
     }
 
     public async Task EditJwtBearerAuthentication(int id, JwtBearerAuthModel model)
@@ -79,10 +78,10 @@ public class ProjectSettingsWebService : IProjectSettingsWebService
         return model;
     }
 
-    public async Task<AuthIndexModel> GetAuthIndexModel(string name)
+    public async Task<AuthIndexModel> GetAuthIndexModel(int projectId)
     {
         var model = new AuthIndexModel();
-        model.Project = await GetProjectByName(name);
+        model.Project =_mapper.Map<MockServer.Web.Models.Projects.Project>(await _projectRepository.Get(projectId));
         model.AuthenticationSchemes = await _authRepository.GetProjectAuthenticationSchemes(model.Project.Id);
         return model;
     }
@@ -113,19 +112,16 @@ public class ProjectSettingsWebService : IProjectSettingsWebService
         return model;
     }
 
-    public async Task SaveAuthIndexModel(string name, AuthIndexModel model)
+    public async Task SaveAuthIndexModel(int projectId, AuthIndexModel model)
     {
-        var user = _contextAccessor.HttpContext.User.Parse<ApplicationUser>();
-        Guard.Against.Null(user, nameof(ApplicationUser));
-        var project = await _projectRepository.Get(user.Id, name);
-        await _authRepository.ActivateProjectAuthenticationSchemes(project.Id, model.AuthenticationSchemes.Select(s => s.Id).ToList());
+        await _authRepository.ActivateProjectAuthenticationSchemes(projectId, model.AuthenticationSchemes.Select(s => s.Id).ToList());
     }
 
     private async Task<MockServer.Web.Models.Projects.Project> GetProjectByName(string name)
     {
         var user = _contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         Guard.Against.Null(user, nameof(ApplicationUser));
-        var project = await _projectRepository.Get(user.Id, name);
+        var project = await _projectRepository.Find(user.Id, name);
         return _mapper.Map<MockServer.Web.Models.Projects.Project>(project);
     }
 }

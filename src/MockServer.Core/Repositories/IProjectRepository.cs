@@ -4,9 +4,9 @@ namespace MockServer.Core.Repositories;
 
 public interface IProjectRepository
 {
-    Task<Project> Get(int userId);
-    Task<Project> Get(int userId, string name);
-    Task<Project> Get(string username, string name);
+    Task<Project> Get(int projectId);
+    Task<Project> Find(int userId, string name);
+    Task<Project> Find(string username, string name);
     Task<IEnumerable<Project>> Search(int userId, string query, int accessibility, string sort);
     Task Add(Project project);
     Task Update(Project project);

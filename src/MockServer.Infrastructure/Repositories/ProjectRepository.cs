@@ -58,17 +58,19 @@ public class ProjectRepository : IProjectRepository
         });
     }
 
-    public async Task<Project> Get(int userId, string projectName)
+    public async Task<Project> Find(int userId, string projectName)
     {
         var query =
                 """
-                SELECT Id,
+                SELECT 
+                    Id,
                     Name,
                     Description,
-                    Accessibility,
-                    PrivateKey
-                FROM Project
-                WHERE UserId = @UserId AND 
+                    Accessibility
+                FROM
+                    Project
+                WHERE 
+                    UserId = @UserId AND 
                     upper(Name) = upper(@Name);               
                 """;
         using var connection = new SqliteConnection(_connectionString);
@@ -87,9 +89,7 @@ public class ProjectRepository : IProjectRepository
                         Id,
                         UserId,
                         Name,
-                        Description,
-                        PrivateAccess,
-                        PrivateKey
+                        Description
                     FROM 
                         Project
                     WHERE 
@@ -102,7 +102,7 @@ public class ProjectRepository : IProjectRepository
         });
     }
 
-    public async Task<Project> Get(string username, string name)
+    public async Task<Project> Find(string username, string name)
     {
         var query =
                 """
@@ -110,8 +110,7 @@ public class ProjectRepository : IProjectRepository
                     p.Id,
                     p.Name,
                     p.Description,
-                    p.Accessibility,
-                    p.PrivateKey
+                    p.Accessibility
                 FROM Project p
                 INNER JOIN Users u ON p.UserId = u.Id
                 WHERE upper(u.Username) = upper(@Username) AND 
@@ -133,7 +132,6 @@ public class ProjectRepository : IProjectRepository
                     Name,
                     Description,
                     Accessibility,
-                    PrivateKey,
                     CreatedAt,
                     UpdatedAt
                 FROM Project

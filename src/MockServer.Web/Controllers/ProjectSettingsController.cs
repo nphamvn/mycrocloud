@@ -54,7 +54,7 @@ public class ProjectSettingsController : BaseController
     {
         if (id is not int)
         {
-            await _settingsService.CreateJwtBearerAuthentication(ProjectId, model);
+            await _settingsService.CreateJwtBearerAuthentication(id.Value, model);
         }
         else
         {
@@ -95,7 +95,7 @@ public class ProjectSettingsController : BaseController
     [HttpPost("auth/apikey/{id:int}/generate-key")]
     public async Task<IActionResult> GenerateApiKey(string name, int id)
     {
-        string key = await _projectService.GenerateKey(ProjectId);
+        string key = await _projectService.GenerateKey(id);
         return RedirectToAction(nameof(Auth), Request.RouteValues);
     }
 
@@ -114,16 +114,16 @@ public class ProjectSettingsController : BaseController
     }
 
     [HttpPost("set-accessibility")]
-    public async Task<IActionResult> SetAccessibility(string name, ProjectAccessibility accessibility)
+    public async Task<IActionResult> SetAccessibility(int ProjectId, ProjectAccessibility accessibility)
     {
-        await _projectService.SetAccessibility(name, accessibility);
+        await _projectService.SetAccessibility(ProjectId, accessibility);
         return RedirectToAction(nameof(View), Request.RouteValues);
     }
 
     [HttpPost("delete")]
-    public async Task<IActionResult> Delete(string name)
+    public async Task<IActionResult> Delete(int ProjectId)
     {
-        await _projectService.Delete(name);
+        await _projectService.Delete(ProjectId);
         return RedirectToAction(nameof(Index));
     }
 }

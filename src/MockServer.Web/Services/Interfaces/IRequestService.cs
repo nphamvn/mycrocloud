@@ -12,7 +12,7 @@ public interface IRequestWebService
     Task<CreateUpdateRequestViewModel> GetCreateRequestViewModel(int requestId);
     Task<AuthorizationConfigViewModel> GetAuthorizationConfigViewModel(int projectId, int requestId);
     Task ConfigureRequestAuthorization(int requestId, AuthorizationConfigViewModel auth);
-    Task<RequestOpenViewModel> GetRequestOpenViewModel(int requestId);
+    Task<RequestOpenViewModel> GetRequestOpenViewModel(int projectId, int requestId);
     Task SaveFixedRequestConfig(int id, string[] fields, FixedRequestConfigViewModel config);
     Task Delete(int id);
 }

@@ -6,33 +6,33 @@ namespace MockServer.Web.Filters;
 
 public class ValidateProjectRequestAttribute : ActionFilterAttribute
 {
-    private readonly string ProjectId;
-    private readonly string RequestId;
-    public ValidateProjectRequestAttribute(string projectId, string requestId)
+    private readonly string ProjectIdKey;
+    private readonly string RequestIdKey;
+    public ValidateProjectRequestAttribute(string projectIdKey, string requestIdKey)
     {
-        ProjectId = projectId;
-        RequestId = requestId;
+        ProjectIdKey = projectIdKey;
+        RequestIdKey = requestIdKey;
     }
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         int? projectId = null;
         int? requestId = null;
-        if (context.ActionArguments.ContainsKey(ProjectId))
+        if (context.ActionArguments.ContainsKey(ProjectIdKey))
         {
-            projectId = (int)context.ActionArguments[ProjectId];
+            projectId = (int)context.ActionArguments[ProjectIdKey];
         }
-        else if (context.RouteData.Values.ContainsKey(ProjectId))
+        else if (context.RouteData.Values.ContainsKey(ProjectIdKey))
         {
-            projectId = Convert.ToInt32((string)context.RouteData.Values[ProjectId]);
+            projectId = Convert.ToInt32((string)context.RouteData.Values[ProjectIdKey]);
         }
 
-        if (context.ActionArguments.ContainsKey(RequestId))
+        if (context.ActionArguments.ContainsKey(RequestIdKey))
         {
-            requestId = (int)context.ActionArguments[RequestId];
+            requestId = (int)context.ActionArguments[RequestIdKey];
         }
-        else if (context.RouteData.Values.ContainsKey(RequestId))
+        else if (context.RouteData.Values.ContainsKey(RequestIdKey))
         {
-            requestId = Convert.ToInt32((string)context.RouteData.Values[RequestId]);
+            requestId = Convert.ToInt32((string)context.RouteData.Values[RequestIdKey]);
         }
         if (projectId is > 0 && requestId is > 0)
         {

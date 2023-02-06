@@ -18,6 +18,6 @@ public class BaseWebService
     }
     protected Task<Project> GetProject(string projectName)
     {
-        return _projectRepository.Get(AuthUser.Id, projectName);
+        return _projectRepository.Find(AuthUser.Id, projectName);
     }
 }

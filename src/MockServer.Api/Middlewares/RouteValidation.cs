@@ -26,7 +26,7 @@ public class RouteValidation : IMiddleware
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         var req = GrabRequest(context.Request);
-        var p = await _projectRepository.Get(req.Username, req.ProjectName);
+        var p = await _projectRepository.Find(req.Username, req.ProjectName);
         if (p == default)
         {
             context.Response.StatusCode = (int)HttpStatusCode.NotFound;

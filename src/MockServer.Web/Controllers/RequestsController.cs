@@ -24,7 +24,7 @@ public class RequestsController : Controller
     [ValidateProjectRequest(RouteName.ProjectId, RouteName.RequestId)]
     public async Task<IActionResult> Open(int ProjectId, int RequestId)
     {
-        var vm = await _requestService.GetRequestOpenViewModel(RequestId);
+        var vm = await _requestService.GetRequestOpenViewModel(ProjectId, RequestId);
         return PartialView("Views/Requests/_RequestOpen.cshtml", vm);
     }
 

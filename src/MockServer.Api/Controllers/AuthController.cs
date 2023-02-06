@@ -7,8 +7,8 @@ namespace MockServer.Api.Controllers;
 public class AuthController : ControllerBase
 {
     [Route("auth")]
-    public Task<IActionResult> Auth()
+    public async Task<IActionResult> Auth()
     {
-
+        return Ok();
     }
 }

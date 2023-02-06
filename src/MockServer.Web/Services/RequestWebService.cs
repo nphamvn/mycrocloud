@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MockServer.Core.Enums;
 using MockServer.Core.Helpers;
+using MockServer.Core.Models.Requests;
 using MockServer.Core.Repositories;
 using MockServer.Web.Models.Requests;
 using MockServer.Web.Services.Interfaces;
@@ -27,7 +28,7 @@ public class RequestWebService : BaseWebService, IRequestWebService
         _authRepository = authRepository;
         _mapper = mapper;
     }
-    public async Task<RequestOpenViewModel> GetRequestOpenViewModel(int requestId)
+    public async Task<RequestOpenViewModel> GetRequestOpenViewModel(int projectId, int requestId)
     {
         var request = await _requestRepository.GetById(requestId);
         var vm = _mapper.Map<RequestOpenViewModel>(request);
@@ -43,8 +44,8 @@ public class RequestWebService : BaseWebService, IRequestWebService
                 var req = await _requestRepository.GetById(request.Id);
                 ret = new FixedRequestConfiguration
                 {
-                    RequestParams = req.Parameters,
-                    RequestHeaders = req.Headers,
+                    RequestParams = req.Parameters ?? new List<RequestParam>(),
+                    RequestHeaders = req.Headers?? new List<RequestHeader>(),
                     RequestBody = await _requestRepository.GetRequestBody(request.Id),
                     ResponseHeaders = (await _requestRepository.GetResponseHeaders(request.Id)).ToList(),
                     Response = await _requestRepository.GetResponse(request.Id)

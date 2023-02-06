@@ -1,6 +1,7 @@
 using MockServer.Core.Models.Requests;
 using MockServer.Core.Enums;
 using MockServer.Core.Models.Auth;
+using MockServer.Core.Models.Projects;
 
 namespace MockServer.Web.Models.Requests;
 

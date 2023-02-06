@@ -11,11 +11,6 @@ public class GetAuthUserProjectIdAttribute : ActionFilterAttribute
     public const string DefaultProjectIdArgument = "ProjectId";
     private string projectNameArgument;
     private string projectIdArgument;
-    public GetAuthUserProjectIdAttribute()
-    {
-        projectNameArgument = DefaultProjectNameArgument;
-        projectIdArgument = DefaultProjectIdArgument;
-    }
     public GetAuthUserProjectIdAttribute(string projectName, string projectId)
     {
         projectNameArgument = projectName;
@@ -36,7 +31,7 @@ public class GetAuthUserProjectIdAttribute : ActionFilterAttribute
         }
         if (!string.IsNullOrEmpty(projectName))
         {
-            var project = await projectRepository.Get(user.Id, projectName);
+            var project = await projectRepository.Find(user.Id, projectName);
             if (project != null)
             {
                 context.ActionArguments[projectIdArgument] = project.Id;

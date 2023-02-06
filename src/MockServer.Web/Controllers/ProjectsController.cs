@@ -17,7 +17,6 @@ public class ProjectsController : BaseController
     }
 
     [HttpGet]
-    [Authorize]
     public async Task<IActionResult> Index(ProjectIndexViewModel fm)
     {
         var vm = await _projectService.GetIndexViewModel(fm.Search);
