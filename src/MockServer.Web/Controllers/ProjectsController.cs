@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MockServer.Web.Common;
 using MockServer.Web.Filters;
 using MockServer.Web.Models.Projects;
 using MockServer.Web.Services.Interfaces;
 using RouteName = MockServer.Web.Common.Constants.RouteName;
+using Template = MockServer.Web.Common.Constants.Template;
 namespace MockServer.Web.Controllers;
 
 [Authorize]
@@ -23,7 +25,7 @@ public class ProjectsController : BaseController
         return View("Views/Projects/Index.cshtml", vm);
     }
 
-    [HttpGet("{ProjectName}")]
+    [HttpGet(Template.ProjectsController_View)]
     [GetAuthUserProjectId(RouteName.ProjectName, RouteName.ProjectId)]
     public async Task<IActionResult> View(int ProjectId)
     {
@@ -50,6 +52,6 @@ public class ProjectsController : BaseController
             return View("Views/Projects/Create.cshtml", project);
         }
 
-        return RedirectToAction(nameof(View), new { name = project.Name });
+        return RedirectToAction(nameof(View), new { ProjectName = project.Name });
     }
 }

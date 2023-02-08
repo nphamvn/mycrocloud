@@ -7,7 +7,7 @@
             <div>
                 <h3 class="text-xl">
                     <a class="text-decoration-none me-2"
-                    href="@Url.Action(nameof(ProjectsController.View), new {name=p.Name})">@p.Name</a>
+                    href="@Url.Action(nameof(ProjectsController.View), new {ProjectName=p.Name})">@p.Name</a>
                     <span style="padding-top: 2px; padding-bottom: 2px;"
                     class="badge rounded-pill bg-light text-sm fw-bolder text-gray border border-secondary">@p.Accessibility</span>
                 </h3>

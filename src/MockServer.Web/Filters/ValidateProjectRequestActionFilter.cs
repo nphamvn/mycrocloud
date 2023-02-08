@@ -6,33 +6,33 @@ namespace MockServer.Web.Filters;
 
 public class ValidateProjectRequestAttribute : ActionFilterAttribute
 {
-    private readonly string ProjectIdKey;
-    private readonly string RequestIdKey;
+    private readonly string _projectIdKey;
+    private readonly string _requestIdKey;
     public ValidateProjectRequestAttribute(string projectIdKey, string requestIdKey)
     {
-        ProjectIdKey = projectIdKey;
-        RequestIdKey = requestIdKey;
+        _projectIdKey = projectIdKey;
+        _requestIdKey = requestIdKey;
     }
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         int? projectId = null;
         int? requestId = null;
-        if (context.ActionArguments.ContainsKey(ProjectIdKey))
+        if (context.ActionArguments.ContainsKey(_projectIdKey))
         {
-            projectId = (int)context.ActionArguments[ProjectIdKey];
+            projectId = (int)context.ActionArguments[_projectIdKey];
         }
-        else if (context.RouteData.Values.ContainsKey(ProjectIdKey))
+        else if (context.RouteData.Values.ContainsKey(_projectIdKey))
         {
-            projectId = Convert.ToInt32((string)context.RouteData.Values[ProjectIdKey]);
+            projectId = Convert.ToInt32((string)context.RouteData.Values[_projectIdKey]);
         }
 
-        if (context.ActionArguments.ContainsKey(RequestIdKey))
+        if (context.ActionArguments.ContainsKey(_requestIdKey))
         {
-            requestId = (int)context.ActionArguments[RequestIdKey];
+            requestId = (int)context.ActionArguments[_requestIdKey];
         }
-        else if (context.RouteData.Values.ContainsKey(RequestIdKey))
+        else if (context.RouteData.Values.ContainsKey(_requestIdKey))
         {
-            requestId = Convert.ToInt32((string)context.RouteData.Values[RequestIdKey]);
+            requestId = Convert.ToInt32((string)context.RouteData.Values[_requestIdKey]);
         }
         if (projectId is > 0 && requestId is > 0)
         {

@@ -35,7 +35,6 @@ public class DataBinderProvider
     private readonly DataBinderProviderOptions Options;
     public DataBinderProvider(IOptions<DataBinderProviderOptions> options)
     {
-        Console.WriteLine(nameof(DataBinderProvider));
         Options = options.Value;
     }
     public IDataBinder GetBinder(string name)
@@ -137,7 +136,7 @@ public class FromHeaderDataBinder : IDataBinder
     public string Name { get; set; }
     public FromHeaderDataBinder()
     {
-        
+
     }
     public FromHeaderDataBinder(string name)
     {
@@ -157,7 +156,7 @@ public class FromQueryDataBinder : IDataBinder
     public string Query { get; set; }
     public FromQueryDataBinder()
     {
-        
+
     }
     public FromQueryDataBinder(string query)
     {
