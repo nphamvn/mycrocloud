@@ -9,6 +9,7 @@ public class AppClaim
 public class JwtBearerAuthenticationOptions : AuthOptions
 {
     public string SecretKey { get; set; }
+    public string Authority { get; set; }
     public string Algorithm { get; set; } = SecurityAlgorithms.HmacSha256;
     public string Issuer { get; set; }
     public string Audience { get; set; }
