@@ -7,12 +7,12 @@ public interface IRequestRepository
     Task<int> Create(int projectId, Request request);
     Task<Request> Find(int projectId, string method, string path);
     Task<Request> GetById(int id);
-    Task<IEnumerable<Request>> GetByProjectId(int ProjectId);
+    Task<IEnumerable<Request>> GetByProjectId(int projectId);
     Task Update(int id, Request request);
     Task Delete(int id);
-    Task UpdateRequestParams(int id, IList<RequestParam> parameters);
-    Task UpdateRequestHeaders(int id, IList<RequestHeader> parameters);
-    Task UpdateRequestBody(int id, FixedRequest config);
+    Task UpdateRequestQuery(int id, IList<RequestQuery> queries);
+    Task UpdateRequestHeader(int id, IList<RequestHeader> headers);
+    Task UpdateRequestBody(int id, RequestBody body);
     Task<ForwardingRequest> GetForwardingRequest(int requestId);
     Task UpdateResponseHeaders(int id, FixedRequest config);
     Task UpdateResponse(int id, FixedRequest config);

@@ -4,7 +4,7 @@ public enum AuthenticationType
 {
     JwtBearer = 1,
     ApiKey = 2,
-    Custom = 3
+    Basic = 3
 }
 public enum AuthorizationType
 {

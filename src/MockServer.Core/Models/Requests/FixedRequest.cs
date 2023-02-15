@@ -2,7 +2,7 @@
 public class FixedRequest
 {
     public IList<RequestHeader> RequestHeaders { get; set; }
-    public IList<RequestParam> RequestParams { get; set; }
+    public IList<RequestQuery> RequestParams { get; set; }
     public RequestBody RequestBody { get; set; }
     public IList<ResponseHeader> ResponseHeaders { get; set; }
     public Response Response { get; set; }
@@ -15,7 +15,7 @@ public class RequestHeader
     public string Description { get; set; }
     public string Constraints { get; set; }
 }
-public class RequestParam
+public class RequestQuery
 {
     public string Key { get; set; }
     public string Value { get; set; }

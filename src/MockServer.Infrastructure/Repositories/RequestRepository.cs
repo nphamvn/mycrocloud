@@ -108,22 +108,15 @@ public class RequestRepository : IRequestRepository
                 """
                 SELECT
                     r.Id,
-                    r.ProjectId,
                     r.Type,
                     r.Name,
                     r.Path,
                     r.Method,
-                    r.Description,
-                    r.Authorization,
-                    r.Parameters,
-                    r.Headers
+                    r.Description
                 FROM Requests r
                 WHERE r.Id = @Id
                 """;
         using var connection = new SqliteConnection(_connectionString);
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<AppAuthorization>());
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RequestHeader>>());
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RequestParam>>());
         return await connection.QuerySingleOrDefaultAsync<Request>(query, new
         {
             Id = id
@@ -157,7 +150,6 @@ public class RequestRepository : IRequestRepository
                 """
                 SELECT 
                     r.Id,
-                    r.ProjectId,
                     r.Type,
                     r.Name,
                     r.Method,
@@ -165,7 +157,8 @@ public class RequestRepository : IRequestRepository
                 FROM Requests r
                     INNER JOIN
                         Project p ON r.ProjectId = p.Id
-                WHERE p.Id = @ProjectId;
+                WHERE
+                    p.Id = @ProjectId;
                 """;
 
         using var connection = new SqliteConnection(_connectionString);
@@ -246,7 +239,6 @@ public class RequestRepository : IRequestRepository
                     UPDATE
                         Requests
                     SET
-                        Type = @Type,
                         Name = @Name,
                         Method = @Method,
                         Path = @Path,
@@ -258,7 +250,6 @@ public class RequestRepository : IRequestRepository
         await connection.ExecuteAsync(query, new
         {
             Id = id,
-            Type = (int)request.Type,
             Name = request.Name,
             Method = request.Method,
             Path = request.Path,
@@ -315,7 +306,7 @@ public class RequestRepository : IRequestRepository
         }
     }
 
-    public async Task UpdateRequestHeaders(int id, IList<RequestHeader> headers)
+    public async Task UpdateRequestHeader(int id, IList<RequestHeader> headers)
     {
         using var connection = new SqliteConnection(_connectionString);
         await connection.OpenAsync();
@@ -345,7 +336,7 @@ public class RequestRepository : IRequestRepository
         }
     }
 
-    public async Task UpdateRequestParams(int id, IList<RequestParam> parameters)
+    public async Task UpdateRequestQuery(int id, IList<RequestQuery> parameters)
     {
         using var connection = new SqliteConnection(_connectionString);
         await connection.OpenAsync();
@@ -361,10 +352,10 @@ public class RequestRepository : IRequestRepository
                                 WHERE
                                     Id = @Id
                                 """;
-            SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RequestParam>>());
+            SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RequestQuery>>());
             await connection.ExecuteAsync(query, new
             {
-                Parameters = JsonSerializer.Serialize(parameters)
+                Parameters = parameters
             }, transaction);
             await transaction.CommitAsync();
         }
@@ -504,6 +495,11 @@ public class RequestRepository : IRequestRepository
                 throw;
             }
         }
+    }
+
+    public Task UpdateRequestBody(int id, RequestBody body)
+    {
+        throw new NotImplementedException();
     }
 }
 public class JsonTypeHandler<T> : SqlMapper.TypeHandler<T>

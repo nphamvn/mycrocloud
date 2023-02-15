@@ -44,7 +44,7 @@ public class RequestWebService : BaseWebService, IRequestWebService
                 var req = await _requestRepository.GetById(request.Id);
                 ret = new FixedRequestConfiguration
                 {
-                    RequestParams = req.Parameters ?? new List<RequestParam>(),
+                    RequestParams = req.Parameters ?? new List<RequestQuery>(),
                     RequestHeaders = req.Headers?? new List<RequestHeader>(),
                     RequestBody = await _requestRepository.GetRequestBody(request.Id),
                     ResponseHeaders = (await _requestRepository.GetResponseHeaders(request.Id)).ToList(),
@@ -86,17 +86,17 @@ public class RequestWebService : BaseWebService, IRequestWebService
         var mapped = _mapper.Map<Core.Models.Requests.FixedRequest>(config);
         if (fields.Contains(nameof(config.RequestParams)))
         {
-            await _requestRepository.UpdateRequestParams(id, mapped.RequestParams);
+            await _requestRepository.UpdateRequestQuery(id, mapped.RequestParams);
         }
 
         if (fields.Contains(nameof(config.RequestHeaders)))
         {
-            await _requestRepository.UpdateRequestHeaders(id, mapped.RequestHeaders);
+            await _requestRepository.UpdateRequestHeader(id, mapped.RequestHeaders);
         }
 
         if (fields.Contains(nameof(config.RequestBody)))
         {
-            await _requestRepository.UpdateRequestBody(id, mapped);
+            await _requestRepository.UpdateRequestBody(id, mapped.RequestBody);
         }
 
         if (fields.Contains(nameof(config.ResponseHeaders)))

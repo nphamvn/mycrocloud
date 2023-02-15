@@ -202,7 +202,7 @@ public class AuthRepository : IAuthRepository
         }
     }
 
-    public Task<AppAuthentication> GetAuthenticationScheme<TAuthOptions>(int id) where TAuthOptions : AuthOptions
+    public Task<AppAuthentication> GetAuthenticationScheme<TAuthOptions>(int id) where TAuthOptions : AuthenticationOptions
     {
         Type type = typeof(TAuthOptions);
         if (typeof(JwtBearerAuthenticationOptions).IsEquivalentTo(type))
@@ -257,7 +257,7 @@ public class AuthRepository : IAuthRepository
     }
 }
 
-public class AuthenticationOptionsJsonTypeHandler : SqlMapper.TypeHandler<AuthOptions>
+public class AuthenticationOptionsJsonTypeHandler : SqlMapper.TypeHandler<AuthenticationOptions>
 {
     private readonly AuthenticationType _type;
 
@@ -265,7 +265,7 @@ public class AuthenticationOptionsJsonTypeHandler : SqlMapper.TypeHandler<AuthOp
     {
         _type = type;
     }
-    public override AuthOptions Parse(object value)
+    public override AuthenticationOptions Parse(object value)
     {
         var stringValue = value.ToString();
         if (_type is AuthenticationType.JwtBearer)
@@ -278,11 +278,11 @@ public class AuthenticationOptionsJsonTypeHandler : SqlMapper.TypeHandler<AuthOp
         }
         else
         {
-            return JsonSerializer.Deserialize<AuthOptions>(stringValue);
+            return JsonSerializer.Deserialize<AuthenticationOptions>(stringValue);
         }
     }
 
-    public override void SetValue(IDbDataParameter parameter, AuthOptions value)
+    public override void SetValue(IDbDataParameter parameter, AuthenticationOptions value)
     {
         if (_type is AuthenticationType.JwtBearer)
         {
