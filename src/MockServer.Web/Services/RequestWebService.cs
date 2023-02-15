@@ -44,7 +44,7 @@ public class RequestWebService : BaseWebService, IRequestWebService
                 var req = await _requestRepository.GetById(request.Id);
                 ret = new FixedRequestConfiguration
                 {
-                    RequestParams = req.Parameters ?? new List<RequestQuery>(),
+                    RequestParams = req.Queries ?? new List<RequestQuery>(),
                     RequestHeaders = req.Headers?? new List<RequestHeader>(),
                     RequestBody = await _requestRepository.GetRequestBody(request.Id),
                     ResponseHeaders = (await _requestRepository.GetResponseHeaders(request.Id)).ToList(),

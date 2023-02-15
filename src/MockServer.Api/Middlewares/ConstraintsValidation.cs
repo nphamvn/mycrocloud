@@ -36,9 +36,9 @@ public class ConstraintsValidation : IMiddleware
         var r = await _requestRepository.GetById(id);
         if (r.Type == RequestType.Fixed)
         {
-            var @params = await _requestRepository.GetRequestParams(r.Id);
+            var queries = r.Queries;
             var queryBinder = new FromQueryDataBinder();
-            foreach (var param in @params)
+            foreach (var param in queries)
             {
                 queryBinder.Query = param.Key;
                 var value = queryBinder.Get(context);
@@ -63,7 +63,7 @@ public class ConstraintsValidation : IMiddleware
                     }
                 }
             }
-            var headers = await _requestRepository.GetRequestHeaders(r.Id);
+            var headers = r.Headers;
             var headerBinder = new FromHeaderDataBinder();
             foreach (var header in headers)
             {

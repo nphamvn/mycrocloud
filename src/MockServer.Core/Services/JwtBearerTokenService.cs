@@ -36,19 +36,21 @@ public class JwtBearerTokenService : IJwtBearerTokenService
     public ClaimsPrincipal ValidateToken(string token, JwtBearerAuthenticationOptions options)
     {
         var jwtHandler = new JwtSecurityTokenHandler();
-        SecurityKey issuerSigningKey = null;
-        OpenIdConnectConfiguration _configuration = null;
-        if (!string.IsNullOrEmpty(options.SecretKey))
+        var keys = new List<SecurityKey>();
+        if (options.SymmetricSecuritySecretKeys?.Count > 0)
         {
-            issuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.SecretKey));
+            foreach (var key in options.SymmetricSecuritySecretKeys)
+            {
+                keys.Add(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)));
+            }   
         }
-        else if (!string.IsNullOrEmpty(options.Authority))
+        
+        if (!string.IsNullOrEmpty(options.Authority))
         {
             var task = GetConfigurationAsync(options.Authority);
-             _configuration = task.Result;
+            OpenIdConnectConfiguration _configuration = task.Result;
+            keys.Concat(_configuration.SigningKeys);
         }
-        // Create a security key
-
 
         // Create a validation parameters object
         var validationParameters = new TokenValidationParameters()
@@ -60,8 +62,7 @@ public class JwtBearerTokenService : IJwtBearerTokenService
             ValidateIssuerSigningKey = options.ValidateIssuerSigningKey,
             ValidIssuer = options.Issuer,
             ValidAudience = options.Audience,
-            IssuerSigningKey = issuerSigningKey ?? throw new Exception("IssuerSigningKey"),
-            IssuerSigningKeys = _configuration.SigningKeys
+            IssuerSigningKeys = keys
         };
         return jwtHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
     }
