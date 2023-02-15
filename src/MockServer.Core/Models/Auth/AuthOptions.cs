@@ -1,6 +1,6 @@
 namespace MockServer.Core.Models.Auth;
 
-public class AuthOptions
+public class AuthenticationOptions
 {
 
 }

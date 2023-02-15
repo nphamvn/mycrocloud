@@ -34,7 +34,7 @@ public class RequestConfiguration
 }
 public class FixedRequestConfiguration : RequestConfiguration
 {
-    public IList<RequestParam> RequestParams { get; set; }
+    public IList<RequestQuery> RequestParams { get; set; }
     public IList<RequestHeader> RequestHeaders { get; set; }
     public RequestBody RequestBody { get; set; }
     public IList<ResponseHeader> ResponseHeaders { get; set; }

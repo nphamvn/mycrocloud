@@ -6,7 +6,7 @@ public class AppClaim
     public string Type { get; set; }
     public string Value { get; set; }
 }
-public class JwtBearerAuthenticationOptions : AuthOptions
+public class JwtBearerAuthenticationOptions : AuthenticationOptions
 {
     public string SecretKey { get; set; }
     public string Algorithm { get; set; } = SecurityAlgorithms.HmacSha256;
