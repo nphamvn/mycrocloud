@@ -3,7 +3,7 @@ using MockServer.Core.Models.Auth;
 
 namespace MockServer.Core.Services.Auth;
 
-public interface IAppAuthenticationHandler
+public interface IAuthenticationHandler
 {
-    Task<AppAuthenticateResult> AuthenticateAsync(HttpContext context);
+    Task<AuthenticateResult> AuthenticateAsync(HttpContext context);
 }

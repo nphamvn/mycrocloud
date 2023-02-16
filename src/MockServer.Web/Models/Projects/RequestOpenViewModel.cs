@@ -11,7 +11,7 @@ public class RequestOpenViewModel
     public string Name { get; set; }
     public string Method { get; set; }
     public string Path { get; set; }
-    public AppAuthorization Authorization { get; set; }
+    public Authorization Authorization { get; set; }
     public string ProjectName { get; set; }
     public RequestType Type { get; set; }
     public string Username { get; set; }

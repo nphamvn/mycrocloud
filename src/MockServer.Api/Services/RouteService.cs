@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using MockServer.Core.Repositories;
 using MockServer.Api.Interfaces;
-using MockServer.Api.Models;
+using Route = MockServer.Api.Models.Route;
 
 namespace MockServer.Api.Services;
 
@@ -15,7 +15,7 @@ public class RouteService : IRouteResolver
         _cacheService = cacheService;
         _requestRepository = requestRepository;
     }
-    public async Task<RouteResolveResult> Resolve(string method, string path, ICollection<Models.Route> routes)
+    public async Task<RouteResolveResult> Resolve(string method, string path, ICollection<Route> routes)
     {
         var routeTemplates = new Dictionary<string, int>();
 

@@ -11,8 +11,8 @@ public class Request : BaseEntity
     public string Path { get; set; }
     public string Description { get; set; }
     public string Method { get; set; }
-    public Project Project { get; set; }
-    public AppAuthorization Authorization { get; set; }
+    public WebApp Project { get; set; }
+    public Authorization Authorization { get; set; }
     public IList<RequestHeader> Headers { get; set; }
     public IList<RequestQuery> Queries { get; set; }
 }

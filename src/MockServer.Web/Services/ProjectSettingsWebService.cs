@@ -35,19 +35,19 @@ public class ProjectSettingsWebService : IProjectSettingsWebService
     public async Task CreateApiKeyAuthentication(string name, ApiKeyAuthModel model)
     {
         var project = await GetProjectByName(name);
-        var auth = _mapper.Map<AppAuthentication>(model);
+        var auth = _mapper.Map<AuthenticationScheme>(model);
         await _authRepository.AddProjectAuthenticationScheme(project.Id, auth);
     }
 
     public async Task CreateJwtBearerAuthentication(int projectId, JwtBearerAuthModel model)
     {
-        var auth = _mapper.Map<AppAuthentication>(model);
+        var auth = _mapper.Map<AuthenticationScheme>(model);
         await _authRepository.AddProjectAuthenticationScheme(projectId, auth);
     }
 
     public async Task EditJwtBearerAuthentication(int id, JwtBearerAuthModel model)
     {
-        var auth = _mapper.Map<AppAuthentication>(model);
+        var auth = _mapper.Map<AuthenticationScheme>(model);
         await _authRepository.UpdateProjectAuthenticationScheme(id, auth);
     }
 
@@ -129,8 +129,8 @@ public class ProjectSettingsAuthProfile : Profile
 {
     public ProjectSettingsAuthProfile()
     {
-        CreateMap<AppAuthentication, JwtBearerAuthModel>().ReverseMap();
-        CreateMap<AppAuthentication, ApiKeyAuthModel>().ReverseMap();
-        CreateMap<MockServer.Core.Models.Projects.Project, MockServer.Web.Models.Projects.Project>().ReverseMap();
+        CreateMap<AuthenticationScheme, JwtBearerAuthModel>().ReverseMap();
+        CreateMap<AuthenticationScheme, ApiKeyAuthModel>().ReverseMap();
+        CreateMap<MockServer.Core.Models.Projects.WebApp, MockServer.Web.Models.Projects.Project>().ReverseMap();
     }
 }

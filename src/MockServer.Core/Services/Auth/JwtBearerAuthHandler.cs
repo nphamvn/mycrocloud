@@ -1,34 +1,37 @@
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Models.Auth;
-
+using AuthenticateResult = MockServer.Core.Models.Auth.AuthenticateResult;
+using AuthenticationTicket = Microsoft.AspNetCore.Authentication.AuthenticationTicket;
 namespace MockServer.Core.Services.Auth;
 
-public class JwtBearerAuthHandler : AppAuthenticationHandler<JwtBearerAuthenticationOptions>
+public class JwtBearerAuthHandler : AuthenticationHandler<JwtBearerAuthenticationOptions>
 {
-    private readonly JwtBearerAuthenticationOptions options;
+    private readonly JwtBearerAuthenticationOptions _options;
     public JwtBearerAuthHandler(JwtBearerAuthenticationOptions options)
     {
-        this.options = options;
+        _options = options;
     }
-    protected override Task<AppAuthenticateResult> HandleAuthenticateAsync(HttpContext context)
+    protected override Task<AuthenticateResult> HandleAuthenticateAsync(HttpContext context)
     {
-        options.BinderSource = "Authorization";
-        context.Request.Headers.TryGetValue(options.BinderSource, out var value);
-        const string Bearer = "Bearer";
-        if (string.IsNullOrEmpty(value) && !value.ToString().StartsWith(Bearer))
+        context.Request.Headers.TryGetValue(_options.BinderSource, out var value);
+        if (string.IsNullOrEmpty(value))
         {
-            return Task.FromResult((AppAuthenticateResult)AppAuthenticateResult.Fail("Invalid token"));
+            return Task.FromResult((AuthenticateResult)AuthenticateResult.Fail("No token found"));
         }
-        var token = value.ToString().Substring(Bearer.Length).Trim();
+        else if(!value.ToString().StartsWith(_options.TokenPrefix)) 
+        {
+            return Task.FromResult((AuthenticateResult)AuthenticateResult.Fail("No token found"));
+        }
+
+        var token = value.ToString().Substring(_options.TokenPrefix.Length).Trim();
 
         IJwtBearerTokenService service = new JwtBearerTokenService();
         try
         {
-            var principal = service.ValidateToken(token, options);
-            var ticket = new AuthenticationTicket(principal, "AppJwtBearer");
-            return Task.FromResult(new AppAuthenticateResult()
+            var principal = service.ValidateToken(token, _options);
+            var ticket = new AuthenticationTicket(principal, Scheme.SchemeName);
+            return Task.FromResult(new AuthenticateResult()
             {
                 Succeeded = true,
                 Ticket = ticket
@@ -36,7 +39,7 @@ public class JwtBearerAuthHandler : AppAuthenticationHandler<JwtBearerAuthentica
         }
         catch (Exception)
         {
-            return Task.FromResult<AppAuthenticateResult>((AppAuthenticateResult)AppAuthenticateResult.Fail("Invalid token"));
+            return Task.FromResult<AuthenticateResult>((AuthenticateResult)AuthenticateResult.Fail("Invalid token"));
         }
     }
 }

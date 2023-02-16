@@ -5,13 +5,13 @@ using MockServer.Api.Models;
 using Route = MockServer.Api.Models.Route;
 
 namespace MockServer.Api.Middlewares;
-public class RouteValidation : IMiddleware
+public class RouteResolver : IMiddleware
 {
     private readonly IRequestRepository _requestRepository;
-    private readonly IRouteResolver _routeService;
+    private readonly IRouteResolver _routeResolver;
     private readonly IProjectRepository _projectRepository;
     private readonly ICacheService _cacheService;
-    public RouteValidation(
+    public RouteResolver(
             IRequestRepository requestRepository,
             ICacheService cacheService,
             IRouteResolver routeService,
@@ -20,44 +20,44 @@ public class RouteValidation : IMiddleware
         _requestRepository = requestRepository;
         _projectRepository = projectRepository;
         _cacheService = cacheService;
-        _routeService = routeService;
+        _routeResolver = routeService;
     }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         var req = GrabRequest(context.Request);
-        var p = await _projectRepository.Find(req.Username, req.ProjectName);
-        if (p == default)
+        var app = await _projectRepository.Find(req.Username, req.ProjectName);
+        if (app == default)
         {
             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
             await context.Response.WriteAsync($"'{req.ProjectName}' project is not found");
             return;
         }
-        ICollection<Route> routes;
-        string key = p.Id.ToString();
-        if (!await _cacheService.Exists(p.Id.ToString()))
+        ICollection<Route> registeredRoutes;
+        string key = app.Id.ToString();
+        if (!await _cacheService.Exists(app.Id.ToString()))
         {
-            var requests = await _requestRepository.GetByProjectId(p.Id);
-            routes = requests.Select(r => new Route
+            var requests = await _requestRepository.GetByProjectId(app.Id);
+            registeredRoutes = requests.Select(r => new Route
             {
                 Id = r.Id,
                 Method = r.Method.ToLower(),
                 Path = r.Path.ToLower()
             }).ToList();
-            await _cacheService.Set(key, routes);
+            await _cacheService.Set(key, registeredRoutes);
         }
         else
         {
-            routes = await _cacheService.Get<ICollection<Models.Route>>(key);
+            registeredRoutes = await _cacheService.Get<ICollection<Route>>(key);
         }
-        var result = await _routeService.Resolve(req.Method.ToLower(), req.Path, routes);
+        var result = await _routeResolver.Resolve(req.Method.ToLower(), req.Path, registeredRoutes);
         if (result == null)
         {
             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
             await context.Response.WriteAsync($"No matching route found for path: {req.Path}");
             return;
         }
-        context.Items["ProjectId"] = p.Id;
+        context.Items["ProjectId"] = app.Id;
         context.Items["RequestId"] = result.Route.Id;
         context.Request.RouteValues = result.RouteValues;
         await next.Invoke(context);
@@ -77,10 +77,10 @@ public class RouteValidation : IMiddleware
         };
     }
 }
-public static class RouteValidationExtensions
+public static class RouteResolverExtensions
 {
-    public static IApplicationBuilder UseAppRoute(this IApplicationBuilder builder)
+    public static IApplicationBuilder UseRouteResolver(this IApplicationBuilder builder)
     {
-        return builder.UseMiddleware<RouteValidation>();
+        return builder.UseMiddleware<RouteResolver>();
     }
 }

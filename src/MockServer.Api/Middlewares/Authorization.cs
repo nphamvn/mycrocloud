@@ -20,52 +20,49 @@ public class Authorization : IMiddleware
     {
         ArgumentNullException.ThrowIfNull(context.Items["RequestId"]);
         var requestId = Convert.ToInt32(context.Items["RequestId"]);
-        var auth = await _authRepository.GetRequestAuthorization(requestId);
+        var authorization = await _authRepository.GetRequestAuthorization(requestId);
         //No authorization is set
-        if (auth == null)
+        if (authorization == null)
         {
+            await next.Invoke(context);
+            return;
+        }
+        else if (authorization.Type == AuthorizationType.AllowAnonymous)
+        {
+            //AllowAnonymous
             await next.Invoke(context);
             return;
         }
 
-        //AllowAnonymous
-        if (auth.Type == AuthorizationType.AllowAnonymous)
+        if (context.User == null || !context.User.Identity.IsAuthenticated)
         {
-            await next.Invoke(context);
+            context.Response.StatusCode = 403; // Forbidden
             return;
         }
-        else if (auth.Type == AuthorizationType.Authorize)
+
+        if (authorization.AuthenticationSchemes.Count > 0)
         {
-            if (context.User == null || !context.User.Identity.IsAuthenticated)
+            //allowedSchemes: "1,2,3,4,5"
+            var allowedSchemes = authorization.AuthenticationSchemes;
+            var authSchemeId = Convert.ToInt32(context.Items["AuthSchemeId"]);
+            // check if the scheme is in the allowed list of scheme
+            if (!allowedSchemes.Contains(authSchemeId))
             {
                 context.Response.StatusCode = 403; // Forbidden
                 return;
             }
+        }
 
-            if (auth.AuthenticationSchemes.Count > 0)
+        if (authorization.Policies.Any())
+        {
+            IAppAuthorizationService authorizationService = new AppAuthorizationService();
+            foreach (var policy in authorization.Policies)
             {
-                //allowedSchemes: "1,2,3,4,5"
-                var allowedSchemes = auth.AuthenticationSchemes;
-                var authSchemeId = Convert.ToInt32(context.Items["AuthSchemeId"]);
-                // check if the scheme is in the allowed list of scheme
-                if (!allowedSchemes.Contains(authSchemeId))
+                //Handle requirement
+                if (!authorizationService.CheckRequirement(policy, context.User))
                 {
                     context.Response.StatusCode = 403; // Forbidden
                     return;
-                }
-            }
-
-            if (auth.Requirements.Any())
-            {
-                IAppAuthorizationService authorizationService = new AppAuthorizationService();
-                foreach (var requirement in auth.Requirements)
-                {
-                    //Hanlde requirement
-                    if (!authorizationService.CheckRequirement(requirement, context.User))
-                    {
-                        context.Response.StatusCode = 403; // Forbidden
-                        return;
-                    }
                 }
             }
         }
@@ -81,7 +78,7 @@ public static class AuthorizationnExtensions
 }
 public interface IAppAuthorizationService
 {
-    bool CheckRequirement(Requirement requirement, ClaimsPrincipal user);
+    bool CheckRequirement(Policy requirement, ClaimsPrincipal user);
 }
 
 public class AppAuthorizationService : IAppAuthorizationService
@@ -91,15 +88,15 @@ public class AppAuthorizationService : IAppAuthorizationService
     {
         _engine = new Engine();
     }
-    public bool CheckRequirement(Requirement requirement, ClaimsPrincipal user)
+    public bool CheckRequirement(Policy requirement, ClaimsPrincipal user)
     {
-        var u = new Dictionary<string, object>();
+        var userDic = new Dictionary<string, object>();
         foreach (var claim in user.Claims)
         {
-            u[claim.Type] = claim.Value;
+            userDic[claim.Type] = claim.Value;
         }
-        _engine.SetValue("user", u);
-        _engine.Execute($"let user = {JsonSerializer.Serialize(u)};");
+        _engine.SetValue("user", userDic);
+        _engine.Execute($"let user = {JsonSerializer.Serialize(userDic)};");
         var result = _engine.Execute(string.Format("eval({0})", requirement.ConditionalExpression)).GetCompletionValue().AsBoolean();
         return result;
     }

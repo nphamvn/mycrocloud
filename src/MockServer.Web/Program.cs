@@ -30,6 +30,9 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Add("profile");
         options.GetClaimsFromUserInfoEndpoint = true;
         options.SaveTokens = true;
+    })
+    .AddJwtBearer("Bearer", options => {
+        
     });
 
 var app = builder.Build();

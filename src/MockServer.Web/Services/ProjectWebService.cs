@@ -42,7 +42,7 @@ public class ProjectWebService : IProjectWebService
         {
             return false;
         }
-        var mapped = _mapper.Map<Core.Models.Projects.Project>(project);
+        var mapped = _mapper.Map<Core.Models.Projects.WebApp>(project);
         mapped.UserId = user.Id;
         await projectRepository.Add(mapped);
         return true;

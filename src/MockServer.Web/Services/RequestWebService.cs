@@ -152,7 +152,7 @@ public class RequestWebService : BaseWebService, IRequestWebService
 
     public async Task ConfigureRequestAuthorization(int requestId, AuthorizationConfigViewModel auth)
     {
-        var authorization = _mapper.Map<Core.Models.Auth.AppAuthorization>(auth);
+        var authorization = _mapper.Map<Core.Models.Auth.Authorization>(auth);
         await _authRepository.UpdateRequestAuthorization(requestId, authorization);
     }
 }

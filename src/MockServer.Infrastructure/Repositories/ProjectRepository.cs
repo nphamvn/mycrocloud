@@ -15,7 +15,7 @@ public class ProjectRepository : IProjectRepository
         _connectionString = settings.Sqlite.ConnectionString;
     }
 
-    public async Task Add(Project project)
+    public async Task Add(WebApp project)
     {
         var query =
                 """
@@ -58,7 +58,7 @@ public class ProjectRepository : IProjectRepository
         });
     }
 
-    public async Task<Project> Find(int userId, string projectName)
+    public async Task<WebApp> Find(int userId, string projectName)
     {
         var query =
                 """
@@ -74,14 +74,14 @@ public class ProjectRepository : IProjectRepository
                     upper(Name) = upper(@Name);               
                 """;
         using var connection = new SqliteConnection(_connectionString);
-        return await connection.QuerySingleOrDefaultAsync<Project>(query, new
+        return await connection.QuerySingleOrDefaultAsync<WebApp>(query, new
         {
             UserId = userId,
             Name = projectName
         });
     }
 
-    public async Task<Project> Get(int id)
+    public async Task<WebApp> Get(int id)
     {
         var query =
                 """
@@ -96,13 +96,13 @@ public class ProjectRepository : IProjectRepository
                         Id = @id;
                 """;
         using var connection = new SqliteConnection(_connectionString);
-        return await connection.QuerySingleOrDefaultAsync<Project>(query, new
+        return await connection.QuerySingleOrDefaultAsync<WebApp>(query, new
         {
             id = id
         });
     }
 
-    public async Task<Project> Find(string username, string name)
+    public async Task<WebApp> Find(string username, string name)
     {
         var query =
                 """
@@ -117,14 +117,14 @@ public class ProjectRepository : IProjectRepository
                     upper(Name) = upper(@Name);               
                 """;
         using var connection = new SqliteConnection(_connectionString);
-        return await connection.QuerySingleOrDefaultAsync<Project>(query, new
+        return await connection.QuerySingleOrDefaultAsync<WebApp>(query, new
         {
             Username = username,
             Name = name
         });
     }
 
-    public async Task<IEnumerable<Project>> Search(int userId, string query, int accessibility, string sort)
+    public async Task<IEnumerable<WebApp>> Search(int userId, string query, int accessibility, string sort)
     {
         var sql =
                 """
@@ -161,7 +161,7 @@ public class ProjectRepository : IProjectRepository
         }
 
         using var connection = new SqliteConnection(_connectionString);
-        return await connection.QueryAsync<Project>(sql, new
+        return await connection.QueryAsync<WebApp>(sql, new
         {
             UserId = userId,
             Query = "%" + query + "%",
@@ -174,7 +174,7 @@ public class ProjectRepository : IProjectRepository
         throw new NotImplementedException();
     }
 
-    public async Task Update(Project project)
+    public async Task Update(WebApp project)
     {
         var query =
                 """

@@ -16,7 +16,7 @@ public class AuthRepository : IAuthRepository
     {
         _connectionString = settings.Sqlite.ConnectionString;
     }
-    public Task AddProjectAuthenticationScheme(int projectId, AppAuthentication auth)
+    public Task AddProjectAuthenticationScheme(int projectId, AuthenticationScheme auth)
     {
         var query =
                 """
@@ -49,7 +49,7 @@ public class AuthRepository : IAuthRepository
         });
     }
 
-    public Task<IEnumerable<AppAuthentication>> GetProjectAuthenticationSchemes(int id)
+    public Task<IEnumerable<AuthenticationScheme>> GetProjectAuthenticationSchemes(int id)
     {
         var query =
                 """
@@ -65,13 +65,13 @@ public class AuthRepository : IAuthRepository
                     ProjectId = @Id
                 """;
         using var connection = new SqliteConnection(_connectionString);
-        return connection.QueryAsync<AppAuthentication>(query, new
+        return connection.QueryAsync<AuthenticationScheme>(query, new
         {
             Id = id
         });
     }
 
-    public Task<AppAuthentication> GetAuthenticationScheme(int id, AuthenticationType type)
+    public Task<AuthenticationScheme> GetAuthenticationScheme(int id, AuthenticationType type)
     {
         var query =
                 """
@@ -88,13 +88,13 @@ public class AuthRepository : IAuthRepository
                 """;
         using var connection = new SqliteConnection(_connectionString);
         SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(type));
-        return connection.QuerySingleOrDefaultAsync<AppAuthentication>(query, new
+        return connection.QuerySingleOrDefaultAsync<AuthenticationScheme>(query, new
         {
             Id = id
         });
     }
 
-    public async Task<AppAuthorization> GetRequestAuthorization(int requestId)
+    public async Task<Authorization> GetRequestAuthorization(int requestId)
     {
         var query =
                 """
@@ -110,10 +110,10 @@ public class AuthRepository : IAuthRepository
         {
             Id = requestId
         });
-        return !string.IsNullOrEmpty(json) ? JsonSerializer.Deserialize<AppAuthorization>(json) : null;
+        return !string.IsNullOrEmpty(json) ? JsonSerializer.Deserialize<Authorization>(json) : null;
     }
 
-    public async Task UpdateRequestAuthorization(int requestId, AppAuthorization authorization)
+    public async Task UpdateRequestAuthorization(int requestId, Authorization authorization)
     {
         var query =
                 """
@@ -132,7 +132,7 @@ public class AuthRepository : IAuthRepository
         });
     }
 
-    public async Task UpdateProjectAuthenticationScheme(int id, AppAuthentication auth)
+    public async Task UpdateProjectAuthenticationScheme(int id, AuthenticationScheme auth)
     {
         var query =
                 """
@@ -202,7 +202,7 @@ public class AuthRepository : IAuthRepository
         }
     }
 
-    public Task<AppAuthentication> GetAuthenticationScheme<TAuthOptions>(int id) where TAuthOptions : AuthenticationOptions
+    public Task<AuthenticationScheme> GetAuthenticationScheme<TAuthOptions>(int id) where TAuthOptions : AuthenticationSchemeOptions
     {
         Type type = typeof(TAuthOptions);
         if (typeof(JwtBearerAuthenticationOptions).IsEquivalentTo(type))
@@ -227,13 +227,13 @@ public class AuthRepository : IAuthRepository
                     Id = @Id
                 """;
         using var connection = new SqliteConnection(_connectionString);
-        return connection.QuerySingleOrDefaultAsync<AppAuthentication>(query, new
+        return connection.QuerySingleOrDefaultAsync<AuthenticationScheme>(query, new
         {
             Id = id
         });
     }
 
-    public async Task<AppAuthentication> GetAuthenticationScheme(int id)
+    public async Task<AuthenticationScheme> GetAuthenticationScheme(int id)
     {
         using var connection = new SqliteConnection(_connectionString);
         var type = await connection.QuerySingleOrDefaultAsync<AuthenticationType>("SELECT Type FROM ProjectAuthentication WHERE Id = @Id", new { Id = id });
@@ -250,14 +250,14 @@ public class AuthRepository : IAuthRepository
                     Id = @Id
                 """;
         SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(type));
-        return await connection.QuerySingleOrDefaultAsync<AppAuthentication>(query, new
+        return await connection.QuerySingleOrDefaultAsync<AuthenticationScheme>(query, new
         {
             Id = id
         });
     }
 }
 
-public class AuthenticationOptionsJsonTypeHandler : SqlMapper.TypeHandler<AuthenticationOptions>
+public class AuthenticationOptionsJsonTypeHandler : SqlMapper.TypeHandler<AuthenticationSchemeOptions>
 {
     private readonly AuthenticationType _type;
 
@@ -265,7 +265,7 @@ public class AuthenticationOptionsJsonTypeHandler : SqlMapper.TypeHandler<Authen
     {
         _type = type;
     }
-    public override AuthenticationOptions Parse(object value)
+    public override AuthenticationSchemeOptions Parse(object value)
     {
         var stringValue = value.ToString();
         if (_type is AuthenticationType.JwtBearer)
@@ -278,11 +278,11 @@ public class AuthenticationOptionsJsonTypeHandler : SqlMapper.TypeHandler<Authen
         }
         else
         {
-            return JsonSerializer.Deserialize<AuthenticationOptions>(stringValue);
+            return JsonSerializer.Deserialize<AuthenticationSchemeOptions>(stringValue);
         }
     }
 
-    public override void SetValue(IDbDataParameter parameter, AuthenticationOptions value)
+    public override void SetValue(IDbDataParameter parameter, AuthenticationSchemeOptions value)
     {
         if (_type is AuthenticationType.JwtBearer)
         {

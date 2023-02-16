@@ -7,6 +7,6 @@ public class AuthorizationConfigViewModel
 {
     public AuthorizationType? Type { get; set; }
     public IList<int> AuthenticationSchemes { get; set; }
-    public IList<Requirement> Requirements { get; set; } = new List<Requirement>();
-    public IEnumerable<AppAuthentication>? AuthenticationSchemeSelectList { get; set; }
+    public IList<Policy> Requirements { get; set; } = new List<Policy>();
+    public IEnumerable<AuthenticationScheme>? AuthenticationSchemeSelectList { get; set; }
 }

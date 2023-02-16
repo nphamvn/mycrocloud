@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using MockServer.Core.Interfaces;
@@ -47,9 +48,18 @@ public class JwtBearerTokenService : IJwtBearerTokenService
         
         if (!string.IsNullOrEmpty(options.Authority))
         {
-            var task = GetConfigurationAsync(options.Authority);
+            var metadataAddress = options.Authority;
+            if (!metadataAddress.EndsWith("/", StringComparison.Ordinal))
+            {
+                metadataAddress += "/";
+            }
+            metadataAddress += ".well-known/openid-configuration";
+            IConfigurationManager<OpenIdConnectConfiguration> configurationManager =
+                    new ConfigurationManager<OpenIdConnectConfiguration>(metadataAddress, new OpenIdConnectConfigurationRetriever());
+            var task = configurationManager.GetConfigurationAsync(CancellationToken.None);
+            task.Wait();
             OpenIdConnectConfiguration _configuration = task.Result;
-            keys.Concat(_configuration.SigningKeys);
+            keys.AddRange(_configuration.SigningKeys);
         }
 
         // Create a validation parameters object

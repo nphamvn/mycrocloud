@@ -8,7 +8,7 @@ public class ProjectProfile : Profile
 {
     public ProjectProfile()
     {
-        CreateMap<CreateProjectViewModel, Core.Models.Projects.Project>().ReverseMap();
-        CreateMap<Core.Models.Projects.Project, ProjectIndexItem>().ReverseMap();
+        CreateMap<CreateProjectViewModel, Core.Models.Projects.WebApp>().ReverseMap();
+        CreateMap<Core.Models.Projects.WebApp, ProjectIndexItem>().ReverseMap();
     }
 }

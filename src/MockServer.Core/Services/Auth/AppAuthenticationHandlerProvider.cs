@@ -4,13 +4,15 @@ using MockServer.Core.Interfaces;
 
 namespace MockServer.Core.Services.Auth;
 
-public class AppAuthenticationHandlerProvider : IAppAuthenticationHandlerProvider
+public class AuthenticationHandlerProvider : IAuthenticationHandlerProvider
 {
-    public IAppAuthenticationHandler GetHandler(AppAuthentication scheme)
+    public IAuthenticationHandler GetHandler(AuthenticationScheme scheme)
     {
         if (scheme.Type is AuthenticationType.JwtBearer)
         {
-            return new JwtBearerAuthHandler((JwtBearerAuthenticationOptions)scheme.Options);
+            var JwtBearerAuthHandler = new JwtBearerAuthHandler((JwtBearerAuthenticationOptions)scheme.Options);
+            JwtBearerAuthHandler.Scheme = scheme;
+            return JwtBearerAuthHandler;
         }
         else if (scheme.Type is AuthenticationType.ApiKey)
         {

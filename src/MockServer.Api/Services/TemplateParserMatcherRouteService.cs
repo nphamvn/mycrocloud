@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Routing.Template;
 using MockServer.Core.Repositories;
 using MockServer.Api.Interfaces;
-using MockServer.Api.Models;
+using Route = MockServer.Api.Models.Route;
 
 namespace MockServer.Api.Services;
 
@@ -15,7 +15,7 @@ public class TemplateParserMatcherRouteService : IRouteResolver
         _requestRepository = requestRepository;
     }
 
-    public async Task<RouteResolveResult> Resolve(string method, string path, ICollection<Models.Route> routes)
+    public async Task<RouteResolveResult> Resolve(string method, string path, ICollection<Route> routes)
     {
         if (!path.StartsWith("/"))
         {
@@ -24,8 +24,8 @@ public class TemplateParserMatcherRouteService : IRouteResolver
         int matchCount = 0;
         foreach (var route in routes)
         {
-            RouteTemplate template = TemplateParser.Parse(route.Path);
-            TemplateMatcher matcher = new TemplateMatcher(template, new RouteValueDictionary());
+            var template = TemplateParser.Parse(route.Path);
+            var matcher = new TemplateMatcher(template, new RouteValueDictionary());
             var values = new RouteValueDictionary();
             var match = matcher.TryMatch(new PathString(path), values);
             if (match && route.Method.Equals(method))
@@ -38,6 +38,6 @@ public class TemplateParserMatcherRouteService : IRouteResolver
                 };
             }
         }
-        return default;
+        return null;
     }
 }

@@ -4,7 +4,7 @@ using MockServer.Core.Models.Requests;
 
 namespace MockServer.Core.Models.Projects;
 
-public class Project : BaseEntity
+public class WebApp : BaseEntity
 {
     public string Name { get; set; }
     public string Description { get; set; }
@@ -14,5 +14,5 @@ public class Project : BaseEntity
     public DateTime UpdatedAt { get; set; }
     public ApplicationUser User { get; set; }
     public ICollection<Request> Requests { get; set; }
-    public List<AppAuthentication> Authentications { get; set; }
+    public List<AuthenticationScheme> Authentications { get; set; }
 }

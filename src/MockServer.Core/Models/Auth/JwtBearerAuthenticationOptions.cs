@@ -6,8 +6,10 @@ public class AppClaim
     public string Type { get; set; }
     public string Value { get; set; }
 }
-public class JwtBearerAuthenticationOptions : AuthenticationOptions
+public class JwtBearerAuthenticationOptions : AuthenticationSchemeOptions
 {
+    public bool RequireHttpsMetadata { get; set; } = true;
+    public string MetadataAddress { get; set; } = default!;
     public string SecretKey { get; set; }
     public IList<string> SymmetricSecuritySecretKeys { get; set; }
     public string Authority { get; set; }
@@ -20,7 +22,8 @@ public class JwtBearerAuthenticationOptions : AuthenticationOptions
     public bool ValidateIssuer { get; set; }
     public bool ValidateAudience { get; set; }
     public bool ValidateIssuerSigningKey { get; set; }
-    public string BinderSource { get; set; }
+    public string BinderSource { get; set; } = "Authorization";
+    public string TokenPrefix { get; set; } = "Bearer";
     public IList<AppClaim> AdditionalClaims { get; set; } = new List<AppClaim>();
     public string Description { get; set; }
 }

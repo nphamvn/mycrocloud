@@ -28,18 +28,17 @@ public class Authentication : IMiddleware
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         ArgumentNullException.ThrowIfNull(context.Items["ProjectId"]);
-        var projectId = Convert.ToInt32(context.Items["ProjectId"]);
-        var schemes = await _authRepository.GetProjectAuthenticationSchemes(projectId);
+        var appId = Convert.ToInt32(context.Items["ProjectId"]);
+        var schemes = await _authRepository.GetProjectAuthenticationSchemes(appId);
         var defaultScheme = schemes.FirstOrDefault(a => a.Order == 1);
-        IAppAuthenticationHandlerProvider handlerProvider = new AppAuthenticationHandlerProvider();
-        IAppAuthenticationHandler handler;
-        AppAuthentication auth;
-        AppAuthenticateResult result;
+        IAuthenticationHandlerProvider handlerProvider = new AuthenticationHandlerProvider();
+        IAuthenticationHandler handler;
+        AuthenticationScheme auth;
+        AuthenticateResult result;
         if (defaultScheme != null)
         {
             auth = await _authRepository.GetAuthenticationScheme(defaultScheme.Id, defaultScheme.Type);
             handler = handlerProvider.GetHandler(auth);
-            //TODO: Modify header value
             result = await handler.AuthenticateAsync(context);
             if (result.Succeeded)
             {
@@ -53,7 +52,6 @@ public class Authentication : IMiddleware
                 foreach (var scheme in otherSchemes)
                 {
                     handler = handlerProvider.GetHandler(scheme);
-                    //TODO: Modify header value
                     result = await handler.AuthenticateAsync(context);
                     if (result.Succeeded)
                     {
@@ -70,7 +68,6 @@ public class Authentication : IMiddleware
             {
                 auth = await _authRepository.GetAuthenticationScheme(scheme.Id, scheme.Type);
                 handler = handlerProvider.GetHandler(auth);
-                //TODO: Modify header value
                 result = await handler.AuthenticateAsync(context);
                 if (result.Succeeded)
                 {

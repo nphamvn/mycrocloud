@@ -6,5 +6,5 @@ namespace MockServer.Web.Models.ProjectSettings.Auth;
 public class AuthIndexModel
 {
     public Project Project { get; set; }
-    public IEnumerable<AppAuthentication> AuthenticationSchemes { get; set; }
+    public IEnumerable<AuthenticationScheme> AuthenticationSchemes { get; set; }
 }
