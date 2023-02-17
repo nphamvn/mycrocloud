@@ -36,7 +36,6 @@ public class db {
         _jsonFilePath = Path.Combine("db", dbOwner, fileName);
     }
 
-
     public async Task<object> read(string table) {
         
         return new object();
