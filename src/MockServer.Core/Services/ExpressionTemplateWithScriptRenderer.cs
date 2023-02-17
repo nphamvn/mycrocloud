@@ -8,20 +8,25 @@ namespace MockServer.Core.Services;
 
 public class ExpressionTemplateWithScriptRenderer : IExpressionTemplateWithScriptRenderer
 {
-    public string Render(object ctx, string template, string script)
+    private readonly Engine _engine;
+    public ExpressionTemplateWithScriptRenderer()
     {
-        var engine = new Engine();
-        engine.SetValue("ctx", ctx);
-        engine.SetValue("read", new Func<string, object>(ReadData));
-        engine.SetValue("write", new Action<string, object>(WriteData));
-        engine.Execute(script);
+        
+    }
+    public ExpressionTemplateWithScriptRenderer(Engine engine)
+    {
+        _engine = engine;
+    }
+
+    public string Render(string source)
+    {
         string pattern = @"@{(.*?)}";
         RegexOptions options = RegexOptions.Singleline;
-        string output = Regex.Replace(template, pattern, (match) =>
+        string output = Regex.Replace(source, pattern, (match) =>
         {
             if (match.Success)
             {
-                return engine.Execute(match.Groups[1].Value).GetCompletionValue().ToString();
+                return _engine.Execute(match.Groups[1].Value).GetCompletionValue().ToString();
             }
             else
             {
@@ -29,14 +34,5 @@ public class ExpressionTemplateWithScriptRenderer : IExpressionTemplateWithScrip
             }
         }, options);
         return output;
-    }
-
-    private object ReadData(string name)
-    {
-        return new object();
-    }
-    private void WriteData(string name, object data)
-    {
-
     }
 }

@@ -18,14 +18,47 @@ public class FixedRequestHandler : IRequestHandler
         _requestRepository = requestRepository;
     }
 
-    public async Task<ResponseMessage> GetResponseMessage(Request request)
+    private db connectDb(string connectionString) {
+        var dbOwner = connectionString.Split(':')[0];
+        var fileName = connectionString.Split(':')[1] + ".json";
+        var _jsonFilePath = Path.Combine("db", dbOwner, fileName);
+        var dbOwnerId = 1;
+        bool isValid = appOwnerId == dbOwnerId;
+        if (isValid)
+        {
+            return new db(connectionString);
+        }
+        else 
+        {
+            throw new Exception("Cannot connect");
+        }
+    }
+    private int appOwnerId;
+    public async Task<ResponseMessage> GetResponseMessage(Request incomingRequest)
     {
-        var headers = await _requestRepository.GetResponseHeaders(request.Id);
+        var request = await _requestRepository.GetById(incomingRequest.Id);
+        appOwnerId = request.Project.User.Id;
+        var handlerContext = new HandlerContext(incomingRequest.HttpContext);
+        handlerContext.Setup();
+        var script =
+                    """
+                    const db = connectDb('other:blogs');
+                    const posts = db.read('posts');
+                    const newPost = {
+                        name: 'new post'
+                    };
+                    const post = db.write('posts', newPost);
+                    """;
+        if (!string.IsNullOrEmpty(script))
+        {
+            handlerContext.JintEngine.Execute(script);
+        }
+        var headers = await _requestRepository.GetResponseHeaders(incomingRequest.Id);
         foreach (var header in headers)
         {
-            request.HttpContext.Response.Headers.Add(header.Name, header.Value);
+            incomingRequest.HttpContext.Response.Headers.Add(header.Name, header.Value);
         }
-        var res = await _requestRepository.GetResponse(request.Id);
+        var res = await _requestRepository.GetResponse(incomingRequest.Id);
         string body = "";
         if (res.BodyTextRenderEngine == 1)
         {
@@ -34,23 +67,15 @@ public class FixedRequestHandler : IRequestHandler
         else if (res.BodyTextRenderEngine == 2)
         {
             //Handlebars
-            IHandlebarsTemplateRenderer renderService = new HandlebarsTemplateRenderer();
-            var req = await HttpContextExtentions.GetRequestDictionary(request.HttpContext);
-            var ctx = new
-            {
-                request = req
-            };
-            body = renderService.Render(ctx, res.BodyText, res.BodyRenderScript);
+            IHandlebarsTemplateRenderer renderService = new HandlebarsTemplateRenderer(handlerContext.JintEngine);
+            body = renderService.Render(res.BodyText);
         }
         else if (res.BodyTextRenderEngine == 3)
         {
-            var ctx = new
-            {
-                request = await HttpContextExtentions.GetRequestDictionary(request.HttpContext)
-            };
-            IExpressionTemplateWithScriptRenderer renderService = new ExpressionTemplateWithScriptRenderer();
-            body = renderService.Render(ctx, res.BodyText, res.BodyRenderScript);
+            IExpressionTemplateWithScriptRenderer renderService = new ExpressionTemplateWithScriptRenderer(handlerContext.JintEngine);
+            body = renderService.Render(res.BodyText);
         }
+
         return new ResponseMessage
         {
             StatusCode = (HttpStatusCode)res.StatusCode,
