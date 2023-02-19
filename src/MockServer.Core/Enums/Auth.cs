@@ -1,6 +1,6 @@
 namespace MockServer.Core.Enums;
 
-public enum AuthenticationType
+public enum AuthenticationSchemeType
 {
     JwtBearer = 1,
     ApiKey = 2,

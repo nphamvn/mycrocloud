@@ -71,7 +71,7 @@ public class AuthRepository : IAuthRepository
         });
     }
 
-    public Task<AuthenticationScheme> GetAuthenticationScheme(int id, AuthenticationType type)
+    public Task<AuthenticationScheme> GetAuthenticationScheme(int id, AuthenticationSchemeType type)
     {
         var query =
                 """
@@ -207,11 +207,11 @@ public class AuthRepository : IAuthRepository
         Type type = typeof(TAuthOptions);
         if (typeof(JwtBearerAuthenticationOptions).IsEquivalentTo(type))
         {
-            SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(AuthenticationType.JwtBearer));
+            SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(AuthenticationSchemeType.JwtBearer));
         }
         else if (typeof(ApiKeyAuthenticationOptions).IsEquivalentTo(type))
         {
-            SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(AuthenticationType.ApiKey));
+            SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(AuthenticationSchemeType.ApiKey));
         }
         var query =
                 """
@@ -236,7 +236,7 @@ public class AuthRepository : IAuthRepository
     public async Task<AuthenticationScheme> GetAuthenticationScheme(int id)
     {
         using var connection = new SqliteConnection(_connectionString);
-        var type = await connection.QuerySingleOrDefaultAsync<AuthenticationType>("SELECT Type FROM ProjectAuthentication WHERE Id = @Id", new { Id = id });
+        var type = await connection.QuerySingleOrDefaultAsync<AuthenticationSchemeType>("SELECT Type FROM ProjectAuthentication WHERE Id = @Id", new { Id = id });
         var query =
                 """
                 SELECT
@@ -259,20 +259,20 @@ public class AuthRepository : IAuthRepository
 
 public class AuthenticationOptionsJsonTypeHandler : SqlMapper.TypeHandler<AuthenticationSchemeOptions>
 {
-    private readonly AuthenticationType _type;
+    private readonly AuthenticationSchemeType _type;
 
-    public AuthenticationOptionsJsonTypeHandler(AuthenticationType type)
+    public AuthenticationOptionsJsonTypeHandler(AuthenticationSchemeType type)
     {
         _type = type;
     }
     public override AuthenticationSchemeOptions Parse(object value)
     {
         var stringValue = value.ToString();
-        if (_type is AuthenticationType.JwtBearer)
+        if (_type is AuthenticationSchemeType.JwtBearer)
         {
             return JsonSerializer.Deserialize<JwtBearerAuthenticationOptions>(stringValue);
         }
-        else if (_type is AuthenticationType.ApiKey)
+        else if (_type is AuthenticationSchemeType.ApiKey)
         {
             return JsonSerializer.Deserialize<ApiKeyAuthenticationOptions>(stringValue);
         }
@@ -284,11 +284,11 @@ public class AuthenticationOptionsJsonTypeHandler : SqlMapper.TypeHandler<Authen
 
     public override void SetValue(IDbDataParameter parameter, AuthenticationSchemeOptions value)
     {
-        if (_type is AuthenticationType.JwtBearer)
+        if (_type is AuthenticationSchemeType.JwtBearer)
         {
             parameter.Value = JsonSerializer.Serialize((JwtBearerAuthenticationOptions)value);
         }
-        else if (_type is AuthenticationType.ApiKey)
+        else if (_type is AuthenticationSchemeType.ApiKey)
         {
             parameter.Value = JsonSerializer.Serialize((ApiKeyAuthenticationOptions)value);
         }

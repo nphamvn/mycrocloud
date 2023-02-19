@@ -2,6 +2,7 @@ namespace MockServer.Web.Common;
 
 public class Constants
 {
+    public const int TemporaryId = -9999;
     public class RouteName
     {
         public const string ProjectId = "ProjectId";

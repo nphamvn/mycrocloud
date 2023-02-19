@@ -1,0 +1,220 @@
+@using MockServer.Web.Controllers
+@using MockServer.Web.Extentions
+@using MockServer.Core.Models
+@model MockServer.Web.Models.ProjectRequests.IndexViewModel
+@{
+    ViewData["Title"] = Model.Project.Name;
+}
+<partial name="/Views/ProjectShared/_Breadcrumb.cshtml" model="Model.Project" />
+<div style="height: calc(100vh - 180px);">
+    <partial name="/Views/ProjectShared/_NavTabs.cshtml" model="Model.Project" />
+    <div class="tab-content h-100">
+        <div class="tab-pane fade show active h-100">
+            <div class="row h-100 p-2">
+                <div class="col-3 h-100 overflow-scroll">
+                    <div class="d-grid mt-1">
+                        <button class="btn btn-sm bg-violet-500 text-white js-new-request-button">New</button>
+                    </div>
+                    <div class="request-container">
+                        <ul id="requests" class="list-group list-group-flush mt-2">
+                            @foreach (var req in Model.Requests)
+                            {
+                                <li data-request-id="@req.Id" class="request-list-item list-group-item px-2 py-1">
+                                    <div class="row">
+                                        <div class="col js-open-request">
+                                            <span class="tw-text-base">@req.Name</span>
+                                            <div>
+                                                <small
+                                                class="badge rounded-pill fw-bolder text-white me-1 @req.MethodBadgeColor"
+                                                style="width: 60px; font-size: 11px;">@req.Method</small>
+                                                <small class="text-muted">/@req.Path</small>
+                                            </div>
+                                        </div>
+                                        <div class="p-0 my-auto" style="width: 40px;">
+                                            <button class="btn btn-sm btn-context-menu" type="button"><i
+                                                class="bi bi-three-dots"></i></button>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-9 h-100" id="RequestOpenContent">
+
+                </div>
+            </div>
+            <style>
+                .context-menu {
+                    position: absolute;
+                    width: 60px;
+                }
+            </style>
+            <template id="context-menu-template">
+                <div class="btn-group-vertical dropdown-menu context-menu" role="group">
+                    <button name="btnCopy" type="button" class="dropdown-item btn btn-default">Copy</button>
+                    <button name="btnDelete" type="button"
+                        class="dropdown-item btn btn-default text-danger">Delete</button>
+                </div>
+            </template>
+
+            <!-- Modal -->
+            <template id="requestDeleteConfirmModalTemplate">
+                <div class="modal fade" id="requestDeleteConfirmModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Delete confirm</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Are your sure want to delete request?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button name="btnDelete" type="button" class="btn btn-danger">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+<div id="ajax-partial">
+
+</div>
+<!-- New request: Start -->
+<script>
+    $(function () {
+        $('.js-new-request-button').click(function () {
+            $.get({
+                url: '@Url.Action(nameof(ProjectRequestsController.GetCreatePartial), "ProjectRequests", new {ProjectName = Model.Project.Name})',
+                success: function (data) {
+                    const html = data;
+                    const partial = $('#ajax-partial').html(html);
+                    const modal = $('.modal', partial);
+                    initSaveRequestModal(modal);
+                    $('#btnSave', modal).click(function () {
+                        let request = {
+                            Type: $('input[name=Type]:checked', modal).val(),
+                            Name: $('input[name=Name]', modal).val(),
+                            Description: $('input[name=Description]', modal).val(),
+                            Method: $('select[name=Method] option:selected', modal).val(),
+                            Path: $('input[name=Path]', modal).val()
+                        };
+                        $.post({
+                            url: '@Url.Action(nameof(ProjectRequestsController.CreateAjax), "Requests", new {projectName = ViewData["ProjectName"]})',
+                            data: request,
+                            success: function (data) {
+                                $('#btnSave', modal).off('click');
+                                const id = data;
+                                modal.data('id', id);
+                                modal.modal('hide');
+                            },
+                            error: function () {
+                                alert('something went wrong');
+                            }
+                        });
+                    });
+                    modal.on('hidden.bs.modal', function (e) {
+                        if (modal.data('id') !== undefined) {
+                            location.reload();
+                        }
+                        modal.remove();
+                    });
+                    modal.modal('show');
+                }
+            });
+        });
+    });
+</script>
+<!-- New request: End -->
+<!-- Conext menu: Start -->
+<script>
+    $(function () {
+        $('#requests .btn-context-menu').click(showRequestContextMenu);
+    });
+
+    function showRequestContextMenu() {
+        $('.btn-clicked').removeClass('btn-clicked');
+        $(document).off('click', documentClickHandler);
+        $('.context-menu button').off('click');
+        $('.context-menu').remove();
+
+        const requestId = $(this).closest('li').data('request-id');
+        $(this).addClass('btn-clicked');
+        var position = $(this).offset();
+        const container = $($('#context-menu-template').html());
+        var left = (position.left - 70 + $(this).outerWidth()) + 'px';
+        var top = (position.top + $(this).outerHeight()) + 'px';
+        container.css({'left': left, 'top': top});
+        $('.btn-group-vertical button', container).click(function () {
+            $('.btn-clicked').removeClass('btn-clicked');
+            $(document).off('click', documentClickHandler);
+            $('.context-menu button').off('click');
+            $('.context-menu').remove();
+        });
+        const deleteButton = $('button[name=btnDelete]', container);
+        deleteButton.click(function () {
+            //show confirm modal
+            const modal = $($('#requestDeleteConfirmModalTemplate').html());
+            $('body').append(modal);
+
+            $("#requestDeleteConfirmModal button[name=btnDelete]").click(function () {
+                $(this).off('click');
+                deleteRequest(requestId);
+                $("#requestDeleteConfirmModal").modal("hide");
+            });
+
+            $("#requestDeleteConfirmModal").on('hide.bs.modal', function () {
+                $("#requestDeleteConfirmModal button[name=btnDelete]").off('click');
+                $("#requestDeleteConfirmModal").remove();
+            })
+            $("#requestDeleteConfirmModal").modal("show");
+            $(this).off('click');
+        });
+        $('.request-container').append(container);
+        $(document).click(documentClickHandler);
+    }
+    const documentClickHandler = function (e) {
+        const menu = $('.context-menu');
+        const button = $('.btn-clicked');
+        // Check if the target of the click event is the context menu or one of its children
+        if (e.target !== menu[0] && !menu.has(e.target).length && !$(e.target).is(button)) {
+            button.removeClass('btn-clicked');
+            // Remove the event handler
+            $(document).off('click', documentClickHandler);
+            //Remove the menu
+            menu.remove();
+        }
+    }
+
+    function deleteRequest(id) {
+        const tempUrl = '@Url.Action(nameof(ProjectRequestsController.Delete), "ProjectRequests", new { RequestId = Constants.TemporaryId})'
+        $.post({
+            async: false,
+            url: tempUrl.replace(@Constants.TemporaryId, id),
+            success: function () {
+                $('#requests [data-request-id=' + id + ']').remove();
+            }
+        });
+    }
+</script>
+<!-- Conext menu: End -->
+<!-- Open request: Start -->
+<script>
+    $(function () {
+        const tempUrl = '@Url.Action(nameof(ProjectRequestsController.View), "ProjectRequests", new {ProjectName = @Model.Project.Name, RequestId = Constants.TemporaryId})';
+        $('.js-open-request').click(function () {
+            const selected = $(this).closest('li');
+            selected.parent().find('li').removeClass('bg-gray');
+            selected.addClass('bg-gray');
+            const id = selected.data('request-id');
+            $('#RequestOpenContent').load(tempUrl.replace(@Constants.TemporaryId, id));
+        });
+    });
+</script>
+<!-- Open request: End -->

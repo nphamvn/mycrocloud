@@ -10,7 +10,7 @@ public interface IAuthRepository
     Task ActivateProjectAuthenticationSchemes(int projectId, List<int> schemeIds);
     Task<IEnumerable<AuthenticationScheme>> GetProjectAuthenticationSchemes(int projectId);
     Task<AuthenticationScheme> GetAuthenticationScheme(int id);
-    Task<AuthenticationScheme> GetAuthenticationScheme(int id, AuthenticationType type);
+    Task<AuthenticationScheme> GetAuthenticationScheme(int id, AuthenticationSchemeType type);
     Task<AuthenticationScheme> GetAuthenticationScheme<TOptions>(int id) where TOptions : AuthenticationSchemeOptions;
     Task<Authorization> GetRequestAuthorization(int requestId);
     Task UpdateRequestAuthorization(int requestId, Authorization authorization);

@@ -1,16 +1,15 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using MockServer.Core.Enums;
 using MockServer.Core.Helpers;
-using MockServer.Core.Models.Requests;
 using MockServer.Core.Repositories;
-using MockServer.Web.Models.Requests;
+using MockServer.Web.Models.ProjectRequests;
+using MockServer.Web.Models.Projects;
 using MockServer.Web.Services.Interfaces;
 
 namespace MockServer.Web.Services;
 
-public class RequestWebService : BaseWebService, IRequestWebService
+public class RequestWebService : BaseWebService, IProjectRequestWebService
 {
     private readonly IRequestRepository _requestRepository;
     private readonly IProjectRepository _projectRepository;
@@ -28,35 +27,16 @@ public class RequestWebService : BaseWebService, IRequestWebService
         _authRepository = authRepository;
         _mapper = mapper;
     }
-    public async Task<RequestOpenViewModel> GetRequestOpenViewModel(int projectId, int requestId)
+    public async Task<RequestViewModel> GetRequestOpenViewModel(int requestId)
     {
         var request = await _requestRepository.GetById(requestId);
-        var vm = _mapper.Map<RequestOpenViewModel>(request);
-        vm.Configuration = await this.GetRequestConfiguration(request);
+        var vm = _mapper.Map<RequestViewModel>(request);
+        vm.AuthorizationConfiguration = await GetAuthorization(request.ProjectId, requestId);
+        
         return vm;
     }
-    private async Task<RequestConfiguration> GetRequestConfiguration(Core.Models.Requests.Request request)
-    {
-        RequestConfiguration ret = null;
-        switch (request.Type)
-        {
-            case RequestType.Fixed:
-                var req = await _requestRepository.GetById(request.Id);
-                ret = new FixedRequestConfiguration
-                {
-                    RequestParams = req.Queries ?? new List<RequestQuery>(),
-                    RequestHeaders = req.Headers?? new List<RequestHeader>(),
-                    RequestBody = await _requestRepository.GetRequestBody(request.Id),
-                    ResponseHeaders = (await _requestRepository.GetResponseHeaders(request.Id)).ToList(),
-                    Response = await _requestRepository.GetResponse(request.Id)
-                };
-                break;
-            default:
-                break;
-        }
-        return ret;
-    }
-    public async Task<int> Create(int projectId, CreateUpdateRequestViewModel request)
+
+    public async Task<int> Create(int projectId, SaveRequestViewModel request)
     {
         var existing = await _requestRepository.Find(projectId, request.Method, request.Path);
         if (existing == null)
@@ -75,55 +55,28 @@ public class RequestWebService : BaseWebService, IRequestWebService
         await _requestRepository.Delete(id);
     }
 
-    public async Task<FixedRequestConfigViewModel> GetFixedRequestConfigViewModel(int id)
+    public async Task<RequestConfiguration> GetFixedRequestConfigViewModel(int id)
     {
         var request = await _requestRepository.GetById(id);
-        return _mapper.Map<FixedRequestConfigViewModel>(request);
+        return _mapper.Map<RequestConfiguration>(request);
     }
 
-    public async Task SaveFixedRequestConfig(int id, string[] fields, FixedRequestConfigViewModel config)
-    {
-        var mapped = _mapper.Map<Core.Models.Requests.FixedRequest>(config);
-        if (fields.Contains(nameof(config.RequestParams)))
-        {
-            await _requestRepository.UpdateRequestQuery(id, mapped.RequestParams);
-        }
-
-        if (fields.Contains(nameof(config.RequestHeaders)))
-        {
-            await _requestRepository.UpdateRequestHeader(id, mapped.RequestHeaders);
-        }
-
-        if (fields.Contains(nameof(config.RequestBody)))
-        {
-            await _requestRepository.UpdateRequestBody(id, mapped.RequestBody);
-        }
-
-        if (fields.Contains(nameof(config.ResponseHeaders)))
-        {
-            await _requestRepository.UpdateResponseHeaders(id, mapped);
-        }
-        if (fields.Contains(nameof(config.Response)))
-        {
-            await _requestRepository.UpdateResponse(id, mapped);
-        }
-    }
-
-    public async Task<CreateUpdateRequestViewModel> GetCreateRequestViewModel(int requestId)
+    public async Task<SaveRequestViewModel> GetEditRequestViewModel(int requestId)
     {
         var request = await _requestRepository.GetById(requestId);
-        var vm = _mapper.Map<CreateUpdateRequestViewModel>(request);
+        var vm = _mapper.Map<SaveRequestViewModel>(request);
+        vm.Project = await _projectRepository.Get(request.ProjectId);
         vm.HttpMethods = HttpProtocolExtensions.CommonHttpMethods
                             .Select(m => new SelectListItem(m, m));
         return vm;
     }
 
-    public async Task<bool> ValidateEdit(int id, CreateUpdateRequestViewModel request, ModelStateDictionary modelState)
+    public async Task<bool> ValidateEdit(int id, SaveRequestViewModel request, ModelStateDictionary modelState)
     {
         return modelState.IsValid;
     }
 
-    public async Task Edit(int id, CreateUpdateRequestViewModel request)
+    public async Task Edit(int id, SaveRequestViewModel request)
     {
         var existing = await _requestRepository.GetById(id);
         if (existing != null)
@@ -133,26 +86,47 @@ public class RequestWebService : BaseWebService, IRequestWebService
         }
     }
 
-    public async Task<CreateUpdateRequestViewModel> GetCreateRequestViewModel()
-    {
-        var vm = new CreateUpdateRequestViewModel();
-        vm.HttpMethods = HttpProtocolExtensions.CommonHttpMethods
-                            .Select(m => new SelectListItem(m, m));
-        return vm;
-    }
-
-    public async Task<AuthorizationConfigViewModel> GetAuthorizationConfigViewModel(int projectId, int requestId)
+    public async Task<AuthorizationConfiguration> GetAuthorization(int projectId, int requestId)
     {
         var authorization = await _authRepository.GetRequestAuthorization(requestId);
-        var vm = authorization != null ? _mapper.Map<AuthorizationConfigViewModel>(authorization)
-                                        : new AuthorizationConfigViewModel();
+        var vm = authorization != null ? _mapper.Map<AuthorizationConfiguration>(authorization)
+                                        : new AuthorizationConfiguration();
         vm.AuthenticationSchemeSelectList = await _authRepository.GetProjectAuthenticationSchemes(projectId);
         return vm;
     }
 
-    public async Task ConfigureRequestAuthorization(int requestId, AuthorizationConfigViewModel auth)
+    public async Task AttachAuthorization(int requestId, AuthorizationConfiguration auth)
     {
         var authorization = _mapper.Map<Core.Models.Auth.Authorization>(auth);
         await _authRepository.UpdateRequestAuthorization(requestId, authorization);
+    }
+
+    public async Task<IndexViewModel> GetIndexViewModel(int projectId)
+    {
+        return new IndexViewModel
+        {
+            Project = _mapper.Map<Project>(await _projectRepository.Get(projectId)),
+            Requests = _mapper.Map<IEnumerable<RequestIndexItem>>(await _requestRepository.GetByProjectId(projectId))
+        };
+    }
+
+    public Task<bool> ValidateCreate(int projectId, SaveRequestViewModel request, ModelStateDictionary modelState)
+    {
+        return Task.FromResult(modelState.IsValid);
+    }
+
+    public Task SaveRequestConfiguration(int requestId, RequestConfiguration config)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<SaveRequestViewModel> GetCreateRequestViewModel(int projectId)
+    {
+        var vm = new SaveRequestViewModel();
+        vm.Project = await _projectRepository.Get(projectId);
+        vm.Project.User = AuthUser;
+        vm.HttpMethods = HttpProtocolExtensions.CommonHttpMethods
+                            .Select(m => new SelectListItem(m, m));
+        return vm;
     }
 }

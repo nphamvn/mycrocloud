@@ -6,7 +6,6 @@ using MockServer.Core.Models;
 using MockServer.Core.Repositories;
 using MockServer.Web.Extentions;
 using MockServer.Web.Models.Projects;
-using MockServer.Web.Models.Requests;
 using MockServer.Web.Services.Interfaces;
 
 namespace MockServer.Web.Services;
@@ -42,7 +41,7 @@ public class ProjectWebService : IProjectWebService
         {
             return false;
         }
-        var mapped = _mapper.Map<Core.Models.Projects.WebApp>(project);
+        var mapped = _mapper.Map<Core.Models.Projects.Project>(project);
         mapped.UserId = user.Id;
         await projectRepository.Add(mapped);
         return true;
@@ -64,6 +63,12 @@ public class ProjectWebService : IProjectWebService
         return _apiKeyService.GenerateApiKey();
     }
 
+    public async Task<Project> Get(int projectId)
+    {
+        var project = await projectRepository.Get(projectId);
+        return _mapper.Map<Project>(project);
+    }
+
     public async Task<ProjectIndexViewModel> GetIndexViewModel(ProjectSearchModel searchModel)
     {
         var user = contextAccessor.HttpContext.User.Parse<ApplicationUser>();
@@ -81,16 +86,6 @@ public class ProjectWebService : IProjectWebService
             CreatedAt = p.CreatedAt,
             UpdatedAt = p.UpdatedAt
         }).ToList();
-        return vm;
-    }
-
-    public async Task<ProjectViewViewModel> GetProjectViewViewModel(int projectId)
-    {
-        var project = await projectRepository.Get(projectId);
-        var vm = new ProjectViewViewModel();
-        vm.ProjectInfo = _mapper.Map<ProjectIndexItem>(project);
-        var requests = await _requestRepository.GetByProjectId(project.Id);
-        vm.Requests = _mapper.Map<IEnumerable<RequestIndexItem>>(requests);
         return vm;
     }
 

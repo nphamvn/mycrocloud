@@ -5,9 +5,9 @@ namespace MockServer.Web.Services.Interfaces;
 
 public interface IProjectWebService
 {
+    Task<Project> Get(int projectId);
     Task<ProjectIndexViewModel> GetIndexViewModel(ProjectSearchModel searchModel);
     Task<bool> Create(CreateProjectViewModel project);
-    Task<ProjectViewViewModel> GetProjectViewViewModel(int projectId);
     Task Rename(int projectId, string newName);
     Task<string> GenerateKey(int projectId);
     Task Delete(int projectId);

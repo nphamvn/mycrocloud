@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddOptions();
 builder.Services.AddGlobalSettings(builder.Configuration);
-builder.Services.AddScoped<RouteResolver>();
+builder.Services.AddScoped<RouteService>();
 builder.Services.AddScoped<Authentication>();
 builder.Services.AddScoped<Authorization>();
 builder.Services.AddScoped<ConstraintsValidation>();

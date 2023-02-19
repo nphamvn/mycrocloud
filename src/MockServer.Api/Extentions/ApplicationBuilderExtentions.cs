@@ -70,7 +70,7 @@ public static class ApplicationBuilderExtentions
                             return a + b;
                         }
                         """;
-                var result = renderService.Render(ctx, template, script);
+                var result = renderService.Render(template);
                 await context.Response.WriteAsync(result);
             });
         });
@@ -99,7 +99,7 @@ public static class ApplicationBuilderExtentions
                             return a + b;
                         }
                         """;
-                var result = renderService.Render(ctx, template, script);
+                var result = renderService.Render(template);
                 context.Response.StatusCode = 200;
                 var data = Encoding.UTF8.GetBytes(result);
                 context.Response.Headers["content-type"] = "application/json; charset=utf-8";

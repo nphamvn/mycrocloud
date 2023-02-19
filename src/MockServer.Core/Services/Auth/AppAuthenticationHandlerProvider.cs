@@ -8,13 +8,13 @@ public class AuthenticationHandlerProvider : IAuthenticationHandlerProvider
 {
     public IAuthenticationHandler GetHandler(AuthenticationScheme scheme)
     {
-        if (scheme.Type is AuthenticationType.JwtBearer)
+        if (scheme.Type is AuthenticationSchemeType.JwtBearer)
         {
             var JwtBearerAuthHandler = new JwtBearerAuthHandler((JwtBearerAuthenticationOptions)scheme.Options);
             JwtBearerAuthHandler.Scheme = scheme;
             return JwtBearerAuthHandler;
         }
-        else if (scheme.Type is AuthenticationType.ApiKey)
+        else if (scheme.Type is AuthenticationSchemeType.ApiKey)
         {
             return new ApiKeyAuthHandler((ApiKeyAuthenticationOptions)scheme.Options);
         }

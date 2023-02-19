@@ -20,7 +20,7 @@ public class AccountController : Controller
     {
         return Challenge(new AuthenticationProperties
         {
-            RedirectUri = "/projects"
+            RedirectUri = "/"
         });
     }
 
@@ -28,13 +28,5 @@ public class AccountController : Controller
     public async Task<IActionResult> Logout()
     {
         return SignOut("Cookies", "oidc");
-    }
-
-    [Authorize]
-    [HttpGet("user")]
-    public IActionResult GetUser()
-    {
-        var user = HttpContext.User;
-        return Ok(JsonSerializer.Serialize(user));
     }
 }

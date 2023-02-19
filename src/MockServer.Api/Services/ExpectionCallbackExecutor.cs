@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Http;
-using MockServer.Api.Interfaces;
+﻿using MockServer.Api.Interfaces;
 using MockServer.Api.Models;
 using MockServer.Api.Models.Docker;
 

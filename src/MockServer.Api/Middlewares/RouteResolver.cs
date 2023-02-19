@@ -57,6 +57,7 @@ public class RouteResolver : IMiddleware
             await context.Response.WriteAsync($"No matching route found for path: {req.Path}");
             return;
         }
+        context.Items["Username"] = req.Username;
         context.Items["ProjectId"] = app.Id;
         context.Items["RequestId"] = result.Route.Id;
         context.Request.RouteValues = result.RouteValues;

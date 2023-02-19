@@ -33,7 +33,7 @@ public class ConstraintsValidation : IMiddleware
         ArgumentNullException.ThrowIfNull(context.Items["RequestId"]);
         int id = Convert.ToInt32(context.Items["RequestId"]);
         var r = await _requestRepository.GetById(id);
-        var queries = r.Queries;
+        var queries = r.Query;
         var queryBinder = new FromQueryDataBinder();
         foreach (var param in queries)
         {

@@ -24,8 +24,7 @@ namespace MockServer.Web.Extentions
             services.AddScoped<IRequestRepository, RequestRepository>();
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IProjectWebService, ProjectWebService>();
-            services.AddScoped<IProjectSettingsWebService, ProjectSettingsWebService>();
-            services.AddScoped<IRequestWebService, RequestWebService>();
+            services.AddScoped<IProjectRequestWebService, RequestWebService>();
         }
     }
 }

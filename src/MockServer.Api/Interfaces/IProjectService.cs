@@ -4,5 +4,5 @@ namespace MockServer.Core.Interfaces;
 
 public interface IProjectService
 {
-    Task<WebApp> GetProject(int id);
+    Task<Project> GetProject(int id);
 }

@@ -1,14 +1,14 @@
 using AutoMapper;
-using MockServer.Core.Models.Projects;
 using MockServer.Web.Models.Projects;
-
+using CoreProject = MockServer.Core.Models.Projects.Project;
 namespace MockServer.Web.Profiles;
 
 public class ProjectProfile : Profile
 {
     public ProjectProfile()
     {
-        CreateMap<CreateProjectViewModel, Core.Models.Projects.WebApp>().ReverseMap();
-        CreateMap<Core.Models.Projects.WebApp, ProjectIndexItem>().ReverseMap();
+        CreateMap<CreateProjectViewModel, CoreProject>().ReverseMap();
+        CreateMap<CoreProject, ProjectIndexItem>().ReverseMap();
+        CreateMap<CoreProject, Project>().ReverseMap();
     }
 }

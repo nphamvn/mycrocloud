@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MockServer.Core.Enums;
 using MockServer.Web.Filters;
-using MockServer.Web.Models.ProjectSettings.Auth;
 using MockServer.Web.Services.Interfaces;
 using RouteName = MockServer.Web.Common.Constants.RouteName;
 namespace MockServer.Web.Controllers;
@@ -13,19 +12,16 @@ namespace MockServer.Web.Controllers;
 public class ProjectSettingsController : BaseController
 {
     private readonly IProjectWebService _projectService;
-    private readonly IProjectSettingsWebService _settingsService;
-    public ProjectSettingsController(IProjectWebService projectService,
-        IProjectSettingsWebService settingsService)
+    public ProjectSettingsController(IProjectWebService projectService)
     {
         _projectService = projectService;
-        _settingsService = settingsService;
     }
 
     [HttpGet]
-    [HttpGet("general")]
+    //[HttpGet("general")]
     public async Task<IActionResult> Index(int ProjectId)
     {
-        var model = await _settingsService.GetIndexModel(ProjectId);
+        var model = await _projectService.Get(ProjectId);
         return View("Views/ProjectSettings/Index.cshtml", model);
     }
 

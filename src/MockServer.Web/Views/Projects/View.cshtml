@@ -1,29 +1,15 @@
-@using MockServer.Core.Models
-@using MockServer.Web.Extentions
 @model MockServer.Web.Models.Projects.ProjectViewViewModel
 @{
     ViewData["Title"] = Model.ProjectInfo.Name;
     ViewData["ProjectName"] = Model.ProjectInfo.Name;
 }
-<div class="mb-2">
-    <span><a class="text-decoration-none"
-            href="@Url.Action("Index", "Home")">@(User.Parse<ApplicationUser>().Username)</a></span>
-    <span>/</span>
-    <strong><a class="text-decoration-none"
-            href="@Url.Action("View", new {name=Model.ProjectInfo.Name})">@Model.ProjectInfo.Name</a></strong>
-    <span
-        class="badge py-0 rounded-pill bg-light text-sm fw-bolder text-gray border border-secondary">@Model.ProjectInfo.Accessibility</span>
-</div>
-
+<partial name="/Views/Projects/_Breadcrumb.cshtml" model="@ViewData["ProjectName"]"/>
 <div style="height: calc(100vh - 180px);">
     <partial name="_NavTabs.cshtml" model="Model.ProjectInfo.Name" />
     <!-- Tab content -->
     <div class="tab-content h-100">
         <div id="requests-tab" class="tab-pane fade show active h-100">
             <partial name="_RequestsPartial.cshtml" model="Model" />
-        </div>
-        <div id="settings-tab" class="tab-pane fade h-100">
-
         </div>
     </div>
 </div>

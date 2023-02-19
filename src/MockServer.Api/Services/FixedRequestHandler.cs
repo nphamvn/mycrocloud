@@ -3,7 +3,6 @@ using System.Text;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Repositories;
 using MockServer.Core.Services;
-using MockServer.Api.Extentions;
 using MockServer.Api.Interfaces;
 using MockServer.Api.Models;
 
@@ -12,42 +11,28 @@ namespace MockServer.Api.Services;
 public class FixedRequestHandler : IRequestHandler
 {
     private readonly IRequestRepository _requestRepository;
-
+    private int _userId;
     public FixedRequestHandler(IRequestRepository requestRepository)
     {
         _requestRepository = requestRepository;
     }
-
-    private db connectDb(string connectionString) {
-        var dbOwner = connectionString.Split(':')[0];
-        var fileName = connectionString.Split(':')[1] + ".json";
-        var _jsonFilePath = Path.Combine("db", dbOwner, fileName);
-        var dbOwnerId = 1;
-        bool isValid = appOwnerId == dbOwnerId;
-        if (isValid)
-        {
-            return new db(connectionString);
-        }
-        else 
-        {
-            throw new Exception("Cannot connect");
-        }
-    }
-    private int appOwnerId;
+    
     public async Task<ResponseMessage> GetResponseMessage(Request incomingRequest)
     {
         var request = await _requestRepository.GetById(incomingRequest.Id);
-        appOwnerId = request.Project.User.Id;
+        _userId = request.Project.User.Id;
         var handlerContext = new HandlerContext(incomingRequest.HttpContext);
         handlerContext.Setup();
         var script =
                     """
-                    const db = connectDb('other:blogs');
-                    const posts = db.read('posts');
+                    const db = connectDb('blogs');
+                    db.read();
+                    db.data.
                     const newPost = {
                         name: 'new post'
                     };
                     const post = db.write('posts', newPost);
+                    const posts = db.read('posts');
                     """;
         if (!string.IsNullOrEmpty(script))
         {

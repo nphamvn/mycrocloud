@@ -1,4 +1,4 @@
-using MockServer.Web.Models.Requests;
+using MockServer.Web.Models.ProjectRequests;
 
 namespace MockServer.Web.Models.Projects;
 

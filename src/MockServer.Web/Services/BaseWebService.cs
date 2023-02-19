@@ -16,7 +16,7 @@ public class BaseWebService
         AuthUser = _contextAccessor.HttpContext.User.Parse<ApplicationUser>();
         _projectRepository = _contextAccessor.HttpContext.RequestServices.GetService<IProjectRepository>();
     }
-    protected Task<WebApp> GetProject(string projectName)
+    protected Task<Project> GetProject(string projectName)
     {
         return _projectRepository.Find(AuthUser.Id, projectName);
     }

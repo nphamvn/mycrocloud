@@ -30,7 +30,6 @@ public class RequestBody : BaseEntity
     public bool MatchExactly { get; set; }
     public string Format { get; set; }
     public string Text { get; set; }
-    public string Description { get; set; }
     public string Constraints { get; set; }
 }
 public class ResponseHeader : BaseEntity

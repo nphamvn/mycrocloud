@@ -37,7 +37,7 @@ public class ExpressionTemplateWithScriptRendererTest
                     return a + b;
                 }
                 """;
-        var result = _expressionTemplateWithScriptRenderer.Render(ctx, template, script);
+        var result = _expressionTemplateWithScriptRenderer.Render(template);
         Console.WriteLine(result);
         Assert.True(true);
     }

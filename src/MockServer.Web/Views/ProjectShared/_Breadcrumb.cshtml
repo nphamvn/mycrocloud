@@ -1,0 +1,14 @@
+@using MockServer.Web.Controllers
+@using MockServer.Core.Models
+@using MockServer.Web.Extentions
+@model MockServer.Web.Models.Projects.Project
+<div class="mb-2">
+    <span>
+        <a class="text-decoration-none"
+            href="@Url.Action(nameof(HomeController.Index), "Home")">@(User.Parse<ApplicationUser>().Username)</a>
+    </span>
+    <span>/</span>
+    <strong><a class="text-decoration-none"
+            href="@Url.Action(nameof(ProjectsController.View), new {ProjectName=Model.Name})">@Model.Name</a>
+    </strong>
+</div>

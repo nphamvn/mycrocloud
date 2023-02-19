@@ -108,6 +108,7 @@ public class RequestRepository : IRequestRepository
                 """
                 SELECT
                     r.Id,
+                    r.ProjectId,
                     r.Type,
                     r.Name,
                     r.Path,

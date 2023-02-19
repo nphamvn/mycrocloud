@@ -46,96 +46,35 @@
                 </div>
             </div>
             <div id="projectList" class="my-3">
-                <partial name="_ProjectListPartial.cshtml" model="Model.Projects"></partial>
+                <ul class="list-group list-group-flush project-list">
+                    @foreach (var project in Model.Projects)
+                    {
+                        <li class="list-group-item">
+                            <div>
+                                <h3 class="text-xl">
+                                    <a class="text-decoration-none me-2"
+                                    href="@Url.Action(nameof(ProjectRequestsController.Index), "ProjectRequests" ,new {ProjectName=project.Name})">@project.Name</a>
+                                    <span style="padding-top: 2px; padding-bottom: 2px;"
+                                    class="badge rounded-pill bg-light text-sm fw-bolder text-gray border border-secondary">@project.Accessibility</span>
+                                </h3>
+                                <p>@project.Description</p>
+                                <div class="d-flex">
+                                    @if (project.UpdatedAt > default(DateTime))
+                                    {
+                                        <div class="text-sm text-gray">
+                                            Updated <span name="updated-at"
+                                        data-updated-at="@project.UpdatedAt.ToString("yyyy-MM-ddTHH:mm:ss")"></span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
             </div>
         </div>
     </div>
 </div>
-@section Scripts {
-<script src="https://unpkg.com/javascript-time-ago@2.5.9/bundle/javascript-time-ago.js"></script>
-<script>
-    @* TimeAgo.addDefaultLocale({locale: 'en',
-            now: {
-            now: {
-            current: "now",
-            future: "in a moment",
-            past: "just now"
-            }
-            }}); *@
-
-        TimeAgo.addDefaultLocale({
-            locale: 'en',
-            now: {
-                now: {
-                    current: "now",
-                    future: "in a moment",
-                    past: "just now"
-                }
-            },
-            long: {
-                year: {
-                    past: {
-                        one: "{0} year ago",
-                        other: "{0} years ago"
-                    },
-                    future: {
-                        one: "in {0} year",
-                        other: "in {0} years"
-                    }
-                },
-                month: {
-                    past: {
-                        one: "{0} month ago",
-                        other: "{0} months ago"
-                    },
-                    future: {
-                        one: "in {0} month",
-                        other: "in {0} months"
-                    }
-                },
-                day: {
-                    past: {
-                        one: "{0} day ago",
-                        other: "{0} days ago"
-                    },
-                    future: {
-                        one: "in {0} day",
-                        other: "in {0} days"
-                    }
-                },
-                hour: {
-                    past: {
-                        one: "{0} hour ago",
-                        other: "{0} hours ago"
-                    },
-                    future: {
-                        one: "in {0} hour",
-                        other: "in {0} hours"
-                    }
-                },
-                minute: {
-                    past: {
-                        one: "{0} minute ago",
-                        other: "{0} minutes ago"
-                    },
-                    future: {
-                        one: "in {0} minute",
-                        other: "in {0} minutes"
-                    }
-                },
-                second: {
-                    past: {
-                        one: "{0} second ago",
-                        other: "{0} seconds ago"
-                    },
-                    future: {
-                        one: "in {0} minute",
-                        other: "in {0} minutes"
-                    }
-                }
-            }
-        });
-</script>
 <script>
     $(function () {
         $('#search #query').keyup(delay(function (e) {
@@ -163,4 +102,87 @@
         }
     }
 </script>
-}
+<script src="https://unpkg.com/javascript-time-ago@2.5.9/bundle/javascript-time-ago.js"></script>
+<script>
+    TimeAgo.addDefaultLocale({
+        locale: 'en',
+        now: {
+            now: {
+                current: "now",
+                future: "in a moment",
+                past: "just now"
+            }
+        },
+        long: {
+            year: {
+                past: {
+                    one: "{0} year ago",
+                    other: "{0} years ago"
+                },
+                future: {
+                    one: "in {0} year",
+                    other: "in {0} years"
+                }
+            },
+            month: {
+                past: {
+                    one: "{0} month ago",
+                    other: "{0} months ago"
+                },
+                future: {
+                    one: "in {0} month",
+                    other: "in {0} months"
+                }
+            },
+            day: {
+                past: {
+                    one: "{0} day ago",
+                    other: "{0} days ago"
+                },
+                future: {
+                    one: "in {0} day",
+                    other: "in {0} days"
+                }
+            },
+            hour: {
+                past: {
+                    one: "{0} hour ago",
+                    other: "{0} hours ago"
+                },
+                future: {
+                    one: "in {0} hour",
+                    other: "in {0} hours"
+                }
+            },
+            minute: {
+                past: {
+                    one: "{0} minute ago",
+                    other: "{0} minutes ago"
+                },
+                future: {
+                    one: "in {0} minute",
+                    other: "in {0} minutes"
+                }
+            },
+            second: {
+                past: {
+                    one: "{0} second ago",
+                    other: "{0} seconds ago"
+                },
+                future: {
+                    one: "in {0} minute",
+                    other: "in {0} minutes"
+                }
+            }
+        }
+    });
+    $(function () {
+        const timeago = new TimeAgo('en-US');
+        $('.project-list span[name=updated-at]').each(function () {
+            const updatedAt = $(this).data('updated-at');
+            if (updatedAt !== '') {
+                $(this).text(timeago.format(new Date(updatedAt)));
+            }
+        });
+    });
+</script>

@@ -4,7 +4,7 @@ using MockServer.Core.Models.Requests;
 
 namespace MockServer.Core.Models.Projects;
 
-public class WebApp : BaseEntity
+public class Project : BaseEntity
 {
     public string Name { get; set; }
     public string Description { get; set; }
