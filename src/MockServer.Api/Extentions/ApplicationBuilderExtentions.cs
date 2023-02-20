@@ -9,6 +9,65 @@ public static class ApplicationBuilderExtentions
 {
     public static IApplicationBuilder MapTestPaths(this IApplicationBuilder app)
     {
+        app.Map("/dev/db/read", app =>
+        {
+            app.Run(async context =>
+            {
+                context.Items["Username"] = "npham";
+                var handlerContext = new HandlerContext(context);
+                handlerContext.Setup();
+
+                var script =
+                    """
+                    const db = connectDb('tiny_blog');
+                    //read data
+                    let data = db.read();
+                    log(data.posts[0]);
+                    """;
+                if (!string.IsNullOrEmpty(script))
+                {
+                    handlerContext.JintEngine.Execute(script);
+                }
+                IHandlebarsTemplateRenderer renderService = new HandlebarsTemplateRenderer(handlerContext.JintEngine);
+                var template =
+                    """
+                    hello, world
+                    """;
+                string body = renderService.Render(template);
+            });
+        });
+
+        app.Map("/dev/db/write", app =>
+        {
+            app.Run(async context =>
+            {
+                context.Items["Username"] = "npham";
+                var handlerContext = new HandlerContext(context);
+                handlerContext.Setup();
+
+                var script =
+                    """
+                    const db = connectDb('tiny_blog');
+                    //read data
+                    let data = db.read();
+                    //data = { posts: [] };  
+                    data.posts.push({title:'hello world'});
+                    //write data
+                    db.write(data);
+                    """;
+                if (!string.IsNullOrEmpty(script))
+                {
+                    handlerContext.JintEngine.Execute(script);
+                }
+                IHandlebarsTemplateRenderer renderService = new HandlebarsTemplateRenderer(handlerContext.JintEngine);
+                var template =
+                    """
+                    hello, world
+                    """;
+                string body = renderService.Render(template);
+            });
+        });
+
         app.Map("/dev/header-binder", app =>
         {
             app.Run(async context =>

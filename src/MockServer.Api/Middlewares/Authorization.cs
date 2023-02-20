@@ -71,7 +71,7 @@ public class Authorization : IMiddleware
 }
 public static class AuthorizationnExtensions
 {
-    public static IApplicationBuilder UseAppAuthorization(this IApplicationBuilder builder)
+    public static IApplicationBuilder UseRequestAuthorization(this IApplicationBuilder builder)
     {
         return builder.UseMiddleware<Authorization>();
     }

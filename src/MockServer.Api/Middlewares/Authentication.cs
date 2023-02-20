@@ -89,7 +89,7 @@ public class Authentication : IMiddleware
 
 public static class AuthenticationExtensions
 {
-    public static IApplicationBuilder UseAppAuthentication(this IApplicationBuilder builder)
+    public static IApplicationBuilder UseRequestAuthentication(this IApplicationBuilder builder)
     {
         return builder.UseMiddleware<Authentication>();
     }

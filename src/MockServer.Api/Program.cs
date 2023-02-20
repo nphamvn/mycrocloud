@@ -18,6 +18,7 @@ builder.Services.AddScoped<ConstraintsValidation>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IRequestRepository, RequestRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<IDatabaseRespository, DatabaseRespository>();
 builder.Services.AddScoped<IRequestHandler, FixedRequestHandler>();
 builder.Services.AddScoped<IRequestHandler, ForwardingRequestHandler>();
 builder.Services.AddScoped<IRequestHandlerFactory, RequestHandlerFactory>();
@@ -52,9 +53,9 @@ app.UseCors(MyAllowSpecificOrigins);
 //Validate route
 app.UseRouteResolver();
 //Authenticate
-app.UseAppAuthentication();
+app.UseRequestAuthentication();
 //Authorize
-app.UseAppAuthorization();
+app.UseRequestAuthorization();
 //Validate
 app.UseConstraintsValidation();
 app.Run(async context =>

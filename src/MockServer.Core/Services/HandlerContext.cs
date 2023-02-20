@@ -1,3 +1,5 @@
+using System.Dynamic;
+using System.Text.Json;
 using Jint;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +11,7 @@ namespace MockServer.Core.Services;
 public class HandlerContext
 {
     private Engine _engine;
-    public Engine JintEngine { get; }
+    public Engine JintEngine => _engine;
     private readonly HttpContext _context;
     private readonly IDatabaseRespository _databaseRespository;
     private readonly string _username;
@@ -19,7 +21,8 @@ public class HandlerContext
         _databaseRespository = _context.RequestServices.GetService<IDatabaseRespository>();
         _username = Convert.ToString(_context.Items["Username"]);
     }
-    public void Setup() {
+    public void Setup()
+    {
         _engine = new Engine();
         var task = HttpContextExtentions.GetRequestDictionary(_context);
         task.Wait();
@@ -30,6 +33,8 @@ public class HandlerContext
         };
 
         _engine.SetValue("ctx", ctx);
+        _engine.SetValue("log", new Action<object>(Console.WriteLine));
+        _engine.SetValue("connectDb", new Func<string, db>(connectDb));
     }
     private db connectDb(string name)
     {
@@ -41,25 +46,56 @@ public class HandlerContext
     }
 }
 
-public class db {
-    private readonly string _jsonFilePath;
-    public dynamic data { get;}
+public class db
+{
+    private readonly string _path;
+    public object data { get; private set; }
     public db(string username, string name)
     {
-        var fileName = name.Split(':')[1] + ".json";
-        _jsonFilePath = Path.Combine("db", username, fileName);
+        //var fileName = name + ".json";
+        //_path = Path.Combine("db", username, fileName);
+        _path = name + ".json";
+        if (!File.Exists(_path))
+        {
+            File.Create(_path);
+        }
     }
 
-    public async Task<dynamic> read(string table) {
-        
-        return new object();
-    }
-    public async Task<dynamic> write(string table, object obj) {
+    public object read()
+    {
+        // Read the JSON data from file
+        string jsonString = File.ReadAllText(_path);
+        if (!string.IsNullOrEmpty(jsonString))
+        {
+            // Deserialize the JSON data into a dynamic object
+            data = JsonSerializer.Deserialize<ExpandoObject>(jsonString);
+        }
+        else
+        {
+            data = new();
+        }
 
-        return obj;
+        return data;
+    }
+    public void write(object obj)
+    {
+        data = obj;
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = true
+        };
+        // Convert the dynamic object to a JSON string
+        string jsonString = JsonSerializer.Serialize(data, options);
+
+        // Write the JSON string to file
+        using (StreamWriter sw = File.CreateText(_path))
+        {
+            sw.Write(jsonString);
+        }
     }
 }
 
-public class Http {
+public class Http
+{
 
 }
