@@ -19,10 +19,11 @@ public static class ApplicationBuilderExtentions
 
                 var script =
                     """
+                    //connect db
                     const db = connectDb('tiny_blog');
                     //read data
-                    let data = db.read();
-                    log(data.posts[0]);
+                    let data = read(db);
+                    log(data.posts.length);
                     """;
                 if (!string.IsNullOrEmpty(script))
                 {
@@ -37,27 +38,60 @@ public static class ApplicationBuilderExtentions
             });
         });
 
-        app.Map("/dev/db/write", app =>
+        app.Map("/dev/db/write/post", app =>
         {
             app.Run(async context =>
             {
                 context.Items["Username"] = "npham";
                 var handlerContext = new HandlerContext(context);
                 handlerContext.Setup();
-
-                var script =
+                var post =
                     """
+                    //connect db
                     const db = connectDb('tiny_blog');
                     //read data
-                    let data = db.read();
-                    //data = { posts: [] };  
-                    data.posts.push({title:'hello world'});
-                    //write data
+                    let data = read(db);
+                    let count = data.posts.length;
+                    //perform on data
+                    data.posts.push({title:'hello world ' +  (count + 1)});
+                    //save data
                     db.write(data);
                     """;
-                if (!string.IsNullOrEmpty(script))
+                if (!string.IsNullOrEmpty(post))
                 {
-                    handlerContext.JintEngine.Execute(script);
+                    handlerContext.JintEngine.Execute(post);
+                }
+                IHandlebarsTemplateRenderer renderService = new HandlebarsTemplateRenderer(handlerContext.JintEngine);
+                var template =
+                    """
+                    hello, world
+                    """;
+                string body = renderService.Render(template);
+            });
+        });
+
+        app.Map("/dev/db/write/comment", app =>
+        {
+            app.Run(async context =>
+            {
+                context.Items["Username"] = "npham";
+                var handlerContext = new HandlerContext(context);
+                handlerContext.Setup();
+                var comment =
+                    """
+                    //connect db
+                    const db = connectDb('tiny_blog');
+                    //read data
+                    let data = read(db);
+                    //perform on data
+                    data.comments = data.comments || [];
+                    //save data
+                    data.comments.push({postId: 1, 'comment': 'nice'})
+                    db.write(data);
+                    """;
+                if (!string.IsNullOrEmpty(comment))
+                {
+                    handlerContext.JintEngine.Execute(comment);
                 }
                 IHandlebarsTemplateRenderer renderService = new HandlebarsTemplateRenderer(handlerContext.JintEngine);
                 var template =

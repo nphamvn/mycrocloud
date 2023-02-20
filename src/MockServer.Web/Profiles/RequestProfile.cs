@@ -12,5 +12,6 @@ public class RequestProfile : Profile
         CreateMap<SaveRequestViewModel, Core.Models.Requests.Request>().ReverseMap();
         CreateMap<Core.Models.Requests.Request, RequestViewModel>().ReverseMap();
         CreateMap<Core.Models.Requests.FixedRequest, RequestConfiguration>().ReverseMap();
+        CreateMap<Authorization, AuthorizationConfiguration>().ReverseMap();
     }
 }

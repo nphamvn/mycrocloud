@@ -42,15 +42,14 @@ public class HandlerContext
         var task = _databaseRespository.Find(username, name);
         task.Wait();
         var db = task.Result;
-        return db != null ? new db(username, name) : throw new Exception("No database found");
+        return db != null ? new db(username, name, _engine) : throw new Exception("No database found");
     }
 }
 
 public class db
 {
     private readonly string _path;
-    public object data { get; private set; }
-    public db(string username, string name)
+    public db(string username, string name, Engine engine)
     {
         //var fileName = name + ".json";
         //_path = Path.Combine("db", username, fileName);
@@ -59,33 +58,36 @@ public class db
         {
             File.Create(_path);
         }
+        engine.Execute("function read(db) { return JSON.parse(db.readJson()); }");
     }
 
-    public object read()
+    public string readJson()
     {
         // Read the JSON data from file
-        string jsonString = File.ReadAllText(_path);
-        if (!string.IsNullOrEmpty(jsonString))
+        return File.ReadAllText(_path);
+    }
+
+    public object read() {
+        var json = readJson();
+        if (!string.IsNullOrEmpty(json))
         {
             // Deserialize the JSON data into a dynamic object
-            data = JsonSerializer.Deserialize<ExpandoObject>(jsonString);
+            return JsonSerializer.Deserialize<ExpandoObject>(json);
         }
         else
         {
-            data = new();
+            return null;
         }
-
-        return data;
     }
+
     public void write(object obj)
     {
-        data = obj;
         var options = new JsonSerializerOptions
         {
             WriteIndented = true
         };
         // Convert the dynamic object to a JSON string
-        string jsonString = JsonSerializer.Serialize(data, options);
+        string jsonString = JsonSerializer.Serialize(obj, options);
 
         // Write the JSON string to file
         using (StreamWriter sw = File.CreateText(_path))

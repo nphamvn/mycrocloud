@@ -27,7 +27,6 @@ public class RequestRepository : IRequestRepository
                         Name,
                         Method,
                         Path,
-                        Authorization,
                         Description
                      )
                      VALUES (
@@ -36,7 +35,6 @@ public class RequestRepository : IRequestRepository
                         @Name,
                         @Method,
                         @Path,
-                        @Authorization,
                         @Description
                      );
                     SELECT last_insert_rowid();
@@ -499,6 +497,26 @@ public class RequestRepository : IRequestRepository
     }
 
     public Task UpdateRequestBody(int id, RequestBody body)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IEnumerable<RequestQuery>> GetRequestQueries(int id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IEnumerable<RequestHeader>> GetRequestHeaders(int id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task AttachAuthorization(int id, Authorization authorization)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Authorization> GetAuthorization(int id)
     {
         throw new NotImplementedException();
     }

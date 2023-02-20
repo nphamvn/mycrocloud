@@ -31,8 +31,20 @@ public class RequestWebService : BaseWebService, IProjectRequestWebService
     {
         var request = await _requestRepository.GetById(requestId);
         var vm = _mapper.Map<RequestViewModel>(request);
+        vm.Project = await _projectRepository.Get(request.ProjectId);
+        vm.Project.User = AuthUser;
         vm.AuthorizationConfiguration = await GetAuthorization(request.ProjectId, requestId);
-        
+        vm.RequestConfiguration = new RequestConfiguration
+        {
+            //Query = (await _requestRepository.GetRequestQueries(requestId)).ToList(),
+            //Headers = (await _requestRepository.GetRequestHeaders(requestId)).ToList(),
+            //Body = (await _requestRepository.GetRequestBody(requestId))
+        };
+        vm.ResponseConfiguration = new ResponseConfiguration
+        {
+            //Headers = (await _requestRepository.GetResponseHeaders(requestId)).ToList(),
+            
+        };
         return vm;
     }
 
