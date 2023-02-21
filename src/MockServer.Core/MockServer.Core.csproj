@@ -21,13 +21,10 @@
     <Folder Include="Entities\Request\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Jint" Version="2.11.58" />
+    <PackageReference Include="Jint" Version="3.0.0-beta-2046" />
     <PackageReference Include="JWT" Version="10.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.14" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="6.27.0" />
-  </ItemGroup>
-    <ItemGroup>
-    <Content Include="handlebars.min-v4.7.7.js" />
   </ItemGroup>
 </Project>

@@ -2,10 +2,10 @@ using System.Dynamic;
 using System.Text.Json;
 using MockServer.Core.Databases;
 
-public class JsonFileBasedDb: Db
+public class JsonFileAdapter: Db
 {
     private readonly string _path;
-    public JsonFileBasedDb(string username, string name)
+    public JsonFileAdapter(string username, string name)
     {
         //var fileName = name + ".json";
         //_path = Path.Combine("db", username, fileName);

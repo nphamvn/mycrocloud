@@ -97,7 +97,7 @@ public class AppAuthorizationService : IAppAuthorizationService
         }
         _engine.SetValue("user", userDic);
         _engine.Execute($"let user = {JsonSerializer.Serialize(userDic)};");
-        var result = _engine.Execute(string.Format("eval({0})", requirement.ConditionalExpression)).GetCompletionValue().AsBoolean();
+        var result = _engine.Evaluate(requirement.ConditionalExpression).AsBoolean();
         return result;
     }
 }

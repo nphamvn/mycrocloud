@@ -40,9 +40,9 @@ public class HandlerContext
 
         _engine.SetValue("ctx", ctx);
         _engine.SetValue("log", new Action<object>(Console.WriteLine));
-        _engine.SetValue("connectDb", new Func<string, Db>(ConnectDatabase));
+        _engine.SetValue("getAdapter", new Func<string, Db>(GetAdapter));
     }
-    private Db ConnectDatabase(string name)
+    private Db GetAdapter(string name)
     {
         string username = Convert.ToString(_context.Items["Username"]);
         var task = _databaseRespository.Find(username, name);
@@ -50,22 +50,15 @@ public class HandlerContext
         var db = task.Result;
         if (db != null)
         {
-            _engine.Execute(
-                """
-                function read(db) {
-                    let json = db.readJson();
-                    log(json);
-                    return JSON.parse(json); 
-                }
-                """);
+            _engine.Execute(File.ReadAllText("Resources/js/Db.js"));
             Db instance;
-            if (_settings.DatabaseProvider == nameof(JsonFileBasedDb))
+            if (_settings.DatabaseProvider == nameof(JsonFileAdapter))
             {
-                instance = _factoryService.Create<JsonFileBasedDb>(username, name);
+                instance = _factoryService.Create<JsonFileAdapter>(username, name);
             }
-            else if (_settings.DatabaseProvider == nameof(NoSqlDb))
+            else if (_settings.DatabaseProvider == nameof(NoSqlAdapter))
             {
-                instance = _factoryService.Create<NoSqlDb>(db.Id, _databaseRespository);
+                instance = _factoryService.Create<NoSqlAdapter>(db.Id, _databaseRespository);
             }
             else 
             {

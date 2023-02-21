@@ -21,11 +21,12 @@ public class HandlebarsTemplateRenderer : IHandlebarsTemplateRenderer
     {
         var engine = _engine ?? new Engine();
         var handlebars = File.ReadAllText("handlebars.min-v4.7.7.js");
+        return handlebars;
         engine.Execute(handlebars);
         engine.SetValue("source", source);
         engine.Execute("let hb = {};");
         engine.Execute("const template = Handlebars.compile(source);");
-        var result = engine.Execute("template(hb)").GetCompletionValue();
+        var result = engine.Execute("template(hb)");
         return result.ToString();
     }
 }

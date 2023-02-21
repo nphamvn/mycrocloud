@@ -11,6 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddOptions();
 builder.Services.AddGlobalSettings(builder.Configuration);
+builder.Services.AddMemoryCache();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 builder.Services.AddScoped<IFactoryService, FactoryService>();
 builder.Services.AddScoped<RouteService>();
 builder.Services.AddScoped<Authentication>();
@@ -25,8 +28,7 @@ builder.Services.AddScoped<IRequestHandler, ForwardingRequestHandler>();
 builder.Services.AddScoped<IRequestHandlerFactory, RequestHandlerFactory>();
 builder.Services.AddScoped<ICacheService, MemoryCacheService>();
 builder.Services.AddScoped<IRouteResolver, TemplateParserMatcherRouteService>();
-builder.Services.AddMemoryCache();
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 builder.Services.AddScoped<RequestHandler>();
 builder.Services.AddModelBinderProvider(options =>
 {

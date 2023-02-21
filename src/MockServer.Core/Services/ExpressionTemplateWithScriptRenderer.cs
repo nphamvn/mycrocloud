@@ -26,7 +26,7 @@ public class ExpressionTemplateWithScriptRenderer : IExpressionTemplateWithScrip
         {
             if (match.Success)
             {
-                return _engine.Execute(match.Groups[1].Value).GetCompletionValue().ToString();
+                return _engine.Execute(match.Groups[1].Value).ToString();
             }
             else
             {

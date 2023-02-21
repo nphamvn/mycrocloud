@@ -24,7 +24,4 @@
   <ItemGroup>
     <ProjectReference Include="..\MockServer.Core\MockServer.Core.csproj" />
   </ItemGroup>
-    <ItemGroup>
-    <Content Include="handlebars.min-v4.7.7.js" />
-  </ItemGroup>
 </Project>

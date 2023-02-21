@@ -3,11 +3,11 @@ using System.Text.Json;
 using MockServer.Core.Databases;
 using MockServer.Core.Repositories;
 
-public class NoSqlDb : Db
+public class NoSqlAdapter : Db
 {
     private readonly int _dbId;
     private readonly IDatabaseRepository _databaseRespository;
-    public NoSqlDb(int dbId, IDatabaseRepository databaseRespository)
+    public NoSqlAdapter(int dbId, IDatabaseRepository databaseRespository)
     {
         _dbId = dbId;
         _databaseRespository = databaseRespository;
