@@ -13,7 +13,7 @@ public static class ApplicationBuilderExtentions
         {
             app.Run(async context =>
             {
-                context.Items["Username"] = "npham";
+                context.Items["Username"] = "nampham";
                 var handlerContext = new HandlerContext(context);
                 handlerContext.Setup();
 
@@ -42,7 +42,7 @@ public static class ApplicationBuilderExtentions
         {
             app.Run(async context =>
             {
-                context.Items["Username"] = "npham";
+                context.Items["Username"] = "nampham";
                 var handlerContext = new HandlerContext(context);
                 handlerContext.Setup();
                 var post =
@@ -51,6 +51,7 @@ public static class ApplicationBuilderExtentions
                     const db = connectDb('tiny_blog');
                     //read data
                     let data = read(db);
+                    data = data || { posts: [] };
                     let count = data.posts.length;
                     //perform on data
                     data.posts.push({title:'hello world ' +  (count + 1)});
@@ -74,7 +75,7 @@ public static class ApplicationBuilderExtentions
         {
             app.Run(async context =>
             {
-                context.Items["Username"] = "npham";
+                context.Items["Username"] = "nampham";
                 var handlerContext = new HandlerContext(context);
                 handlerContext.Setup();
                 var comment =

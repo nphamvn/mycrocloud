@@ -1,0 +1,30 @@
+@model MockServer.Web.Models.Database.SaveDatabaseViewModel
+<form>
+    <div>
+        <label>Name</label>
+        <input type="text" asp-for="Name">
+    </div>
+    <div>
+        <label>Description</label>
+        <input type="text" asp-for="Description">
+    </div>
+    <div>
+        <label>Data</label>
+        <div>
+            <ul>
+                <li>Table View</li>
+                <li>Raw JSON</li>
+            </ul>
+            <div>
+                <input type="hidden" id="js-text-data" value="@Model.Data">
+                <pre id="js-json-data"></pre>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    const data = $("#js-text-data").val();
+    console.log(data);
+    const obj = JSON.parse(data);
+    $('#js-json-data').text(JSON.stringify(obj, undefined, 2));
+</script>

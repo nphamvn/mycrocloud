@@ -42,8 +42,7 @@
                                 href="@Url.Action(nameof(ProjectsController.Index), "Projects")">Projects</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Explore"
-                                asp-action="Index">Explore</a>
+                            <a class="nav-link text-white" href="@Url.Action(nameof(DatabasesController.Index), "Databases")">Databases</a>
                         </li>
                     </ul>
                     @if (User.Identity.IsAuthenticated)

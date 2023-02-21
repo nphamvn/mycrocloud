@@ -1,0 +1,9 @@
+@using MockServer.Web.Controllers
+@model MockServer.Web.Models.Database.IndexViewModel
+<a href="@Url.Action(nameof(DatabasesController.New))">New</a>
+<ul>
+    @foreach (var item in Model.DatabaseItems)
+    {
+        <li><a href="@Url.Action(nameof(DatabasesController.View), new { Name = item.Name })">@item.Name</a></li>
+    }
+</ul>

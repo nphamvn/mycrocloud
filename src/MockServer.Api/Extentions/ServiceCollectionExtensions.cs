@@ -9,6 +9,7 @@ public static class ServiceCollectionExtentions
     {
         var settings = new GlobalSettings();
         settings.Sqlite = new SqlSettings { ConnectionString = configuration.GetConnectionString("SQLite") };
+        settings.DatabaseProvider = configuration["DatabaseProvider"];
         services.AddSingleton<GlobalSettings>(s => settings);
     }
 

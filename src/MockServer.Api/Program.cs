@@ -11,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddOptions();
 builder.Services.AddGlobalSettings(builder.Configuration);
+builder.Services.AddScoped<IFactoryService, FactoryService>();
 builder.Services.AddScoped<RouteService>();
 builder.Services.AddScoped<Authentication>();
 builder.Services.AddScoped<Authorization>();
@@ -18,7 +19,7 @@ builder.Services.AddScoped<ConstraintsValidation>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IRequestRepository, RequestRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
-builder.Services.AddScoped<IDatabaseRespository, DatabaseRespository>();
+builder.Services.AddScoped<IDatabaseRepository, DatabaseRespository>();
 builder.Services.AddScoped<IRequestHandler, FixedRequestHandler>();
 builder.Services.AddScoped<IRequestHandler, ForwardingRequestHandler>();
 builder.Services.AddScoped<IRequestHandlerFactory, RequestHandlerFactory>();
