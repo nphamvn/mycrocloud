@@ -1,4 +1,6 @@
+@using MockServer.Web.Controllers
 @model MockServer.Web.Models.Database.SaveDatabaseViewModel
+<a href="@Url.Action(nameof(DatabasesController.Index))">Back</a>
 <form method="post">
     <div>
         <label>Name</label>

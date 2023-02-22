@@ -1,11 +1,13 @@
+@using MockServer.Web.Controllers
 @model MockServer.Web.Models.Database.SaveDatabaseViewModel
+<a href="@Url.Action(nameof(DatabasesController.Index))">Back</a>
 <div>
     <label>Name</label>
-    <input type="text" asp-for="Name">
+    <input readonly type="text" asp-for="Name">
 </div>
 <div>
     <label>Description</label>
-    <input type="text" asp-for="Description">
+    <input readonly type="text" asp-for="Description">
 </div>
 <div>
     <label>Data</label>
@@ -19,7 +21,7 @@
                 <div>Table</div>
                 <button type="button" class="btn btn-default" id="load_json_btn">Render</button>
             </div>
-            <div id="inner_tbl">
+            <div id="data_table">
             </div>
         </div>
     </div>
@@ -33,7 +35,7 @@
         editor = monaco.editor.create(document.getElementById('editor'), {
             value: data,
             language: 'json',
-            readOnly: false
+            readOnly: true
         });
     });
 </script>
@@ -48,7 +50,7 @@
     function processJson() {
         let obj = getJsonVar();
         let table = buildTable(obj);
-        $("#inner_tbl").html(table);
+        $("#data_table").html(table);
     }
     function getJsonVar() {
         try {
