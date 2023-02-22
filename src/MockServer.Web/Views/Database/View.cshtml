@@ -1,30 +1,85 @@
 @model MockServer.Web.Models.Database.SaveDatabaseViewModel
-<form>
-    <div>
-        <label>Name</label>
-        <input type="text" asp-for="Name">
-    </div>
-    <div>
-        <label>Description</label>
-        <input type="text" asp-for="Description">
-    </div>
-    <div>
-        <label>Data</label>
-        <div>
-            <ul>
-                <li>Table View</li>
-                <li>Raw JSON</li>
-            </ul>
-            <div>
-                <input type="hidden" id="js-text-data" value="@Model.Data">
-                <pre id="js-json-data"></pre>
+<div>
+    <label>Name</label>
+    <input type="text" asp-for="Name">
+</div>
+<div>
+    <label>Description</label>
+    <input type="text" asp-for="Description">
+</div>
+<div>
+    <label>Data</label>
+    <div class="row">
+        <div class="col">
+            <div>Raw JSON</div>
+            <div id="editor" style="height: 500px;"></div>
+        </div>
+        <div class="col">
+            <div class="d-flex">
+                <div>Table</div>
+                <button type="button" class="btn btn-default" id="load_json_btn">Render</button>
+            </div>
+            <div id="inner_tbl">
             </div>
         </div>
     </div>
-</form>
+</div>
+<script src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
 <script>
-    const data = $("#js-text-data").val();
-    console.log(data);
-    const obj = JSON.parse(data);
-    $('#js-json-data').text(JSON.stringify(obj, undefined, 2));
+    const data = @Html.Raw(Json.Serialize(Model.Data));
+    require.config({paths: {'vs': 'https://unpkg.com/monaco-editor@latest/min/vs'}});
+    var editor;
+    require(['vs/editor/editor.main'], function () {
+        editor = monaco.editor.create(document.getElementById('editor'), {
+            value: data,
+            language: 'json',
+            readOnly: false
+        });
+    });
+</script>
+<script>
+    $('#load_json_btn').click(function () {
+        processJson();
+    });
+    function call(a) {
+        $("#json_vl").val(JSON.stringify(a, void 0, 2));
+        processJson();
+    }
+    function processJson() {
+        let obj = getJsonVar();
+        let table = buildTable(obj);
+        $("#inner_tbl").html(table);
+    }
+    function getJsonVar() {
+        try {
+            const json = editor.getValue();
+            var a = $.parseJSON(json);
+            $("#json_vl").val(JSON.stringify(a, void 0, 2));
+            return a;
+        } catch (e) {
+        }
+    }
+    function buildTable(a) {
+        var e = document.createElement("table"), d, b;
+        if ("[object Array]" === Object.prototype.toString.call(a)) return buildArray(a);
+        for (var c in a) "object" != typeof a[c] || "[object Array]" === Object.prototype.toString.call(a[c]) ? "object" == typeof a[c] && "[object Array]" === Object.prototype.toString.call(a[c]) ? (d = e.insertRow(-1), b = d.insertCell(-1), b.colSpan = 2, b.innerHTML = '<div class="td_head">' + $("<div />").text(c).html() + '</div><table style="width:100%">' + $(buildArray(a[c]), false).html() + "</table>") : (d = e.insertRow(-1), b = d.insertCell(-1), b.innerHTML = "<div class='td_head'>" + $("<div />").text(c).html() + "</div>", d = d.insertCell(-1), d.innerHTML = "<div class='td_row_even'>" + $("<div />").text(a[c]).html() + "</div>") : (d = e.insertRow(-1), b = d.insertCell(-1), b.colSpan = 2, b.innerHTML = '<div class="td_head">' + $("<div />").text(c).html() + '</div><table style="width:100%">' + $(buildTable(a[c]), false).html() + "</table>");
+        return e;
+    }
+    function buildArray(a) {
+        var e = document.createElement("table"), d, b, c = false, p = false, m = {}, h = -1, n = 0, l;
+        l = "";
+        if (0 == a.length) return "<div></div>";
+        d = e.insertRow(-1);
+        for (var f = 0; f < a.length; f++) if ("object" != typeof a[f] || "[object Array]" === Object.prototype.toString.call(a[f])) "object" == typeof a[f] && "[object Array]" === Object.prototype.toString.call(a[f]) ? (b = d.insertCell(h), b.colSpan = 2, b.innerHTML = '<div class="td_head"></div><table style="width:100%">' + $(buildArray(a[f]), false).html() + "</table>", c = true) : p || (h += 1, p = true, b = d.insertCell(h), m.empty = h, b.innerHTML = "<div class='td_head'>&nbsp;</div>"); else for (var k in a[f]) l = "-" + k, l in m || (c = true, h += 1, b = d.insertCell(h), m[l] = h, b.innerHTML = "<div class='td_head'>" + $("<div />").text(k).html() + "</div>");
+        c || e.deleteRow(0);
+        n = h + 1;
+        for (f = 0; f < a.length; f++) if (d = e.insertRow(-1), td_class = 0 == f % 2 ? "td_row_even" : "td_row_odd", "object" != typeof a[f] || "[object Array]" === Object.prototype.toString.call(a[f])) if ("object" == typeof a[f] && "[object Array]" === Object.prototype.toString.call(a[f])) for (h = m.empty, c = 0; c < n; c++) b = d.insertCell(c), b.className = td_class, l = c == h ? '<table style="width:100%">' + $(buildArray(a[f]), false).html() + "</table>" : " ", b.innerHTML = "<div class='" + td_class + "'>" + $("<div />").text(l).html() + "</div>"; else for (h = m.empty, c = 0; c < n; c++) b = d.insertCell(c), l = c == h ? a[f] : " ", b.className = td_class, b.innerHTML = "<div class='" + td_class + "'>" + $("<div />").text(l).html() + "</div>"; else {
+            for (c = 0; c < n; c++) b = d.insertCell(c), b.className = td_class, b.innerHTML = "<div class='" + td_class + "'>&nbsp;</div>";
+            for (k in a[f]) c = a[f], l = "-" + k, h = m[l], b = d.cells[h], b.className = td_class, "object" != typeof c[k] || "[object Array]" === Object.prototype.toString.call(c[k]) ? "object" == typeof c[k] && "[object Array]" === Object.prototype.toString.call(c[k]) ? b.innerHTML = '<table style="width:100%">' + $(buildArray(c[k]), false).html() + "</table>" : b.innerHTML = "<div class='" + td_class + "'>" + $("<div />").text(c[k]).html() + "</div>" : b.innerHTML = '<table style="width:100%">' + $(buildTable(c[k]), false).html() + "</table>";
+        }
+        return e;
+    }
+    function log(obj) {
+        console.log(obj);
+    }
 </script>
