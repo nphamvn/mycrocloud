@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using MockServer.Core.Models.Services;
+using MockServer.Web.Attributes;
 using MockServer.Web.Models.Database;
 using MockServer.Web.Services.Interfaces;
 using RouteName = MockServer.Web.Common.Constants.RouteName;
@@ -33,6 +35,10 @@ public class DatabasesController: BaseController
     [HttpPost("new")]
     public async Task<IActionResult> New(SaveDatabaseViewModel model)
     {
+        if (!ModelState.IsValid)
+        {
+            return View("/Views/Database/Save.cshtml", model);
+        }
         await _databaseWebService.Create(model);
         return RedirectToAction(nameof(Index), Request.RouteValues);
     }
@@ -46,7 +52,25 @@ public class DatabasesController: BaseController
     [HttpPost("edit/{id:int}")]
     public async Task<IActionResult> New(int id, SaveDatabaseViewModel model)
     {
+        if (!ModelState.IsValid)
+        {
+            return View("/Views/Database/Save.cshtml", model);
+        }
         await _databaseWebService.Edit(id, model);
         return RedirectToAction(nameof(Index), Request.RouteValues);
+    }
+
+    [HttpGet("{Name}/download")]
+    public async Task<IActionResult> Download(string Name)
+    {
+        var data = await _databaseWebService.GetDataBinary(Name);
+        return File(data, "application/json", Name + ".json");
+    }
+
+    [AjaxOnly]
+    [HttpPost("{Name}/applications")]
+    public async Task<IActionResult> ConfigureApplication(string Name, Service service, bool allowed) {
+        await _databaseWebService.ConfigureApplication(Name, service, allowed);
+        return Ok();
     }
 }

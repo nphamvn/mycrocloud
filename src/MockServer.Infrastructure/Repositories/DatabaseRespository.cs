@@ -1,6 +1,8 @@
+using System.Text.Json;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using MockServer.Core.Databases;
+using MockServer.Core.Models.Services;
 using MockServer.Core.Repositories;
 using MockServer.Core.Settings;
 
@@ -131,6 +133,27 @@ public class DatabaseRespository : IDatabaseRepository
         });
     }
 
+    public async Task<IEnumerable<Service>> GetDatabaseUsingService(int id)
+    {
+        var query =
+                """
+                SELECT
+                    UsingService
+                FROM
+                    Database
+                WHERE
+                    Id = @Id
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        var json =  await connection.QuerySingleOrDefaultAsync<string>(query, new
+        {
+            Id = id
+        });
+
+        return !string.IsNullOrEmpty(json) ?
+            JsonSerializer.Deserialize<IEnumerable<Service>>(json) : null;
+    }
+
     public Task Update(int id, Database db)
     {
         var query =
@@ -168,6 +191,25 @@ public class DatabaseRespository : IDatabaseRepository
         {
             Id = id,
             Data = data
+        });
+    }
+
+    public Task UpdateDatabaseUsingService(int id, IList<Service> services)
+    {
+        var query =
+                """
+                UPDATE
+                    Database
+                SET
+                    UsingService = @UsingService
+                WHERE
+                    Id = @Id
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        return connection.ExecuteAsync(query, new
+        {
+            Id = id,
+            UsingService = JsonSerializer.Serialize(services)
         });
     }
 }

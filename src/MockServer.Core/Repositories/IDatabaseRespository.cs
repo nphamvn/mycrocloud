@@ -1,4 +1,6 @@
 using MockServer.Core.Databases;
+using MockServer.Core.Models.Services;
+
 namespace MockServer.Core.Repositories;
 
 public interface IDatabaseRepository
@@ -10,4 +12,6 @@ public interface IDatabaseRepository
     Task<Database> Find(string username, string name);
     Task Update(int id, Database db);
     Task UpdateData(int id, string data);
+    Task UpdateDatabaseUsingService(int id, IList<Service> services);
+    Task<IEnumerable<Service>> GetDatabaseUsingService(int id);
 }

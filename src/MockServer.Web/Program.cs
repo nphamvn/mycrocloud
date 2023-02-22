@@ -10,7 +10,7 @@ builder.Logging.AddSerilog(logger);
 builder.Services.ConfigureServices(builder.Configuration);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddServerSideBlazor();
+//builder.Services.AddServerSideBlazor();
 JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 builder.Services.AddAuthentication(options =>
     {
@@ -53,5 +53,5 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapBlazorHub();
+//app.MapBlazorHub();
 app.Run();

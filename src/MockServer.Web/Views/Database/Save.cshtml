@@ -1,14 +1,22 @@
 @using MockServer.Web.Controllers
 @model MockServer.Web.Models.Database.SaveDatabaseViewModel
-<a href="@Url.Action(nameof(DatabasesController.Index))">Back</a>
-<form method="post">
-    <div>
-        <label>Name</label>
-        <input type="text" asp-for="Name">
+<div class="mb-2">
+    <a class="text-decoration-none text-secondary fw-normal fs-6" href="@Url.Action(nameof(DatabasesController.Index))"><span
+        class="me-1"><i class="bi bi-arrow-left"></i></span><span>Back</span></a>
+</div>
+
+<form method="post" class="w-75">
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Name</label>
+        <input type="text" class="form-control" asp-for="Name" placeholder="Enter database name">
+        <div class="form-text">Must start and end with an alphanumeric character and can only contain alphanumeric
+            characters and '-'. Can't have more than 35 characters.</div>
+        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
-    <div>
-        <label>Description</label>
-        <input type="text" asp-for="Description">
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Description</label>
+        <textarea class="form-control" asp-for="Description" rows="3" placeholder="Enter description"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
     </div>
-    <button type="submit">Save</button>
+    <button class="btn btn-primary" type="submit">Save</button>
 </form>

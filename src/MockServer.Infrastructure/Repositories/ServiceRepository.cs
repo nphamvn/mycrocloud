@@ -23,25 +23,16 @@ public class ServiceRepository : IServiceRepository
                     Id,
                     Name
                 FROM
-                    WebApps
+                    Project
                 WHERE 
                     UserId = @UserId
                 UNION
                 SELECT
-                    {(int)ServiceType.UserPool} TYPE,
-                    2 Id,
-                    'User Pool 1' Name
+                    {(int)ServiceType.Database} Type,
+                    Id,
+                    Name
                 FROM
-                    UserPools
-                WHERE
-                    UserId = @UserId
-                UNION
-                SELECT
-                    {(int)ServiceType.Authorizer} TYPE,
-                    3 Id,
-                    'JWT Bearer Authorizer 1' Name
-                FROM
-                    Authorizers
+                    Database
                 WHERE
                     UserId = @UserId
                 """;
