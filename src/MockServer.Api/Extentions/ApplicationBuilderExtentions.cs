@@ -1,7 +1,4 @@
-using System.Text;
-using MockServer.Core.Interfaces;
 using MockServer.Core.Services;
-using MockServer.Api.Constraints;
 
 namespace MockServer.Api.Extentions;
 
@@ -9,23 +6,31 @@ public static class ApplicationBuilderExtentions
 {
     public static IApplicationBuilder MapTestPaths(this IApplicationBuilder app)
     {
-        app.Map("/dev/db/read", app =>
+        app.Map("/dev/db/tiny_blog/posts/new", app =>
         {
             app.Run(async context =>
             {
                 context.Items["Username"] = "nampham";
                 var handlerContext = new HandlerContext(context);
+                handlerContext.WebApp = new()
+                {
+                    UserId = 1,
+                    Id = 8
+                };
                 handlerContext.Setup();
 
                 var script =
                     """
                     //connect db
-                    const adapter = getAdapter('tiny_blog');
+                    const adapter = createAdapter('tiny_blog');
                     const db = new Db(adapter);
                     //read data
                     db.read();
-                    log(db.data.posts.length);
-                    db.data.posts.push({title: 'hello world' + (db.data.posts.length + 1)});
+                    const id = db.data.posts.length + 1;
+                    db.data.posts.push({
+                        "id": id,
+                        "title": "post " + id
+                    });
                     db.write();
                     """;
                 if (!string.IsNullOrEmpty(script))

@@ -56,7 +56,7 @@ public class JintTest
             """);
         engine.Execute(
             """
-            const adapter = getAdapter('tiny_blog');
+            const adapter = createAdapter('tiny_blog');
             const db = new Db(adapter);
             db.read();
             db.data = {name: 'nam'};

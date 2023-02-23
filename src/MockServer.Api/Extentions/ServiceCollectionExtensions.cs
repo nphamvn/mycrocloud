@@ -1,4 +1,4 @@
-using MockServer.Core.Services;
+using MockServer.Api.TinyFramework;
 using MockServer.Core.Settings;
 
 namespace MockServer.Api.Extentions;

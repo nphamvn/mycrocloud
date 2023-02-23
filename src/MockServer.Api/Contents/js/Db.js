@@ -10,9 +10,9 @@ class Db {
   }
 }
 Db.prototype.read = function () {
-  let json = this._adapter.readJson();
+  let json = this._adapter.ReadJson();
   this._data = JSON.parse(json);
 };
 Db.prototype.write = function () {
-  this._adapter.write(this._data);
+  this._adapter.Write(this._data);
 };

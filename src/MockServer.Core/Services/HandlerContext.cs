@@ -4,7 +4,11 @@ using Jint;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using MockServer.Core.Databases;
+using MockServer.Core.Enums;
 using MockServer.Core.Extentions;
+using MockServer.Core.Models;
+using MockServer.Core.Models.Projects;
+using MockServer.Core.Models.Services;
 using MockServer.Core.Repositories;
 using MockServer.Core.Settings;
 
@@ -15,15 +19,14 @@ public class HandlerContext
     private Engine _engine;
     public Engine JintEngine => _engine;
     private readonly HttpContext _context;
+    public Project WebApp { get; set; }
     private readonly IDatabaseRepository _databaseRespository;
-    private readonly string _username;
     private readonly GlobalSettings _settings;
     private readonly IFactoryService _factoryService;
     public HandlerContext(HttpContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _databaseRespository = _context.RequestServices.GetService<IDatabaseRepository>();
-        _username = Convert.ToString(_context.Items["Username"]);
         _settings = _context.RequestServices.GetService<GlobalSettings>();
         _factoryService = _context.RequestServices.GetService<IFactoryService>();
     }
@@ -40,35 +43,28 @@ public class HandlerContext
 
         _engine.SetValue("ctx", ctx);
         _engine.SetValue("log", new Action<object>(Console.WriteLine));
-        _engine.SetValue("getAdapter", new Func<string, Db>(GetAdapter));
+        _engine.SetValue("createAdapter", new Func<string, IDatabaseAdapter>(CreateAdapter));
     }
-    private Db GetAdapter(string name)
+    private IDatabaseAdapter CreateAdapter(string databaseName)
     {
-        string username = Convert.ToString(_context.Items["Username"]);
-        var task = _databaseRespository.Find(username, name);
-        task.Wait();
-        var db = task.Result;
-        if (db != null)
+        var code = File.ReadAllText("Contents/js/Db.js");
+        var jsonSerializerOptions = new JsonSerializerOptions
         {
-            _engine.Execute(File.ReadAllText("Resources/js/Db.js"));
-            Db instance;
-            if (_settings.DatabaseProvider == nameof(JsonFileAdapter))
-            {
-                instance = _factoryService.Create<JsonFileAdapter>(username, name);
-            }
-            else if (_settings.DatabaseProvider == nameof(NoSqlAdapter))
-            {
-                instance = _factoryService.Create<NoSqlAdapter>(db.Id, _databaseRespository);
-            }
-            else 
-            {
-                throw new DbException("Database provider not found");
-            }
-            return instance;
-        }
-        else 
-        {
-            throw new DbException("Database not found");
-        }
+            WriteIndented = true
+        };
+        return DatabaseAdapterUtilities.CreateAdapter(
+            service: new Service {
+                Type = ServiceType.WebApp,
+                Id = WebApp.Id
+            },
+            factoryService: _factoryService,
+            DatabaseProvider: _settings.DatabaseProvider,
+            databaseRepository: _databaseRespository,
+            jsonSerializerOptions: jsonSerializerOptions,
+            UserId: WebApp.UserId,
+            databaseName: databaseName,
+            engine: _engine,
+            codes: new string[] { code }
+        );
     }
 }

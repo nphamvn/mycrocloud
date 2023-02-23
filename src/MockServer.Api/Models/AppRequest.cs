@@ -8,4 +8,5 @@ public class Request
     public RequestType Type { get; set; }
     public string Path { get; set; }
     public HttpContext HttpContext { get; set; }
+    public Core.Models.Projects.Project WebApp { get; set; }
 }

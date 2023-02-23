@@ -15,4 +15,5 @@ public class Project : BaseEntity
     public ApplicationUser User { get; set; }
     public ICollection<Request> Requests { get; set; }
     public List<AuthenticationScheme> Authentications { get; set; }
+    public List<string> UseMiddlewares { get; set; }
 }
