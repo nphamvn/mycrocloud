@@ -8,6 +8,8 @@ public class Constants
         public const string ProjectId = "ProjectId";
         public const string ProjectName = "ProjectName";
         public const string RequestId = "RequestId";
+        public const string DatabaseId = "DatabaseId";
+        public const string DatabaseName = "DatabaseName";
     }
     public class Template
     {

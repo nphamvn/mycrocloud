@@ -125,3 +125,7 @@ function createKey(charCount) {
 
   return key;
 }
+
+function log(obj) {
+  console.log(obj);
+}

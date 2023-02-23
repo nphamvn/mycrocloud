@@ -40,6 +40,22 @@ public class DatabaseRespository : IDatabaseRepository
         });
     }
 
+    public Task Delete(int id)
+    {
+        var query =
+                """
+                DELETE FROM
+                    Database
+                WHERE
+                    Id = @Id
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        return connection.ExecuteAsync(query, new
+        {
+            Id = id
+        });
+    }
+
     public Task<Database> Find(int userId, string name)
     {
         var query =

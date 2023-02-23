@@ -8,6 +8,7 @@ var logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Logging.AddSerilog(logger);
 builder.Services.ConfigureServices(builder.Configuration);
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 //builder.Services.AddServerSideBlazor();

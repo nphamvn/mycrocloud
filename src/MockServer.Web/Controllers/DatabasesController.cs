@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
+using MockServer.Core.Extentions;
 using MockServer.Core.Models.Services;
 using MockServer.Web.Attributes;
+using MockServer.Web.Filters;
 using MockServer.Web.Models.Database;
 using MockServer.Web.Services.Interfaces;
 using RouteName = MockServer.Web.Common.Constants.RouteName;
 
 namespace MockServer.Web.Controllers;
 
+[GetAuthUserDatabaseId(RouteName.DatabaseName, RouteName.DatabaseId)]
 public class DatabasesController: BaseController
 {
     private readonly IDatabaseWebService _databaseWebService;
@@ -20,9 +23,9 @@ public class DatabasesController: BaseController
         return View("/Views/Database/Index.cshtml", vm);
     }
 
-    [HttpGet("{name}")]
-    public async Task<IActionResult> View(string Name) {
-        var vm = await _databaseWebService.GetViewModel(Name);
+    [HttpGet("{DatabaseName}")]
+    public async Task<IActionResult> View(int DatabaseId) {
+        var vm = await _databaseWebService.GetViewModel(DatabaseId);
         return View("/Views/Database/View.cshtml",vm);
     }
     
@@ -40,37 +43,62 @@ public class DatabasesController: BaseController
             return View("/Views/Database/Save.cshtml", model);
         }
         await _databaseWebService.Create(model);
-        return RedirectToAction(nameof(Index), Request.RouteValues);
+        return RedirectToAction(nameof(View), Request.RouteValues.With(RouteName.DatabaseName, model.Name));
     }
 
-    [HttpGet("edit/{id:int}")]
-    public async Task<IActionResult> Edit(int id)
+    [HttpGet("{DatabaseName}/edit")]
+    public async Task<IActionResult> Edit(int DatabaseId)
     {
-        var vm = await _databaseWebService.GetViewModel(id);
+        var vm = await _databaseWebService.GetViewModel(DatabaseId);
         return View("/Views/Database/Save.cshtml", vm);
     }
-    [HttpPost("edit/{id:int}")]
-    public async Task<IActionResult> New(int id, SaveDatabaseViewModel model)
+    
+    [HttpPost("{DatabaseName}/edit")]
+    public async Task<IActionResult> Edit(int DatabaseId, SaveDatabaseViewModel model)
     {
         if (!ModelState.IsValid)
         {
-            return View("/Views/Database/Save.cshtml", model);
+            var vm = await _databaseWebService.GetViewModel(DatabaseId);
+            return View("/Views/Database/View.cshtml", vm);
         }
-        await _databaseWebService.Edit(id, model);
-        return RedirectToAction(nameof(Index), Request.RouteValues);
-    }
-
-    [HttpGet("{Name}/download")]
-    public async Task<IActionResult> Download(string Name)
-    {
-        var data = await _databaseWebService.GetDataBinary(Name);
-        return File(data, "application/json", Name + ".json");
+        await _databaseWebService.Edit(DatabaseId, model);
+        return RedirectToAction(nameof(View), Request.RouteValues.With(RouteName.DatabaseName, model.Name));
     }
 
     [AjaxOnly]
-    [HttpPost("{Name}/applications")]
-    public async Task<IActionResult> ConfigureApplication(string Name, Service service, bool allowed) {
-        await _databaseWebService.ConfigureApplication(Name, service, allowed);
+    [HttpGet("{DatabaseName}/data")]
+    public async Task<IActionResult> Data(int DatabaseId)
+    {
+        string data = await _databaseWebService.GetData(DatabaseId);
+        return Ok(data);
+    }
+
+    [AjaxOnly]
+    [HttpPost("{DatabaseName}/data")]
+    public async Task<IActionResult> Data(int DatabaseId, string Data)
+    {
+        await _databaseWebService.SaveData(DatabaseId, Data);
         return Ok();
+    }
+
+    [HttpGet("{DatabaseName}/data/export")]
+    public async Task<IActionResult> Download(string DatabaseName, int DatabaseId)
+    {
+        var data = await _databaseWebService.GetDataBinary(DatabaseId);
+        return File(data, "application/json", DatabaseName + ".json");
+    }
+
+    [AjaxOnly]
+    [HttpPost("{DatabaseName}/applications")]
+    public async Task<IActionResult> ConfigureApplication(int DatabaseId, Service service, bool allowed) {
+        await _databaseWebService.ConfigureApplication(DatabaseId, service, allowed);
+        return Ok();
+    }
+
+    [HttpPost("{DatabaseName}/delete")]
+    public async Task<IActionResult> Delete(int DatabaseId)
+    {
+        await _databaseWebService.Delete(DatabaseId);
+        return RedirectToAction(nameof(Index), Request.RouteValues);
     }
 }

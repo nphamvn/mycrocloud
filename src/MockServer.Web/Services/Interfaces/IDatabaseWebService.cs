@@ -9,7 +9,9 @@ public interface IDatabaseWebService
     Task Create(SaveDatabaseViewModel db);
     Task Edit(int id, SaveDatabaseViewModel db);
     Task<SaveDatabaseViewModel> GetViewModel(int id);
-    Task<SaveDatabaseViewModel> GetViewModel(string name);
-    Task<byte[]> GetDataBinary(string name);
-    Task ConfigureApplication(string name, Service service, bool allowed);
+    Task<byte[]> GetDataBinary(int id);
+    Task ConfigureApplication(int id, Service service, bool allowed);
+    Task Delete(int databaseId);
+    Task SaveData(int id, string data);
+    Task<string> GetData(int id);
 }

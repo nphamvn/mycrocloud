@@ -1,9 +1,26 @@
 @using MockServer.Web.Controllers
 @model MockServer.Web.Models.Database.IndexViewModel
-<a href="@Url.Action(nameof(DatabasesController.New))">New</a>
-<ul>
-    @foreach (var item in Model.DatabaseItems)
+<div class="mx-auto mt-3">
+    <div class="d-flex">
+        <h5 class="me-auto">Your Databases</h5>
+        <a class="btn btn-primary" href="@Url.Action(nameof(DatabasesController.New))">
+            <span><i class="bi bi-plus"></i></span>
+            <span>Creat new database</span>
+        </a>
+    </div>
+    @if (Model.DatabaseItems?.Count() > 0)
     {
-        <li><a href="@Url.Action(nameof(DatabasesController.View), new { Name = item.Name })">@item.Name</a></li>
+        <ul class="list-group list-group-flush">
+            @foreach (var item in Model.DatabaseItems)
+            {
+                <li class="list-group-item">
+                    <a class="text-decoration-none" href="@Url.Action(nameof(DatabasesController.View), new { DatabaseName = item.Name })">@item.Name</a>
+                </li>
+            }
+        </ul>
     }
-</ul>
+    else
+    {
+        <div>You don't have any database.</div>
+    }
+</div>

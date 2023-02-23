@@ -26,9 +26,9 @@ public class DatabaseWebService : BaseWebService, IDatabaseWebService
         _mapper = mapper;
     }
 
-    public async Task ConfigureApplication(string name, Service service, bool allowed)
+    public async Task ConfigureApplication(int id, Service service, bool allowed)
     {
-        var db = await _databaseRepository.Find(AuthUser.Id, name);
+        var db = await _databaseRepository.Get(id);
         var services = await _databaseRepository.GetDatabaseUsingService(db.Id);
         List<Service> currentList;
         if (services != null)
@@ -75,15 +75,26 @@ public class DatabaseWebService : BaseWebService, IDatabaseWebService
         return _databaseRepository.Add(AuthUser.Id, db);
     }
 
+    public Task Delete(int id)
+    {
+        return _databaseRepository.Delete(id);
+    }
+
     public Task Edit(int id, SaveDatabaseViewModel vm)
     {
         var db = _mapper.Map<Database>(vm);
         return _databaseRepository.Update(AuthUser.Id, db);
     }
 
-    public async Task<byte[]> GetDataBinary(string name)
+    public async Task<string> GetData(int id)
     {
-        var db = await _databaseRepository.Find(AuthUser.Id, name);
+        var db = await _databaseRepository.Get(id);
+        return db.Data;
+    }
+
+    public async Task<byte[]> GetDataBinary(int id)
+    {
+        var db = await _databaseRepository.Get(id);
         return Encoding.UTF8.GetBytes(db.Data);
     }
 
@@ -98,17 +109,16 @@ public class DatabaseWebService : BaseWebService, IDatabaseWebService
     public async Task<SaveDatabaseViewModel> GetViewModel(int id)
     {
         var db = await _databaseRepository.Get(id);
-        return _mapper.Map<SaveDatabaseViewModel>(db);
-    }
-
-    public async Task<SaveDatabaseViewModel> GetViewModel(string name)
-    {
-        var db = await _databaseRepository.Find(AuthUser.Id, name);
-        var vm =  _mapper.Map<SaveDatabaseViewModel>(db);
-        var applications = await _databaseRepository.GetDatabaseUsingService(db.Id);
+        var vm = _mapper.Map<SaveDatabaseViewModel>(db);
+        var applications = await _databaseRepository.GetDatabaseUsingService(id);
         vm.AllServices = (await _serviceRepository.GetServices(AuthUser.Id))
                             .Where(s => s.Type != ServiceType.Database);
         vm.AllowedService = _mapper.Map<IEnumerable<Service>>(applications);
         return vm;
+    }
+
+    public Task SaveData(int id, string data)
+    {
+        return _databaseRepository.UpdateData(id, data);
     }
 }

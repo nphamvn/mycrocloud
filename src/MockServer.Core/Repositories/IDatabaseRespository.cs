@@ -14,4 +14,5 @@ public interface IDatabaseRepository
     Task UpdateData(int id, string data);
     Task UpdateDatabaseUsingService(int id, IList<Service> services);
     Task<IEnumerable<Service>> GetDatabaseUsingService(int id);
+    Task Delete(int id);
 }
