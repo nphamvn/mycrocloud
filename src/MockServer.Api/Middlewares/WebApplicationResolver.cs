@@ -1,4 +1,7 @@
 using System.Net;
+using Microsoft.Extensions.Options;
+using MockServer.Api.Options;
+using MockServer.Core.Extentions;
 using MockServer.Core.Repositories;
 
 namespace MockServer.Api.Middlewares;
@@ -6,19 +9,22 @@ namespace MockServer.Api.Middlewares;
 public class WebApplicationResolver : IMiddleware
 {
     private readonly IProjectRepository _projectRepository;
-    public WebApplicationResolver(IProjectRepository projectRepository)
+    private readonly VirtualHostOptions _virtualHostOptions;
+    public WebApplicationResolver(IOptions<VirtualHostOptions> virtualHostOptions, 
+        IProjectRepository projectRepository)
     {
         _projectRepository = projectRepository;
+        _virtualHostOptions = virtualHostOptions.Value;
     }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         var host = context.Request.Host.Host;
-        var username = host.Split('.')[0];
-        var appName = host.Split('.')[1];
+        var username = host.Split('.')[_virtualHostOptions.UsernameHostIndex];
+        var appName = host.Split('.')[_virtualHostOptions.ApplicationNameHostIndex];
 
         var project = await _projectRepository.Find(username, appName);
-        if (project == default)
+        if (project == null || project.Blocked)
         {
             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
             await context.Response.WriteAsync($"'{appName}' project is not found");

@@ -1,15 +1,13 @@
-using MockServer.Api.TinyFramework;
 using MockServer.Core.Models;
 using MockServer.Core.Models.Projects;
-using WebApplication = MockServer.Api.TinyFramework.WebApplication;
-namespace MockServer.Api.Services;
+namespace MockServer.Api.TinyFramework;
 
-public class Container
+public class Host
 {
     private readonly HttpContext _context;
     private readonly IServiceProvider _provider;
 
-    public Container(IHttpContextAccessor contextAccessor, IServiceProvider provider)
+    public Host(IHttpContextAccessor contextAccessor, IServiceProvider provider)
     {
         _context = contextAccessor.HttpContext;
         _provider = provider;
@@ -39,6 +37,4 @@ public class Container
             WebApplication = app
         });
     }
-
-
 }

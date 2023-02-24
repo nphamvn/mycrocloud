@@ -58,7 +58,6 @@ public class HandlerContext
                 Id = WebApp.Id
             },
             factoryService: _factoryService,
-            DatabaseProvider: _settings.DatabaseProvider,
             databaseRepository: _databaseRespository,
             jsonSerializerOptions: jsonSerializerOptions,
             UserId: WebApp.UserId,

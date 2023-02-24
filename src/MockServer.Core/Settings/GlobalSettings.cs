@@ -6,7 +6,6 @@ public class GlobalSettings
     {
     }
     public SqlSettings Sqlite { get; set; }
-    public string DatabaseProvider { get; set; }
 }
 public class SqlSettings
 {

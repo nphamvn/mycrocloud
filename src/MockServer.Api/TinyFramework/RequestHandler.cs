@@ -1,5 +1,3 @@
-using MockServer.Api.Interfaces;
-
 namespace MockServer.Api.TinyFramework;
 
 public class RequestHandler

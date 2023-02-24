@@ -256,54 +256,7 @@ public class RequestRepository : IRequestRepository
         });
     }
 
-    public async Task UpdateRequestBody(int id, FixedRequest config)
-    {
-        if (config.RequestBody is RequestBody body)
-        {
-            using var connection = new SqliteConnection(_connectionString);
-            await connection.OpenAsync();
-            using var transaction = await connection.BeginTransactionAsync();
-            try
-            {
-                var deleteQuery = "DELETE FROM RequestBody WHERE RequestId = @RequestId";
-                await connection.ExecuteAsync(deleteQuery, new
-                {
-                    RequestId = id,
-                }, transaction);
-                var insertQuery =
-                        """
-                         INSERT INTO RequestBody (
-                            RequestId,
-                            Required,
-                            MatchExactly,
-                            Format,
-                            Text
-                        ) VALUES(
-                            @RequestId,
-                            @Required,
-                            @MatchExactly,
-                            @Format,
-                            @Text
-                        )
-                        """;
-
-                await connection.ExecuteAsync(insertQuery, new
-                {
-                    RequestId = id,
-                    Required = body.Required,
-                    MatchExactly = body.MatchExactly,
-                    Format = body.Format,
-                    Text = body.Text
-                }, transaction);
-                await transaction.CommitAsync();
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
-        }
-    }
+    
 
     public async Task UpdateRequestHeader(int id, IList<RequestHeader> headers)
     {

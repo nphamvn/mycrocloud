@@ -1,4 +1,5 @@
 using System.Net;
+using MockServer.Api.TinyFramework.DataBinding;
 using MockServer.Core.Repositories;
 
 namespace MockServer.Api.TinyFramework;
@@ -6,10 +7,13 @@ namespace MockServer.Api.TinyFramework;
 public class ConstraintValidationMiddleware : IMiddleware
 {
     private readonly IRequestRepository _requestRepository;
+    private readonly ConstraintBuilder _constraintBuilder;
 
-    public ConstraintValidationMiddleware(IRequestRepository requestRepository)
+    public ConstraintValidationMiddleware(IRequestRepository requestRepository,
+            ConstraintBuilder constraintBuilder)
     {
         _requestRepository = requestRepository;
+        _constraintBuilder = constraintBuilder;
     }
     
     public async Task<MiddlewareInvokeResult> InvokeAsync(Request request)
@@ -103,12 +107,10 @@ public class ConstraintValidationMiddleware : IMiddleware
 
     private List<IConstraint> BuildConstraints(List<string> constraints)
     {
-        var map = ConstraintBuilder.GetDefaultConstraintMap();
-        var builder = new ConstraintBuilder(map);
         foreach (var constraintText in constraints)
         {
-            builder.AddResolvedConstraint(constraintText);
+            _constraintBuilder.AddResolvedConstraint(constraintText);
         }
-        return builder.Build();
+        return _constraintBuilder.Build();
     }
 }

@@ -15,5 +15,6 @@ public class Request : BaseEntity
     public Authorization Authorization { get; set; }
     public IList<RequestHeader> Headers { get; set; }
     public IList<RequestQuery> Queries { get; set; }
+    public RequestBody Body { get; set; }
 }
 

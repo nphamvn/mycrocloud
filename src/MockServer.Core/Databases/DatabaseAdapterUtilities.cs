@@ -11,7 +11,6 @@ public static class DatabaseAdapterUtilities
     public static IDatabaseAdapter CreateAdapter(
             Service service,
             IFactoryService factoryService,
-            string DatabaseProvider,
             IDatabaseRepository databaseRepository,
             JsonSerializerOptions jsonSerializerOptions,
             int UserId, string databaseName,
@@ -32,12 +31,12 @@ public static class DatabaseAdapterUtilities
                 {
                     engine.Execute(code);
                 }
-                if (DatabaseProvider == nameof(JsonFileAdapter))
+                if (db.Adapter == nameof(JsonFileAdapter))
                 {
                     var jsonFileAdapter = factoryService.Create<JsonFileAdapter>(db.JsonFilePath, jsonSerializerOptions);
                     return jsonFileAdapter;
                 }
-                else if (DatabaseProvider == nameof(NoSqlAdapter))
+                else if (db.Adapter == nameof(NoSqlAdapter))
                 {
                     var noSqlAdapter = factoryService.Create<NoSqlAdapter>(db.Id, databaseRepository, jsonSerializerOptions);
                     return noSqlAdapter;

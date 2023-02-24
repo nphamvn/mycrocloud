@@ -16,4 +16,5 @@ public class Project : BaseEntity
     public ICollection<Request> Requests { get; set; }
     public List<AuthenticationScheme> Authentications { get; set; }
     public List<string> UseMiddlewares { get; set; }
+    public bool Blocked { get; set; }
 }

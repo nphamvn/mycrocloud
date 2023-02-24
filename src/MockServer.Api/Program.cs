@@ -6,21 +6,28 @@ using MockServer.Api.Interfaces;
 using MockServer.Api.Middlewares;
 using MockServer.Api.Services;
 using MockServer.Api.TinyFramework;
+using MockServer.Api.TinyFramework.DataBinding;
+using MockServer.Api.Options;
+using Host = MockServer.Api.TinyFramework.Host;
 
 var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddOptions();
 builder.Services.AddGlobalSettings(builder.Configuration);
+builder.Services.AddOptions<VirtualHostOptions>()
+    .BindConfiguration(VirtualHostOptions.Section);
 builder.Services.AddMemoryCache();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IFactoryService, FactoryService>();
 builder.Services.AddScoped<TemplateParserMatcherRouteService>();
+builder.Services.AddHttpForwarder();
 builder.Services.AddScoped<RoutingMiddleware>();
 builder.Services.AddScoped<AuthenticationMiddleware>();
 builder.Services.AddScoped<AuthorizationMiddleware>();
 builder.Services.AddScoped<ConstraintValidationMiddleware>();
+builder.Services.AddSingleton<ConstraintBuilder>(x => new ConstraintBuilder(ConstraintBuilder.GetDefaultConstraintMap()));  //TODO: Use ActivatorUtilities.CreateInstance
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IRequestRepository, RequestRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
@@ -32,12 +39,14 @@ builder.Services.AddScoped<ICacheService, MemoryCacheService>();
 builder.Services.AddScoped<IRouteResolver, TemplateParserMatcherRouteService>();
 builder.Services.AddScoped<RequestHandler>();
 builder.Services.AddScoped<WebApplicationResolver>();
-builder.Services.AddModelBinderProvider(options =>
+//TODO: Use ActivatorUtilities.CreateInstance
+builder.Services.AddSingleton<DataBinderProvider>(x => new DataBinderProvider(new DataBinderProviderOptions
 {
-    options.Map = DataBinderProviderOptions.Default.Map;
-});
+    Map = DataBinderProviderOptions.Default.Map
+}));
 
-builder.Services.AddScoped<Container>();
+builder.Services.AddScoped<Host>();
+builder.Services.AddControllers();
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
@@ -49,26 +58,30 @@ builder.Services.AddCors(options =>
         .AllowAnyHeader();
     });
 });
+
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    //app.MapTestPaths();
-    app.Use(async (context, next) =>
+    var virtualHostOptions = builder.Configuration.GetSection(VirtualHostOptions.Section).Get<VirtualHostOptions>();
+    if (virtualHostOptions.Enabled)
     {
-        var host = context.Request.Host.Host;
-        context.Request.Host = new HostString("nampham.todos.mockserver.com", context.Request.Host.Port ?? 5000);
-        await next.Invoke(context);
-    });
+        app.Use(async (context, next) =>
+        {
+            context.Request.Host = new HostString(virtualHostOptions.Host, virtualHostOptions.Port);
+            await next.Invoke(context);
+        });
+    }
 }
 //Enable CORS
 app.UseCors(MyAllowSpecificOrigins);
+
 //Validate route
 app.UseWebApplicationResolver();
 
 app.Run(async (context) =>
 {
-    var container = context.RequestServices.GetService<Container>();
-    await container.Run();
+    var host = context.RequestServices.GetService<Host>();
+    await host.Run();
 });
 app.Run();

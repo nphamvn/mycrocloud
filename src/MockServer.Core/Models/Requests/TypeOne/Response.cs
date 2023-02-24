@@ -2,6 +2,7 @@ namespace MockServer.Core.Models.Requests;
 
 public class Response
 {
+    public IList<ResponseHeader> Headers { get; set; }
     public string BodyFormat { get; set; }
     public string BodyText { get; set; }
     public int BodyTextRenderEngine { get; set; }

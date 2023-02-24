@@ -2,6 +2,8 @@ using System.Dynamic;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
 
 namespace MockServer.Core.Extentions;
 
@@ -36,5 +38,40 @@ public static class HttpContextExtentions
                 { "query", query},
                 { "body",  body}
             };
+    }
+
+    public static async Task<object> InvokeAction(this HttpContext context, string code) {
+        var scriptOptions = ScriptOptions.Default
+            .WithImports("System", "Microsoft.AspNetCore.Http", "MockServer.Core.Extentions.HttpContextExtentions.Globals");
+        var script = CSharpScript.Create(code, scriptOptions);
+        var result = await script.RunAsync(new Globals(context));
+        return result.ReturnValue;
+    }
+
+    public static async Task<object> Execute(this HttpContext context, string code)
+    {
+        var options = ScriptOptions.Default
+        .WithImports("System")
+        .WithImports("System.Threading.Tasks")
+        .WithImports("Microsoft.AspNetCore.Http")
+        .WithImports("Microsoft.AspNetCore.Http.Features")
+        .AddReferences(typeof(HttpContext).Assembly)
+        .AddReferences(typeof(Globals).Assembly)
+        .AddReferences(typeof(object).Assembly);
+
+        var state = await CSharpScript.RunAsync(code, options, new Globals(context));
+        var result = state.ReturnValue;
+
+        return result;
+    }
+
+    public class Globals
+    {
+        private readonly HttpContext _httpContext;
+        public dynamic Request => _httpContext.GetType().GetProperty("Request")?.GetValue(_httpContext, null);
+        public Globals(HttpContext httpContext)
+        {
+            _httpContext = httpContext;
+        }
     }
 }

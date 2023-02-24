@@ -75,7 +75,6 @@ public class WebApplication : IWebApplication
             }
         }
 
-
         var handler = ServiceProvider.GetRequiredService<RequestHandler>();
         await handler.Handle(request);
 
