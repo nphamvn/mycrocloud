@@ -1,5 +1,5 @@
 @using MockServer.Web.Controllers
-@model MockServer.Web.Models.ProjectRequests.RequestViewModel
+@model MockServer.Web.Models.WebApplications.Routes.RouteViewModel
 <script>
     function initialize() {
         initOverviewScript();
@@ -15,7 +15,7 @@
     function initOverviewScript() {
         $('.js-basic-edit-button').click(function () {
             $.get({
-                url: '@Url.Action(nameof(ProjectRequestsController.GetEditPartial), "ProjectRequests", new {ProjectName = Model.Project.Name, RequestId = Model.Id})',
+                url: '@Url.Action(nameof(WebApplicationRoutesController.GetEditPartial), "ProjectRequests", new {ProjectName = Model.WebApplication.Name, RequestId = Model.Id})',
                 success: function (data) {
                     const html = data;
                     const partial = $('<div></div>').html(data);
@@ -30,7 +30,7 @@
                                 Path: $('input[name=Path]', modal).val()
                             };
                             $.post({
-                                url: '@Url.Action(nameof(ProjectRequestsController.Edit), "ProjectRequests", new {ProjectName = Model.Project.Name, Model.Id})',
+                                url: '@Url.Action(nameof(WebApplicationRoutesController.Edit), "ProjectRequests", new {ProjectName = Model.WebApplication.Name, Model.Id})',
                                 data: request,
                                 success: function (data) {
                                     $('.js-save-button', modal).off('click');
@@ -297,7 +297,7 @@
         };
 
         $.post({
-            url: '@Url.Action(nameof(ProjectRequestsController.SaveRequestConfiguration), "Requests", new { ProjectName = ViewData["ProjectName"], RequestId = ViewData["RequestId"]})',
+            url: '@Url.Action(nameof(WebApplicationRoutesController.SaveRequestConfiguration), "Requests", new { ProjectName = ViewData["ProjectName"], RequestId = ViewData["RequestId"]})',
             data: {
                 RequestParams: params,
                 RequestHeaders: headers,
@@ -429,7 +429,7 @@
     $(function () {
         $('.js-config-auth').click(function () {
             $.get({
-                url: '@Url.Action(nameof(ProjectRequestsController.GetAuthorizationPartial), "Requests", new {ProjectName = ViewData["ProjectName"], id = ViewData["RequestId"]})',
+                url: '@Url.Action(nameof(WebApplicationRoutesController.GetAuthorizationPartial), "Requests", new {ProjectName = ViewData["ProjectName"], id = ViewData["RequestId"]})',
                 success: function (data) {
                     const html = data;
                     const modal = $(html);
@@ -456,7 +456,7 @@
                             Requirements: requirements
                         };
                         $.post({
-                            url: '@Url.Action(nameof(ProjectRequestsController.ConfigAuthorization), "Requests", new {projectName = ViewData["ProjectName"], id = ViewData["RequestId"]})',
+                            url: '@Url.Action(nameof(WebApplicationRoutesController.ConfigAuthorization), "Requests", new {projectName = ViewData["ProjectName"], id = ViewData["RequestId"]})',
                             data: auth,
                             success: function (data) {
                                 $('#btnSave', modal).off('click');

@@ -1,5 +1,5 @@
-@using MockServer.Core.Enums
-@model MockServer.Web.Models.ProjectRequests.SaveRequestViewModel
+@using MockServer.Core.WebApplications
+@model MockServer.Web.Models.WebApplications.Routes.RouteSaveModel
 @{
     string formMode = ViewData["FormMode"]?.ToString() ?? "Create";
     ViewData["ModalTitle"] = formMode == "Create" ? "Create request" : "Edit request";
@@ -37,7 +37,7 @@
                         <label class="col-sm-2 col-form-label" asp-for="Method"></label>
                         <div class="col-sm-10">
                             <select id="method" class="form-control" asp-for="Method">
-                                @foreach (var method in Model.HttpMethods)
+                                @foreach (var method in Model.HttpMethodSelectListItems)
                                 {
                                     <option value="@method.Value">@method.Text</option>
                                 }
@@ -62,8 +62,8 @@
                            <div class="col-sm-10 form-group">
                                 <div class="mb-1">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" value="@((int)RequestType.Fixed)"
-                                            asp-for="Type" checked>
+                                        <input class="form-check-input" type="radio" value="@((int)RouteIntegrationType.MockIntegration)"
+                                            asp-for="IntegrationType" checked>
                                         <label class="form-check-label">Mock Response</label>
                                     </div>
                                     <span id="emailHelp" class="form-text text-muted ps-4">Return a "mock" response when a
@@ -71,8 +71,8 @@
                                 </div>
                                 <div class="mb-1">
                                     <div class="form-check">
-                                            <input class="form-check-input" type="radio" value="@((int)RequestType.Forwarding)"
-                                                    asp-for="Type">
+                                            <input class="form-check-input" type="radio" value="@((int)RouteIntegrationType.DirectForwarding)"
+                                                    asp-for="IntegrationType">
                                                 <label class="form-check-label">From Forward</label>
                                             </div>
                                             <small id="emailHelp" class="form-text text-muted ps-4">Forward a request when the request
@@ -81,8 +81,8 @@
                                                 </div>
                                                     <div>
                                                         <div class="form-check">
-                                        <input class="form-check-input" type="radio" value="@((int)RequestType.Callback)"
-                                            asp-for="Type">
+                                        <input class="form-check-input" type="radio" value="@((int)RouteIntegrationType.FunctionTrigger)"
+                                            asp-for="IntegrationType">
                                         <label class="form-check-label">Function</label>
                                     </div>
                                     <small id="emailHelp" class="form-text text-muted ps-4">Execute a callback when a request
@@ -91,7 +91,7 @@
                                 </div>
                             </div>
                         </div>
-                        <span asp-validation-for="Type" class="text-danger"></span>
+                        <span asp-validation-for="IntegrationType" class="text-danger"></span>
                     </div>
                     <div>
                         <div class="row mb-2">
@@ -113,7 +113,7 @@
 <script>
     function onInit() {
         const modal = $('.js-save-request-modal');
-        const baseUrl = '@string.Format("https://{0}.{1}.mockserver.com", Model.Project.User.Username , Model.Project.Name)';
+        const baseUrl = '@string.Format("https://{0}.{1}.mockserver.com", Model.WebApplication.User.Username , Model.WebApplication.Name)';
         generatePreviewUrl(modal);
         $('select[name=Method]', modal).on('change', function () {
             generatePreviewUrl(modal);

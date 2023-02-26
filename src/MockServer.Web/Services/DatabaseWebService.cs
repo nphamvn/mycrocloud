@@ -1,9 +1,8 @@
 using System.Text;
 using AutoMapper;
 using MockServer.Core.Databases;
-using MockServer.Core.Enums;
-using MockServer.Core.Models.Services;
 using MockServer.Core.Repositories;
+using MockServer.Core.Services;
 using MockServer.Web.Models.Database;
 using MockServer.Web.Services.Interfaces;
 

@@ -5,7 +5,8 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using MockServer.Core.Interfaces;
-using MockServer.Core.Models.Auth;
+using MockServer.Core.WebApplications.Security.JwtBearer;
+
 namespace MockServer.Core.Services;
 public class JwtBearerTokenService : IJwtBearerTokenService
 {

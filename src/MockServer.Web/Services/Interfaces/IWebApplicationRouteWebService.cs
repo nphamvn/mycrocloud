@@ -1,0 +1,23 @@
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using MockServer.Web.Models.WebApplications.Routes;
+using MockServer.Web.Models.WebApplications.Routes.Authorizations;
+using MockServer.Web.Models.WebApplications.Routes.Integrations.MockIntegrations;
+
+namespace MockServer.Web.Services;
+
+public interface IWebApplicationRouteWebService
+{
+    Task<RouteIndexModel> GetIndexModel(int appId);
+    Task<bool> ValidateCreate(int appId, RouteSaveModel route, ModelStateDictionary modelState);
+    Task<int> Create(int appId, RouteSaveModel route);
+    Task<bool> ValidateEdit(int routeId, RouteSaveModel route, ModelStateDictionary modelState);
+    Task Edit(int routeId, RouteSaveModel route);
+    Task<RouteSaveModel> GetEditRouteModel(int requestId);
+    Task<RouteSaveModel> GetCreateRouteModel(int appId);
+    Task Delete(int routeId);
+    Task<RouteViewModel> GetViewModel(int routeId);
+    Task<AuthorizationViewModel> GetAuthorizationViewModel(int appId, int requestId);
+    Task AttachAuthorization(int requestId, AuthorizationSaveModel auth);
+    Task<MockIntegrationViewModel> GetMockIntegration(int requestId);
+    Task SaveMockIntegration(int requestId, MockIntegrationSaveModel integration);
+}

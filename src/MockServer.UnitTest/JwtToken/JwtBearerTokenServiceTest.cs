@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using MockServer.Core.Interfaces;
-using MockServer.Core.Models.Auth;
 using MockServer.Core.Services;
+using MockServer.Core.WebApplications.Security.JwtBearer;
 
 namespace MockServer.UnitTest.JwtToken;
 

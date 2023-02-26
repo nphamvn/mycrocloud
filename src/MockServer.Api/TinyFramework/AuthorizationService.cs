@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using System.Text.Json;
 using Jint;
-using MockServer.Core.Models.Auth;
+using MockServer.Core.WebApplications.Security;
 
 namespace MockServer.Api.TinyFramework;
 
@@ -12,7 +12,7 @@ public class AuthorizationService : IAuthorizationService
     {
         _engine = new Engine();
     }
-    public bool CheckRequirement(Policy requirement, ClaimsPrincipal user)
+    public bool CheckRequirement(Policy policy, ClaimsPrincipal user)
     {
         var userDic = new Dictionary<string, object>();
         foreach (var claim in user.Claims)
@@ -21,7 +21,15 @@ public class AuthorizationService : IAuthorizationService
         }
         _engine.SetValue("user", userDic);
         _engine.Execute($"let user = {JsonSerializer.Serialize(userDic)};");
-        var result = _engine.Evaluate(requirement.ConditionalExpression).AsBoolean();
-        return result;
+        foreach (var condition in policy.ConditionalExpressions)
+        {
+            var result = _engine.Evaluate(condition).AsBoolean();
+            if (result == false)
+            {
+                return false;
+            }
+        }
+        
+        return true;
     }
 }

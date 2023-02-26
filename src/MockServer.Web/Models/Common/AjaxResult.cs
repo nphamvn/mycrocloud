@@ -3,14 +3,18 @@ namespace MockServer.Web.Models.Common;
 public class AjaxResult
 {
     public ICollection<Error> Errors { get; set; } = new List<Error>();
-    public bool Success
+    public bool Succeeded
         => Errors.Count == 0;
     public void AddError(string message)
     {
         Errors.Add(new(message));
     }
 
-    public static AjaxResult Ok() {
+    public static AjaxResult Success() {
+        return new AjaxResult();
+    }
+    public static AjaxResult Error()
+    {
         return new AjaxResult();
     }
 }

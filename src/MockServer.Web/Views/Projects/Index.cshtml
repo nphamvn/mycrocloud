@@ -1,14 +1,14 @@
 @using MockServer.Web.Controllers
-@model MockServer.Web.Models.Projects.ProjectIndexViewModel;
+@model MockServer.Web.Models.WebApplications.WebApplicationIndexViewModel;
 @{
-    ViewData["Title"] = "Your Projects";
+    ViewData["Title"] = "Your Applications";
 }
 <div class="row justify-content-center">
     <div class="col-8">
         <h3>@ViewData["Title"]</h3>
         <div class="mt-2">
             <div class="d-flex">
-                <form id="search" class="flex-grow-1 row" action="@Url.Action(nameof(ProjectsController.Index))"
+                <form id="search" class="flex-grow-1 row" action="@Url.Action(nameof(WebApplicationsController.Index))"
                     method="get">
                     <div class="d-flex">
                         <div class="me-auto w-100">
@@ -47,13 +47,13 @@
             </div>
             <div id="projectList" class="my-3">
                 <ul class="list-group list-group-flush project-list">
-                    @foreach (var project in Model.Projects)
+                    @foreach (var project in Model.Applications)
                     {
                         <li class="list-group-item">
                             <div>
                                 <h3 class="text-xl">
                                     <a class="text-decoration-none me-2"
-                                    href="@Url.Action(nameof(ProjectRequestsController.Index), "ProjectRequests" ,new {ProjectName=project.Name})">@project.Name</a>
+                                    href="@Url.Action(nameof(WebApplicationRoutesController.Index), "ProjectRequests" ,new {ProjectName=project.Name})">@project.Name</a>
                                     <span style="padding-top: 2px; padding-bottom: 2px;"
                                     class="badge rounded-pill bg-light text-sm fw-bolder text-gray border border-secondary">@project.Accessibility</span>
                                 </h3>

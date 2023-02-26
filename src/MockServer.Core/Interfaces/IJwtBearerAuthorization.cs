@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using MockServer.Core.Models.Auth;
+using MockServer.Core.WebApplications.Security.JwtBearer;
 
 namespace MockServer.Core.Interfaces;
 

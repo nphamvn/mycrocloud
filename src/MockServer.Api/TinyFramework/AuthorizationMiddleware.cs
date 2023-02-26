@@ -1,20 +1,22 @@
-using MockServer.Core.Enums;
 using MockServer.Core.Repositories;
-
+using MockServer.Core.WebApplications.Security;
+using CoreRoute = MockServer.Core.WebApplications.Route;
+using CoreWebApplication = MockServer.Core.WebApplications.WebApplication;
 namespace MockServer.Api.TinyFramework;
 
 public class AuthorizationMiddleware : IMiddleware
 {
-    private readonly IAuthRepository _authRepository;
+    private readonly IWebApplicationAuthenticationSchemeRepository _authRepository;
 
-    public AuthorizationMiddleware(IAuthRepository authRepository)
+    public AuthorizationMiddleware(IWebApplicationAuthenticationSchemeRepository authRepository)
     {
         _authRepository = authRepository;
     }
-    public async Task<MiddlewareInvokeResult> InvokeAsync(Request request)
+    public async Task<MiddlewareInvokeResult> InvokeAsync(HttpContext context)
     {
-        var authorization = await _authRepository.GetRequestAuthorization(request.Id);
-        var context = request.HttpContext;
+        var route = context.Items[nameof(CoreRoute)] as CoreRoute;
+        var app = context.Items[nameof(CoreWebApplication)] as CoreWebApplication;
+        var authorization = route.Authorization;
         //No authorization is set
         if (authorization == null)
         {
@@ -35,10 +37,10 @@ public class AuthorizationMiddleware : IMiddleware
         if (authorization.AuthenticationSchemes.Count > 0)
         {
             //allowedSchemes: "1,2,3,4,5"
-            var allowedSchemes = authorization.AuthenticationSchemes;
+            var allowedSchemeIds = authorization.AuthenticationSchemes.Select(s => s.Id);
             var authSchemeId = Convert.ToInt32(context.Items["AuthSchemeId"]);
             // check if the scheme is in the allowed list of scheme
-            if (!allowedSchemes.Contains(authSchemeId))
+            if (!allowedSchemeIds.Contains(authSchemeId))
             {
                 context.Response.StatusCode = 403; // Forbidden
                 return MiddlewareInvokeResult.End;

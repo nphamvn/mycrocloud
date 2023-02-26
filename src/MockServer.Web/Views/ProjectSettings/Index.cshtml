@@ -1,8 +1,8 @@
-@using MockServer.Core.Enums
+@using MockServer.Core.WebApplications
 @using MockServer.Web.Controllers
-@model MockServer.Web.Models.Projects.Project
+@model MockServer.Web.Models.WebApplications.WebApplication
 @{
-    var rv = new { name = ViewData["ProjectName"] };
+    var rv = new { name = Model.Name };
 }
 <partial name="/Views/ProjectShared/_Breadcrumb.cshtml" model="Model" />
 <div style="height: calc(100vh - 180px);">
@@ -15,7 +15,7 @@
                     <h5>General</h5>
                     <hr />
                     <!-- Rename: Start-->
-                    <form action="@Url.Action(nameof(ProjectSettingsController.Rename), rv)"
+                    <form action="@Url.Action(nameof(WebApplicationSettingsController.Rename), rv)"
                         class="mb-2 border-bottom pb-3">
                         <div class="row">
                             <div class="col-3">
@@ -33,17 +33,17 @@
                     <div class="set-accessibility col-6">
                         <div class="d-flex mb-2">
                             <form id="frmSetAccessibility"
-                                asp-action="@nameof(ProjectSettingsController.SetAccessibility)"
+                                asp-action="@nameof(WebApplicationSettingsController.SetAccessibility)"
                                 asp-route-name="@Model.Name" method="post">
                                 <input type="hidden" name="accessibility">
                             </form>
                             <div class="me-auto">
                                 <strong>Accessibility</strong>
-                                @if (Model.Accessibility == ProjectAccessibility.Public)
+                                @if (Model.Accessibility == WebApplicationAccessibility.Public)
                                 {
                                     <div>The project is currently publicly accessible.</div>
                                 }
-                                else if (Model.Accessibility == ProjectAccessibility.Private)
+                                else if (Model.Accessibility == WebApplicationAccessibility.Private)
                                 {
                                     <div>The project is currently private.</div>
                                 }
@@ -54,21 +54,21 @@
                                     Change accessibility
                                 </button>
                                 <ul class="dropdown-menu">
-                                    @if (Model.Accessibility == ProjectAccessibility.Private)
+                                    @if (Model.Accessibility == WebApplicationAccessibility.Private)
                                     {
                                         <li>
                                             <button type="button" class="dropdown-item btn btn-default"
-                                            name="setAccessibility" data-accessibility="@ProjectAccessibility.Public"
+                                            name="setAccessibility" data-accessibility="@WebApplicationAccessibility.Public"
                                             data-bs-toggle="modal" data-bs-target="#set-accessibility-confirm-modal">
                                                 Change to public
                                             </button>
                                         </li>
                                     }
-                                    else if (Model.Accessibility == ProjectAccessibility.Public)
+                                    else if (Model.Accessibility == WebApplicationAccessibility.Public)
                                     {
                                         <li>
                                             <button type="button" class="dropdown-item btn btn-default"
-                                            name="setAccessibility" data-accessibility="@ProjectAccessibility.Private"
+                                            name="setAccessibility" data-accessibility="@WebApplicationAccessibility.Private"
                                             data-bs-toggle="modal" data-bs-target="#set-accessibility-confirm-modal">
                                                 Change to private
                                             </button>
@@ -132,7 +132,7 @@
                                         This will permanently delete everything in the <strong>@Model.Name</strong>
                                         project.
                                     </div>
-                                    <form asp-action="@nameof(ProjectSettingsController.Delete)"
+                                    <form asp-action="@nameof(WebApplicationSettingsController.Delete)"
                                         asp-route-name="@Model.Name">
                                         <div>
                                             <div class="mb-3">

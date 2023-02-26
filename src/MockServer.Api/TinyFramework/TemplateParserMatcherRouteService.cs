@@ -7,8 +7,10 @@ namespace MockServer.Api.TinyFramework;
 public class TemplateParserMatcherRouteService : IRouteResolver
 {
     private readonly ICacheService _cacheService;
-    private readonly IRequestRepository _requestRepository;
-    public TemplateParserMatcherRouteService(ICacheService cacheService, IRequestRepository requestRepository)
+    private readonly IWebApplicationRouteRepository _requestRepository;
+    
+    public TemplateParserMatcherRouteService(ICacheService cacheService, 
+        IWebApplicationRouteRepository requestRepository)
     {
         _cacheService = cacheService;
         _requestRepository = requestRepository;

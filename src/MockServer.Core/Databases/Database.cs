@@ -1,11 +1,9 @@
-using MockServer.Core.Models;
+using MockServer.Core.Services;
 
 namespace MockServer.Core.Databases;
 
-public class Database: BaseEntity
+public class Database: Service
 {
-    public int UserId { get; set; }
-    public string Name { get; set; }
     public string Description { get; set; }
     public string Data { get; set; }
     public string Adapter { get; set; }

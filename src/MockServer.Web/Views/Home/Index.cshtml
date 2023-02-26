@@ -1,8 +1,8 @@
-﻿@using MockServer.Web.Extentions
-@using MockServer.Core.Models
+﻿@using MockServer.Core.Identity
+@using MockServer.Web.Extentions
 @{
     ViewData["Title"] = "Home Page";
-    var user = User.Parse<ApplicationUser>();
+    var user = User.Parse<User>();
 }
 @if (User.Identity.IsAuthenticated)
 {

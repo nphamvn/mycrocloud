@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MockServer.Core.Extentions;
-using MockServer.Core.Models.Services;
+using MockServer.Core.Services;
 using MockServer.Web.Attributes;
 using MockServer.Web.Filters;
 using MockServer.Web.Models.Database;

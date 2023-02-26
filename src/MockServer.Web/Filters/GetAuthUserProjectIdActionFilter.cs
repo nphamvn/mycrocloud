@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Filters;
-using MockServer.Core.Models;
+using MockServer.Core.Identity;
 using MockServer.Core.Repositories;
 using MockServer.Web.Extentions;
 
@@ -16,8 +16,8 @@ public class GetAuthUserProjectIdAttribute : ActionFilterAttribute
     }
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var user = context.HttpContext.User.Parse<ApplicationUser>();
-        var projectRepository = context.HttpContext.RequestServices.GetService<IProjectRepository>();
+        var user = context.HttpContext.User.Parse<User>();
+        var projectRepository = context.HttpContext.RequestServices.GetService<IWebApplicationRepository>();
         string projectName = null;
         if (context.ActionArguments.ContainsKey(_projectNameKey))
         {

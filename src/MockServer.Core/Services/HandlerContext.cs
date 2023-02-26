@@ -1,16 +1,12 @@
-using System.Dynamic;
 using System.Text.Json;
 using Jint;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using MockServer.Core.Databases;
-using MockServer.Core.Enums;
 using MockServer.Core.Extentions;
-using MockServer.Core.Models;
-using MockServer.Core.Models.Projects;
-using MockServer.Core.Models.Services;
 using MockServer.Core.Repositories;
 using MockServer.Core.Settings;
+using MockServer.Core.WebApplications;
 
 namespace MockServer.Core.Services;
 
@@ -19,7 +15,7 @@ public class HandlerContext
     private Engine _engine;
     public Engine JintEngine => _engine;
     private readonly HttpContext _context;
-    public Project WebApp { get; set; }
+    public WebApplication WebApplication { get; set; }
     private readonly IDatabaseRepository _databaseRespository;
     private readonly GlobalSettings _settings;
     private readonly IFactoryService _factoryService;
@@ -55,12 +51,12 @@ public class HandlerContext
         return DatabaseAdapterUtilities.CreateAdapter(
             service: new Service {
                 Type = ServiceType.WebApp,
-                Id = WebApp.Id
+                Id = WebApplication.Id
             },
             factoryService: _factoryService,
             databaseRepository: _databaseRespository,
             jsonSerializerOptions: jsonSerializerOptions,
-            UserId: WebApp.UserId,
+            UserId: WebApplication.UserId,
             databaseName: databaseName,
             engine: _engine,
             codes: new string[] { code }

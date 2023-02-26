@@ -1,7 +1,6 @@
-@using MockServer.Core.Enums
-@model MockServer.Web.Models.Projects.CreateProjectViewModel
+@model MockServer.Web.Models.WebApplications.WebApplicationCreateModel
 @{
-    ViewData["Title"] = "Create new project";
+    ViewData["Title"] = "Create new web application";
 }
 <div class="row justify-content-center">
     <div class="col-6">
@@ -15,30 +14,10 @@
             <div class="form-group mt-3">
                 <label asp-for="Description"></label>
                 <textarea class="form-control" rows="3" asp-for="Description"></textarea>
-                <small class="form-text text-muted">Add a brief summary about this project.</small>
-            </div>
-            <div class="form-group border-top mt-3 pt-2">
-                <div>
-                    <div>
-                        <input class="form-check-input" type="radio" asp-for="Accessibility"
-                            value="@((int)ProjectAccessibility.Public)" checked>
-                        <label class="form-check-label ms-1" for="pulic">Public</label>
-                    </div>
-                    <small class="form-text text-muted ps-3">Anyone can see this project.</small>
-                </div>
-                <div>
-                    <div>
-                        <input class="form-check-input" type="radio" asp-for="Accessibility"
-                            value="@((int)ProjectAccessibility.Private)">
-                        <label class="form-check-label ms-1" for="private">Private</label>
-                    </div>
-                    <div class="ps-3">
-                        <small class="form-text text-muted">Only you can see this project.</small>
-                    </div>
-                </div>
+                <small class="form-text text-muted">Add a brief summary about this application.</small>
             </div>
             <div class="mt-3 border-top pt-2">
-                <button class="btn btn-primary" type="submit">Create project</button>
+                <button class="btn btn-primary" type="submit">Save</button>
             </div>
         </form>
     </div>

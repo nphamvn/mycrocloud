@@ -1,8 +1,8 @@
-@using MockServer.Core.Enums
+@using MockServer.Core.WebApplications.Security
 @using MockServer.Web.Controllers
-@model MockServer.Web.Models.ProjectAuthentication.IndexViewModel
+@model MockServer.Web.Models.WebApplications.Authentications.AuthenticationIndexModel
 @{
-    ViewData["Title"] = Model.Project.Name;
+    ViewData["Title"] = Model.WebApplication.Name;
     var availableSchemes = Model.AuthenticationSchemes.Where(s => s.Order == 0);
     var selectedSchemes = Model.AuthenticationSchemes.Where(s => s.Order > 0);
 }
@@ -72,9 +72,9 @@
     }
 </style>
 
-<partial name="/Views/ProjectShared/_Breadcrumb.cshtml" model="Model.Project" />
+<partial name="/Views/ProjectShared/_Breadcrumb.cshtml" model="Model.WebApplication" />
 <div style="height: calc(100vh - 180px);">
-    <partial name="_NavTabs.cshtml" model="Model.Project" />
+    <partial name="_NavTabs.cshtml" model="Model.WebApplication" />
     <div class="tab-content h-100">
         <div class="tab-pane fade show active h-100">
             <div class="row flex-nowrap">
@@ -101,10 +101,10 @@
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     <li><a class="dropdown-item"
-                                                            href="@Url.Action(nameof(ProjectAuthenticationController.JwtBearer), new { ProjectName = Model.Project.Name })">JWT</a>
+                                                            href="@Url.Action(nameof(WebApplicationAuthenticationsController.JwtBearer), new { ProjectName = Model.WebApplication.Name })">JWT</a>
                                                     </li>
                                                     <li><a class="dropdown-item"
-                                                            href="@Url.Action(nameof(ProjectAuthenticationController.ApiKey), new { ProjectName = Model.Project.Name })">API
+                                                            href="@Url.Action(nameof(WebApplicationAuthenticationsController.ApiKey), new { ProjectName = Model.WebApplication.Name })">API
                                                             Key</a></li>
                                                 </ul>
                                             </div>
@@ -120,18 +120,18 @@
                                                         if (scheme.Type is AuthenticationSchemeType.JwtBearer)
                                                         {
                                                             link =
-                                                            @Url.Action(nameof(ProjectAuthenticationController.JwtBearer), new
+                                                            @Url.Action(nameof(WebApplicationAuthenticationsController.JwtBearer), new
                                                             {
-                                                                ProjectName = Model.Project.Name,
+                                                                ProjectName = Model.WebApplication.Name,
                                                                 id = scheme.Id
                                                             });
                                                         }
                                                         else if (scheme.Type is AuthenticationSchemeType.ApiKey)
                                                         {
-                                                            link = @Url.Action(nameof(ProjectAuthenticationController.ApiKey),
+                                                            link = @Url.Action(nameof(WebApplicationAuthenticationsController.ApiKey),
                                                             new
                                                             {
-                                                                ProjectName = Model.Project.Name,
+                                                                ProjectName = Model.WebApplication.Name,
                                                                 id = scheme.Id
                                                             });
                                                         }
@@ -166,18 +166,18 @@
                                                         if (scheme.Type is AuthenticationSchemeType.JwtBearer)
                                                         {
                                                             link =
-                                                            @Url.Action(nameof(ProjectAuthenticationController.JwtBearer), new
+                                                            @Url.Action(nameof(WebApplicationAuthenticationsController.JwtBearer), new
                                                             {
-                                                                ProjectName = Model.Project.Name,
+                                                                ProjectName = Model.WebApplication.Name,
                                                                 SchemeId = scheme.Id
                                                             });
                                                         }
                                                         else if (scheme.Type is AuthenticationSchemeType.ApiKey)
                                                         {
-                                                            link = @Url.Action(nameof(ProjectAuthenticationController.ApiKey),
+                                                            link = @Url.Action(nameof(WebApplicationAuthenticationsController.ApiKey),
                                                             new
                                                             {
-                                                                ProjectName = Model.Project.Name,
+                                                                ProjectName = Model.WebApplication.Name,
                                                                 SchemeId = scheme.Id
                                                             });
                                                         }

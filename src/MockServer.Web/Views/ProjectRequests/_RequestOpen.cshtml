@@ -1,4 +1,5 @@
-@model MockServer.Web.Models.ProjectRequests.RequestViewModel
+@using MockServer.Core.WebApplications
+@model MockServer.Web.Models.WebApplications.Routes.RouteViewModel
 <div class="row h-100">
     <div class="col-9 h-100 overflow-scroll">
         <div>
@@ -32,21 +33,19 @@
                     <button class="btn btn-light btn-sm py-1 ms-auto my-0 js-config-auth">Configure</button>
                 </div>
                 <div class="card-body">
-                    @if (Model.AuthorizationConfiguration != null)
+                    @if (Model.Authorization != null)
                     {
                         <table class="table table-borderless">
                             <thead>
                                 <tr>
                                     <th scope="col">Authorization Type</th>
-                                    <th scope="col">Authentication Schemes</th>
                                     <th scope="col">Policies</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td scope="row">@Model.AuthorizationConfiguration.Type</td>
-                                    <td>@Model.AuthorizationConfiguration.AuthenticationSchemes.Count</td>
-                                    <td>@Model.AuthorizationConfiguration.Policies.Count</td>
+                                    <td scope="row">@Model.Authorization.Type</td>
+                                    <td>@Model.Authorization.Policies.Count</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -97,33 +96,27 @@
                                     <thead>
                                         <tr>
                                             <th style="width: 35%" scope="col">Key</th>
-                                            <th style="width: 35%" scope="col">Value</th>
                                             <th style="width: 10%" scope="col">Constraints</th>
                                             <th style="width: 10%" scope="col"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @{
-                                            Model.RequestConfiguration.Query.Add(new());
+                                            Model.RequestQueries.Add(new());
                                         }
-                                        @for (int i = 0; i < Model.RequestConfiguration.Query.Count; i++)
+                                        @for (int i = 0; i < Model.RequestQueries.Count; i++)
                                         {
                                             <tr>
-                                                <td class="align-middle"><input asp-for="RequestConfiguration.Query[i].Key"
+                                                <td class="align-middle"><input asp-for="RequestQueries[i].Key"
                                                     type="text" class="form-control form-control-sm param-key"
                                                     placeholder="key" autocomplete="off">
-                                                </td>
-                                                <td class="align-middle"><input type="text"
-                                                    class="form-control form-control-sm param-value"
-                                                    asp-for="RequestConfiguration.Query[i].Value" placeholder="value"
-                                                    autocomplete="off">
                                                 </td>
                                                 <td class="align-middle">
                                                     <div>
                                                         <input type="hidden"
-                                                        asp-for="RequestConfiguration.Query[i].Constraints">
+                                                        asp-for="RequestQueries[i].Constraints">
                                                         <span
-                                                        name="ConstraintsCount">@Model.RequestConfiguration.Query[i].ConstraintsCount</span>
+                                                        name="ConstraintsCount">@Model.RequestQueries[i]</span>
                                                         <button class="ms-2 js-config-param-constraints"><i
                                                             class="bi bi-box-arrow-in-up-right"></i></button>
                                                     </div>
@@ -142,28 +135,23 @@
                                     <thead>
                                         <tr>
                                             <th style="width: 35%" scope="col">Header</th>
-                                            <th style="width: 35%" scope="col">Value</th>
                                             <th style="width: 10%" scope="col">Constraints</th>
                                             <th style="width: 10%" scope="col"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @{
-                                            Model.RequestConfiguration.Headers.Add(new());
+                                            Model.RequestHeaders.Add(new());
                                         }
-                                        @for (int i = 0; i < Model.RequestConfiguration.Headers.Count; i++)
+                                        @for (int i = 0; i < Model.RequestHeaders.Count; i++)
                                         {
                                             <tr>
                                                 <td class="align-middle"><input type="text"
                                                     class="form-control form-control-sm"
-                                                    asp-for="RequestConfiguration.Headers[i].Name" placeholder="name">
-                                                </td>
-                                                <td class="align-middle"><input type="text"
-                                                    class="form-control form-control-sm"
-                                                    asp-for="RequestConfiguration.Headers[i].Value" placeholder="value">
+                                                    asp-for="RequestHeaders[i].Name" placeholder="name">
                                                 </td>
                                                 <td class="align-middle"><input type="hidden"
-                                                    asp-for="RequestConfiguration.Headers[i].Constraints">
+                                                    asp-for="RequestHeaders[i].Constraints">
                                                 </td>
                                                 <td class="align-middle"><button
                                                     class="btn header-delete text-gray btn-show-on-hover"><i
@@ -179,16 +167,15 @@
                                     <div class="d-flex input-group mb-2">
                                         <div class="form-check me-5">
                                             <input class="form-check-input" type="checkbox"
-                                                checked="@(Model.RequestConfiguration.Body.Constraints.Contains("Required", StringComparison.OrdinalIgnoreCase))">
+                                                checked="@(Model.RequestBody.Constraints.Contains("Required"))">
                                             <label class="form-check-label"></label>
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox"
-                                                checked="@(Model.RequestConfiguration.Body.Constraints.Contains("MatchExactly", StringComparison.OrdinalIgnoreCase))">
+                                                checked="@(Model.RequestBody.Constraints.Contains("MatchExactly"))">
                                             <label class="form-check-label">Match Exactly</label>
                                         </div>
-                                        <input type="hidden" asp-for="RequestConfiguration.Body.Constraints"
-                                            value="RequestConfiguration.Body.Constraints">
+                                        <input type="hidden" asp-for="RequestBody.Constraints">
                                     </div>
                                     <div>
                                         <div class="d-flex">
@@ -203,7 +190,7 @@
                                             </div>
                                         </div>
                                         <div class="position-relative" style="min-height: 200px;">
-                                            <textarea asp-for="RequestConfiguration.Body.Text"></textarea>
+                                            <textarea asp-for="RequestBody.Text"></textarea>
                                             <div id="request-body-editor"></div>
                                         </div>
                                     </div>
@@ -213,135 +200,10 @@
                     </div>
                 </div>
             </div>
-            <div>
-                <div class="card mt-1">
-                    <div class="card-header d-flex">
-                        Script
-                        <button id="btnSave" class="btn btn-light btn-sm py-1 ms-auto my-0">Save</button>
-                    </div>
-                    <div class="card-body">
-                        <div class="position-relative" style="min-height: 200px;">
-                            <textarea asp-for="HandlerConfiguration.Script"></textarea>
-                            <div id="response-body-render-script"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <div class="card mt-1">
-                    <div class="card-header">
-                        Response Configuration
-                    </div>
-                    <div class="card-body">
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button type="button" class="nav-link active py-1" data-bs-toggle="tab"
-                                    data-bs-target="#response-basic-tab">Basic</button>
-                            </li>
-                            <li class="nav-item">
-                                <button type="button" class="nav-link py-1" data-bs-toggle="tab"
-                                    data-bs-target="#response-body-tab">Body</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button type="button" class="nav-link py-1" data-bs-toggle="tab"
-                                    data-bs-target="#response-header-tab">Headers</button>
-                            </li>
-                        </ul>
-                        <div class="tab-content" style="min-height: 200px;">
-                            <div id="response-basic-tab" class="tab-pane fade show active p-2" role="tabpanel">
-                                <div class="mb-3 col-sm-2">
-                                    <label class="form-label">Status code</label>
-                                    <input type="text" list="commonStatusCodes" class="form-control form-control-sm"
-                                        asp-for="ResponseConfiguration.StatusCode" />
-                                    <datalist id="commonStatusCodes">
-                                        @foreach (var item in Model.StatusCodeSelectListItem)
-                                        {
-                                            <option value="@Convert.ToInt32(item.Value)">@item.Text</option>
-                                        }
-                                    </datalist>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Delay</label>
-                                    <div class="d-flex">
-                                        <div class="my-auto me-2">
-                                            <input class="form-check-input" type="checkbox"
-                                                asp-for="ResponseConfiguration.Delay"
-                                                checked="@Model.ResponseConfiguration?.Delay">
-                                        </div>
-                                        <div class="col-2 me-1">
-                                            <input type="number" class="form-control form-control-sm" min="0"
-                                                max="10000" asp-for="ResponseConfiguration.DelayTime">
-                                        </div>
-                                        <div class="my-auto">
-                                            <label>miliseconds</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="response-body-tab" class="tab-pane fade p-2" role="tabpanel">
-                                <div>
-                                    <div class="d-flex">
-                                        <select id="response-body-type" class="form-select form-select-sm w-auto mb-1">
-                                            <option value="json" selected>JSON</option>
-                                            <option value="xml">XML</option>
-                                            <option value="text">Text</option>
-                                        </select>
-                                        <select class="form-select form-select-sm w-auto mb-1"
-                                            asp-for="ResponseConfiguration.BodyRenderType">
-                                            <option value="1">Static</option>
-                                            <option value="2">Handlebars</option>
-                                            <option value="3">Expression with script</option>
-                                        </select>
-                                        <div class="ms-auto">
-                                            <button class="btn btn-sm btn-link text-decoration-none">Format</button>
-                                        </div>
-                                    </div>
-                                    <div class="position-relative" style="min-height: 200px;">
-                                        <textarea asp-for="ResponseConfiguration.BodyText"></textarea>
-                                        <div id="response-body-editor"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="response-header-tab" class="tab-pane fade p-2" role="tabpanel">
-                                <table id="response-header-table" class="table table-sm p-0 m-0">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 35%" scope="col">Name</th>
-                                            <th style="width: 55%" scope="col">Value</th>
-                                            <th style="width: 10%" scope="col"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @{
-                                            Model.ResponseConfiguration.Headers.Add(new());
-                                        }
-                                        @for (int i = 0; i < Model.ResponseConfiguration.Headers.Count; i++)
-                                        {
-                                            <tr>
-                                                <td class="align-middle"><input
-                                                    asp-for="ResponseConfiguration.Headers[i].Name" type="text"
-                                                    class="form-control form-control-sm header-name" placeholder="name"
-                                                    autocomplete="off">
-                                                </td>
-                                                <td class="align-middle">
-                                                    <input type="text" class="form-control form-control-sm header-value"
-                                                    asp-for="ResponseConfiguration.Headers[i].Value"
-                                                    placeholder="value">
-                                                </td>
-                                                <td class="align-middle"><button
-                                                    class="btn header-delete text-gray btn-show-on-hover"><i
-                                                        class="bi bi-trash"></i></button>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @if (Model.IntegrationType == RouteIntegrationType.MockIntegration)
+            {
+                <partial name="_RouteMockIntegration.cshtml" model="Model.Integration"/>
+            }
             <template id="requestParamRow">
                 <tr>
                     <td class="align-middle"><input type="text" name="key"

@@ -3,7 +3,7 @@ using MockServer.Web.Services.Interfaces;
 
 namespace MockServer.Web.Services;
 
-public class HomeService : IHomeService
+public class HomeService : IServiceWebService
 {
     public Task<IEnumerable<ServiceItem>> GetAllServices()
     {

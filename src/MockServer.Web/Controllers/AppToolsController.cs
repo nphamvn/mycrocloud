@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +13,7 @@ public class AppToolsController : BaseController
         ViewData["Method"] = method;
         return View("Views/AppTools/HttpRequestSender.cshtml");
     }
+
     [AllowAnonymous]
     [Route("/ping")]
     public IActionResult Ping()
@@ -23,6 +23,7 @@ public class AppToolsController : BaseController
             Message = "pong"
         });
     }
+
     [AllowAnonymous]
     [Route("/me")]
     public IActionResult Me()
@@ -32,6 +33,7 @@ public class AppToolsController : BaseController
             Request = HttpContextExtentions.GetRequestDictionary(HttpContext)
         });
     }
+    
     [AllowAnonymous]
     [Route("/dic")]
     public IActionResult Dic()

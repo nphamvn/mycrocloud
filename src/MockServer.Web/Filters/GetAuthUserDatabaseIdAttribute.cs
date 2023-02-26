@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Filters;
-using MockServer.Core.Models;
+using MockServer.Core.Identity;
 using MockServer.Core.Repositories;
 using MockServer.Web.Extentions;
 
@@ -16,7 +16,7 @@ public class GetAuthUserDatabaseIdAttribute : ActionFilterAttribute
     }
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var user = context.HttpContext.User.Parse<ApplicationUser>();
+        var user = context.HttpContext.User.Parse<User>();
         var databaseRepository = context.HttpContext.RequestServices.GetService<IDatabaseRepository>();
         string databaseName = null;
         if (context.ActionArguments.ContainsKey(_databaseNameKey))

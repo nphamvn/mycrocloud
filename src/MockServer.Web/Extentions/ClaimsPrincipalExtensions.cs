@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using MockServer.Core.Models;
+using MockServer.Core.Identity;
 
 namespace MockServer.Web.Extentions
 {
@@ -10,9 +10,9 @@ namespace MockServer.Web.Extentions
             if (principal == null)
                 throw new ArgumentNullException(nameof(principal));
 
-            if (typeof(T) == typeof(ApplicationUser))
+            if (typeof(T) == typeof(User))
             {
-                var user = new ApplicationUser
+                var user = new User
                 {
                     Id = Convert.ToInt32(principal.FindFirstValue("sub")),
                     Username = principal.FindFirstValue("name"),

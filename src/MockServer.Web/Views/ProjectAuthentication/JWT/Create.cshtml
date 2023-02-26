@@ -1,7 +1,7 @@
 @using MockServer.Web.Common
-@model MockServer.Web.Models.ProjectAuthentication.JwtBearer.JwtBearerSchemeViewModel
+@model MockServer.Web.Models.WebApplications.Authentications.JwtBearer.JwtBearerSchemeSaveModel
 @{
-    var project = Model.Project;
+    var project = Model.WebApplication;
     var formMode = FormMode.Edit;
 }
 <div class="row flex-nowrap">
@@ -79,7 +79,7 @@
                                         <th>&nbsp;</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                @* <tbody>
                                     @{
                                         Model.Options.AdditionalClaims.Add(new());
                                     }
@@ -101,7 +101,7 @@
                                             </td>
                                         </tr>
                                     }
-                                </tbody>
+                                </tbody> *@
                             </table>
                         </div>
                     </div>

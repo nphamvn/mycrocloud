@@ -2,8 +2,8 @@ using System.Text.Json;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using MockServer.Core.Databases;
-using MockServer.Core.Models.Services;
 using MockServer.Core.Repositories;
+using MockServer.Core.Services;
 using MockServer.Core.Settings;
 
 namespace MockServer.Infrastructure.Repositories;

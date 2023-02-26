@@ -1,8 +1,8 @@
-using MockServer.Api.Services;
-using MockServer.Core.Models;
-using MockServer.Core.Models.Auth;
+using MockServer.Core.Identity;
 using MockServer.Core.Services;
-
+using MockServer.Core.WebApplications;
+using MockServer.Core.WebApplications.Security;
+using CoreRoute = MockServer.Core.WebApplications.Route;
 namespace MockServer.Api.TinyFramework;
 
 public class WebApplication : IWebApplication
@@ -10,18 +10,19 @@ public class WebApplication : IWebApplication
     public int Id { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
-    public ApplicationUser User { get; set; }
-    public List<AuthenticationScheme> Authentications { get; set; }
-    public List<string> UseMiddlewares { get; set; }
-
-    public ApplicationUser Owner { get; set; }
+    public User User { get; set; }
+    public Dictionary<AuthenticationScheme, IAuthenticationHandler> AuthenticationSchemeHandlerMap { get; set; } = new();
+    public List<string> UseMiddlewares { get; set; } = new();
     private Dictionary<string, IMiddleware> _useMiddlewares = new();
     public IServiceProvider ServiceProvider { get; set; }
     public IFactoryService FactoryService { get; set; }
+
+    //Used to be mapped with AutoMapper
     public WebApplication()
     {
         
     }
+    //Used to create instance manually
     public WebApplication(IServiceProvider provider)
     {
         ServiceProvider = provider;
@@ -36,16 +37,16 @@ public class WebApplication : IWebApplication
         _useMiddlewares.Add(middleware.GetType().Name , middleware);
     }
 
-    public async Task Handle(Request request)
+    public async Task Handle(HttpContext context)
     {
-        await BeforeHandle(request);
+        await BeforeHandle(context);
 
         MiddlewareInvokeResult result = default;
         IMiddleware middleware;
         if (_useMiddlewares.ContainsKey(nameof(RoutingMiddleware)))
         {
             middleware = _useMiddlewares[nameof(RoutingMiddleware)];
-            result = await middleware.InvokeAsync(request);
+            result = await middleware.InvokeAsync(context);
 
             if (result != MiddlewareInvokeResult.Next)
             {
@@ -56,7 +57,7 @@ public class WebApplication : IWebApplication
         if (_useMiddlewares.ContainsKey(nameof(AuthenticationMiddleware)))
         {
             middleware = _useMiddlewares[nameof(AuthenticationMiddleware)];
-            result = await middleware.InvokeAsync(request);
+            result = await middleware.InvokeAsync(context);
 
             if (result != MiddlewareInvokeResult.Next)
             {
@@ -67,7 +68,7 @@ public class WebApplication : IWebApplication
         if (_useMiddlewares.ContainsKey(nameof(ConstraintValidationMiddleware)))
         {
             middleware = _useMiddlewares[nameof(ConstraintValidationMiddleware)];
-            result = await middleware.InvokeAsync(request);
+            result = await middleware.InvokeAsync(context);
 
             if (result != MiddlewareInvokeResult.Next)
             {
@@ -75,18 +76,26 @@ public class WebApplication : IWebApplication
             }
         }
 
-        var handler = ServiceProvider.GetRequiredService<RequestHandler>();
-        await handler.Handle(request);
+        var route = context.Items[nameof(CoreRoute)] as CoreRoute;
+        var factoryService = ServiceProvider.GetRequiredService<IFactoryService>();
+        RequestHandler handler = default;
+        if (route.IntegrationType == RouteIntegrationType.MockIntegration)
+        {
+            handler = factoryService.Create<MockIntegrationHandler>();
+        }
 
-        await AfterHandle(request);
+        await handler.Handle(context);
+
+        await AfterHandle(context);
     }
 
-    private async Task BeforeHandle(Request request) {
-        
-    }
-
-    private async Task AfterHandle(Request request)
+    private async Task BeforeHandle(HttpContext context)
     {
 
+    }
+
+    private async Task AfterHandle(HttpContext context)
+    {
+        
     }
 }

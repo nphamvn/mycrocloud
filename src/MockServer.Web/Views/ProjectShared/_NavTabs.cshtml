@@ -1,4 +1,4 @@
-@model MockServer.Web.Models.Projects.Project
+@model MockServer.Web.Models.WebApplications.WebApplication
 @using MockServer.Web.Controllers
 @{
     var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
@@ -6,15 +6,15 @@
 }
 <ul class="nav nav-tabs" role="tablist">
     <li class="nav-item" role="presentation">
-        <a href="@Url.Action(nameof(ProjectRequestsController.Index), "ProjectRequests" ,new {ProjectName=Model.Name})"
+        <a href="@Url.Action(nameof(WebApplicationRoutesController.Index), "ProjectRequests" ,new {ProjectName=Model.Name})"
             class="nav-link @(controller.Equals("ProjectRequests", StringComparison.OrdinalIgnoreCase) && action.Equals("Index", StringComparison.OrdinalIgnoreCase) ?"active":"") py-1" role="tab">Requests</a>
     </li>
     <li class="nav-item" role="presentation">
-        <a href="@Url.Action(nameof(ProjectAuthenticationController.Index), "ProjectAuthentication", new {ProjectName=Model.Name})"
+        <a href="@Url.Action(nameof(WebApplicationAuthenticationsController.Index), "ProjectAuthentication", new {ProjectName=Model.Name})"
             class="nav-link @(controller== "ProjectAuthentication"?"active":"") py-1" role="tab">Authentication</a>
     </li>
     <li class="nav-item" role="presentation">
-        <a href="@Url.Action(nameof(ProjectSettingsController.Index), "ProjectSettings", new {ProjectName=Model.Name})"
+        <a href="@Url.Action(nameof(WebApplicationSettingsController.Index), "ProjectSettings", new {ProjectName=Model.Name})"
             class="nav-link @(controller.Equals("ProjectSettings", StringComparison.OrdinalIgnoreCase)?"active":"") py-1" role="tab">Settings</a>
     </li>
 </ul>

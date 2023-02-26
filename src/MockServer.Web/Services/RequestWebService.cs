@@ -3,58 +3,65 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MockServer.Core.Helpers;
 using MockServer.Core.Repositories;
-using MockServer.Web.Models.ProjectRequests;
-using MockServer.Web.Models.Projects;
-using MockServer.Web.Services.Interfaces;
-
+using MockServer.Core.WebApplications;
+using MockServer.Web.Models.WebApplications.Routes;
+using MockServer.Web.Models.WebApplications.Routes.Authorizations;
+using MockServer.Web.Models.WebApplications.Routes.Integrations.MockIntegrations;
+using CoreRoute = MockServer.Core.WebApplications.Route;
+using CoreAuthorization = MockServer.Core.WebApplications.Security.Authorization;
+using CoreMockIntegration = MockServer.Core.WebApplications.MockIntegration;
 namespace MockServer.Web.Services;
 
-public class RequestWebService : BaseWebService, IProjectRequestWebService
+public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRouteWebService
 {
-    private readonly IRequestRepository _requestRepository;
-    private readonly IProjectRepository _projectRepository;
-    private readonly IAuthRepository _authRepository;
+    private readonly IWebApplicationRouteRepository _webApplicationRouteRepository;
+    private readonly IWebApplicationRepository _projectRepository;
+    private readonly IWebApplicationAuthenticationSchemeRepository _authRepository;
+    private readonly IWebApplicationWebService _webApplicationWebService;
     private readonly IMapper _mapper;
-    public RequestWebService(
+    public WebApplicationRouteWebService(
         IHttpContextAccessor contextAccessor,
-        IRequestRepository requestRepository,
-        IProjectRepository projectRepository,
-        IAuthRepository authRepository,
+        IWebApplicationRouteRepository requestRepository,
+        IWebApplicationRepository projectRepository,
+        IWebApplicationAuthenticationSchemeRepository authRepository,
+        IWebApplicationWebService webApplicationWebService,
         IMapper mapper) : base(contextAccessor)
     {
-        _requestRepository = requestRepository;
+        _webApplicationRouteRepository = requestRepository;
         _projectRepository = projectRepository;
         _authRepository = authRepository;
+        this._webApplicationWebService = webApplicationWebService;
         _mapper = mapper;
     }
-    public async Task<RequestViewModel> GetRequestOpenViewModel(int requestId)
+    public async Task<RouteViewModel> GetViewModel(int routeId)
     {
-        var request = await _requestRepository.GetById(requestId);
-        var vm = _mapper.Map<RequestViewModel>(request);
-        vm.Project = await _projectRepository.Get(request.ProjectId);
-        vm.Project.User = AuthUser;
-        vm.AuthorizationConfiguration = await GetAuthorization(request.ProjectId, requestId);
-        vm.RequestConfiguration = new RequestConfiguration
+        var route = await _webApplicationRouteRepository.GetById(routeId);
+        var vm = _mapper.Map<RouteViewModel>(route);
+        vm.WebApplication = await _webApplicationWebService.Get(route.ApplicationId);
+        vm.WebApplication.User = AuthUser;
+        vm.Authorization = await GetAuthorizationViewModel(route.ApplicationId, routeId);
+        if (route.IntegrationType == RouteIntegrationType.MockIntegration)
         {
-            //Query = (await _requestRepository.GetRequestQueries(requestId)).ToList(),
-            //Headers = (await _requestRepository.GetRequestHeaders(requestId)).ToList(),
-            //Body = (await _requestRepository.GetRequestBody(requestId))
-        };
-        vm.ResponseConfiguration = new ResponseConfiguration
+
+        }
+        else if (route.IntegrationType == RouteIntegrationType.DirectForwarding)
         {
-            //Headers = (await _requestRepository.GetResponseHeaders(requestId)).ToList(),
-            
-        };
+
+        }
+        else if (route.IntegrationType == RouteIntegrationType.FunctionTrigger)
+        {
+
+        }
         return vm;
     }
 
-    public async Task<int> Create(int projectId, SaveRequestViewModel request)
+    public async Task<int> Create(int appId, RouteSaveModel route)
     {
-        var existing = await _requestRepository.Find(projectId, request.Method, request.Path);
+        var existing = await _webApplicationRouteRepository.Find(appId, route.Method, route.Path);
         if (existing == null)
         {
-            var mapped = _mapper.Map<Core.Models.Requests.Request>(request);
-            return await _requestRepository.Create(projectId, mapped);
+            var mapped = _mapper.Map<CoreRoute>(route);
+            return await _webApplicationRouteRepository.Create(appId, mapped);
         }
         else
         {
@@ -64,81 +71,84 @@ public class RequestWebService : BaseWebService, IProjectRequestWebService
 
     public async Task Delete(int id)
     {
-        await _requestRepository.Delete(id);
+        await _webApplicationRouteRepository.Delete(id);
     }
 
-    public async Task<RequestConfiguration> GetFixedRequestConfigViewModel(int id)
+    public async Task<RouteSaveModel> GetEditRouteModel(int requestId)
     {
-        var request = await _requestRepository.GetById(id);
-        return _mapper.Map<RequestConfiguration>(request);
-    }
-
-    public async Task<SaveRequestViewModel> GetEditRequestViewModel(int requestId)
-    {
-        var request = await _requestRepository.GetById(requestId);
-        var vm = _mapper.Map<SaveRequestViewModel>(request);
-        vm.Project = await _projectRepository.Get(request.ProjectId);
-        vm.HttpMethods = HttpProtocolExtensions.CommonHttpMethods
-                            .Select(m => new SelectListItem(m, m));
+        var route = await _webApplicationRouteRepository.GetById(requestId);
+        var vm = _mapper.Map<RouteSaveModel>(route);
+        vm.WebApplication = await _webApplicationWebService.Get(route.ApplicationId);
+        vm.HttpMethodSelectListItems = HttpProtocolExtensions.CommonHttpMethods
+                                        .Select(m => new SelectListItem(m, m));
         return vm;
     }
 
-    public async Task<bool> ValidateEdit(int id, SaveRequestViewModel request, ModelStateDictionary modelState)
+    public async Task<bool> ValidateEdit(int id, RouteSaveModel request, ModelStateDictionary modelState)
     {
         return modelState.IsValid;
     }
 
-    public async Task Edit(int id, SaveRequestViewModel request)
+    public async Task Edit(int id, RouteSaveModel route)
     {
-        var existing = await _requestRepository.GetById(id);
+        var existing = await _webApplicationRouteRepository.GetById(id);
         if (existing != null)
         {
-            var mapped = _mapper.Map<Core.Models.Requests.Request>(request);
-            await _requestRepository.Update(id, mapped);
+            var mapped = _mapper.Map<CoreRoute>(route);
+            await _webApplicationRouteRepository.Update(id, mapped);
         }
     }
 
-    public async Task<AuthorizationConfiguration> GetAuthorization(int projectId, int requestId)
+    public async Task<AuthorizationViewModel> GetAuthorizationViewModel(int projectId, int routeId)
     {
-        var authorization = await _authRepository.GetRequestAuthorization(requestId);
-        var vm = authorization != null ? _mapper.Map<AuthorizationConfiguration>(authorization)
-                                        : new AuthorizationConfiguration();
-        vm.AuthenticationSchemeSelectList = await _authRepository.GetProjectAuthenticationSchemes(projectId);
+        var authorization = await _webApplicationRouteRepository.GetAuthorization(routeId);
+        var vm = authorization != null ? _mapper.Map<AuthorizationViewModel>(authorization)
+                                        : new AuthorizationViewModel();
+        //var AuthenticationSchemes = await _webApplicationWebService.Get()
+        //vm.AuthenticationSchemeSelectListItems = await _webApplicationWebService.(projectId);
         return vm;
     }
 
-    public async Task AttachAuthorization(int requestId, AuthorizationConfiguration auth)
+    public async Task AttachAuthorization(int routeId, AuthorizationSaveModel auth)
     {
-        var authorization = _mapper.Map<Core.Models.Auth.Authorization>(auth);
-        await _authRepository.UpdateRequestAuthorization(requestId, authorization);
+        var authorization = _mapper.Map<CoreAuthorization>(auth);
+        await _webApplicationRouteRepository.AttachAuthorization(routeId, authorization);
     }
 
-    public async Task<IndexViewModel> GetIndexViewModel(int projectId)
+    public async Task<RouteIndexModel> GetIndexModel(int appId)
     {
-        return new IndexViewModel
+        var vm = new RouteIndexModel
         {
-            Project = _mapper.Map<Project>(await _projectRepository.Get(projectId)),
-            Requests = _mapper.Map<IEnumerable<RequestIndexItem>>(await _requestRepository.GetByProjectId(projectId))
+            WebApplication = await _webApplicationWebService.Get(appId),
+            Routes = _mapper.Map<IEnumerable<RouteIndexItem>>(await _webApplicationRouteRepository.GetByApplicationId(appId))
         };
+        return vm;
     }
 
-    public Task<bool> ValidateCreate(int projectId, SaveRequestViewModel request, ModelStateDictionary modelState)
+    public Task<bool> ValidateCreate(int appId, RouteSaveModel request, ModelStateDictionary modelState)
     {
         return Task.FromResult(modelState.IsValid);
     }
 
-    public Task SaveRequestConfiguration(int requestId, RequestConfiguration config)
+    public async Task<RouteSaveModel> GetCreateRouteModel(int appId)
     {
-        throw new NotImplementedException();
+        var vm = new RouteSaveModel();
+        vm.WebApplication = await _webApplicationWebService.Get(appId);
+        vm.WebApplication.User = AuthUser;
+        vm.HttpMethodSelectListItems = HttpProtocolExtensions.CommonHttpMethods
+                                        .Select(m => new SelectListItem(m, m));
+        return vm;
     }
 
-    public async Task<SaveRequestViewModel> GetCreateRequestViewModel(int projectId)
+    public async Task<MockIntegrationViewModel> GetMockIntegration(int routeId)
     {
-        var vm = new SaveRequestViewModel();
-        vm.Project = await _projectRepository.Get(projectId);
-        vm.Project.User = AuthUser;
-        vm.HttpMethods = HttpProtocolExtensions.CommonHttpMethods
-                            .Select(m => new SelectListItem(m, m));
-        return vm;
+        var integration = await _webApplicationRouteRepository.GetMockIntegration(routeId);
+        return _mapper.Map<MockIntegrationViewModel>(integration);
+    }
+
+    public async Task SaveMockIntegration(int requestId, MockIntegrationSaveModel integration)
+    {
+        var mapped = _mapper.Map<CoreMockIntegration>(integration);
+        await _webApplicationRouteRepository.UpdateMockIntegration(requestId, mapped);
     }
 }

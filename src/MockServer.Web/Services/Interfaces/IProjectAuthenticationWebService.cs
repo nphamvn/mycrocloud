@@ -1,13 +1,13 @@
-using MockServer.Web.Models.ProjectAuthentication;
-using MockServer.Web.Models.ProjectAuthentication.JwtBearer;
+using MockServer.Web.Models.WebApplications.Authentications;
+using MockServer.Web.Models.WebApplications.Authentications.JwtBearer;
 
-namespace MockServer.Web.Services.Interfaces;
+namespace MockServer.Web.Services;
 
-public interface IProjectAuthenticationWebService
+public interface IWebApplicationAuthenticationWebService
 {
-    Task<IndexViewModel> GetIndexViewModel(int projectId);
-    Task SaveConfigurations(int projectId, IndexViewModel model);
-    Task AddJwtBearerScheme(int projectId, JwtBearerSchemeViewModel model);
-    Task EditJwtBearerScheme(int schemeId, JwtBearerSchemeViewModel model);
-    Task<JwtBearerSchemeViewModel> GetJwtBearerScheme(int projectId, int schemeId);
+    Task<AuthenticationIndexModel> GetIndexViewModel(int appId);
+    Task SaveConfigurations(int appId, AuthenticationIndexModel model);
+    Task AddJwtBearerScheme(int appId, JwtBearerSchemeSaveModel scheme);
+    Task EditJwtBearerScheme(int schemeId, JwtBearerSchemeSaveModel scheme);
+    Task<JwtBearerSchemeSaveModel> GetJwtBearerScheme(int schemeId);
 }

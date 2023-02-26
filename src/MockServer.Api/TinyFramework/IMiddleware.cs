@@ -2,5 +2,5 @@ namespace MockServer.Api.TinyFramework;
 
 public interface IMiddleware
 {
-    Task<MiddlewareInvokeResult> InvokeAsync(Request request);
+    Task<MiddlewareInvokeResult> InvokeAsync(HttpContext context);
 }

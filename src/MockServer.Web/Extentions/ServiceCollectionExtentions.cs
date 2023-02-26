@@ -20,12 +20,12 @@ namespace MockServer.Web.Extentions
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddHttpContextAccessor();
-            services.AddScoped<IProjectRepository, ProjectRepository>();
-            services.AddScoped<IRequestRepository, RequestRepository>();
-            services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IWebApplicationRepository, WebApplicationRepository>();
+            services.AddScoped<IWebApplicationRouteRepository, WebApplicationRouteRepository>();
+            services.AddScoped<IWebApplicationAuthenticationSchemeRepository, WebApplicationAuthenticationSchemeRepository>();
             services.AddScoped<IDatabaseRepository, DatabaseRespository>();
-            services.AddScoped<IProjectWebService, ProjectWebService>();
-            services.AddScoped<IProjectRequestWebService, RequestWebService>();
+            services.AddScoped<IWebApplicationWebService, WebApplicationWebService>();
+            services.AddScoped<IWebApplicationRouteWebService, WebApplicationRouteWebService>();
             services.AddScoped<IServiceRepository, ServiceRepository>();
             services.AddScoped<IDatabaseWebService, DatabaseWebService>();
         }

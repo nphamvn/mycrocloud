@@ -12,7 +12,7 @@ public static class ApplicationBuilderExtentions
             {
                 context.Items["Username"] = "nampham";
                 var handlerContext = new HandlerContext(context);
-                handlerContext.WebApp = new()
+                handlerContext.WebApplication = new()
                 {
                     UserId = 1,
                     Id = 8

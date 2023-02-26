@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using MockServer.Core.Models.Services;
+using MockServer.Core.Services;
 
 namespace MockServer.Web.Models.Database;
 

@@ -1,6 +1,6 @@
 @using Microsoft.AspNetCore.Components
-@using MockServer.Web.Models.ProjectRequests
-@using Services.Interfaces
+@using Models.WebApplications.Routes
+@using Services
 
 <partial name="/Views/ProjectShared/_Breadcrumb.cshtml" model="Model.Project" />
 <div style="height: calc(100vh - 180px);">
@@ -14,7 +14,7 @@
                     </div>
                     <div class="request-container">
                         <ul id="requests" class="list-group list-group-flush mt-2">
-                            @foreach (var req in Model.Requests)
+                            @foreach (var req in Model.Routes)
                             {
                                 <li class="request-list-item list-group-item px-2 py-1">
                                     <div class="row">
@@ -73,21 +73,19 @@
                     <button class="btn btn-light btn-sm py-1 ms-auto my-0 js-config-auth">Configure</button>
                 </div>
                 <div class="card-body">
-                    @if (DisplayingRequest.AuthorizationConfiguration != null)
+                    @if (DisplayingRequest.Authorization != null)
                     {
                         <table class="table table-borderless">
                             <thead>
                                 <tr>
                                     <th scope="col">Authorization Type</th>
-                                    <th scope="col">Authentication Schemes</th>
                                     <th scope="col">Policies</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td scope="row">@DisplayingRequest.AuthorizationConfiguration.Type</td>
-                                            <td>@DisplayingRequest.AuthorizationConfiguration.AuthenticationSchemes.Count</td>
-                                            <td>@DisplayingRequest.AuthorizationConfiguration.Policies.Count</td>
+                                    <td scope="row">@DisplayingRequest.Authorization.Type</td>
+                                    <td>@DisplayingRequest.Authorization.Policies.Count</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -647,7 +645,7 @@
 @code {
     public bool Loading { get; set; }
     [Inject]
-    protected IProjectRequestWebService RequestWebService { get; set; }
+    protected IWebApplicationRouteWebService RequestWebService { get; set; }
     protected override void OnInitialized()
     {
         base.OnInitialized();
@@ -658,16 +656,16 @@
         return base.OnParametersSetAsync();
     }
     
-    public RequestViewModel DisplayingRequest { get; set; }
+    public RouteViewModel DisplayingRequest { get; set; }
     public bool ShowSaveRequestModal { get; set; } = false;
-    public SaveRequestViewModel SaveRequestModel { get; set; }
+    public RouteSaveModel SaveRequestModel { get; set; }
 
     [Parameter]
-    public IndexViewModel Model { get; set; }
+    public RouteIndexModel Model { get; set; }
 
     private async Task Display(int id)
     {
-        DisplayingRequest = await RequestWebService.GetRequestOpenViewModel(id);
+        DisplayingRequest = await RequestWebService.GetViewModel(id);
     }
 
     private async Task ShowCreateModal() {
@@ -675,7 +673,7 @@
     }
 
     private async Task ShowEditModal(int id) {
-        SaveRequestModel = await RequestWebService.GetEditRequestViewModel(id);
+        SaveRequestModel = await RequestWebService.GetEditRouteModel(id);
     }
 }
 

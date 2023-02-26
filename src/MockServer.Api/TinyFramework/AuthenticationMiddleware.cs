@@ -1,40 +1,29 @@
-using MockServer.Api.TinyFramework.DataBinding;
-using MockServer.Core.Models.Auth;
-using MockServer.Core.Repositories;
-
 namespace MockServer.Api.TinyFramework;
 
+using MockServer.Core.WebApplications.Security;
+using CoreWebApplication = MockServer.Core.WebApplications.WebApplication;
 public class AuthenticationMiddleware : IMiddleware
 {
-    private readonly IAuthRepository _authRepository;
-    private readonly DataBinderProvider _modelBinderProvider;
+    private readonly Dictionary<AuthenticationScheme, IAuthenticationHandler> _schemeHandlerMap;
 
-    public AuthenticationMiddleware(
-            IAuthRepository authRepository,
-            DataBinderProvider modelBinderProvider)
+    public AuthenticationMiddleware(Dictionary<AuthenticationScheme, IAuthenticationHandler> schemeHandlerMap)
     {
-        _authRepository = authRepository;
-        _modelBinderProvider = modelBinderProvider;
+        _schemeHandlerMap = schemeHandlerMap;
     }
-
-    public async Task<MiddlewareInvokeResult> InvokeAsync(Request request)
+    public async Task<MiddlewareInvokeResult> InvokeAsync(HttpContext context)
     {
-        var app = request.WebApplication;
-        var context = request.HttpContext;
-        var schemes = await _authRepository.GetProjectAuthenticationSchemes(app.Id);
-        var defaultScheme = schemes.FirstOrDefault(a => a.Order == 1);
-        IAuthenticationHandlerProvider handlerProvider = new AuthenticationHandlerProvider();
+        var app = context.Items[typeof(CoreWebApplication).Name] as CoreWebApplication;
+        var schemes = new List<AuthenticationScheme>(this._schemeHandlerMap.Keys);
         IAuthenticationHandler handler;
-        AuthenticationScheme auth;
         AuthenticateResult result;
-        if (defaultScheme != null)
+        if (schemes.Any(s => s.Order == 1))
         {
-            auth = await _authRepository.GetAuthenticationScheme(defaultScheme.Id, defaultScheme.Type);
-            handler = handlerProvider.GetHandler(auth);
+            var defaultScheme = schemes.First(s => s.Order == 1);
+            handler = _schemeHandlerMap[defaultScheme];
             result = await handler.AuthenticateAsync(context);
             if (result.Succeeded)
             {
-                context.Items["AuthSchemeId"] = auth.Id;
+                context.Items["AuthSchemeId"] = defaultScheme.Id;
                 context.User = result.Ticket.Principal;
             }
             else
@@ -43,7 +32,7 @@ public class AuthenticationMiddleware : IMiddleware
                 var otherSchemes = schemes.Where(s => s.Id != defaultScheme.Id);
                 foreach (var scheme in otherSchemes)
                 {
-                    handler = handlerProvider.GetHandler(scheme);
+                    handler = _schemeHandlerMap[defaultScheme];
                     result = await handler.AuthenticateAsync(context);
                     if (result.Succeeded)
                     {
@@ -58,12 +47,11 @@ public class AuthenticationMiddleware : IMiddleware
         {
             foreach (var scheme in schemes)
             {
-                auth = await _authRepository.GetAuthenticationScheme(scheme.Id, scheme.Type);
-                handler = handlerProvider.GetHandler(auth);
+                handler = _schemeHandlerMap[scheme];
                 result = await handler.AuthenticateAsync(context);
                 if (result.Succeeded)
                 {
-                    context.Items["AuthSchemeId"] = auth.Id;
+                    context.Items["AuthSchemeId"] = scheme.Id;
                     context.User = result.Principal;
                     break;
                 }

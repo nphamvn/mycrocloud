@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
-using MockServer.Core.Models.Auth;
+using MockServer.Core.WebApplications.Security.ApiKey;
 
 namespace MockServer.Api.TinyFramework;
 
@@ -20,9 +20,9 @@ public class ApiKeyAuthHandler : AuthenticationHandler<ApiKeyAuthenticationOptio
         if (found is ApiKey apiKey)
         {
             var claims = new List<Claim>();
-            foreach (var claim in apiKey.Claims)
+            foreach (var claim in apiKey.Payload)
             {
-                claims.Add(new Claim(claim.Type, claim.Value));
+                claims.Add(new Claim(claim.Key, claim.Value));
             }
             var claimsIdentity = new ClaimsIdentity(claims);
             var principal = new ClaimsPrincipal(claimsIdentity);

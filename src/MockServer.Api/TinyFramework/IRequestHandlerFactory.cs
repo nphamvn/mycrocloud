@@ -1,8 +1,8 @@
-using MockServer.Core.Enums;
+using MockServer.Core.WebApplications;
 
 namespace MockServer.Api.TinyFramework;
 
 public interface IRequestHandlerFactory
 {
-    IRequestHandler GetInstance(RequestType type);
+    IRequestHandler GetInstance(RouteIntegrationType type);
 }
