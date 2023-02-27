@@ -1,7 +1,5 @@
 using System.Text.Json;
-using Dapper;
-
-namespace MockServer.Infrastructure.Repositories;
+namespace Dapper;
 
 public class JsonTypeHandler<T> : SqlMapper.TypeHandler<T>
 {
