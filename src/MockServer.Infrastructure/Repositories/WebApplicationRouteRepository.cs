@@ -124,7 +124,7 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
         using var connection = new SqliteConnection(_connectionString);
         SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RouteRequestQuery>>());
         SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RouteRequestHeader>>());
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RouteRequestBody>>());
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteRequestBody>());
         return await connection.QuerySingleOrDefaultAsync<Route>(query, new
         {
             Id = id
@@ -323,9 +323,30 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
         throw new NotImplementedException();
     }
 
-    public Task<MockIntegration> GetMockIntegration(int id)
+    public Task<MockIntegration> GetMockIntegration(int routeId)
     {
-        throw new NotImplementedException();
+        var query =
+                """
+                SELECT
+                    mi.Code,
+                    mi.ResponseHeaders,
+                    mi.ResponseBodyText,
+                    mi.ResponseBodyTextFormat,
+                    mi.ResponseBodyTextRenderEngine,
+                    mi.ResponseStatusCode,
+                    mi.ResponseDelay,
+                    mi.ResponseDelayTime
+                FROM
+                    WebApplicationRouteMockIntegration mi
+                WHERE
+                    RouteId = @RouteId
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<MockIntegrationResponseHeader>>());
+        return connection.QuerySingleOrDefaultAsync<MockIntegration>(query, new
+        {
+            RouteId = routeId
+        });
     }
 
     public Task UpdateMockIntegration(int id, MockIntegration integration)

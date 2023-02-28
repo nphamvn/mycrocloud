@@ -2,6 +2,8 @@ using System.Net;
 using MockServer.Api.Interfaces;
 using MockServer.Core.Repositories;
 using CoreWebApplication = MockServer.Core.WebApplications.WebApplication;
+using CoreRoute = MockServer.Core.WebApplications.Route;
+
 namespace MockServer.Api.TinyFramework;
 
 public class RoutingMiddleware : IMiddleware
@@ -46,7 +48,7 @@ public class RoutingMiddleware : IMiddleware
             await context.Response.WriteAsync($"No matching route found for {context.Request.Method} {context.Request.Path}");
             return MiddlewareInvokeResult.End;
         }
-        var route = await _requestRepository.GetById(result.Route.Id);
+        context.Items[typeof(CoreRoute).Name] = await _requestRepository.GetById(result.Route.Id);
         context.Request.RouteValues = result.RouteValues;
         return MiddlewareInvokeResult.Next;
     }

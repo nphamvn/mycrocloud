@@ -76,7 +76,7 @@ public class WebApplication : IWebApplication
             }
         }
 
-        var route = context.Items[nameof(CoreRoute)] as CoreRoute;
+        var route = context.Items[typeof(CoreRoute).Name] as CoreRoute;
         var factoryService = ServiceProvider.GetRequiredService<IFactoryService>();
         RequestHandler handler = default;
         if (route.IntegrationType == RouteIntegrationType.MockIntegration)

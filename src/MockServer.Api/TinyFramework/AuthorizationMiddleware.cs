@@ -14,7 +14,7 @@ public class AuthorizationMiddleware : IMiddleware
     }
     public async Task<MiddlewareInvokeResult> InvokeAsync(HttpContext context)
     {
-        var route = context.Items[nameof(CoreRoute)] as CoreRoute;
+        var route = context.Items[typeof(CoreRoute).Name] as CoreRoute;
         var app = context.Items[nameof(CoreWebApplication)] as CoreWebApplication;
         var authorization = route.Authorization;
         //No authorization is set

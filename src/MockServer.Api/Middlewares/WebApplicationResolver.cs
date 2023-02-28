@@ -2,7 +2,7 @@ using System.Net;
 using Microsoft.Extensions.Options;
 using MockServer.Api.Options;
 using MockServer.Core.Repositories;
-
+using CoreWebApplication = MockServer.Core.WebApplications.WebApplication;
 namespace MockServer.Api.Middlewares;
 
 public class WebApplicationResolver : IMiddleware
@@ -30,7 +30,7 @@ public class WebApplicationResolver : IMiddleware
             await context.Response.WriteAsync($"'{appName}' project is not found");
             return;
         }
-        context.Items[nameof(WebApplication)] = app;
+        context.Items[typeof(CoreWebApplication).Name] = app;
         await next.Invoke(context);
     }
 }

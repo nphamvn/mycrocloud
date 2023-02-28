@@ -25,10 +25,10 @@ public class MockIntegrationHandler : RequestHandler
     
     public override async Task Handle(HttpContext context)
     {
-        var route = context.Items[nameof(CoreRoute)] as CoreRoute;
-        var app = context.Items[nameof(CoreWebApplication)] as CoreWebApplication;
+        var route = context.Items[typeof(CoreRoute).Name] as CoreRoute;
+        var app = context.Items[typeof(CoreWebApplication).Name] as CoreWebApplication;
         var integration = await _requestRepository.GetMockIntegration(route.Id);
-        var handlerContext = _factoryService.Create<HandlerContext>(context) ;
+        var handlerContext = _factoryService.Create<JintHandlerContext>(context) ;
         handlerContext.WebApplication = app;
         handlerContext.Setup();
 

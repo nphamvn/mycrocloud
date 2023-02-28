@@ -10,7 +10,7 @@ using MockServer.Core.WebApplications;
 
 namespace MockServer.Core.Services;
 
-public class HandlerContext
+public class JintHandlerContext
 {
     private Engine _engine;
     public Engine JintEngine => _engine;
@@ -19,11 +19,14 @@ public class HandlerContext
     private readonly IDatabaseRepository _databaseRespository;
     private readonly GlobalSettings _settings;
     private readonly IFactoryService _factoryService;
-    public HandlerContext(HttpContext context)
+    public JintHandlerContext(HttpContext context, 
+            IDatabaseRepository databaseRespository,
+            GlobalSettings settings
+        )
     {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-        _databaseRespository = _context.RequestServices.GetService<IDatabaseRepository>();
-        _settings = _context.RequestServices.GetService<GlobalSettings>();
+        _context = context;
+        _databaseRespository = databaseRespository;
+        _settings = settings;
         _factoryService = _context.RequestServices.GetService<IFactoryService>();
     }
     public void Setup()

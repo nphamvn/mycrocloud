@@ -35,7 +35,7 @@ public class ConstraintBuilder
     /// <param name="constraint">A typical constraint looks like the following
     /// "exampleConstraint(arg1, arg2, 12)".</param>
     /// <returns></returns>
-    private IConstraint ResolveConstraint(string constraint)
+    public IConstraint ResolveConstraint(string constraint)
     {
         string argumentString;
         string key;

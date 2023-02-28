@@ -11,7 +11,7 @@ public static class ApplicationBuilderExtentions
             app.Run(async context =>
             {
                 context.Items["Username"] = "nampham";
-                var handlerContext = new HandlerContext(context);
+                JintHandlerContext handlerContext = null;//new HandlerContext(context);
                 handlerContext.WebApplication = new()
                 {
                     UserId = 1,

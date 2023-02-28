@@ -9,6 +9,7 @@ using MockServer.Api.TinyFramework;
 using MockServer.Api.TinyFramework.DataBinding;
 using MockServer.Api.Options;
 using Host = MockServer.Api.TinyFramework.Host;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -51,6 +52,11 @@ builder.Services.AddSingleton<DataBinderProvider>(x =>
 
 builder.Services.AddScoped<Host>();
 builder.Services.AddControllers();
+// If using Kestrel:
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.AllowSynchronousIO = true;
+});
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>

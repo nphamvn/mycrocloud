@@ -31,9 +31,9 @@ public class ConstraintValidationMiddleware : IMiddleware
     
     public async Task<MiddlewareInvokeResult> InvokeAsync(HttpContext context)
     {
-        var route = context.Items[nameof(CoreRoute)] as CoreRoute;
+        var route = context.Items[typeof(CoreRoute).Name] as CoreRoute;
         var queries = route.RequestQueries;
-        foreach (var query in queries)
+        foreach (var query in queries.OrEmptyIfNull())
         {
             _fromQueryDataBinder.Query = query.Key;
             var value = _fromQueryDataBinder.Get(context);
@@ -74,9 +74,9 @@ public class ConstraintValidationMiddleware : IMiddleware
         }
         var body = route.RequestBody;
         var text = _fromBodyDataBinder.Get(context) as string;
-        if (body.Constraints?.Count > 0)
+        if (body?.Constraints?.Count > 0)
         {
-            var constraints = BuildConstraints(body.Constraints);
+            var constraints = BuildConstraints(route.RequestBody.Constraints);
             foreach (var constraint in constraints)
             {
                 if (!constraint.Match(text, out string message))
@@ -88,7 +88,7 @@ public class ConstraintValidationMiddleware : IMiddleware
                 }
             }
         }
-        if (body.FieldConstraints?.Count > 0)
+        if (body?.FieldConstraints?.Count > 0)
         {
             dynamic data = JsonSerializer.Deserialize<ExpandoObject>(text);
             foreach (var field in body.FieldConstraints)
@@ -105,7 +105,11 @@ public class ConstraintValidationMiddleware : IMiddleware
                         await context.Response.WriteAsync($"The body is not valid.");
                         return MiddlewareInvokeResult.End;
                     }
-                    fieldData = fieldData[fieldName];
+                    if (fieldData is ExpandoObject obj)
+                    {
+                        ((IDictionary<string, object>)obj).TryGetValue(fieldName, out fieldData);
+                    }
+                    //fieldData = fieldData[fieldName];
                 }
 
                 List<IConstraint> constraints = BuildConstraints(field.Constraints);
@@ -126,10 +130,11 @@ public class ConstraintValidationMiddleware : IMiddleware
 
     private List<IConstraint> BuildConstraints(List<string> constraints)
     {
+        var _constraints = new List<IConstraint>();
         foreach (var constraintText in constraints)
         {
-            _constraintBuilder.AddResolvedConstraint(constraintText);
+            _constraints.Add(_constraintBuilder.ResolveConstraint(constraintText));
         }
-        return _constraintBuilder.Build();
+        return _constraints;
     }
 }
