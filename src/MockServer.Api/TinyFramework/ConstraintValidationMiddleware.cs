@@ -52,7 +52,7 @@ public class ConstraintValidationMiddleware : IMiddleware
             }
         }
         var headers = route.RequestHeaders;
-        foreach (var header in headers)
+        foreach (var header in headers.OrEmptyIfNull())
         {
             _fromHeaderDataBinder.Name = header.Name;
             var value = _fromHeaderDataBinder.Get(context);

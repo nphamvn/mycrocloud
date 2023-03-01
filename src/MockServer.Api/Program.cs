@@ -14,12 +14,15 @@ using System.Text.Json;
 using MockServer.Core.Databases;
 
 var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
+
 // Add services to the container.
+builder.Services.AddScoped<IFactoryService, FactoryService>();
 builder.Services.AddOptions();
 builder.Services.AddGlobalSettings(builder.Configuration);
 builder.Services.AddOptions<VirtualHostOptions>()
                 .BindConfiguration(VirtualHostOptions.Section);
-builder.Services.Configure<DatabaseAdapterOptions>(options => {
+builder.Services.Configure<DatabaseAdapterOptions>(options =>
+{
     options.JsonSerializerOptions = new JsonSerializerOptions
     {
         WriteIndented = true
@@ -29,11 +32,6 @@ builder.Services.Configure<DatabaseAdapterOptions>(options => {
 builder.Services.AddMemoryCache();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IFactoryService, FactoryService>();
-var provider = builder.Services.BuildServiceProvider();
-var factoryService = provider.GetService<IFactoryService>();
-
-builder.Services.AddScoped<TemplateParserMatcherRouteService>();
 builder.Services.AddHttpForwarder();
 builder.Services.AddScoped<RoutingMiddleware>();
 builder.Services.AddScoped<AuthorizationMiddleware>();
@@ -42,22 +40,23 @@ builder.Services.AddSingleton<FromHeaderDataBinder>();
 builder.Services.AddSingleton<FromBodyDataBinder>();
 builder.Services.AddScoped<ConstraintValidationMiddleware>();
 builder.Services.AddSingleton<ConstraintBuilder>(x =>
-    factoryService.Create<ConstraintBuilder>(ConstraintBuilder.GetDefaultConstraintMap())
-    );
+{
+    return ActivatorUtilities.CreateInstance<ConstraintBuilder>(x, ConstraintBuilder.GetDefaultConstraintMap());
+});
 builder.Services.AddScoped<IWebApplicationAuthenticationSchemeRepository, WebApplicationAuthenticationSchemeRepository>();
 builder.Services.AddScoped<IWebApplicationRouteRepository, WebApplicationRouteRepository>();
 builder.Services.AddScoped<IWebApplicationRepository, WebApplicationRepository>();
 builder.Services.AddScoped<IDatabaseRepository, DatabaseRespository>();
-builder.Services.AddScoped<MockIntegrationJintHandler>();
-builder.Services.AddScoped<DirectForwardingIntegrationHandler>();
 builder.Services.AddScoped<ICacheService, MemoryCacheService>();
 builder.Services.AddScoped<IRouteResolver, TemplateParserMatcherRouteService>();
 builder.Services.AddScoped<WebApplicationResolver>();
 builder.Services.AddSingleton<DataBinderProvider>(x =>
-    factoryService.Create<DataBinderProvider>(new DataBinderProviderOptions
+{
+    return ActivatorUtilities.CreateInstance<DataBinderProvider>(x, new DataBinderProviderOptions
     {
         Map = DataBinderProviderOptions.Default.Map
-    }));
+    });
+});
 
 builder.Services.AddScoped<Host>();
 builder.Services.AddControllers();

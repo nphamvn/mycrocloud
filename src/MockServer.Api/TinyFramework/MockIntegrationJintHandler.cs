@@ -1,9 +1,7 @@
 using System.Net;
 using System.Text;
-using System.Text.Json;
 using Jint;
 using Microsoft.Extensions.Options;
-using MockServer.Api.Options;
 using MockServer.Core.Databases;
 using MockServer.Core.Repositories;
 using MockServer.Core.Services;

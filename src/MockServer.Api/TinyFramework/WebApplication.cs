@@ -86,6 +86,10 @@ public class WebApplication : IWebApplication
             var engine = new Engine();
             handler = factoryService.Create<MockIntegrationJintHandler>(engine, app, route);
         }
+        else if (route.IntegrationType == RouteIntegrationType.DirectForwarding)
+        {
+            handler = factoryService.Create<DirectForwardingIntegrationHandler>(route);
+        }
 
         await handler.Handle(context);
 

@@ -354,9 +354,22 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
         throw new NotImplementedException();
     }
 
-    public Task<DirectForwardingIntegration> GetDirectForwardingIntegration(int id)
+    public Task<DirectForwardingIntegration> GetDirectForwardingIntegration(int routeId)
     {
-        throw new NotImplementedException();
+        var query =
+                """
+                SELECT
+                    mi.ExternalServerHost
+                FROM
+                    WebApplicationRouteDirectForwardingIntegration mi
+                WHERE
+                    RouteId = @RouteId
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        return connection.QuerySingleOrDefaultAsync<DirectForwardingIntegration>(query, new
+        {
+            RouteId = routeId
+        });
     }
 
     public Task UpdateDirectForwardingIntegration(int id, DirectForwardingIntegration integration)

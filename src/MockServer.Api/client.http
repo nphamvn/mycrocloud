@@ -1,6 +1,11 @@
 GET  https://localhost:5000/todos?Page=2
 Authorization: "Bearer token"
-
 {
     "name": "nam"
 }
+###
+GET  https://localhost:5000/todos/1
+
+###
+
+GET https://jsonplaceholder.typicode.com/todos/1
