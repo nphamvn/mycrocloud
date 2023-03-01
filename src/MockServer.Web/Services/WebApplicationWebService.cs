@@ -50,8 +50,7 @@ public class WebApplicationWebService : BaseWebService, IWebApplicationWebServic
 
     public async Task<WebApplicationIndexViewModel> GetIndexViewModel(WebApplicationSearchModel searchModel)
     {
-        Enum.TryParse<WebApplicationAccessibility>(searchModel.Accessibility, out WebApplicationAccessibility accessibility);
-        var apps = await _webApplicationRepository.Search(AuthUser.Id, searchModel.Query, (int)accessibility, searchModel.Sort);
+        var apps = await _webApplicationRepository.Search(AuthUser.Id, searchModel.Query, searchModel.Sort);
         var vm = new WebApplicationIndexViewModel
         {
             Applications = _mapper.Map<IEnumerable<WebApplicationIndexItem>>(apps)

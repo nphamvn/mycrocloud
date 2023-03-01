@@ -27,7 +27,7 @@ public class WebApplicationRoutesController : Controller
     public async Task<IActionResult> Index(int ProjectId)
     {
         var vm = await _webApplicationRouteWebService.GetIndexModel(ProjectId);
-        return View("Views/ProjectRequests/Index.cshtml", vm);
+        return View("Views/WebApplications/Routes/Index.cshtml", vm);
     }
 
     [AjaxOnly]

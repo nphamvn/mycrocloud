@@ -19,7 +19,7 @@ public class WebApplicationsController : BaseController
     public async Task<IActionResult> Index(WebApplicationIndexViewModel fm)
     {
         var vm = await _webApplicationWebService.GetIndexViewModel(fm.Search);
-        return View("Views/Projects/Index.cshtml", vm);
+        return View("Views/WebApplications/WebApplications.Index.cshtml", vm);
     }
 
     [HttpGet("create")]

@@ -13,19 +13,7 @@
                     <div class="d-flex">
                         <div class="me-auto w-100">
                             <input id="query" asp-for="Search.Query" class="form-control" type="text" autocomplete="off"
-                                placeholder="Find a project...">
-                        </div>
-                        <div class="dropdown mx-2">
-                            <input id="accessibility" type="hidden" name="Search.Accessibility" value="">
-                            <button class="btn border dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                Accessibility
-                            </button>
-                            <ul id="accessibility_dropdown" class="dropdown-menu">
-                                <li data-accessibility=""><a class="dropdown-item" href="#">All</a></li>
-                                <li data-accessibility="Public"><a class="dropdown-item" href="#">Public</a></li>
-                                <li data-accessibility="Private"><a class="dropdown-item" href="#">Private</a></li>
-                            </ul>
+                                placeholder="Find an application...">
                         </div>
                         <div class="dropdown me-2">
                             <input id="sort" type="hidden" name="Search.Sort" value="">
@@ -53,9 +41,7 @@
                             <div>
                                 <h3 class="text-xl">
                                     <a class="text-decoration-none me-2"
-                                    href="@Url.Action(nameof(WebApplicationRoutesController.Index), "ProjectRequests" ,new {ProjectName=project.Name})">@project.Name</a>
-                                    <span style="padding-top: 2px; padding-bottom: 2px;"
-                                    class="badge rounded-pill bg-light text-sm fw-bolder text-gray border border-secondary">@project.Accessibility</span>
+                                    href="@Url.Action(nameof(WebApplicationRoutesController.Index), "WebApplicationRoutes" ,new {ProjectName=project.Name})">@project.Name</a>
                                 </h3>
                                 <p>@project.Description</p>
                                 <div class="d-flex">

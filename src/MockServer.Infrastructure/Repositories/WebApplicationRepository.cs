@@ -133,7 +133,7 @@ public class WebApplicationRepository : IWebApplicationRepository
         });
     }
 
-    public async Task<IEnumerable<WebApplication>> Search(int userId, string query, int accessibility, string sort)
+    public async Task<IEnumerable<WebApplication>> Search(int userId, string query, string sort)
     {
         var sql =
                 """
@@ -154,10 +154,6 @@ public class WebApplicationRepository : IWebApplicationRepository
         {
             conditions.Add("Name LIKE @Query OR Description LIKE @Query");
         }
-        if (accessibility != 0)
-        {
-            conditions.Add("Accessibility = @Accessibility");
-        }
         if (conditions.Count > 0)
         {
             sql += " AND " + string.Join(" AND ", conditions);
@@ -175,8 +171,7 @@ public class WebApplicationRepository : IWebApplicationRepository
         return await connection.QueryAsync<WebApplication>(sql, new
         {
             UserId = userId,
-            Query = "%" + query + "%",
-            Accessibility = accessibility
+            Query = "%" + query + "%"
         });
     }
     public async Task Update(WebApplication app)
