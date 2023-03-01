@@ -1,11 +1,11 @@
-using System.Text.Json;
 using MockServer.Core.Databases;
 
 public class JsonFileAdapter : DatabaseAdapter
 {
     private readonly string _filePath;
 
-    public JsonFileAdapter(string filePath, JsonSerializerOptions options) : base(options)
+    public JsonFileAdapter(string filePath, DatabaseAdapterOptions options) 
+                : base(options)
     {
         _filePath = filePath;
     }

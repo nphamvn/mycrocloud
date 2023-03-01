@@ -1,5 +1,3 @@
-using System.Data;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using Jint;
 using MockServer.Core.Interfaces;
@@ -9,10 +7,6 @@ namespace MockServer.Core.Services;
 public class ExpressionTemplateWithScriptRenderer : IExpressionTemplateWithScriptRenderer
 {
     private readonly Engine _engine;
-    public ExpressionTemplateWithScriptRenderer()
-    {
-        
-    }
     public ExpressionTemplateWithScriptRenderer(Engine engine)
     {
         _engine = engine;

@@ -1,5 +1,3 @@
-using System.Dynamic;
-using System.Text.Json;
 using MockServer.Core.Databases;
 using MockServer.Core.Repositories;
 
@@ -8,7 +6,7 @@ public class NoSqlAdapter : DatabaseAdapter
     private readonly int _dbId;
     private readonly IDatabaseRepository _databaseRespository;
     public NoSqlAdapter(int dbId, IDatabaseRepository databaseRespository,
-                JsonSerializerOptions options) : base(options)
+                DatabaseAdapterOptions options) : base(options)
     {
         _dbId = dbId;
         _databaseRespository = databaseRespository;

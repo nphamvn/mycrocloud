@@ -61,7 +61,6 @@ public class Host
             app.UseMiddleware<ConstraintValidationMiddleware>();
         }
 
-        //_context.Items[nameof(WebApplication)] = app;
         await app.Handle(_context);
     }
 }

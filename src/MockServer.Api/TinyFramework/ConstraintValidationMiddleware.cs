@@ -42,11 +42,10 @@ public class ConstraintValidationMiddleware : IMiddleware
                 List<IConstraint> constraints = BuildConstraints(query.Constraints);
                 foreach (var constraint in constraints)
                 {
-                    if (!constraint.Match(value, out string message))
+                    if (!constraint.Match(value))
                     {
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         await context.Response.WriteAsync($"The '{query.Key}' parameter is not valid.");
-                        await context.Response.WriteAsync(message);
                         return MiddlewareInvokeResult.End;
                     }
                 }
@@ -62,11 +61,10 @@ public class ConstraintValidationMiddleware : IMiddleware
                 var constraints = BuildConstraints(header.Constraints);
                 foreach (var constraint in constraints)
                 {
-                    if (!constraint.Match(value, out string message))
+                    if (!constraint.Match(value))
                     {
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         await context.Response.WriteAsync($"The '{header.Name}' header is not valid.");
-                        await context.Response.WriteAsync(message);
                         return MiddlewareInvokeResult.End;
                     }
                 }
@@ -79,11 +77,10 @@ public class ConstraintValidationMiddleware : IMiddleware
             var constraints = BuildConstraints(route.RequestBody.Constraints);
             foreach (var constraint in constraints)
             {
-                if (!constraint.Match(text, out string message))
+                if (!constraint.Match(text))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     await context.Response.WriteAsync($"The body is not valid.");
-                    await context.Response.WriteAsync(message);
                     return MiddlewareInvokeResult.End;
                 }
             }
@@ -115,11 +112,10 @@ public class ConstraintValidationMiddleware : IMiddleware
                 List<IConstraint> constraints = BuildConstraints(field.Constraints);
                 foreach (var constraint in constraints)
                 {
-                    if (!constraint.Match(fieldData, out string message))
+                    if (!constraint.Match(fieldData))
                     {
                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                         await context.Response.WriteAsync($"The body is not valid.");
-                        await context.Response.WriteAsync(message);
                         return MiddlewareInvokeResult.End;
                     }
                 }

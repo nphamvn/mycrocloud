@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace MockServer.Api.TinyFramework;
 
 public class FloatConstraint : IConstraint
 {
-    public bool Match(object value, out string message)
+    public string ErrorMessage => throw new NotImplementedException();
+
+    public bool Match(object value)
     {
         throw new NotImplementedException();
     }

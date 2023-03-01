@@ -4,9 +4,10 @@ namespace MockServer.Api.TinyFramework;
 
 public class RequiredConstraint : IConstraint
 {
-    public bool Match(object value, out string message)
+    public string ErrorMessage => throw new NotImplementedException();
+
+    public bool Match(object value)
     {
-        message = "";
         var valueString = Convert.ToString(value, CultureInfo.InvariantCulture);
         return !string.IsNullOrEmpty(valueString);
     }

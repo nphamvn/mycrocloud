@@ -1,8 +1,10 @@
+using Jint;
 using MockServer.Core.Identity;
 using MockServer.Core.Services;
 using MockServer.Core.WebApplications;
 using MockServer.Core.WebApplications.Security;
 using CoreRoute = MockServer.Core.WebApplications.Route;
+using CoreWebApplication = MockServer.Core.WebApplications.WebApplication;
 namespace MockServer.Api.TinyFramework;
 
 public class WebApplication : IWebApplication
@@ -75,13 +77,14 @@ public class WebApplication : IWebApplication
                 return;
             }
         }
-
+        var app = context.Items[typeof(CoreWebApplication).Name] as CoreWebApplication;
         var route = context.Items[typeof(CoreRoute).Name] as CoreRoute;
         var factoryService = ServiceProvider.GetRequiredService<IFactoryService>();
         RequestHandler handler = default;
         if (route.IntegrationType == RouteIntegrationType.MockIntegration)
         {
-            handler = factoryService.Create<MockIntegrationHandler>();
+            var engine = new Engine();
+            handler = factoryService.Create<MockIntegrationJintHandler>(engine, app, route);
         }
 
         await handler.Handle(context);

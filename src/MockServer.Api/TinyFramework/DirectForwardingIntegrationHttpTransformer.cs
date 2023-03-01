@@ -3,7 +3,7 @@ using Yarp.ReverseProxy.Transforms;
 
 namespace MockServer.Api.TinyFramework;
 
-public class DirectForwardingHttpTransformer : HttpTransformer
+public class DirectForwardingIntegrationHttpTransformer : HttpTransformer
 {
     public override async ValueTask TransformRequestAsync(HttpContext httpContext, HttpRequestMessage proxyRequest, string destinationPrefix, CancellationToken cancellationToken)
     {

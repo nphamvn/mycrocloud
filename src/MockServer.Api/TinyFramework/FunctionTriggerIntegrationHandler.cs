@@ -1,19 +1,34 @@
-﻿using MockServer.Api.Interfaces;
+﻿using System.Diagnostics;
+using System.Net;
+using MockServer.Api.Interfaces;
 using MockServer.Api.Models.Docker;
-
+using MockServer.Core.Repositories;
+using Yarp.ReverseProxy.Forwarder;
+using CoreRoute = MockServer.Core.WebApplications.Route;
 namespace MockServer.Api.TinyFramework
 {
     public class FunctionTriggerIntegrationHandler : RequestHandler
     {
         private readonly IDockerServices _dockerServices;
+        private readonly IWebApplicationRouteRepository _webApplicationRouteRepository;
+        private readonly IHttpForwarder _forwarder;
+        private readonly CoreRoute _route;
 
-        public FunctionTriggerIntegrationHandler(IDockerServices dockerServices)
+        public FunctionTriggerIntegrationHandler(IDockerServices dockerServices,
+            IWebApplicationRouteRepository webApplicationRouteRepository,
+            IHttpForwarder forwarder,
+            CoreRoute route)
         {
             _dockerServices = dockerServices;
+            _webApplicationRouteRepository = webApplicationRouteRepository;
+            _forwarder = forwarder;
+            _route = route;
         }
 
         public override async Task Handle(HttpContext context)
         {
+            var integration = await _webApplicationRouteRepository.GetFunctionTriggerIntegration(_route.Id);
+            
             //1: Prepare source file by replacing user's class file to template source (username, requestId)
             //2: Send message to Go (or Python) GRPC service to build image, start container
             var runContainerResult = await _dockerServices.StartContainer(new RunContainerOptions
@@ -21,15 +36,26 @@ namespace MockServer.Api.TinyFramework
             });
 
             //3: Send request to started container
-            using var client = new HttpClient();
-            var httpRequest = context.Request;
-            var message = new HttpRequestMessage();
-            var path = httpRequest.Path.Value.StartsWith("/") ? httpRequest.Path.Value.Remove(0, 1) : httpRequest.Path.Value;
-            message.Method = new HttpMethod(httpRequest.Method);
-            string host = "ip";
-            int port = 1000;
-            message.RequestUri = new Uri(string.Format("http://{0}:{1}/{2}", host, port, path));
-            var response = await client.SendAsync(message);
+
+            var httpClient = new HttpMessageInvoker(new SocketsHttpHandler()
+            {
+                UseProxy = false,
+                AllowAutoRedirect = false,
+                AutomaticDecompression = DecompressionMethods.None,
+                UseCookies = false,
+                ActivityHeadersPropagator = new ReverseProxyPropagator(DistributedContextPropagator.Current),
+                ConnectTimeout = TimeSpan.FromSeconds(15),
+            });
+            var transformer = new DirectForwardingIntegrationHttpTransformer(); // or HttpTransformer.Default;
+            var requestConfig = new ForwarderRequestConfig { ActivityTimeout = TimeSpan.FromSeconds(100) };
+            var destinationPrefix = "container ip";
+            var error = await _forwarder.SendAsync(context, destinationPrefix, httpClient, requestConfig, transformer);
+            // Check if the operation was successful
+            if (error != ForwarderError.None)
+            {
+                var errorFeature = context.GetForwarderErrorFeature();
+                var exception = errorFeature.Exception;
+            }
         }
     }
 }

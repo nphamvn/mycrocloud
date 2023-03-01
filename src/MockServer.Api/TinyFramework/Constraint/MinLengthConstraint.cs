@@ -2,7 +2,9 @@ namespace MockServer.Api.TinyFramework;
 
 public class MinLengthConstraint : IConstraint
 {
-    public bool Match(object value, out string message)
+    public string ErrorMessage => throw new NotImplementedException();
+
+    public bool Match(object value)
     {
         throw new NotImplementedException();
     }

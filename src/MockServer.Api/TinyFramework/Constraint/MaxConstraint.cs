@@ -14,9 +14,10 @@ public class MaxConstraint : IConstraint
 
     public long Max { get; }
 
-    public bool Match(object value, out string message)
+    public string ErrorMessage => throw new NotImplementedException();
+
+    public bool Match(object value)
     {
-        message = "";
         ArgumentNullException.ThrowIfNull(value);
         var valueString = Convert.ToString(value, CultureInfo.InvariantCulture);
         if (long.TryParse(valueString, NumberStyles.Integer, CultureInfo.InvariantCulture, out var longValue))

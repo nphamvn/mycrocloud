@@ -8,26 +8,23 @@ namespace MockServer.Api.TinyFramework;
 
 public class DirectForwardingIntegrationHandler : RequestHandler
 {
-    private readonly IWebApplicationRouteRepository _requestRepository;
+    private readonly IWebApplicationRouteRepository _webApplicationRouteRepository;
     private readonly IHttpForwarder _forwarder;
+    private readonly CoreRoute _route;
 
-    public DirectForwardingIntegrationHandler(IWebApplicationRouteRepository requestRepository,
-        IHttpForwarder forwarder)
+    public DirectForwardingIntegrationHandler(
+        IWebApplicationRouteRepository webApplicationRouteRepository,
+        IHttpForwarder forwarder,
+        CoreRoute route)
     {
-        _requestRepository = requestRepository;
+        _webApplicationRouteRepository = webApplicationRouteRepository;
         _forwarder = forwarder;
+        _route = route;
     }
 
     public override async Task Handle(HttpContext context)
     {
-        var route = context.Items[nameof(CoreRoute)] as CoreRoute;
-        var integration = await _requestRepository.GetDirectForwardingIntegration(route.Id);
-        var message = new HttpRequestMessage();
-        message.Method = new HttpMethod(context.Request.Method);
-        message.RequestUri = new Uri(string.Format("{1}/{2}", integration.ExternalServerHost, context.Request.Path.Value));
-
-        using var client = new HttpClient();
-        var response = await client.SendAsync(message);
+        var integration = await _webApplicationRouteRepository.GetDirectForwardingIntegration(_route.Id);
 
         var httpClient = new HttpMessageInvoker(new SocketsHttpHandler()
         {
@@ -38,12 +35,11 @@ public class DirectForwardingIntegrationHandler : RequestHandler
             ActivityHeadersPropagator = new ReverseProxyPropagator(DistributedContextPropagator.Current),
             ConnectTimeout = TimeSpan.FromSeconds(15),
         });
-
+        var transformer = new DirectForwardingIntegrationHttpTransformer(); // or HttpTransformer.Default;
         var requestConfig = new ForwarderRequestConfig { ActivityTimeout = TimeSpan.FromSeconds(100) };
-        var transformer = new DirectForwardingHttpTransformer();
 
         var error = await _forwarder.SendAsync(context, integration.ExternalServerHost,
-                httpClient, requestConfig, transformer);
+                        httpClient, requestConfig, transformer);
         // Check if the operation was successful
         if (error != ForwarderError.None)
         {

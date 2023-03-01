@@ -1,4 +1,3 @@
-using System;
 namespace MockServer.Core.Databases;
 
 public interface IDatabaseAdapter

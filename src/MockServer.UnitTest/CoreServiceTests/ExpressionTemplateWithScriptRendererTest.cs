@@ -1,3 +1,4 @@
+using Jint;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Services;
 
@@ -8,7 +9,7 @@ public class ExpressionTemplateWithScriptRendererTest
     private IExpressionTemplateWithScriptRenderer _expressionTemplateWithScriptRenderer;
     public ExpressionTemplateWithScriptRendererTest()
     {
-        _expressionTemplateWithScriptRenderer = new ExpressionTemplateWithScriptRenderer();
+        _expressionTemplateWithScriptRenderer = new ExpressionTemplateWithScriptRenderer( new Engine());
     }
     [Fact]
     public void Test1()

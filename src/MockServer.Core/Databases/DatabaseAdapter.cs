@@ -5,9 +5,9 @@ namespace MockServer.Core.Databases;
 
 public abstract class DatabaseAdapter : IDatabaseAdapter
 {
-    private readonly JsonSerializerOptions _options;
+    private readonly DatabaseAdapterOptions _options;
 
-    public DatabaseAdapter(JsonSerializerOptions options)
+    public DatabaseAdapter(DatabaseAdapterOptions options)
     {
         _options = options;
     }
@@ -19,6 +19,6 @@ public abstract class DatabaseAdapter : IDatabaseAdapter
         return !string.IsNullOrEmpty(json) ? JsonSerializer.Deserialize<ExpandoObject>(json) : null;
     }
     public string GetJson(object value){
-        return JsonSerializer.Serialize(value, _options);
+        return JsonSerializer.Serialize(value, _options.JsonSerializerOptions);
     }
 }

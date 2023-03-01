@@ -1,32 +1,25 @@
-using System.Dynamic;
-using System.Text.RegularExpressions;
 using Jint;
 using MockServer.Core.Interfaces;
 
 namespace MockServer.Core.Services;
 
-public class HandlebarsTemplateRenderer : IHandlebarsTemplateRenderer
+public class JintHandlebarsTemplateRenderer : IHandlebarsTemplateRenderer
 {
     private readonly Engine _engine;
-    public HandlebarsTemplateRenderer()
-    {
-
-    }
-    public HandlebarsTemplateRenderer(Engine engine)
+    private readonly string _handlebarsCode;
+    public JintHandlebarsTemplateRenderer(Engine engine, string handlebarsCode)
     {
         _engine = engine;
+        _handlebarsCode = handlebarsCode;
     }
 
     public string Render(string source)
     {
-        var engine = _engine ?? new Engine();
-        var handlebars = File.ReadAllText("handlebars.min-v4.7.7.js");
-        return handlebars;
-        engine.Execute(handlebars);
-        engine.SetValue("source", source);
-        engine.Execute("let hb = {};");
-        engine.Execute("const template = Handlebars.compile(source);");
-        var result = engine.Execute("template(hb)");
+        _engine.Execute(_handlebarsCode);
+        _engine.SetValue("source", source);
+        _engine.Execute("let hb = {};");
+        _engine.Execute("const template = Handlebars.compile(source);");
+        var result = _engine.Execute("template(hb)");
         return result.ToString();
     }
 }

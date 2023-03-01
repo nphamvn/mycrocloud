@@ -1,3 +1,4 @@
+using Jint;
 using MockServer.Core.Interfaces;
 using MockServer.Core.Services;
 
@@ -9,7 +10,7 @@ public class ScriptGetterTest
 
     public ScriptGetterTest()
     {
-        _scriptGetter = new HandlebarsTemplateRenderer();
+        _scriptGetter = new JintHandlebarsTemplateRenderer(new Engine(), File.ReadAllText(""));
     }
 
     // [Fact]

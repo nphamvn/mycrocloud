@@ -2,13 +2,10 @@ namespace MockServer.Api.TinyFramework;
 
 public class IntConstraint : IConstraint
 {
-    public IntConstraint()
-    {
+    public string ErrorMessage => throw new NotImplementedException();
 
-    }
-    public bool Match(object value, out string message)
+    public bool Match(object value)
     {
-        message = "";
-        return true;
+        throw new NotImplementedException();
     }
 }
