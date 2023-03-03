@@ -8,10 +8,12 @@ using static MockServer.Web.Common.Constants;
 namespace MockServer.Web.Controllers;
 
 [Authorize]
-[Route("webapps/{ProjectName}/authentications")]
-[GetAuthUserProjectId(RouteName.ProjectName, RouteName.ProjectId)]
+[Route("webapps/{AppName}/authentications")]
+[GetAuthUserWebApplicationId(RouteName.WebApplicationName, RouteName.WebApplicationId)]
 public class WebApplicationAuthenticationsController: BaseController
 {
+    public const string Name = "WebApps";
+
     private readonly IWebApplicationAuthenticationWebService _service;
 
     public WebApplicationAuthenticationsController(IWebApplicationAuthenticationWebService projectAuthenticationWebService)

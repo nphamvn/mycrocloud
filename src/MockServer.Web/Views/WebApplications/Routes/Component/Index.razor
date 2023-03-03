@@ -1,0 +1,168 @@
+@using Microsoft.AspNetCore.Components
+@using Models.WebApplications.Routes
+@using Services
+
+<partial name="/Views/ProjectShared/_Breadcrumb.cshtml" model="Model.Project" />
+<div style="height: calc(100vh - 180px);">
+    <partial name="/Views/ProjectShared/_NavTabs.cshtml" model="Model.Project" />
+    <div class="tab-content h-100">
+        <div class="tab-pane fade show active h-100">
+            <div class="row h-100 p-2">
+                <div class="col-3 h-100 overflow-scroll">
+                    <div class="d-grid mt-1">
+                        <button class="btn btn-sm bg-violet-500 text-white js-new-request-button">New</button>
+                    </div>
+                    <div class="request-container">
+                        <ul id="requests" class="list-group list-group-flush mt-2">
+                            @foreach (var req in RouteIndexModel.Routes)
+                            {
+                                <li class="request-list-item list-group-item px-2 py-1">
+                                    <div class="row">
+                                        <div class="col" @onclick="async() => await OpenRoute(req.Id)">
+                                            <span class="tw-text-base">@req.Name</span>
+                                            <div>
+                                                <small
+                                                class="badge rounded-pill fw-bolder text-white me-1 @req.MethodBadgeColor"
+                                                style="width: 60px; font-size: 11px;">@req.Method</small>
+                                                <small class="text-muted">/@req.Path</small>
+                                            </div>
+                                        </div>
+                                        <div class="p-0 my-auto" style="width: 40px;">
+                                            <button class="btn btn-sm btn-context-menu" type="button"><i
+                                                class="bi bi-three-dots"></i></button>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-9 h-100" id="RequestOpenContent">
+                    @if (OpeningRoute != null)
+                    {
+                        <div class="row">
+                            <div class="col-9">
+                                <div>
+                                    <div class="card">
+                                        <div class="card-header d-flex">
+                                            Overview
+                                            <button
+                                            class="btn btn-light btn-sm py-1 ms-auto my-0 js-basic-edit-button">Edit</button>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="d-flex mb-1">
+                                                <strong class="fw-bolder">@OpeningRoute.Name</strong>
+                                            </div>
+                                            <div class="mb-2">
+                                                <small>@OpeningRoute.Description</small>
+                                            </div>
+                                            <div class="mb-2">
+                                                <strong class="me-2 @OpeningRoute.MethodTextColor"
+                                                id="method">@OpeningRoute.Method</strong>
+                                                <span id="path">@OpeningRoute.Path</span>
+                                            </div>
+                                            <div class="input-group mb-3">
+                                                <input type="text" class="form-control" value="@OpeningRoute.Url" readonly>
+                                                <button id="btnCopyPrivateKeyToClipboard" type="button"
+                                                class="input-group-text">
+                                                    <i class="bi bi-clipboard"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card mt-1">
+                                        <div class="card-header d-flex">
+                                            Authorization
+                                            <button
+                                            class="btn btn-light btn-sm py-1 ms-auto my-0 js-config-auth">Configure</button>
+                                        </div>
+                                        <div class="card-body">
+                                            @if (OpeningRoute.Authorization != null)
+                                            {
+                                                <table class="table table-borderless">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">Authorization Type</th>
+                                                            <th scope="col">Policies</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td scope="row">@OpeningRoute.Authorization.Type</td>
+                                                            <td>@OpeningRoute.Authorization.Policies.Count</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            }
+                                            else
+                                            {
+                                                <p>No authorization attached to this request.</p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <style>
+                .context-menu {
+                    position: absolute;
+                    width: 60px;
+                }
+            </style>
+            <template id="context-menu-template">
+                <div class="btn-group-vertical dropdown-menu context-menu" role="group">
+                    <button name="btnCopy" type="button" class="dropdown-item btn btn-default">Copy</button>
+                    <button name="btnDelete" type="button"
+                        class="dropdown-item btn btn-default text-danger">Delete</button>
+                </div>
+            </template>
+
+            <!-- Modal -->
+            <template id="requestDeleteConfirmModalTemplate">
+                <div class="modal fade" id="requestDeleteConfirmModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Delete confirm</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Are your sure want to delete request?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button name="btnDelete" type="button" class="btn btn-danger">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+@code {
+    [Inject]
+    protected IWebApplicationRouteWebService WebApplicationRouteWebService { get; set; }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return base.OnParametersSetAsync();
+    }
+
+    [Parameter]
+    public RouteIndexModel RouteIndexModel { get; set; }
+
+    public RouteViewModel OpeningRoute { get; set; }
+    private async Task OpenRoute(int routeId)
+    {
+        OpeningRoute = await WebApplicationRouteWebService.GetViewModel(routeId);
+    }
+}

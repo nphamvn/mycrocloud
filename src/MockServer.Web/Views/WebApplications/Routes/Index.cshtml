@@ -3,8 +3,8 @@
 @{
     ViewData["Title"] = Model.WebApplication.Name;
 }
-@(await Html.RenderComponentAsync<MockServer.Web.Views.Shared.Component.Component>(RenderMode.ServerPrerendered,new
-        { Model = Model}))
+@(await Html.RenderComponentAsync<MockServer.Web.Views.WebApplications.Routes.Component.Index>(RenderMode.ServerPrerendered,new
+        { RouteIndexModel = Model}))
 <!-- New request: Start -->
 <script>
     $(function () {

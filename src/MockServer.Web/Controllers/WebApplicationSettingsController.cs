@@ -8,7 +8,7 @@ namespace MockServer.Web.Controllers;
 
 [Authorize]
 [Route("webapps/{ProjectName}/settings")]
-[GetAuthUserProjectId(RouteName.ProjectName, RouteName.ProjectId)]
+[GetAuthUserWebApplicationId(RouteName.WebApplicationName, RouteName.WebApplicationId)]
 public class WebApplicationSettingsController : BaseController
 {
     private readonly IWebApplicationWebService _webApplicationWebService;

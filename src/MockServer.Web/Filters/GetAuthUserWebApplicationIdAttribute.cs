@@ -5,11 +5,11 @@ using MockServer.Web.Extentions;
 
 namespace MockServer.Web.Filters;
 
-public class GetAuthUserProjectIdAttribute : ActionFilterAttribute
+public class GetAuthUserWebApplicationIdAttribute : ActionFilterAttribute
 {
     private readonly string _projectNameKey;
     private readonly string _projectIdKey;
-    public GetAuthUserProjectIdAttribute(string projectName, string projectId)
+    public GetAuthUserWebApplicationIdAttribute(string projectName, string projectId)
     {
         _projectNameKey = projectName;
         _projectIdKey = projectId;

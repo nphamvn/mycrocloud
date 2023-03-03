@@ -6,6 +6,7 @@ namespace MockServer.Web.Controllers;
 [Route("[controller]")]
 public class AccountController : Controller
 {
+    public const string Name = "Account";
     private readonly ILogger<AccountController> _logger;
 
     public AccountController(ILogger<AccountController> logger)

@@ -12,8 +12,8 @@ using RouteName = MockServer.Web.Common.Constants.RouteName;
 namespace MockServer.Web.Controllers;
 
 [Authorize]
-[Route("webapps/{ProjectName}/routes")]
-[GetAuthUserProjectId(RouteName.ProjectName, RouteName.ProjectId)]
+[Route("webapps/{AppName}/routes")]
+[GetAuthUserWebApplicationId(RouteName.WebApplicationName, RouteName.WebApplicationId)]
 public class WebApplicationRoutesController : Controller
 {
     private readonly IWebApplicationRouteWebService _webApplicationRouteWebService;
@@ -22,8 +22,8 @@ public class WebApplicationRoutesController : Controller
         _webApplicationRouteWebService = webApplicationRouteWebService;
     }
 
-    [HttpGet("/webapps/{ProjectName}")]
-    [GetAuthUserProjectId(RouteName.ProjectName, RouteName.ProjectId)]
+    [HttpGet("/webapps/{AppName}")]
+    [GetAuthUserWebApplicationId(RouteName.WebApplicationName, RouteName.WebApplicationId)]
     public async Task<IActionResult> Index(int ProjectId)
     {
         var vm = await _webApplicationRouteWebService.GetIndexModel(ProjectId);
@@ -55,7 +55,7 @@ public class WebApplicationRoutesController : Controller
 
     [AjaxOnly]
     [HttpGet("{RequestId:int}/edit")]
-    [ValidateProjectRequest(RouteName.ProjectId, RouteName.RequestId)]
+    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> GetEditPartial(int ProjectId, int RequestId)
     {
         var vm = await _webApplicationRouteWebService.GetEditRouteModel(RequestId);
@@ -65,7 +65,7 @@ public class WebApplicationRoutesController : Controller
 
     [AjaxOnly]
     [HttpPost("{RequestId:int}/edit")]
-    [ValidateProjectRequest(RouteName.ProjectId, RouteName.RequestId)]
+    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> Edit(int RequestId, RouteSaveModel request)
     {
         if (!await _webApplicationRouteWebService.ValidateEdit(RequestId, request, ModelState))
@@ -79,7 +79,7 @@ public class WebApplicationRoutesController : Controller
 
     [AjaxOnly]
     [HttpGet("{RequestId:int}")]
-    [ValidateProjectRequest(RouteName.ProjectId, RouteName.RequestId)]
+    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> View(int RequestId)
     {
         var vm = await _webApplicationRouteWebService.GetViewModel(RequestId);
@@ -88,7 +88,7 @@ public class WebApplicationRoutesController : Controller
 
     [AjaxOnly]
     [HttpGet("{RequestId:int}/authorization")]
-    [ValidateProjectRequest(RouteName.ProjectId, RouteName.RequestId)]
+    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> GetAuthorizationPartial(int ProjectId, int id)
     {
         var vm = await _webApplicationRouteWebService.GetAuthorizationViewModel(ProjectId, id);
@@ -97,7 +97,7 @@ public class WebApplicationRoutesController : Controller
 
     [AjaxOnly]
     [HttpPost("{RequestId:int}/authorization")]
-    [ValidateProjectRequest(RouteName.ProjectId, RouteName.RequestId)]
+    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> ConfigAuthorization(int ProjectId, int RequestId, AuthorizationSaveModel auth)
     {
         await _webApplicationRouteWebService.AttachAuthorization(RequestId, auth);
@@ -106,7 +106,7 @@ public class WebApplicationRoutesController : Controller
 
     [AjaxOnly]
     [HttpPost("{RequestId:int}/mock-integration")]
-    [ValidateProjectRequest(RouteName.ProjectId, RouteName.RequestId)]
+    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> SaveRequestConfiguration(int RequestId, MockIntegrationSaveModel config)
     {
         await _webApplicationRouteWebService.SaveMockIntegration(RequestId, config);
@@ -118,7 +118,7 @@ public class WebApplicationRoutesController : Controller
 
     [AjaxOnly]
     [HttpPost("{RequestId:int}/delete")]
-    [ValidateProjectRequest(RouteName.ProjectId, RouteName.RequestId)]
+    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> Delete(int RequestId)
     {
         await _webApplicationRouteWebService.Delete(RequestId);

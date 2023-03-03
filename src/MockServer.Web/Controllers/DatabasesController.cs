@@ -12,6 +12,7 @@ namespace MockServer.Web.Controllers;
 [GetAuthUserDatabaseId(RouteName.DatabaseName, RouteName.DatabaseId)]
 public class DatabasesController: BaseController
 {
+    public const string Name = "Databases";
     private readonly IDatabaseWebService _databaseWebService;
 
     public DatabasesController(IDatabaseWebService databaseWebService)
