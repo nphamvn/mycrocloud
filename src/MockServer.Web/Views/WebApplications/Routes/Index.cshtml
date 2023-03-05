@@ -3,8 +3,82 @@
 @{
     ViewData["Title"] = Model.WebApplication.Name;
 }
-@(await Html.RenderComponentAsync<MockServer.Web.Views.WebApplications.Routes.Component.Index>(RenderMode.ServerPrerendered,new
-        { RouteIndexModel = Model}))
+<div class="row">
+    <div class="col-2">
+        <partial name="/Views/WebApplications/_SideBar.cshtml" model="Model.WebApplication">
+    </div>
+    <div class="col-10">
+        <div class="row p-2">
+            <div class="col-3">
+                <div class="d-flex mt-1">
+                    <input class="form-control form-control-sm" type="text" placeholder="Search">
+                    <button class="btn btn-sm bg-violet-500 text-white js-new-request-button"><i class="bi bi-plus"></i></button>
+                </div>
+                <div class="request-container">
+                    <ul id="requests" class="list-group list-group-flush mt-2">
+                        @foreach (var route in Model.Routes)
+                        {
+                            <li data-route-id="@route.Id" class="list-group-item px-2 py-1">
+                                <div class="row">
+                                    <div class="col">
+                                        <span class="tw-text-base">@route.Name</span>
+                                        <div>
+                                            <small
+                                            class="badge rounded-pill fw-bolder text-white me-1 @route.MethodBadgeColor"
+                                            style="width: 60px; font-size: 11px;">@route.Method</small>
+                                            <small class="text-muted">/@route.Path</small>
+                                        </div>
+                                    </div>
+                                    <div class="p-0 my-auto" style="width: 40px;">
+                                        <button class="btn btn-sm btn-context-menu" type="button"><i
+                                            class="bi bi-three-dots"></i></button>
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="col-9 h-100" id="RequestOpenContent">
+
+            </div>
+        </div>
+        <style>
+            .context-menu {
+                position: absolute;
+                width: 60px;
+            }
+        </style>
+        <template id="context-menu-template">
+            <div class="btn-group-vertical dropdown-menu context-menu" role="group">
+                <button name="btnCopy" type="button" class="dropdown-item btn btn-default">Copy</button>
+                <button name="btnDelete" type="button" class="dropdown-item btn btn-default text-danger">Delete</button>
+            </div>
+        </template>
+
+        <!-- Modal -->
+        <template id="requestDeleteConfirmModalTemplate">
+            <div class="modal fade" id="requestDeleteConfirmModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Delete confirm</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are your sure want to delete request?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button name="btnDelete" type="button" class="btn btn-danger">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>
 <!-- New request: Start -->
 <script>
     $(function () {

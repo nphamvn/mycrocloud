@@ -5,8 +5,8 @@ public class Constants
     public const int TemporaryId = -9999;
     public class RouteName
     {
-        public const string WebApplicationId = "WebAppId";
-        public const string WebApplicationName = "WebAppName";
+        public const string WebApplicationId = "WebApplicationId";
+        public const string WebApplicationName = "WebApplicationName";
         public const string RouteId = "RouteId";
         public const string DatabaseId = "DatabaseId";
         public const string DatabaseName = "DatabaseName";

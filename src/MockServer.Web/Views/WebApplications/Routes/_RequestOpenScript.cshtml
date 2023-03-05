@@ -297,7 +297,7 @@
         };
 
         $.post({
-            url: '@Url.Action(nameof(WebApplicationRoutesController.SaveRequestConfiguration), "Requests", new { ProjectName = ViewData["ProjectName"], RequestId = ViewData["RequestId"]})',
+            url: '@Url.Action(nameof(WebApplicationRoutesController.MockIntegration), "Requests", new { ProjectName = ViewData["ProjectName"], RequestId = ViewData["RequestId"]})',
             data: {
                 RequestParams: params,
                 RequestHeaders: headers,

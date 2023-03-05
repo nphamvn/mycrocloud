@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using MockServer.Core.WebApplications;
 using MockServer.Web.Models.WebApplications.Routes;
 using MockServer.Web.Models.WebApplications.Routes.Authorizations;
 using MockServer.Web.Models.WebApplications.Routes.Integrations.MockIntegrations;
@@ -20,4 +21,5 @@ public interface IWebApplicationRouteWebService
     Task AttachAuthorization(int requestId, AuthorizationSaveModel auth);
     Task<MockIntegrationViewModel> GetMockIntegration(int requestId);
     Task SaveMockIntegration(int requestId, MockIntegrationSaveModel integration);
+    Task ChangeIntegrationType(int routeId, RouteIntegrationType type);
 }

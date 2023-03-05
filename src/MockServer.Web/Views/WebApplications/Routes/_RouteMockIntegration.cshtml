@@ -1,19 +1,24 @@
+@using MockServer.Web.Controllers
 @model MockServer.Web.Models.WebApplications.Routes.Integrations.MockIntegrations.MockIntegrationViewModel
-<div>
+<div class="mock-integration-details">
     <div class="card mt-1">
         <div class="card-header d-flex">
-            Code
-            <button id="btnSave" class="btn btn-light btn-sm py-1 ms-auto my-0">Save</button>
+            <div>
+                Code
+            </div>
+            <div class="ms-auto">
+                <button type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample">
+                    <i class="fa toggle-icon fa-minus"></i>
+                </button>
+            </div>
         </div>
-        <div class="card-body">
-            <div class="position-relative" style="min-height: 200px;">
-                <textarea asp-for="Code"></textarea>
-                <div id="response-body-render-script"></div>
+        <div class="collapse" id="collapseExample">
+            <div class="card-body">
+                <textarea asp-for="Code" class="form-control" style="display: none;"></textarea>
+                <div id="mockIntegrationCodeEditor" style="height: 300px;"></div>
             </div>
         </div>
     </div>
-</div>
-<div>
     <div class="card mt-1">
         <div class="card-header">
             Response Configuration
@@ -63,28 +68,33 @@
                         </div>
                     </div>
                 </div>
-
                 <div id="response-body-tab" class="tab-pane fade p-2" role="tabpanel">
                     <div>
                         <div class="d-flex">
-                            <select id="response-body-type" class="form-select form-select-sm w-auto mb-1">
-                                <option value="json" selected>JSON</option>
-                                <option value="xml">XML</option>
-                                <option value="text">Text</option>
-                            </select>
-                            <select class="form-select form-select-sm w-auto mb-1"
-                                asp-for="ResponseBodyTextRenderEngine">
-                                <option value="1">Static</option>
-                                <option value="2">Handlebars</option>
-                                <option value="3">Expression with script</option>
-                            </select>
-                            <div class="ms-auto">
-                                <button class="btn btn-sm btn-link text-decoration-none">Format</button>
+                            <div>
+                                <small>Text Format</small>
+                                <select asp-for="ResponseBodyTextFormat" id="response-body-type"
+                                    class="form-select form-select-sm w-auto mb-1">
+                                    <option value="plaintext" selected>Plain Text</option>
+                                    <option value="html">HTML</option>
+                                    <option value="xml">XML</option>
+                                    <option value="json">JSON</option>
+                                </select>
+                            </div>
+                            <div>
+                                <small>Render type</small>
+                                <select class="form-select form-select-sm w-auto mb-1"
+                                    asp-for="ResponseBodyTextRenderEngine">
+                                    <option value="1">Static</option>
+                                    <option value="2">Handlebars</option>
+                                    <option value="3">Expression with script</option>
+                                </select>
                             </div>
                         </div>
-                        <div class="position-relative" style="min-height: 200px;">
-                            <textarea asp-for="ResponseBodyText"></textarea>
-                            <div id="response-body-editor"></div>
+                        <div>
+                            <small>Text</small>
+                            <textarea asp-for="ResponseBodyText" style="display: none;"></textarea>
+                            <div id="response-body-text-editor" style="height: 200px;"></div>
                         </div>
                     </div>
                 </div>
@@ -104,8 +114,8 @@
                             @for (int i = 0; i < Model.ResponseHeaders.Count; i++)
                             {
                                 <tr>
-                                    <td class="align-middle"><input asp-for="ResponseHeaders[i].Name"
-                                        type="text" class="form-control form-control-sm header-name" placeholder="name"
+                                    <td class="align-middle"><input asp-for="ResponseHeaders[i].Name" type="text"
+                                        class="form-control form-control-sm header-name" placeholder="name"
                                         autocomplete="off">
                                     </td>
                                     <td class="align-middle">
@@ -124,4 +134,65 @@
             </div>
         </div>
     </div>
+    <div class="d-flex pt-2">
+        <button class="btn btn-primary btn-sm me-2 js-save-button">Save</button>
+        <button class="btn btn-secondary btn-sm">Cancel</button>
+    </div>
 </div>
+<script src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
+<script>
+    let mockIntegrationCodeEditor, responseBodyTextEditor;
+    require.config({paths: {'vs': 'https://unpkg.com/monaco-editor@latest/min/vs'}});
+    require(['vs/editor/editor.main'], function () {
+        mockIntegrationCodeEditor = monaco.editor.create(document.getElementById('mockIntegrationCodeEditor'), {
+            language: 'javascript',
+            automaticLayout: true
+        });
+        responseBodyTextEditor = monaco.editor.create(document.getElementById('response-body-text-editor'), {
+            language: 'json',
+            automaticLayout: true
+        });
+        $.get('@Url.Action(nameof(WebApplicationRoutesController.MockIntegration), new { WebApplicationName = ViewData["WebApplicationName"], RouteId = ViewData["RouteId"]})', function (data) {
+            const code = data.data.code;
+            const responseBodyText = data.data.responseBodyText;
+            if (code !== null) {
+                mockIntegrationCodeEditor.setValue(code);
+            }
+            if (responseBodyText !== null) {
+                const responseBodyTextFormat = data.data.responseBodyTextFormat;
+                monaco.editor.setModelLanguage(responseBodyTextEditor.getModel(), responseBodyTextFormat);
+                responseBodyTextEditor.setValue(responseBodyText);
+            }
+            mockIntegrationCodeEditor.onDidChangeModelContent(function (event) {
+                console.log('onDidChangeModelContent');
+            });
+        });
+    });
+</script>
+<script>
+    $('.mock-integration-details .js-save-button').click(function() {
+        const code = mockIntegrationCodeEditor.getValue();
+        const responseBodyText = responseBodyTextEditor.getValue();
+        const responseBodyTextFormat = $('select[name="ResponseBodyTextFormat"] option:selected').val();
+        const responseBodyTextRenderEngine = $('select[name="ResponseBodyTextRenderEngine"] option:selected').val();
+        const responseStatusCode = $('input[name="ResponseStatusCode"]').val();
+        const responseDelay = $('input[name="ResponseDelay"]').prop('checked');
+        const responseDelayTime = $('input[name="ResponseDelayTime"]').val();
+        $.post({
+            url: '@Url.Action(nameof(WebApplicationRoutesController.MockIntegration), new { WebApplicationName = ViewData["WebApplicationName"], RouteId = ViewData["RouteId"]})',
+            data: {
+                code: code,
+                responseHeaders: [],
+                responseBodyText: responseBodyText,
+                responseBodyTextFormat: responseBodyTextFormat,
+                responseBodyTextRenderEngine: responseBodyTextRenderEngine,
+                responseStatusCode: responseStatusCode,
+                responseDelay: responseDelay,
+                responseDelayTime: responseDelayTime
+            },
+            success: function(data) {
+                alert('saved');
+            }
+        });
+    });
+</script>

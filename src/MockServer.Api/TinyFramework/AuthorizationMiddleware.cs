@@ -34,10 +34,10 @@ public class AuthorizationMiddleware : IMiddleware
             return MiddlewareInvokeResult.End;
         }
 
-        if (authorization.AuthenticationSchemes.Count > 0)
+        if (authorization.AuthenticationSchemeIds.Count > 0)
         {
             //allowedSchemes: "1,2,3,4,5"
-            var allowedSchemeIds = authorization.AuthenticationSchemes.Select(s => s.Id);
+            var allowedSchemeIds = authorization.AuthenticationSchemeIds;
             var authSchemeId = Convert.ToInt32(context.Items["AuthSchemeId"]);
             // check if the scheme is in the allowed list of scheme
             if (!allowedSchemeIds.Contains(authSchemeId))

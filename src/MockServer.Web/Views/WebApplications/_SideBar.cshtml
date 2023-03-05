@@ -1,0 +1,24 @@
+@model MockServer.Web.Models.WebApplications.WebApplication
+@using MockServer.Web.Controllers
+@{
+    var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
+    var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
+}
+<div class="d-flex flex-column flex-shrink-0 p-2">
+    <a href="/" class="link-dark text-decoration-none">
+        <span class="fs-5">@Model.Name</span>
+    </a>
+    <hr class="my-2">
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+            <a href="@Url.Action(nameof(WebApplicationsController.Overview), "WebApplications" ,new {WebApplicationName=Model.Name})"
+                class="nav-link @(controller.Equals("WebApplications", StringComparison.OrdinalIgnoreCase) && action.Equals("Overview",
+                StringComparison.OrdinalIgnoreCase) ?"active":"") py-1" role="tab">Overview</a>
+        </li>
+        <li>
+            <a href="@Url.Action(nameof(WebApplicationRoutesController.Index), "WebApplicationRoutes" ,new {WebApplicationName=Model.Name})"
+                class="nav-link @(controller.Equals("WebApplicationRoutes", StringComparison.OrdinalIgnoreCase) && action.Equals("Index",
+                StringComparison.OrdinalIgnoreCase) ?"active":"") py-1" role="tab">Routes</a>
+        </li>
+    </ul>
+</div>

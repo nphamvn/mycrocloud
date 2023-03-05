@@ -25,6 +25,7 @@ public class WebApplicationProfile : Profile
         CreateMap<CoreWebApplication, WebApplication>();
         CreateMap<CoreWebApplication, WebApplicationIndexItem>();
         CreateMap<CoreWebApplication, WebApplicationCreateModel>().ReverseMap();
+        CreateMap<CoreWebApplication, WebApplicationViewModel>();
         
         CreateMap<CoreRoute, Route>();
         CreateMap<CoreRoute, RouteIndexItem>();

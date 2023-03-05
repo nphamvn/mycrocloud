@@ -22,9 +22,9 @@
                                 Sort
                             </button>
                             <ul id="sort_dropdown" class="dropdown-menu">
-                                <li data-sort="name"><a class="dropdown-item" href="#">A to Z</a></li>
-                                <li data-sort="createdAt"><a class="dropdown-item" href="#">Recently created</a></li>
-                                <li data-sort="updatedAt"><a class="dropdown-item" href="#">Recently updated</a></li>
+                                <li data-sort="name"><button type="button" class="dropdown-item">A to Z</button></li>
+                                <li data-sort="createdAt"><button type="button" class="dropdown-item">Recently created</button></li>
+                                <li data-sort="updatedAt"><button type="button" class="dropdown-item">Recently updated</button></li>
                             </ul>
                         </div>
                     </div>
@@ -35,21 +35,20 @@
             </div>
             <div id="projectList" class="my-3">
                 <ul class="list-group list-group-flush project-list">
-                    @foreach (var project in Model.Applications)
+                    @foreach (var app in Model.Applications)
                     {
                         <li class="list-group-item">
                             <div>
                                 <h3 class="text-xl">
                                     <a class="text-decoration-none me-2"
-                                    href="@Url.Action(nameof(WebApplicationRoutesController.Index), "WebApplicationRoutes" ,new {ProjectName=project.Name})">@project.Name</a>
+                                    href="@Url.Action(nameof(WebApplicationsController.Home), "WebApplications" ,new {WebApplicationName=app.Name})">@app.Name</a>
                                 </h3>
-                                <p>@project.Description</p>
+                                <p>@app.Description</p>
                                 <div class="d-flex">
-                                    @if (project.UpdatedAt > default(DateTime))
+                                    @if (app.UpdatedAt > default(DateTime))
                                     {
                                         <div class="text-sm text-gray">
-                                            Updated <span name="updated-at"
-                                        data-updated-at="@project.UpdatedAt.ToString("yyyy-MM-ddTHH:mm:ss")"></span>
+                                        Updated <span name="updated-at" data-updated-at="@app.UpdatedAt.ToString("yyyy-MM-ddTHH:mm:ss")"></span>
                                         </div>
                                     }
                                 </div>
@@ -67,13 +66,6 @@
             $(this).closest('form').submit();
         }, 500));
 
-        $('#search #accessibility_dropdown li').click(function () {
-            var accessibility = $(this).data('accessibility');
-            if (accessibility !== '') {
-                $('#search #accessibility').val(accessibility);
-            }
-            $(this).closest('form').submit();
-        });
         $('#search #sort_dropdown li').click(function () {
             var sort = $(this).data('sort');
             $('#search #sort').val(sort);

@@ -120,7 +120,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="py-2 text-center">Raw JSON
-                                <span id="datasouce"></span>
+                                <span id="datasource"></span>
                             </div>
                             <div id="editor" style="height: 400px;"></div>
                         </div>
@@ -145,7 +145,7 @@
                     $.get('@Url.Action(nameof(DatabasesController.Data), new { DatabaseName = Model.Name})', function (data) {
                         data = data;
                         setEditorValue(data);
-                        $('#datasouce').text('(read from database)');
+                        $('#datasource').text('(read from database)');
                         editor.onDidChangeModelContent(function (event) {
                             if (editorChanged === false) {
                                 editorChanged = true;
@@ -163,7 +163,7 @@
                 function fetchData() {
                     $.get('@Url.Action(nameof(DatabasesController.Data), new { DatabaseName = Model.Name})', function (data) {
                         data = data;
-                        $('#datasouce').text('(read from database)');
+                        $('#datasource').text('(read from database)');
                         setEditorValue(data);
                     });
                 }
@@ -235,7 +235,7 @@
                         setEditorValue(data);
                     };
                     reader.readAsText(file);
-                    $('#datasouce').text(`(read from file: ${file.name})`);
+                    $('#datasource').text(`(read from file: ${file.name})`);
                 });
 
                 $('#render-table-button').click(function () {

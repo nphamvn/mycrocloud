@@ -122,6 +122,7 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
                     r.Id = @Id
                 """;
         using var connection = new SqliteConnection(_connectionString);
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<Authorization>());
         SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RouteRequestQuery>>());
         SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RouteRequestHeader>>());
         SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteRequestBody>());
@@ -275,47 +276,23 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
         throw new NotImplementedException();
     }
 
-    public async Task<Authorization> GetRequestAuthorization(int requestId)
-    {
-        var query =
-                """
-                SELECT
-                    Authorization
-                FROM
-                    Requests
-                WHERE
-                    Id = @Id
-                """;
-        using var connection = new SqliteConnection(_connectionString);
-        var json = await connection.QuerySingleOrDefaultAsync<string>(query, new
-        {
-            Id = requestId
-        });
-        return !string.IsNullOrEmpty(json) ? JsonSerializer.Deserialize<Authorization>(json) : null;
-    }
-
-    public async Task UpdateRequestAuthorization(int requestId, Authorization authorization)
+    public Task AttachAuthorization(int id, Authorization authorization)
     {
         var query =
                 """
                 UPDATE 
-                    Requests
+                    WebApplicationRoute
                 SET
                     Authorization = @Authorization
                 WHERE
                     Id = @Id
                 """;
         using var connection = new SqliteConnection(_connectionString);
-        await connection.ExecuteAsync(query, new
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<int>>());
+        return connection.ExecuteAsync(query, new
         {
-            Id = requestId,
-            Authorization = JsonSerializer.Serialize(authorization)
+            Id = id
         });
-    }
-
-    public Task AttachAuthorization(int id, Authorization authorization)
-    {
-        throw new NotImplementedException();
     }
 
     public Task<Authorization> GetAuthorization(int id)
@@ -351,7 +328,36 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
 
     public Task UpdateMockIntegration(int id, MockIntegration integration)
     {
-        throw new NotImplementedException();
+        var query =
+                """
+                UPDATE
+                    WebApplicationRouteMockIntegration
+                SET
+                    Code = @Code,
+                    ResponseHeaders = @ResponseHeaders,
+                    ResponseBodyText = @ResponseBodyText,
+                    ResponseBodyTextFormat = @ResponseBodyTextFormat,
+                    ResponseBodyTextRenderEngine = @ResponseBodyTextRenderEngine,
+                    ResponseStatusCode = @ResponseStatusCode,
+                    ResponseDelay = @ResponseDelay,
+                    ResponseDelayTime = @ResponseDelayTime
+                WHERE
+                    RouteId = @RouteId
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<MockIntegrationResponseHeader>>());
+        return connection.QuerySingleOrDefaultAsync<MockIntegration>(query, new
+        {
+            RouteId = id,
+            Code = integration.Code,
+            ResponseHeaders = integration.ResponseHeaders,
+            ResponseBodyText = integration.ResponseBodyText,
+            ResponseBodyTextFormat = integration.ResponseBodyTextFormat,
+            ResponseBodyTextRenderEngine = integration.ResponseBodyTextRenderEngine,
+            ResponseStatusCode = integration.ResponseStatusCode,
+            ResponseDelay = integration.ResponseDelay,
+            ResponseDelayTime = integration.ResponseDelayTime
+        });
     }
 
     public Task<DirectForwardingIntegration> GetDirectForwardingIntegration(int routeId)

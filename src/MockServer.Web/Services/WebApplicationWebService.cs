@@ -58,6 +58,12 @@ public class WebApplicationWebService : BaseWebService, IWebApplicationWebServic
         return vm;
     }
 
+    public async Task<WebApplicationViewModel> GetOverviewViewModel(int webApplicationId)
+    {
+        var app = await _webApplicationRepository.Get(webApplicationId);
+        return _mapper.Map<WebApplicationViewModel>(app);
+    }
+
     public async Task Rename(int appId, string name)
     {
         var app = await _webApplicationRepository.Get(appId);

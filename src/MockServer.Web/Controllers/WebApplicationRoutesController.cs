@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using MockServer.Core.WebApplications;
 using MockServer.Web.Attributes;
 using MockServer.Web.Filters;
 using MockServer.Web.Models.Common;
@@ -12,7 +13,7 @@ using RouteName = MockServer.Web.Common.Constants.RouteName;
 namespace MockServer.Web.Controllers;
 
 [Authorize]
-[Route("webapps/{AppName}/routes")]
+[Route("webapps/{WebApplicationName}/routes")]
 [GetAuthUserWebApplicationId(RouteName.WebApplicationName, RouteName.WebApplicationId)]
 public class WebApplicationRoutesController : Controller
 {
@@ -22,97 +23,127 @@ public class WebApplicationRoutesController : Controller
         _webApplicationRouteWebService = webApplicationRouteWebService;
     }
 
-    [HttpGet("/webapps/{AppName}")]
     [GetAuthUserWebApplicationId(RouteName.WebApplicationName, RouteName.WebApplicationId)]
-    public async Task<IActionResult> Index(int ProjectId)
+    public async Task<IActionResult> Index(int WebApplicationId)
     {
-        var vm = await _webApplicationRouteWebService.GetIndexModel(ProjectId);
+        var vm = await _webApplicationRouteWebService.GetIndexModel(WebApplicationId);
         return View("Views/WebApplications/Routes/Index.cshtml", vm);
     }
 
     [AjaxOnly]
     [HttpGet("create")]
-    public async Task<IActionResult> GetCreatePartial(int ProjectId)
+    public async Task<IActionResult> GetCreatePartial(int WebApplicationId)
     {
-        var model = await _webApplicationRouteWebService.GetCreateRouteModel(ProjectId);
+        var model = await _webApplicationRouteWebService.GetCreateRouteModel(WebApplicationId);
         return PartialView("Views/ProjectRequests/_CreateRequestPartial.cshtml", model);
     }
 
     [AjaxOnly]
     [HttpPost("create")]
-    public async Task<IActionResult> CreateAjax(int ProjectId, RouteSaveModel request)
+    public async Task<IActionResult> CreateAjax(int WebApplicationId, RouteSaveModel request)
     {
-        if (await _webApplicationRouteWebService.ValidateCreate(ProjectId, request, ModelState))
+        if (await _webApplicationRouteWebService.ValidateCreate(WebApplicationId, request, ModelState))
         {
             return Ok(new AjaxResult<RouteSaveModel>
             {
                 Errors = new List<Error>{ new("something went wrong") }
             });
         }
-        int id = await _webApplicationRouteWebService.Create(ProjectId, request);
+        int id = await _webApplicationRouteWebService.Create(WebApplicationId, request);
         return Ok(AjaxResult.Success());
     }
 
     [AjaxOnly]
-    [HttpGet("{RequestId:int}/edit")]
+    [HttpGet("{RouteId:int}/edit")]
     [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> GetEditPartial(int ProjectId, int RequestId)
+    public async Task<IActionResult> GetEditPartial(int WebApplicationId, int RouteId)
     {
-        var vm = await _webApplicationRouteWebService.GetEditRouteModel(RequestId);
+        var vm = await _webApplicationRouteWebService.GetEditRouteModel(RouteId);
         ViewData["FormMode"] = "Edit";
         return PartialView("Views/Requests/_CreateRequestPartial.cshtml", vm);
     }
 
     [AjaxOnly]
-    [HttpPost("{RequestId:int}/edit")]
+    [HttpPost("{RouteId:int}/edit")]
     [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> Edit(int RequestId, RouteSaveModel request)
+    public async Task<IActionResult> Edit(int RouteId, RouteSaveModel request)
     {
-        if (!await _webApplicationRouteWebService.ValidateEdit(RequestId, request, ModelState))
+        if (!await _webApplicationRouteWebService.ValidateEdit(RouteId, request, ModelState))
         {
             IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
             return BadRequest(allErrors);
         }
-        await _webApplicationRouteWebService.Edit(RequestId, request);
+        await _webApplicationRouteWebService.Edit(RouteId, request);
         return NoContent();
     }
 
     [AjaxOnly]
-    [HttpGet("{RequestId:int}")]
+    [HttpGet("{RouteId:int}")]
     [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> View(int RequestId)
+    public async Task<IActionResult> View(int RouteId)
     {
-        var vm = await _webApplicationRouteWebService.GetViewModel(RequestId);
+        var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
         return PartialView("Views/Requests/_RequestOpen.cshtml", vm);
     }
 
-    [AjaxOnly]
-    [HttpGet("{RequestId:int}/authorization")]
+    [HttpGet("{RouteId:int}")]
     [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> GetAuthorizationPartial(int ProjectId, int id)
+    public async Task<IActionResult> Details(int RouteId)
     {
-        var vm = await _webApplicationRouteWebService.GetAuthorizationViewModel(ProjectId, id);
+        var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
+        return View("Views/WebApplications/Routes/Details.cshtml", vm);
+    }
+
+    [HttpPost("{RouteId:int}/change-integration-type")]
+    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
+    public async Task<IActionResult> ChangeIntegrationType(int RouteId, RouteIntegrationType Type)
+    {
+        await _webApplicationRouteWebService.ChangeIntegrationType(RouteId, Type);
+        return RedirectToAction(nameof(Details), Request.RouteValues);
+    }
+
+    [AjaxOnly]
+    [HttpGet("{RouteId:int}/authorization")]
+    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
+    public async Task<IActionResult> GetAuthorizationPartial(int WebApplicationId, int id)
+    {
+        var vm = await _webApplicationRouteWebService.GetAuthorizationViewModel(WebApplicationId, id);
         return PartialView("Views/Requests/_AuthorizationConfigPartial.cshtml", vm);
     }
 
     [AjaxOnly]
-    [HttpPost("{RequestId:int}/authorization")]
+    [HttpPost("{RouteId:int}/authorization")]
     [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> ConfigAuthorization(int ProjectId, int RequestId, AuthorizationSaveModel auth)
+    public async Task<IActionResult> ConfigAuthorization(int WebApplicationId, int RouteId, AuthorizationSaveModel auth)
     {
-        await _webApplicationRouteWebService.AttachAuthorization(RequestId, auth);
-        return NoContent();
+        await _webApplicationRouteWebService.AttachAuthorization(RouteId, auth);
+        return Ok(new AjaxResult<AuthorizationSaveModel>
+        {
+            Data = auth
+        });
+    }
+
+    //[AjaxOnly]
+    [HttpGet("{RouteId:int}/mock-integration")]
+    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
+    public async Task<IActionResult> MockIntegration(int RouteId)
+    {
+        var integration = await _webApplicationRouteWebService.GetMockIntegration(RouteId);
+        return Ok(new AjaxResult<MockIntegrationViewModel>
+        {
+            Data = integration
+        });
     }
 
     [AjaxOnly]
-    [HttpPost("{RequestId:int}/mock-integration")]
+    [HttpPost("{RouteId:int}/mock-integration")]
     [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> SaveRequestConfiguration(int RequestId, MockIntegrationSaveModel config)
+    public async Task<IActionResult> MockIntegration(int RouteId, MockIntegrationSaveModel integration)
     {
-        await _webApplicationRouteWebService.SaveMockIntegration(RequestId, config);
+        await _webApplicationRouteWebService.SaveMockIntegration(RouteId, integration);
         return Ok(new AjaxResult<MockIntegrationSaveModel>
         {
-            Data = config
+            Data = integration
         });
     }
 

@@ -38,7 +38,7 @@ public class ValidateProjectRequestAttribute : ActionFilterAttribute
         {
             var requestRepository = context.HttpContext.RequestServices.GetService<IWebApplicationRouteRepository>();
             var request = await requestRepository.GetById(requestId.Value);
-            if (request == null || request.ApplicationId != projectId)
+            if (request == null || request.WebApplicationId != projectId)
             {
                 context.Result = new BadRequestObjectResult(context.ModelState);
                 return;

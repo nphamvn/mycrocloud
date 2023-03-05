@@ -11,4 +11,5 @@ public interface IWebApplicationWebService
     Task Rename(int appId, string name);
     Task Delete(int appId);
     Task SetAccessibility(int appId, WebApplicationAccessibility accessibility);
+    Task<WebApplicationViewModel> GetOverviewViewModel(int webApplicationId);
 }

@@ -6,9 +6,10 @@ namespace MockServer.Web.Models.WebApplications.Routes.Authorizations;
 
 public class AuthorizationSaveModel
 {
-    [Required]
-    public string Name { get; set; }
     public AuthorizationType Type { get; set; }
+    public IEnumerable<SelectListItem>? AuthorizationTypeSelectListItem { get; set; }
+    public IList<int> PolicyIds { get; set; }
+    public IEnumerable<SelectListItem>? PolicySelectListItem { get; set; }
     public List<int> AuthenticationSchemeIds { get; set; }
     public IList<AuthorizationPolicySaveModel> Policies { get; set; }
     public IEnumerable<SelectListItem>? AuthenticationSchemeSelectListItems { get; set; }

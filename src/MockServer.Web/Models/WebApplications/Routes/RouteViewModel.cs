@@ -21,7 +21,7 @@ public class RouteViewModel
     public RouteRequestBodyViewModel RequestBody { get; set; }
     public int ApplicationId { get; set; }
     public string Url => string.Format("https://{0}.{1}.mockserver.com:5000/{2}", WebApplication.Name, WebApplication.User.Username, Path);
-    public IEnumerable<SelectListItem> StatusCodeSelectListItem { get; set; }
+    public IEnumerable<SelectListItem> MethodSelectListItem { get; set; }
     public string MethodTextColor
         => Method switch
         {

@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MockServer.Web.Filters;
 using MockServer.Web.Models.WebApplications;
 using MockServer.Web.Services;
+using static MockServer.Web.Common.Constants;
+
 namespace MockServer.Web.Controllers;
 
 [Authorize]
@@ -26,7 +29,7 @@ public class WebApplicationsController : BaseController
     public async Task<IActionResult> Create()
     {
         var vm = new WebApplicationCreateModel();
-        return View("Views/Projects/Create.cshtml", vm);
+        return View("Views/WebApplications/WebApplications.Create.cshtml", vm);
     }
 
     [HttpPost("create")]
@@ -34,10 +37,25 @@ public class WebApplicationsController : BaseController
     {
         if (!ModelState.IsValid)
         {
-            return View("Views/Projects/Create.cshtml", app);
+            return View("Views/WebApplications/WebApplications.Create.cshtml", app);
         }
         await _webApplicationWebService.Create(app);
 
         return RedirectToAction(nameof(View), new { ProjectName = app.Name });
+    }
+
+    [HttpGet("{WebApplicationName}")]
+    [GetAuthUserWebApplicationId(RouteName.WebApplicationName, RouteName.WebApplicationId)]
+    public IActionResult Home(int WebApplicationId)
+    {
+        return RedirectToAction(nameof(Overview), Request.RouteValues);
+    }
+
+    [HttpGet("{WebApplicationName}/overview")]
+    [GetAuthUserWebApplicationId(RouteName.WebApplicationName, RouteName.WebApplicationId)]
+    public async Task<IActionResult> Overview(int WebApplicationId)
+    {
+        var vm = await _webApplicationWebService.Get(WebApplicationId);
+        return View("Views/WebApplications/WebApplications.Overview.cshtml", vm);
     }
 }

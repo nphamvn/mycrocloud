@@ -4,21 +4,21 @@
 @{
     var rv = new { name = Model.Name };
 }
-<partial name="/Views/ProjectShared/_Breadcrumb.cshtml" model="Model" />
-<div style="height: calc(100vh - 180px);">
-    <partial name="/Views/ProjectShared/_NavTabs.cshtml" model="Model" />
-    <div class="tab-content h-100">
-        <div class="tab-pane fade show active h-100">
+<div class="row">
+    <div class="col-2">
+        <partial name="/Views/WebApplications/_SideBar.cshtml" model="Model">
+    </div>
+    <div class="col-10">
+        <div class="tab-content h-100">
+            <div class="tab-pane fade show active h-100">
             <div class="row flex-nowrap">
                 <div class="col py-3">
-                    <h5>General</h5>
-                    <hr />
                     <!-- Rename: Start-->
                     <form action="@Url.Action(nameof(WebApplicationSettingsController.Rename), rv)"
                         class="mb-2 border-bottom pb-3">
                         <div class="row">
                             <div class="col-3">
-                                <strong for="newName" class="form-label font-semibold">Project name</strong>
+                                <strong for="newName" class="form-label font-semibold">Application name</strong>
                                 <div class="d-flex">
                                     <input class="form-control me-2" type="text" name="newName"
                                         value="@Model.Name" autocomplete="off">
@@ -28,56 +28,6 @@
                         </div>
                     </form>
                     <!-- Rename: End-->
-                    <!-- Change accessibility: Start-->
-                    <div class="set-accessibility col-6">
-                        <div class="d-flex mb-2">
-                            <form id="frmSetAccessibility"
-                                asp-action="@nameof(WebApplicationSettingsController.SetAccessibility)"
-                                asp-route-name="@Model.Name" method="post">
-                                <input type="hidden" name="accessibility">
-                            </form>
-                            <div class="me-auto">
-                                <strong>Accessibility</strong>
-                                @if (Model.Accessibility == WebApplicationAccessibility.Public)
-                                {
-                                    <div>The project is currently publicly accessible.</div>
-                                }
-                                else if (Model.Accessibility == WebApplicationAccessibility.Private)
-                                {
-                                    <div>The project is currently private.</div>
-                                }
-                            </div>
-                            <div class="dropdown mt-auto">
-                                <button class="btn btn-secondary" type="button" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    Change accessibility
-                                </button>
-                                <ul class="dropdown-menu">
-                                    @if (Model.Accessibility == WebApplicationAccessibility.Private)
-                                    {
-                                        <li>
-                                            <button type="button" class="dropdown-item btn btn-default"
-                                            name="setAccessibility" data-accessibility="@WebApplicationAccessibility.Public"
-                                            data-bs-toggle="modal" data-bs-target="#set-accessibility-confirm-modal">
-                                                Change to public
-                                            </button>
-                                        </li>
-                                    }
-                                    else if (Model.Accessibility == WebApplicationAccessibility.Public)
-                                    {
-                                        <li>
-                                            <button type="button" class="dropdown-item btn btn-default"
-                                            name="setAccessibility" data-accessibility="@WebApplicationAccessibility.Private"
-                                            data-bs-toggle="modal" data-bs-target="#set-accessibility-confirm-modal">
-                                                Change to private
-                                            </button>
-                                        </li>
-                                    }
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Change accessibility: End-->
                     <!-- Delete: Start-->
                     <div class="d-flex col-8">
                         <div class="me-auto">
@@ -91,31 +41,6 @@
                         </div>
                     </div>
                     <!-- Delete: End-->
-
-
-                    <!-- Change accessibility confirm modal-->
-                    <div class="modal fade" id="set-accessibility-confirm-modal" tabindex="-1" aria-hidden="true"
-                        role="dialog">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">Change project accessibility</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    Are you sure you want to change project accessibility?
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Close</button>
-                                    <button type="button" id="btnSubmitSetAccessiblity"
-                                        class="btn btn-light">Change</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Modal -->
                     <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog">
@@ -154,6 +79,7 @@
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 </div>
