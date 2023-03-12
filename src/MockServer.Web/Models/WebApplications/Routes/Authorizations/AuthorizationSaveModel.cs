@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MockServer.Core.WebApplications.Security;
 
@@ -11,6 +10,5 @@ public class AuthorizationSaveModel
     public IList<int> PolicyIds { get; set; }
     public IEnumerable<SelectListItem>? PolicySelectListItem { get; set; }
     public List<int> AuthenticationSchemeIds { get; set; }
-    public IList<AuthorizationPolicySaveModel> Policies { get; set; }
     public IEnumerable<SelectListItem>? AuthenticationSchemeSelectListItems { get; set; }
 }

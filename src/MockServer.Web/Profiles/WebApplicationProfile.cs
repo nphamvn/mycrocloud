@@ -15,6 +15,7 @@ using CoreAuthenticationScheme = MockServer.Core.WebApplications.Security.Authen
 using MockServer.Web.Models.WebApplications.Authentications;
 using CoreJwtBearerSchemeOptions = MockServer.Core.WebApplications.Security.JwtBearer.JwtBearerAuthenticationOptions;
 using MockServer.Web.Models.WebApplications.Authentications.JwtBearer;
+using MockServer.Web.Models.WebApplications.Authorizations;
 
 namespace MockServer.Web.Profiles;
 
@@ -40,9 +41,9 @@ public class WebApplicationProfile : Profile
         CreateMap<CoreMockIntegration, MockIntegrationSaveModel>().ReverseMap();
         CreateMap<CoreMockIntegration, MockIntegrationViewModel>();
 
-        CreateMap<CoreAuthorizationPolicy, AuthorizationPolicy>();
-        CreateMap<CoreAuthorizationPolicy, AuthorizationPolicySaveModel>().ReverseMap();
-        CreateMap<CoreAuthorizationPolicy, AuthorizationPolicyViewModel>();
+        CreateMap<CoreAuthorizationPolicy, Policy>();
+        CreateMap<CoreAuthorizationPolicy, PolicyIndexItem>();
+        CreateMap<CoreAuthorizationPolicy, PolicySaveModel>().ReverseMap();
 
         CreateMap<CoreAuthorization, Authorization>();
         CreateMap<CoreAuthorization, AuthorizationSaveModel>().ReverseMap();

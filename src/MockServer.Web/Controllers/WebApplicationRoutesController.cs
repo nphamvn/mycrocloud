@@ -88,10 +88,24 @@ public class WebApplicationRoutesController : Controller
 
     [HttpGet("{RouteId:int}")]
     [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> Details(int RouteId)
+    public async Task<IActionResult> Details(int RouteId, string tab = "overview")
     {
-        var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
-        return View("Views/WebApplications/Routes/Details.cshtml", vm);
+        ViewData["Tab"] = tab;
+        if (tab.Equals("Overview", StringComparison.OrdinalIgnoreCase))
+        {
+            var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
+            return View("Views/WebApplications/Routes/Details.cshtml", vm);
+        }
+        else if(tab.Equals("Integration", StringComparison.OrdinalIgnoreCase))
+        {
+            var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
+            return View("Views/WebApplications/Routes/Details.cshtml", vm);
+        }
+        else 
+        {
+            var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
+            return View("Views/WebApplications/Routes/Details.cshtml", vm);
+        }
     }
 
     [HttpPost("{RouteId:int}/change-integration-type")]
@@ -100,6 +114,14 @@ public class WebApplicationRoutesController : Controller
     {
         await _webApplicationRouteWebService.ChangeIntegrationType(RouteId, Type);
         return RedirectToAction(nameof(Details), Request.RouteValues);
+    }
+
+    [AjaxOnly]
+    [HttpPost("{RouteId:int}")]
+    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
+    public async Task<IActionResult> Edit(int WebApplicationId, int RouteId, RouteViewModel vm)
+    {
+        return Ok(vm);
     }
 
     [AjaxOnly]

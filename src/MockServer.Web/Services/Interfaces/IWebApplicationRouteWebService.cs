@@ -13,7 +13,7 @@ public interface IWebApplicationRouteWebService
     Task<int> Create(int appId, RouteSaveModel route);
     Task<bool> ValidateEdit(int routeId, RouteSaveModel route, ModelStateDictionary modelState);
     Task Edit(int routeId, RouteSaveModel route);
-    Task<RouteSaveModel> GetEditRouteModel(int requestId);
+    Task<RouteSaveModel> GetEditRouteModel(int routeId);
     Task<RouteSaveModel> GetCreateRouteModel(int appId);
     Task Delete(int routeId);
     Task<RouteViewModel> GetViewModel(int routeId);

@@ -10,7 +10,7 @@
             class="nav-link @(controller.Equals("ProjectRequests", StringComparison.OrdinalIgnoreCase) && action.Equals("Index", StringComparison.OrdinalIgnoreCase) ?"active":"") py-1" role="tab">Requests</a>
     </li>
     <li class="nav-item" role="presentation">
-        <a href="@Url.Action(nameof(WebApplicationAuthenticationsController.Index), "ProjectAuthentication", new {ProjectName=Model.Name})"
+        <a href="@Url.Action(nameof(WebApplicationAuthenticationsController.Settings), "ProjectAuthentication", new {ProjectName=Model.Name})"
             class="nav-link @(controller== "ProjectAuthentication"?"active":"") py-1" role="tab">Authentication</a>
     </li>
     <li class="nav-item" role="presentation">

@@ -1,143 +1,145 @@
 @using MockServer.Web.Controllers
 @model MockServer.Web.Models.WebApplications.Routes.Integrations.MockIntegrations.MockIntegrationViewModel
 <div class="mock-integration-details">
-    <div class="card mt-1">
-        <div class="card-header d-flex">
-            <div>
-                Code
+    <form method="post">
+        <div class="card mt-1">
+            <div class="card-header d-flex">
+                <div>
+                    Code
+                </div>
+                <div class="ms-auto">
+                    <button type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample">
+                        <i class="fa toggle-icon fa-minus"></i>
+                    </button>
+                </div>
             </div>
-            <div class="ms-auto">
-                <button type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample">
-                    <i class="fa toggle-icon fa-minus"></i>
-                </button>
+            <div class="collapse" id="collapseExample">
+                <div class="card-body">
+                    <textarea asp-for="Code" class="form-control" style="display: none;"></textarea>
+                    <div id="mockIntegrationCodeEditor" style="height: 300px;"></div>
+                </div>
             </div>
         </div>
-        <div class="collapse" id="collapseExample">
+        <div class="card mt-1">
+            <div class="card-header">
+                Response Configuration
+            </div>
             <div class="card-body">
-                <textarea asp-for="Code" class="form-control" style="display: none;"></textarea>
-                <div id="mockIntegrationCodeEditor" style="height: 300px;"></div>
-            </div>
-        </div>
-    </div>
-    <div class="card mt-1">
-        <div class="card-header">
-            Response Configuration
-        </div>
-        <div class="card-body">
-            <ul class="nav nav-tabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button type="button" class="nav-link active py-1" data-bs-toggle="tab"
-                        data-bs-target="#response-basic-tab">Basic</button>
-                </li>
-                <li class="nav-item">
-                    <button type="button" class="nav-link py-1" data-bs-toggle="tab"
-                        data-bs-target="#response-body-tab">Body</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button type="button" class="nav-link py-1" data-bs-toggle="tab"
-                        data-bs-target="#response-header-tab">Headers</button>
-                </li>
-            </ul>
-            <div class="tab-content" style="min-height: 200px;">
-                <div id="response-basic-tab" class="tab-pane fade show active p-2" role="tabpanel">
-                    <div class="mb-3 col-sm-2">
-                        <label class="form-label">Status code</label>
-                        <input type="text" list="commonStatusCodes" class="form-control form-control-sm"
-                            asp-for="ResponseStatusCode" />
-                        <datalist id="commonStatusCodes">
-                            @foreach (var item in Model.ResponseStatusCodeSelectListItems)
-                            {
-                                <option value="@item.Value">@item.Text</option>
-                            }
-                        </datalist>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Delay</label>
-                        <div class="d-flex">
-                            <div class="my-auto me-2">
-                                <input class="form-check-input" type="checkbox" asp-for="ResponseDelay"
-                                    checked="@Model.ResponseDelay">
-                            </div>
-                            <div class="col-2 me-1">
-                                <input type="number" class="form-control form-control-sm" min="0" max="10000"
-                                    asp-for="ResponseDelayTime">
-                            </div>
-                            <div class="my-auto">
-                                <label>miliseconds</label>
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button type="button" class="nav-link active py-1" data-bs-toggle="tab"
+                            data-bs-target="#response-basic-tab">Basic</button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="nav-link py-1" data-bs-toggle="tab"
+                            data-bs-target="#response-body-tab">Body</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button type="button" class="nav-link py-1" data-bs-toggle="tab"
+                            data-bs-target="#response-header-tab">Headers</button>
+                    </li>
+                </ul>
+                <div class="tab-content" style="min-height: 200px;">
+                    <div id="response-basic-tab" class="tab-pane fade show active p-2" role="tabpanel">
+                        <div class="mb-3 col-sm-2">
+                            <label class="form-label">Status code</label>
+                            <input type="text" list="commonStatusCodes" class="form-control form-control-sm"
+                                asp-for="ResponseStatusCode" />
+                            <datalist id="commonStatusCodes">
+                                @foreach (var item in Model.ResponseStatusCodeSelectListItems)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </datalist>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Delay</label>
+                            <div class="d-flex">
+                                <div class="my-auto me-2">
+                                    <input class="form-check-input" type="checkbox" asp-for="ResponseDelay"
+                                        checked="@Model.ResponseDelay">
+                                </div>
+                                <div class="col-2 me-1">
+                                    <input type="number" class="form-control form-control-sm" min="0" max="10000"
+                                        asp-for="ResponseDelayTime">
+                                </div>
+                                <div class="my-auto">
+                                    <label>miliseconds</label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div id="response-body-tab" class="tab-pane fade p-2" role="tabpanel">
-                    <div>
-                        <div class="d-flex">
-                            <div>
-                                <small>Text Format</small>
-                                <select asp-for="ResponseBodyTextFormat" id="response-body-type"
-                                    class="form-select form-select-sm w-auto mb-1">
-                                    <option value="plaintext" selected>Plain Text</option>
-                                    <option value="html">HTML</option>
-                                    <option value="xml">XML</option>
-                                    <option value="json">JSON</option>
-                                </select>
-                            </div>
-                            <div>
-                                <small>Render type</small>
-                                <select class="form-select form-select-sm w-auto mb-1"
-                                    asp-for="ResponseBodyTextRenderEngine">
-                                    <option value="1">Static</option>
-                                    <option value="2">Handlebars</option>
-                                    <option value="3">Expression with script</option>
-                                </select>
-                            </div>
-                        </div>
+                    <div id="response-body-tab" class="tab-pane fade p-2" role="tabpanel">
                         <div>
-                            <small>Text</small>
-                            <textarea asp-for="ResponseBodyText" style="display: none;"></textarea>
-                            <div id="response-body-text-editor" style="height: 200px;"></div>
+                            <div class="d-flex">
+                                <div>
+                                    <small>Text Format</small>
+                                    <select asp-for="ResponseBodyTextFormat" id="response-body-type"
+                                        class="form-select form-select-sm w-auto mb-1">
+                                        <option value="plaintext" selected>Plain Text</option>
+                                        <option value="html">HTML</option>
+                                        <option value="xml">XML</option>
+                                        <option value="json">JSON</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <small>Render type</small>
+                                    <select class="form-select form-select-sm w-auto mb-1"
+                                        asp-for="ResponseBodyTextRenderEngine">
+                                        <option value="1">Static</option>
+                                        <option value="2">Handlebars</option>
+                                        <option value="3">Expression with script</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <small>Text</small>
+                                <textarea asp-for="ResponseBodyText" style="display: none;"></textarea>
+                                <div id="response-body-text-editor" style="height: 200px;"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div id="response-header-tab" class="tab-pane fade p-2" role="tabpanel">
-                    <table id="response-header-table" class="table table-sm p-0 m-0">
-                        <thead>
-                            <tr>
-                                <th style="width: 35%" scope="col">Name</th>
-                                <th style="width: 55%" scope="col">Value</th>
-                                <th style="width: 10%" scope="col"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @{
-                                Model.ResponseHeaders.Add(new());
-                            }
-                            @for (int i = 0; i < Model.ResponseHeaders.Count; i++)
-                            {
+                    <div id="response-header-tab" class="tab-pane fade p-2" role="tabpanel">
+                        <table id="response-header-table" class="table table-sm p-0 m-0">
+                            <thead>
                                 <tr>
-                                    <td class="align-middle"><input asp-for="ResponseHeaders[i].Name" type="text"
-                                        class="form-control form-control-sm header-name" placeholder="name"
-                                        autocomplete="off">
-                                    </td>
-                                    <td class="align-middle">
-                                        <input type="text" class="form-control form-control-sm header-value"
-                                        asp-for="ResponseHeaders[i].Value" placeholder="value">
-                                    </td>
-                                    <td class="align-middle"><button
-                                        class="btn header-delete text-gray btn-show-on-hover"><i
-                                            class="bi bi-trash"></i></button>
-                                    </td>
+                                    <th style="width: 35%" scope="col">Name</th>
+                                    <th style="width: 55%" scope="col">Value</th>
+                                    <th style="width: 10%" scope="col"></th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @{
+                                    Model.ResponseHeaders.Add(new());
+                                }
+                                @for (int i = 0; i < Model.ResponseHeaders.Count; i++)
+                                {
+                                    <tr>
+                                        <td class="align-middle"><input asp-for="ResponseHeaders[i].Name" type="text"
+                                            class="form-control form-control-sm header-name" placeholder="name"
+                                            autocomplete="off">
+                                        </td>
+                                        <td class="align-middle">
+                                            <input type="text" class="form-control form-control-sm header-value"
+                                            asp-for="ResponseHeaders[i].Value" placeholder="value">
+                                        </td>
+                                        <td class="align-middle"><button
+                                            class="btn header-delete text-gray btn-show-on-hover"><i
+                                                class="bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="d-flex pt-2">
-        <button class="btn btn-primary btn-sm me-2 js-save-button">Save</button>
-        <button class="btn btn-secondary btn-sm">Cancel</button>
-    </div>
+        <div class="d-flex pt-2">
+            <button class="btn btn-primary btn-sm me-2 js-save-button">Save</button>
+            <button class="btn btn-secondary btn-sm">Cancel</button>
+        </div>
+    </form>
 </div>
 <script src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
 <script>
@@ -170,7 +172,7 @@
     });
 </script>
 <script>
-    $('.mock-integration-details .js-save-button').click(function() {
+    $('.mock-integration-details .js-save-button').click(function () {
         const code = mockIntegrationCodeEditor.getValue();
         const responseBodyText = responseBodyTextEditor.getValue();
         const responseBodyTextFormat = $('select[name="ResponseBodyTextFormat"] option:selected').val();
@@ -190,7 +192,7 @@
                 responseDelay: responseDelay,
                 responseDelayTime: responseDelayTime
             },
-            success: function(data) {
+            success: function (data) {
                 alert('saved');
             }
         });

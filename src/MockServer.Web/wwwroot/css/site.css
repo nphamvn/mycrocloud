@@ -195,10 +195,6 @@ body {
   background-color: rgb(34 197 94);
 }
 
-.request-list-item:hover {
-  cursor: pointer;
-}
-
 .btn-context-menu:hover {
   border-color: rgb(220, 220, 220);
 }

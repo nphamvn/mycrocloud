@@ -32,13 +32,6 @@ public class WebApplicationSettingsController : BaseController
         return RedirectToAction(nameof(Index), new { name = newName });
     }
 
-    [HttpPost("set-accessibility")]
-    public async Task<IActionResult> SetAccessibility(int ProjectId, WebApplicationAccessibility accessibility)
-    {
-        await _webApplicationWebService.SetAccessibility(ProjectId, accessibility);
-        return RedirectToAction(nameof(View), Request.RouteValues);
-    }
-
     [HttpPost("delete")]
     public async Task<IActionResult> Delete(int ProjectId)
     {

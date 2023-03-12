@@ -18,11 +18,11 @@ public class ServiceRepository : IServiceRepository
         var query =
                 $"""
                 SELECT
-                    {(int)ServiceType.WebApp} Type,
+                    {(int)ServiceType.WebApplication} Type,
                     Id,
                     Name
                 FROM
-                    Project
+                    WebApplication
                 WHERE 
                     UserId = @UserId
                 UNION

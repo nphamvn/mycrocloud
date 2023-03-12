@@ -2,7 +2,7 @@ namespace MockServer.Core.Services;
 
 public enum ServiceType
 {
-    WebApp = 1,
+    WebApplication = 1,
     UserPool,
     Authorizer,
     Database

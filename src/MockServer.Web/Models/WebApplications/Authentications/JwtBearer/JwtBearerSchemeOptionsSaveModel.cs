@@ -4,6 +4,10 @@ namespace MockServer.Web.Models.WebApplications.Authentications.JwtBearer;
 
 public class JwtBearerSchemeOptionsSaveModel
 {
+    public JwtBearerSchemeOptionsSaveModel()
+    {
+        SymmetricSecuritySecretKeys = new List<string>();
+    }
     public bool RequireHttpsMetadata { get; set; } = false;
     public string MetadataAddress { get; set; }
     public string SecretKey { get; set; }

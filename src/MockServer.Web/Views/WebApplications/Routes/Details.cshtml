@@ -1,222 +1,207 @@
-@using MockServer.Web.Controllers
 @using MockServer.Core.WebApplications
+@using MockServer.Web.Controllers
 @using MockServer.Web.Models.WebApplications.Routes
 @model MockServer.Web.Models.WebApplications.Routes.RouteViewModel
 @{
     ViewData["WebApplicationName"] = Model.WebApplication.Name;
     ViewData["RouteId"] = Model.Id;
+    var tab = ViewData["Tab"] as string;
 }
-<div>
-    <div class="card">
-        <div class="card-header">
-            Overview
-        </div>
-        <div class="card-body">
-            <div class="py-2">
-                <input type="text" asp-for="Name" class="form-control form-control-sm" aria-autocomplete="none">
-            </div>
-            <div class="py-2 d-flex">
-                <select asp-for="Method" asp-items="Model.MethodSelectListItem"
-                    class="form-select form-select-sm w-auto me-2">
-                </select>
-                <input type="text" asp-for="Path" class="form-control form-control-sm">
-            </div>
-            <div class="input-group input-group-sm py-2">
-                <input type="text" class="form-control form-control-sm" value="@Model.Url" readonly>
-                <button type="button" class="input-group-text "><i class="bi bi-clipboard"></i></button>
-            </div>
-            <div class="d-flex pt-2">
-                <button class="btn btn-primary btn-sm me-2">Save</button>
-                <button class="btn btn-secondary btn-sm">Cancel</button>
-            </div>
-        </div>
-    </div>
-    <div class="card mt-1">
-        <div class="card-header">
-            Authorization
-        </div>
-        <div class="card-body">
-            <div class="py-2">
-                <label>Authorization Type</label>
-                <select asp-for="Authorization.Type" asp-items="Model.Authorization.AuthorizationTypeSelectListItem"
-                    class="form-select form-select-sm w-auto"></select>
-            </div>
-            <div class="py-2">
-                <label for="optional">Policy</label>
-                <select asp-for="Authorization.PolicyIds" asp-items="Model.Authorization.PolicySelectListItem"
-                    id="authorization-policy" multiple="multiple" data-placeholder="Select policies...">
-                </select>
-                <script>
-                    var authorizationPolicy = $("#authorization-policy").kendoMultiSelect({
-                        autoClose: false
-                    }).data("kendoMultiSelect");
-                </script>
-            </div>
-            <div class="d-flex pt-2">
-                <button class="btn btn-primary btn-sm me-2">Save</button>
-                <button class="btn btn-secondary btn-sm">Cancel</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="card mt-1">
-    <style type="text/css" media="screen">
-        #request-body-editor,
-        #response-body-editor,
-        #response-body-render-script {
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-        }
-    </style>
-    <div class="card-header">
-        Request Validation
-    </div>
-    <div class="card-body">
-        <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button type="button" class="nav-link active py-1" data-bs-toggle="tab"
-                    data-bs-target="#request-param-tab">Queries</button>
-            </li>
-            <li class="nav-item">
-                <button type="button" class="nav-link py-1" data-bs-toggle="tab"
-                    data-bs-target="#request-header-tab">Headers</button>
-            </li>
-            <li class="nav-item">
-                <button type="button" class="nav-link py-1" data-bs-toggle="tab"
-                    data-bs-target="#request-body-tab">Body</button>
-            </li>
-        </ul>
-        <div class="tab-content" style="min-height: 200px;">
-            <div id="request-param-tab" class="tab-pane fade show active p-2" role="tabpanel">
-                <table id="request-params" class="table table-sm p-0 m-0">
-                    <thead>
-                        <tr>
-                            <th style="width: 20%" scope="col">Key</th>
-                            <th style="width: 75%" scope="col">Constraints</th>
-                            <th style="width: 5%" scope="col">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @{
-                            if (Model.RequestQueries == null)
-                            {
-                                Model.RequestQueries = new List<RouteRequestQueryViewModel>();
-                            }
-                            Model.RequestQueries.Add(new());
-                        }
-                        @for (int i = 0; i < Model.RequestQueries.Count; i++)
-                        {
-                            <tr>
-                                <td class="align-middle"><input asp-for="RequestQueries[i].Key" type="text"
-                                    class="form-control form-control-sm param-key" placeholder="key" autocomplete="off">
-                                </td>
-                                <td class="align-middle">
-                                    <div>
-                                        <input type="hidden" asp-for="RequestQueries[i].Constraints">
-                                        <button class="ms-2 js-config-param-constraints"><i
-                                            class="bi bi-box-arrow-in-up-right"></i></button>
-                                    </div>
-                                </td>
-                                <td class="align-middle"><button class="btn param-delete text-gray btn-show-on-hover"><i
-                                        class="bi bi-trash"></i></button>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <div id="request-header-tab" class="tab-pane fade p-2" role="tabpanel">
-                <table id="request-header-table" class="table table-sm p-0 m-0">
-                    <thead>
-                        <tr>
-                            <th style="width: 20%" scope="col">Header</th>
-                            <th style="width: 75%" scope="col">Constraints</th>
-                            <th style="width: 5%" scope="col">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @{
-                            if (Model.RequestHeaders == null)
-                            {
-                                Model.RequestHeaders = new List<RouteRequestHeaderViewModel>();
-                            }
-                            Model.RequestHeaders.Add(new());
-                        }
-                        @for (int i = 0; i < Model.RequestHeaders.Count; i++)
-                        {
-                            <tr>
-                                <td class="align-middle"><input type="text" class="form-control form-control-sm"
-                                    asp-for="RequestHeaders[i].Name" placeholder="name">
-                                </td>
-                                <td class="align-middle"><input type="hidden" asp-for="RequestHeaders[i].Constraints">
-                                </td>
-                                <td class="align-middle"><button class="btn header-delete text-gray btn-show-on-hover"><i
-                                        class="bi bi-trash"></i></button>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-            <div id="request-body-tab" class="tab-pane fade p-2" role="tabpanel">
-                @if (Model.RequestBody == null)
-                {
-                    Model.RequestBody = new RouteRequestBodyViewModel
-                    {
-                        Constraints = new List<string>()
-                    };
-                }
-                <div class="mt-1">
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button"
+            role="tab" aria-controls="home-tab-pane" aria-selected="true">Overview</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button"
+            role="tab" aria-controls="profile-tab-pane" aria-selected="false">Integration</a>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+        <form method="post">
+            <div class="card mt-1">
+                <div class="card-header">
+                    Basic Info
+                </div>
+                <div class="card-body">
                     <div>
-                        <div class="form-check me-5">
-                            <input class="form-check-input" type="checkbox"
-                                checked="@(Model.RequestBody.Constraints.Contains("Required"))">
-                            <label class="form-check-label">Required</label>
-                        </div>
+                        <small>Name</small>
+                        <input type="text" asp-for="Name" class="form-control form-control-sm" aria-autocomplete="none">
+                    </div>
+                    <div class="mt-1 d-flex">
                         <div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox"
-                                    checked="@(Model.RequestBody.Constraints.Contains("MatchExactly"))">
-                                <label class="form-check-label">Match Exactly</label>
-                            </div>
-                            <div>
-                                <textarea class="form-control"></textarea>
-                            </div>
+                            <small>Method</small>
+                            <select asp-for="Method" asp-items="Model.MethodSelectListItem"
+                                class="form-select form-select-sm w-auto me-2">
+                            </select>
+                        </div>
+                        <div class="flex-fill">
+                            <small>Path</small>
+                            <input type="text" asp-for="Path" class="form-control form-control-sm">
                         </div>
                     </div>
-                    <div class="card mt-2">
-                        <div class="card-header">
-                            Fields Constrains
+                    <div class="mt-1">
+                        <small>Url</small>
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control" value="@Model.Url" readonly>
+                            <button type="button" class="input-group-text "><i class="bi bi-clipboard"></i></button>
                         </div>
-                        <div class="card-body">
-                            <p>Tips: </p>
-                            <table id="request-header-table" class="table table-sm">
+                    </div>
+                </div>
+            </div>
+            <div class="card mt-1">
+                <div class="card-header">
+                    Integration Type
+                </div>
+                <div class="card-body">
+                    <small>Integration Type</small>
+                    <select asp-for="IntegrationType" class="form-select form-select-sm w-auto">
+                        <option>Mock Integration</option>
+                        <option>Direct Forwarding</option>
+                        <option>Function Trigger</option>
+                    </select>
+                    <p class="form-text">If you change the integration type, configuration for current type will be
+                        lost.</p>
+                </div>
+            </div>
+            <div class="card mt-1">
+                <div class="card-header">
+                    Authorization
+                </div>
+                <div class="card-body">
+                    <div>
+                        <small>Authorization Type</small>
+                        <select asp-for="Authorization.Type"
+                            asp-items="Model.Authorization.AuthorizationTypeSelectListItem"
+                            class="form-select form-select-sm w-auto"></select>
+                    </div>
+                    <div class="mt-1">
+                        <small>Policy</small>
+                        <select asp-for="Authorization.PolicyIds" asp-items="Model.Authorization.PolicySelectListItem"
+                            id="authorization-policy" multiple="multiple" data-placeholder="Select policies...">
+                        </select>
+                        <script>
+                            var authorizationPolicy = $("#authorization-policy").kendoMultiSelect({
+                                autoClose: false
+                            }).data("kendoMultiSelect");
+                        </script>
+                    </div>
+                </div>
+            </div>
+            <div class="card mt-1">
+                <div class="card-header">
+                    Request Validation
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button type="button" class="nav-link active py-1" data-bs-toggle="tab"
+                                data-bs-target="#request-param-tab">Queries</button>
+                        </li>
+                        <li class="nav-item">
+                            <button type="button" class="nav-link py-1" data-bs-toggle="tab"
+                                data-bs-target="#request-header-tab">Headers</button>
+                        </li>
+                        <li class="nav-item">
+                            <button type="button" class="nav-link py-1" data-bs-toggle="tab"
+                                data-bs-target="#request-body-tab">Body</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" style="min-height: 200px;">
+                        <div id="request-param-tab" class="tab-pane fade show active p-2" role="tabpanel">
+                            <table id="request-params" class="table table-sm p-0 m-0">
                                 <thead>
                                     <tr>
-                                        <th style="width: 20%" scope="col">Field</th>
+                                        <th style="width: 20%" scope="col">Key</th>
                                         <th style="width: 75%" scope="col">Constraints</th>
                                         <th style="width: 5%" scope="col">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @{
-                                        if (Model.RequestBody.FieldConstraints == null)
+                                        if (Model.RequestQueries == null)
                                         {
-                                            Model.RequestBody.FieldConstraints = new List<RouteRequestBodyFieldConstraint>();
+                                            Model.RequestQueries = new List<RouteRequestQueryViewModel>();
                                         }
-                                        Model.RequestBody.FieldConstraints.Add(new());
+                                        Model.RequestQueries.Add(new());
                                     }
-                                    @for (int i = 0; i < Model.RequestBody.FieldConstraints.Count; i++)
+                                    @for (int i = 0; i < Model.RequestQueries.Count; i++)
+                                    {
+                                        <tr>
+                                            <td class="align-middle"><input asp-for="RequestQueries[i].Key" type="text"
+                                                class="form-control form-control-sm param-key" placeholder="key"
+                                                autocomplete="off">
+                                            </td>
+                                            <td class="align-middle">
+                                                <div class="d-flex">
+                                                    <div class="js-query-constraint-list"
+                                                    data-id="@Html.IdFor(m => m.RequestQueries[i].Constraints)"
+                                                    data-name="@Html.NameFor(m => m.RequestQueries[i].Constraints)">
+                                                        @for (int j = 0; j < Model.RequestQueries[i].Constraints.Count; j++)
+                                                        {
+                                                            <input type="hidden" asp-for="RequestQueries[i].Constraints[j]">
+                                                        }
+                                                    </div>
+                                                    <select class="js-query-constraint-list" multiple></select>
+                                                    <button class="ms-2 js-query-constraint-button">
+                                                        <i class="bi bi-box-arrow-in-up-right"></i></button>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle"><button
+                                                class="btn param-delete text-gray btn-show-on-hover"><i
+                                                    class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    }
+                                    <script>
+                                        $('div.js-query-constraint-list').each(function () {
+                                            let dataSource = [];
+                                            $('input', $(this)).each(function () {
+                                                dataSource.push({name: $(this).val(), value: $(this).val()});
+                                            });
+                                            var multiselect = $(this).siblings("select.js-query-constraint-list").kendoMultiSelect({
+                                                dataSource: dataSource,
+                                                dataTextField: 'name',
+                                                dataValueField: 'value',
+                                                clearButton: false
+                                            })
+                                                .data("kendoMultiSelect");
+                                            var values = $.map(dataSource, function (dataItem) {
+                                                return dataItem.value;
+                                            });
+                                            multiselect.value(values);
+                                            multiselect.readonly(true);
+                                        });
+                                    </script>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="request-header-tab" class="tab-pane fade p-2" role="tabpanel">
+                            <table id="request-header-table" class="table table-sm p-0 m-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 20%" scope="col">Header</th>
+                                        <th style="width: 75%" scope="col">Constraints</th>
+                                        <th style="width: 5%" scope="col">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        if (Model.RequestHeaders == null)
+                                        {
+                                            Model.RequestHeaders = new List<RouteRequestHeaderViewModel>();
+                                        }
+                                        Model.RequestHeaders.Add(new());
+                                    }
+                                    @for (int i = 0; i < Model.RequestHeaders.Count; i++)
                                     {
                                         <tr>
                                             <td class="align-middle"><input type="text" class="form-control form-control-sm"
-                                                asp-for="RequestBody.FieldConstraints[i].Field" placeholder="field">
+                                                asp-for="RequestHeaders[i].Name" placeholder="name">
                                             </td>
                                             <td class="align-middle"><input type="hidden"
-                                                asp-for="RequestBody.FieldConstraints[i].Constraints">
+                                                asp-for="RequestHeaders[i].Constraints">
                                             </td>
                                             <td class="align-middle"><button
                                                 class="btn header-delete text-gray btn-show-on-hover"><i
@@ -227,41 +212,98 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div id="request-body-tab" class="tab-pane fade p-2" role="tabpanel">
+                            @if (Model.RequestBody == null)
+                            {
+                                Model.RequestBody = new RouteRequestBodyViewModel
+                                {
+                                    Constraints = new List<string>()
+                                };
+                            }
+                            <div class="mt-1">
+                                <div>
+                                    <div class="form-check me-5">
+                                        <input class="form-check-input" type="checkbox"
+                                            checked="@(Model.RequestBody.Constraints.Contains("Required"))">
+                                        <label class="form-check-label">Required</label>
+                                    </div>
+                                    <div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                checked="@(Model.RequestBody.Constraints.Contains("MatchExactly"))">
+                                            <label class="form-check-label">Match Exactly</label>
+                                        </div>
+                                        <div>
+                                            <textarea class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card mt-2">
+                                    <div class="card-header">
+                                        Fields Constrains
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Tips: </p>
+                                        <table id="request-header-table" class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 20%" scope="col">Field</th>
+                                                    <th style="width: 75%" scope="col">Constraints</th>
+                                                    <th style="width: 5%" scope="col">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{
+                                                    if (Model.RequestBody.FieldConstraints == null)
+                                                    {
+                                                        Model.RequestBody.FieldConstraints = new
+                                                        List<RouteRequestBodyFieldConstraint>();
+                                                    }
+                                                    Model.RequestBody.FieldConstraints.Add(new());
+                                                }
+                                                @for (int i = 0; i < Model.RequestBody.FieldConstraints.Count; i++)
+                                                {
+                                                    <tr>
+                                                        <td class="align-middle"><input type="text"
+                                                            class="form-control form-control-sm"
+                                                            asp-for="RequestBody.FieldConstraints[i].Field"
+                                                            placeholder="field">
+                                                        </td>
+                                                        <td class="align-middle"><input type="hidden"
+                                                            asp-for="RequestBody.FieldConstraints[i].Constraints">
+                                                        </td>
+                                                        <td class="align-middle"><button
+                                                            class="btn header-delete text-gray btn-show-on-hover"><i
+                                                                class="bi bi-trash"></i></button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="d-flex pt-2">
-            <button class="btn btn-primary btn-sm me-2">Save</button>
-            <button class="btn btn-secondary btn-sm">Cancel</button>
-        </div>
-    </div>
-</div>
-<div class="card mt-2">
-    <div class="card-header">
-        Integration Type
-    </div>
-    <div class="card-body">
-        <form method="post" asp-action="nameof(WebApplicationRoutesController.)" class="d-flex">
-            <label class="form-label ">Integration Type</label>
-            <select asp-for="IntegrationType" class="form-select form-select-sm w-auto">
-                <option>Mock Integration</option>
-                <option>Direct Forwarding</option>
-                <option>Function Trigger</option>
-            </select>
-            <button type="submit" class="btn btn-primary btn-sm">Change</button>
+            <div class="mt-1 p-2">
+                <button type="button" class="btn btn-primary js-save-info">Save</button>
+            </div>
         </form>
     </div>
-</div>
-<div class="card mt-2">
-    <div class="card-header">
-        Integration Details
-    </div>
-    <div class="card-body">
-        @if (Model.IntegrationType == RouteIntegrationType.MockIntegration)
-        {
-            <partial name="_RouteMockIntegration.cshtml" model="Model.Integration" />
-        }
+    <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+        <div class="card mt-2">
+            <div class="card-header">
+                Integration Details
+            </div>
+            <div class="card-body js-integration-details">
+                @if (Model.IntegrationType == RouteIntegrationType.MockIntegration)
+                {
+                    <partial name="_RouteMockIntegration.cshtml" model="Model.Integration" />
+                }
+            </div>
+        </div>
     </div>
 </div>
 <div class="row">
@@ -320,9 +362,9 @@
                 </td>
             </tr>
         </template>
-        <template id="requestParamConstraintsConfig">
+        <template id="constraints-config-modal">
             <div class="modal fade">
-                <div class="modal-dialog modal-lg">
+                <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Constraints</h5>
@@ -334,8 +376,7 @@
                                     <input class="form-check-input" type="checkbox" name="required" />
                                     <label class="form-check-label">Required</label>
                                 </div>
-                                <div class="form-text">Used to enforce that a non-parameter value is present
-                                </div>
+                                <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
                             </div>
                             <hr />
                             <div>
@@ -344,8 +385,7 @@
                                         <input class="form-check-input" type="checkbox" name="type" />
                                         <label class="form-check-label">Type</label>
                                     </div>
-                                    <select class="ms-auto form-select form-select-sm" style="width: 100px;"
-                                        name="type">
+                                    <select class="ms-3 form-select form-select-sm" style="width: 100px;" name="type">
                                         <option value="int">Int</option>
                                         <option value="bool">Boolean</option>
                                         <option value="datetime">Datetime</option>
@@ -356,7 +396,7 @@
                                         <option value="long">Long</option>
                                     </select>
                                 </div>
-                                <p class="form-text">Used to enforce that a non-parameter value is present</p>
+                                <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
                             </div>
                             <hr />
                             <div>
@@ -365,10 +405,10 @@
                                         <input class="form-check-input" type="checkbox" name="minlength" />
                                         <label class="form-check-label">Minimum Length</label>
                                     </div>
-                                    <input class="ms-auto form-control form-control-sm" style="width: 100px;"
-                                        type="number" name="minlength" />
+                                    <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
+                                        name="minlength" placeholder="0" />
                                 </div>
-                                <p class="form-text">Used to enforce that a non-parameter value is present</p>
+                                <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
                             </div>
                             <hr />
                             <div>
@@ -377,10 +417,10 @@
                                         <input class="form-check-input" type="checkbox" name="maxlength" />
                                         <label class="form-check-label">Maximum Length</label>
                                     </div>
-                                    <input class="ms-auto form-control form-control-sm" style="width: 100px;"
-                                        type="number" name="maxlength" />
+                                    <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
+                                        name="maxlength" placeholder="100" />
                                 </div>
-                                <p class="form-text">Used to enforce that a non-parameter value is present</p>
+                                <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
                             </div>
                             <hr />
                             <div>
@@ -389,12 +429,11 @@
                                         <input class="form-check-input" type="checkbox" name="length" />
                                         <label class="form-check-label">Length</label>
                                     </div>
-                                    <input class="ms-auto form-control form-control-sm" style="width: 100px;"
-                                        type="number" name="length" />
+                                    <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
+                                        name="length" placeholder="50" />
                                 </div>
-                                <p class="form-text">Constrains value to be a string of a given length or within
-                                    a given range
-                                    of lengths.</p>
+                                <p class="form-text d-none">Constrains value to be a string of a given length or within
+                                    a given range of lengths.</p>
                             </div>
                             <hr />
                             <div>
@@ -403,10 +442,10 @@
                                         <input class="form-check-input" type="checkbox" name="min" />
                                         <label class="form-check-label">Min</label>
                                     </div>
-                                    <input class="ms-auto form-control form-control-sm" style="width: 100px;"
-                                        type="number" name="min" />
+                                    <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
+                                        name="min" placeholder="0" />
                                 </div>
-                                <p class="form-text">Constrains a route parameter to be a long with a minimum
+                                <p class="form-text d-none">Constrains a route parameter to be a long with a minimum
                                     value.</p>
                             </div>
                             <hr />
@@ -416,11 +455,11 @@
                                         <input class="form-check-input" type="checkbox" name="max" />
                                         <label class="form-check-label">Max</label>
                                     </div>
-                                    <input class="ms-auto form-control form-control-sm" style="width: 100px;"
-                                        type="number" name="max" />
+                                    <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
+                                        name="max" placeholder="100" />
                                 </div>
-                                <p class="form-text">Constrains a route parameter to be an integer with a
-                                    maximum value.</p>
+                                <p class="form-text d-none">Constrains a route parameter to be an integer with a maximum
+                                    value.</p>
                             </div>
                             <hr />
                             <div>
@@ -429,17 +468,16 @@
                                         <input class="form-check-input" type="checkbox" name="range" />
                                         <label class="form-check-label">Range</label>
                                     </div>
-                                    <div class="ms-auto d-flex">
+                                    <div class="ms-3 d-flex">
                                         <input class="form-control form-control-sm" style="width: 100px;" type="number"
-                                            name="range-min" />
+                                            name="range-min" placeholder="1" />
                                         <label class="form-label mx-2">~</label>
                                         <input class="form-control form-control-sm" style="width: 100px;" type="number"
-                                            name="range-max" />
+                                            name="range-max" placeholder="100" />
                                     </div>
                                 </div>
-                                <p class="form-text">Constraints a route parameter to be an integer within a
-                                    given range of
-                                    values.</p>
+                                <p class="form-text d-none">Constraints a route parameter to be an integer within a
+                                    given range of values.</p>
                             </div>
                             <hr />
                             <div>
@@ -449,9 +487,8 @@
                                         <label class="form-check-label">Alpha</label>
                                     </div>
                                 </div>
-                                <p class="form-text">Constraints a route parameter to be an integer within a
-                                    given range of
-                                    values.</p>
+                                <p class="form-text d-none">Constraints a route parameter to be an integer within a
+                                    given range of values.</p>
                             </div>
                             <hr />
                             <div>
@@ -460,17 +497,16 @@
                                         <input class="form-check-input" type="checkbox" name="regex" />
                                         <label class="form-check-label">Regex</label>
                                     </div>
-                                    <input class="ms-auto form-control form-control-sm w-50" type="text"
-                                        name="expression" />
+                                    <input class="ms-3 form-control form-control-sm w-50" type="text" name="pattern"
+                                        placeholder="ab+c" />
                                 </div>
-                                <p class="form-text">Constraints a route parameter to be an integer within a
-                                    given range of
-                                    values.</p>
+                                <p class="form-text d-none">Constraints a route parameter to be an integer within a
+                                    given range of values.</p>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary js-save">Save</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary js-save">Ok</button>
                         </div>
                     </div>
                 </div>
@@ -479,4 +515,250 @@
     </div>
 </div>
 </div>
-<partial name="_RequestOpenScript.cshtml" />
+<script>
+    function initialize() {
+        initOverviewScript();
+
+        setUpRequestBodyEditor();
+        setUpHandlerScriptEditor();
+        setUpResponseBodyEditor();
+
+        addTableEventListener();
+    }
+</script>
+<script>
+    function initOverviewScript() {
+        $('.js-basic-edit-button').click(function () {
+            $.get({
+                url: '@Url.Action(nameof(WebApplicationRoutesController.GetEditPartial), "ProjectRequests", new {ProjectName = Model.WebApplication.Name, RequestId = Model.Id})',
+                success: function (data) {
+                    const html = data;
+                    const partial = $('<div></div>').html(data);
+                    const modal = $('.modal', partial);
+                    modal.on('shown.bs.modal', function () {
+                        $('.js-save-button', modal).click(function () {
+                            let request = {
+                                Type: $('input[name=Type]:checked', modal).val(),
+                                Name: $('input[name=Name]', modal).val(),
+                                Description: $('input[name=Description]', modal).val(),
+                                Method: $('select[name=Method] option:selected', modal).val(),
+                                Path: $('input[name=Path]', modal).val()
+                            };
+                            $.post({
+                                url: '@Url.Action(nameof(WebApplicationRoutesController.Edit), "ProjectRequests", new {ProjectName = Model.WebApplication.Name, Model.Id})',
+                                data: request,
+                                success: function (data) {
+                                    $('.js-save-button', modal).off('click');
+                                    const id = data;
+                                    modal.data('id', id);
+                                    modal.modal('hide');
+                                },
+                                error: function () {
+                                    alert('something went wrong');
+                                }
+                            });
+                        });
+                    });
+                    modal.on('hidden.bs.modal', function (e) {
+                        if (modal.data('id') !== undefined) {
+                            console.log('TODO: open request id ' + modal.data('id'));
+                            location.reload();
+                        }
+                        modal.remove();
+                    });
+                    modal.modal('show');
+                }
+            });
+        });
+    }
+</script>
+<script>
+    function setUpEditors() {
+        setUpRequestBodyEditor();
+        setUpHandlerScriptEditor();
+        setUpResponseBodyEditor();
+    }
+    function setUpRequestBodyEditor() {
+        var editor = ace.edit("request-body-editor");
+        editor.setShowPrintMargin("false");
+        var textarea = $('textarea[name="RequestBody.Text"]').hide();
+        editor.getSession().setValue(textarea.val());
+        editor.getSession().on('change', function () {
+            textarea.val(editor.getSession().getValue());
+        });
+        $('#request-body-type').change(function (e) {
+            var mode = $('option:selected', $(this)).val();
+            setEditorMode(editor, mode);
+        }).change();
+    }
+
+    function setUpHandlerScriptEditor() {
+        var editor = ace.edit("response-body-render-script");
+        editor.setShowPrintMargin('false');
+        var textarea = $('textarea[name="Response.BodyRenderScript"]').hide();
+        editor.getSession().setValue(textarea.val());
+        editor.getSession().on('change', function () {
+            textarea.val(editor.getSession().getValue());
+        });
+        editor.session.setMode("ace/mode/javascript");
+    }
+
+    function setUpResponseBodyEditor() {
+        var editor = ace.edit("response-body-editor");
+        editor.setShowPrintMargin("false");
+        var textarea = $('textarea[name="Response.BodyText"]').hide();
+        editor.getSession().setValue(textarea.val());
+        editor.getSession().on('change', function () {
+            textarea.val(editor.getSession().getValue());
+        });
+        $('#response-body-type').change(function (e) {
+            var mode = $('option:selected', $(this)).val();
+            setEditorMode(editor, mode);
+        }).change();
+    }
+    function setEditorMode(editor, mode) {
+        if (mode === 'json') {
+            editor.session.setMode("ace/mode/json");
+        } else if (mode === 'xml') {
+            editor.session.setMode("ace/mode/xml");
+        } else if (mode === 'text') {
+            editor.session.setMode("ace/mode/text");
+        }
+    }
+</script>
+<script>
+    $('.js-save-info').click(function (e) {
+        e.preventDefault();
+        let form = $(this).parent('form');
+        let data = form.serialize();
+        alert(JSON.stringify(data));
+        return;
+        let params = [];
+        let headers = [];
+
+        let body = {
+            required: $("#request-body-tab input[name$='Required']").prop('checked'),
+            matchExactly: $("#request-body-tab input[name$='MatchExactly']").prop('checked'),
+            format: 'json',
+            text: $('textarea[name="RequestBody.Text"]').val()
+        };
+        $('#request-params tbody tr').each(function () {
+            const key = $("input[name$='Key']", this).val();
+            const value = $("input[name$='Value']", this).val();
+            const required = $("input[name$='Required']", this).prop('checked');
+            const matchExactly = $("input[name$='MatchExactly']", this).prop('checked');
+            const constraints = $("input[name$='Constraints']", this).val();
+            if (key !== '' && value !== '') {
+                params.push({
+                    key: key,
+                    value: value,
+                    required: required,
+                    matchExactly: matchExactly,
+                    constraints: constraints
+                });
+            }
+        });
+        $('#request-header-table tbody tr').each(function () {
+            const name = $("input[name$='Name']", this).val();
+            const value = $("input[name$='Value']", this).val();
+            const required = $("input[name$='Required']", this).prop('checked');
+            const matchExactly = $("input[name$='MatchExactly']", this).prop('checked');
+            if (name !== '' && value !== '') {
+                headers.push({
+                    name: name,
+                    value: value,
+                    required: required,
+                    matchExactly: matchExactly
+                });
+            }
+        });
+        let responseHeaders = [];
+        $('#response-header-table tbody tr').each(function () {
+            const name = $("input[name$='Name']", this).val();
+            const value = $("input[name$='Value']", this).val();
+            if (name !== '' && value !== '') {
+                responseHeaders.push({
+                    name: name,
+                    value: value
+                });
+            }
+        });
+
+        let response = {
+            statusCode: $('input[name="Response.StatusCode"]').val(),
+            bodyText: $('textarea[name="Response.BodyText"]').val(),
+            bodyTextRenderEngine: $('select[name="Response.BodyTextRenderEngine"] option:selected').val(),
+            bodyRenderScript: $('textarea[name="Response.BodyRenderScript"]').val(),
+            delay: $('input[name="Response.Delay"]').prop('checked'),
+            delayTime: $('input[name="Response.DelayTime"]').val()
+        };
+
+        $.post({
+            url: '@Url.Action(nameof(WebApplicationRoutesController.MockIntegration), "Requests", new { ProjectName = ViewData["ProjectName"], RequestId = ViewData["RequestId"]})',
+            data: {
+                RequestParams: params,
+                RequestHeaders: headers,
+                RequestBody: body,
+                ResponseHeaders: responseHeaders,
+                response: response
+            },
+            success: function (data) {
+            },
+            error: function (xhr, status, error) {
+                alert('Error:' + error);
+            }
+        });
+    });
+</script>
+<script>
+    $(function () {
+        $('.js-query-constraint-button').click(function () {
+            const modal = $($('#constraints-config-modal').html());
+            let list = $(this).siblings('div.js-query-constraint-list');
+            const id = list.data('id');
+            const name = list.data('name');
+            let values = [];
+            $('input', list).each(function () {
+                values.push($(this).val());
+            });
+            let regex;
+            values.forEach(function (v) {
+                regex = new RegExp('required');
+                if (regex.test(v)) {
+                    $('input[type=checkbox][name=required]', modal).prop('checked', true);
+                    return;
+                }
+            });
+            $('.js-save', modal).click(function () {
+                let dataSource = [];
+                if ($('input[type=checkbox][name=required]', modal).prop('checked')) {
+                    dataSource.push({name: 'required', value: 'required'});
+                }
+                if ($('input[type=checkbox][name=type]', modal).prop('checked')) {
+                    const type = $('select[name=type] option:selected', modal).val();
+                    dataSource.push({name: `type(${type})`, value: `type(${type})`});
+                }
+                list.empty();
+                dataSource.forEach(function (c, i) {
+                    list.append(`<input type="hidden" id="${id}_${i}_" name="${name}[${i}]" value="${c.value}">`);
+                    console.log(c.value);
+                });
+                var multiselect = $("select.js-query-constraint-list").kendoMultiSelect({
+                    dataSource: dataSource,
+                    dataTextField: 'name',
+                    dataValueField: 'value',
+                    clearButton: false
+                })
+                    .data("kendoMultiSelect");
+                multiselect.value([]);
+                var values = $.map(dataSource, function (dataItem) {
+                    return dataItem.value;
+                });
+                multiselect.value(values);
+                multiselect.readonly(true);
+                modal.modal('hide');
+            });
+            modal.modal('show');
+        });
+    });
+</script>

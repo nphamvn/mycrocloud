@@ -16,17 +16,66 @@ public class WebApplicationAuthorizationPolicyRepository : IWebApplicationAuthor
 
     public Task Add(int appId, Policy policy)
     {
-        throw new NotImplementedException();
+        var query =
+                """
+                INSERT INTO 
+                    WebApplicationAuthorizationPolicy (
+                        WebApplicationId,
+                        Name,
+                        ConditionalExpressions
+                    )
+                    VALUES (
+                        @WebApplicationId,
+                        @Name,
+                        @ConditionalExpressions
+                    );
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<List<string>>());
+        return connection.ExecuteAsync(query, new
+        {
+            WebApplicationId = appId,
+            Name = policy.Name,
+            ConditionalExpressions = policy.ConditionalExpressions,
+        });
     }
 
     public Task Delete(int policyId)
     {
-        throw new NotImplementedException();
+        var query =
+                """
+                DELETE FROM
+                    WebApplicationAuthorizationPolicy
+                WHERE
+                    Id = @Id
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        return connection.ExecuteAsync(query, new
+        {
+            Id = policyId
+        });
     }
 
     public Task<Policy> Get(int policyId)
     {
-        throw new NotImplementedException();
+        var query =
+                """
+                SELECT
+                    Id,
+                    WebApplicationId,
+                    Name,
+                    ConditionalExpressions
+                FROM
+                    WebApplicationAuthorizationPolicy
+                WHERE
+                    Id = @Id
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<List<string>>());
+        return connection.QuerySingleOrDefaultAsync<Policy>(query, new
+        {
+            Id = policyId
+        });
     }
 
     public Task<IEnumerable<Policy>> GetAll(int appId)
@@ -51,8 +100,25 @@ public class WebApplicationAuthorizationPolicyRepository : IWebApplicationAuthor
         });
     }
 
-    public Task Update(int appId, Policy policy)
+    public Task Update(int id, Policy policy)
     {
-        throw new NotImplementedException();
+        var query =
+                """
+                UPDATE
+                    WebApplicationAuthorizationPolicy
+                SET
+                    Name = @Name,
+                    ConditionalExpressions = @ConditionalExpressions
+                WHERE
+                    Id = @Id
+                """;
+        using var connection = new SqliteConnection(_connectionString);
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<List<string>>());
+        return connection.ExecuteAsync(query, new
+        {
+            Id = id,
+            Name = policy.Name,
+            ConditionalExpressions = policy.ConditionalExpressions
+        });
     }
 }

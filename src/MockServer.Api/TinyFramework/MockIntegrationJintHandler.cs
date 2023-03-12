@@ -100,7 +100,7 @@ public class MockIntegrationJintHandler : RequestHandler
             var getServiceTask = _databaseRepository.GetDatabaseUsingService(db.Id);
             getServiceTask.Wait();
             var services = getServiceTask.Result;
-            if (services.Any(s => s.Type == ServiceType.WebApp && s.Id == _webApplication.Id))
+            if (services.Any(s => s.Type == ServiceType.WebApplication && s.Id == _webApplication.Id))
             {
                 if (db.Adapter == nameof(JsonFileAdapter))
                 {

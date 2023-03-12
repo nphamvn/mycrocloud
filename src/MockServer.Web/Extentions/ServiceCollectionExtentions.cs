@@ -27,6 +27,8 @@ namespace MockServer.Web.Extentions
             services.AddScoped<IDatabaseRepository, DatabaseRespository>();
             services.AddScoped<IWebApplicationWebService, WebApplicationWebService>();
             services.AddScoped<IWebApplicationRouteWebService, WebApplicationRouteWebService>();
+            services.AddScoped<IWebApplicationAuthenticationWebService, WebApplicationAuthenticationWebService>();
+            services.AddScoped<IWebApplicationAuthorizationWebService, WebApplicationAuthorizationWebService>();
             services.AddScoped<IServiceRepository, ServiceRepository>();
             services.AddScoped<IDatabaseWebService, DatabaseWebService>();
         }

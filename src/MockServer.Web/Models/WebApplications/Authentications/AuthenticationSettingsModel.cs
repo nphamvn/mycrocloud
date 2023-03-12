@@ -1,13 +1,15 @@
 
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 namespace MockServer.Web.Models.WebApplications.Authentications;
 
-public class AuthenticationIndexModel
+public class AuthenticationSettingsModel
 {
-    public AuthenticationIndexModel()
+    public AuthenticationSettingsModel()
     {
         SelectedAuthenticationSchemeIds = new List<int>();
     }
     public WebApplication WebApplication { get; set; }
-    public IEnumerable<AuthenticationSchemeIndexItem> AuthenticationSchemes { get; set; }
+    public IEnumerable<SelectListItem> AuthenticationSchemeSelectListItem { get; set; }
     public IEnumerable<int> SelectedAuthenticationSchemeIds { get; set; }
 }

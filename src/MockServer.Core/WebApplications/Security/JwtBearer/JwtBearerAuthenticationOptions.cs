@@ -1,5 +1,3 @@
-using Microsoft.IdentityModel.Tokens;
-
 namespace MockServer.Core.WebApplications.Security.JwtBearer;
 
 public class JwtBearerAuthenticationOptions : AuthenticationSchemeOptions
