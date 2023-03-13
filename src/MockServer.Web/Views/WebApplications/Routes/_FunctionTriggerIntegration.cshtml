@@ -1,0 +1,7 @@
+@using MockServer.Web.Controllers
+@model MockServer.Web.Models.WebApplications.Routes.Integrations.FunctionTriggerIntegrations.FunctionTriggerIntegrationSaveModel
+<div>
+    <label class="form-label">Function Name</label>
+    <select asp-for="FunctionId" asp-items="Model.FunctionSelectListItem">
+    </select>
+</div>

@@ -46,6 +46,9 @@
                         <li class="nav-item">
                             <a class="nav-link text-white" href="@Url.Action(nameof(DatabasesController.Index), "Databases")">Databases</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="@Url.Action(nameof(FunctionsController.Index), "Functions")">Functions</a>
+                        </li>
                     </ul>
                     @if (User.Identity.IsAuthenticated)
                     {

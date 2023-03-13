@@ -154,6 +154,30 @@
                                             </td>
                                         </tr>
                                     }
+                                    <template id="request-query-tr-template">
+                                        <tr>
+                                            <td class="align-middle"><input type="text" name="key"
+                                                    class="form-control form-control-sm param-key" placeholder="key">
+                                            </td>
+                                            <td class="align-middle"><input type="text" name="value"
+                                                    class="form-control form-control-sm param-value"
+                                                    placeholder="value">
+                                            </td>
+                                            <td class="align-middle">
+                                                <div>
+                                                    <input type="hidden">
+                                                    <span name="ConstraintsCount">0</span>
+                                                    <button class="ms-2 js-config-param-constraints"><i
+                                                            class="bi bi-box-arrow-in-up-right"></i></button>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle">
+                                                <button class="btn text-gray btn-show-on-hover param-delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </template>
                                     <script>
                                         $('div.js-query-constraint-list').each(function () {
                                             let dataSource = [];
@@ -211,6 +235,26 @@
                                     }
                                 </tbody>
                             </table>
+                            <template id="request-header-tr-template">
+                                <tr>
+                                    <td class="align-middle"><input type="text" name="name"
+                                            class="form-control form-control-sm header-name" placeholder="name">
+                                    </td>
+                                    <td class="align-middle"><input type="text" name="value"
+                                            class="form-control form-control-sm header-value" placeholder="value">
+                                    </td>
+                                    <td class="align-middle"><input type="checkbox" name="required"
+                                            class="form-check-input header-required">
+                                    </td>
+                                    <td class="align-middle"><input type="checkbox" name="matchExactly"
+                                            class="form-check-input header-match-exactly">
+                                    </td>
+                                    <td class="align-middle"><button
+                                            class="btn text-gray btn-show-on-hover header-delete"><i
+                                                class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </template>
                         </div>
                         <div id="request-body-tab" class="tab-pane fade p-2" role="tabpanel">
                             @if (Model.RequestBody == null)
@@ -298,223 +342,174 @@
                 Integration Details
             </div>
             <div class="card-body js-integration-details">
-                @if (Model.IntegrationType == RouteIntegrationType.MockIntegration)
-                {
-                    <partial name="_RouteMockIntegration.cshtml" model="Model.Integration" />
-                }
+                <form>
+                    @if (Model.IntegrationType == RouteIntegrationType.MockIntegration)
+                    {
+                        <partial name="_RouteMockIntegration.cshtml" model="Model.Integration" />
+                    }
+                    else if (Model.IntegrationType == RouteIntegrationType.DirectForwarding)
+                    {
+                        <partial name="_DirectForwardingIntegration.cshtml" model="Model.Integration" />
+                    }
+                    else if (Model.IntegrationType == RouteIntegrationType.FunctionTrigger)
+                    {
+                        <partial name="_FunctionTriggerIntegration.cshtml" model="Model.Integration" />
+                    }
+                </form>
             </div>
         </div>
     </div>
 </div>
-<div class="row">
-    <div id="request-config">
-        <template id="requestParamRow">
-            <tr>
-                <td class="align-middle"><input type="text" name="key" class="form-control form-control-sm param-key"
-                        placeholder="key">
-                </td>
-                <td class="align-middle"><input type="text" name="value"
-                        class="form-control form-control-sm param-value" placeholder="value">
-                </td>
-                <td class="align-middle">
+<template id="inline-constraint-modal">
+    <div class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Constraints</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
                     <div>
-                        <input type="hidden">
-                        <span name="ConstraintsCount">0</span>
-                        <button class="ms-2 js-config-param-constraints"><i
-                                class="bi bi-box-arrow-in-up-right"></i></button>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="required" />
+                            <label class="form-check-label">Required</label>
+                        </div>
+                        <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
                     </div>
-                </td>
-                <td class="align-middle"><button class="btn text-gray btn-show-on-hover param-delete"><i
-                            class="bi bi-trash"></i></button>
-                </td>
-            </tr>
-        </template>
-        <template id="requestHeaderRow">
-            <tr>
-                <td class="align-middle"><input type="text" name="name" class="form-control form-control-sm header-name"
-                        placeholder="name">
-                </td>
-                <td class="align-middle"><input type="text" name="value"
-                        class="form-control form-control-sm header-value" placeholder="value">
-                </td>
-                <td class="align-middle"><input type="checkbox" name="required"
-                        class="form-check-input header-required">
-                </td>
-                <td class="align-middle"><input type="checkbox" name="matchExactly"
-                        class="form-check-input header-match-exactly">
-                </td>
-                <td class="align-middle"><button class="btn text-gray btn-show-on-hover header-delete"><i
-                            class="bi bi-trash"></i></button>
-                </td>
-            </tr>
-        </template>
-        <template id="responseHeaderRow">
-            <tr>
-                <td class="align-middle">
-                    <input type="text" name="name" class="form-control form-control-sm header-name" placeholder="name">
-                </td>
-                <td class="align-middle">
-                    <input type="text" name="value" class="form-control form-control-sm header-value"
-                        placeholder="value">
-                </td>
-                <td class="align-middle">
-                    <button class="btn text-gray btn-show-on-hover header-delete"><i class="bi bi-trash"></i></button>
-                </td>
-            </tr>
-        </template>
-        <template id="constraints-config-modal">
-            <div class="modal fade">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Constraints</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="type" />
+                                <label class="form-check-label">Type</label>
+                            </div>
+                            <select class="ms-3 form-select form-select-sm" style="width: 100px;" name="type">
+                                <option value="int">Int</option>
+                                <option value="bool">Boolean</option>
+                                <option value="datetime">Datetime</option>
+                                <option value="decimal">Decimal</option>
+                                <option value="double">Double</option>
+                                <option value="float">Float</option>
+                                <option value="guid">GUID</option>
+                                <option value="long">Long</option>
+                            </select>
                         </div>
-                        <div class="modal-body">
-                            <div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="required" />
-                                    <label class="form-check-label">Required</label>
-                                </div>
-                                <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
+                        <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="minlength" />
+                                <label class="form-check-label">Minimum Length</label>
                             </div>
-                            <hr />
-                            <div>
-                                <div class="d-flex">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="type" />
-                                        <label class="form-check-label">Type</label>
-                                    </div>
-                                    <select class="ms-3 form-select form-select-sm" style="width: 100px;" name="type">
-                                        <option value="int">Int</option>
-                                        <option value="bool">Boolean</option>
-                                        <option value="datetime">Datetime</option>
-                                        <option value="decimal">Decimal</option>
-                                        <option value="double">Double</option>
-                                        <option value="float">Float</option>
-                                        <option value="guid">GUID</option>
-                                        <option value="long">Long</option>
-                                    </select>
-                                </div>
-                                <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
+                            <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
+                                name="minlength" placeholder="0" />
+                        </div>
+                        <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="maxlength" />
+                                <label class="form-check-label">Maximum Length</label>
                             </div>
-                            <hr />
-                            <div>
-                                <div class="d-flex">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="minlength" />
-                                        <label class="form-check-label">Minimum Length</label>
-                                    </div>
-                                    <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
-                                        name="minlength" placeholder="0" />
-                                </div>
-                                <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
+                            <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
+                                name="maxlength" placeholder="100" />
+                        </div>
+                        <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="length" />
+                                <label class="form-check-label">Length</label>
                             </div>
-                            <hr />
-                            <div>
-                                <div class="d-flex">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="maxlength" />
-                                        <label class="form-check-label">Maximum Length</label>
-                                    </div>
-                                    <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
-                                        name="maxlength" placeholder="100" />
-                                </div>
-                                <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
+                            <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
+                                name="length" placeholder="50" />
+                        </div>
+                        <p class="form-text d-none">Constrains value to be a string of a given length or within
+                            a given range of lengths.</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="min" />
+                                <label class="form-check-label">Min</label>
                             </div>
-                            <hr />
-                            <div>
-                                <div class="d-flex">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="length" />
-                                        <label class="form-check-label">Length</label>
-                                    </div>
-                                    <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
-                                        name="length" placeholder="50" />
-                                </div>
-                                <p class="form-text d-none">Constrains value to be a string of a given length or within
-                                    a given range of lengths.</p>
+                            <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
+                                name="min" placeholder="0" />
+                        </div>
+                        <p class="form-text d-none">Constrains a route parameter to be a long with a minimum
+                            value.</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="max" />
+                                <label class="form-check-label">Max</label>
                             </div>
-                            <hr />
-                            <div>
-                                <div class="d-flex">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="min" />
-                                        <label class="form-check-label">Min</label>
-                                    </div>
-                                    <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
-                                        name="min" placeholder="0" />
-                                </div>
-                                <p class="form-text d-none">Constrains a route parameter to be a long with a minimum
-                                    value.</p>
+                            <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
+                                name="max" placeholder="100" />
+                        </div>
+                        <p class="form-text d-none">Constrains a route parameter to be an integer with a maximum
+                            value.</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="range" />
+                                <label class="form-check-label">Range</label>
                             </div>
-                            <hr />
-                            <div>
-                                <div class="d-flex">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="max" />
-                                        <label class="form-check-label">Max</label>
-                                    </div>
-                                    <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
-                                        name="max" placeholder="100" />
-                                </div>
-                                <p class="form-text d-none">Constrains a route parameter to be an integer with a maximum
-                                    value.</p>
-                            </div>
-                            <hr />
-                            <div>
-                                <div class="d-flex">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="range" />
-                                        <label class="form-check-label">Range</label>
-                                    </div>
-                                    <div class="ms-3 d-flex">
-                                        <input class="form-control form-control-sm" style="width: 100px;" type="number"
-                                            name="range-min" placeholder="1" />
-                                        <label class="form-label mx-2">~</label>
-                                        <input class="form-control form-control-sm" style="width: 100px;" type="number"
-                                            name="range-max" placeholder="100" />
-                                    </div>
-                                </div>
-                                <p class="form-text d-none">Constraints a route parameter to be an integer within a
-                                    given range of values.</p>
-                            </div>
-                            <hr />
-                            <div>
-                                <div class="d-flex">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="alpha" />
-                                        <label class="form-check-label">Alpha</label>
-                                    </div>
-                                </div>
-                                <p class="form-text d-none">Constraints a route parameter to be an integer within a
-                                    given range of values.</p>
-                            </div>
-                            <hr />
-                            <div>
-                                <div class="d-flex">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="regex" />
-                                        <label class="form-check-label">Regex</label>
-                                    </div>
-                                    <input class="ms-3 form-control form-control-sm w-50" type="text" name="pattern"
-                                        placeholder="ab+c" />
-                                </div>
-                                <p class="form-text d-none">Constraints a route parameter to be an integer within a
-                                    given range of values.</p>
+                            <div class="ms-3 d-flex">
+                                <input class="form-control form-control-sm" style="width: 100px;" type="number"
+                                    name="range-min" placeholder="1" />
+                                <label class="form-label mx-2">~</label>
+                                <input class="form-control form-control-sm" style="width: 100px;" type="number"
+                                    name="range-max" placeholder="100" />
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary js-save">Ok</button>
+                        <p class="form-text d-none">Constraints a route parameter to be an integer within a
+                            given range of values.</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="alpha" />
+                                <label class="form-check-label">Alpha</label>
+                            </div>
                         </div>
+                        <p class="form-text d-none">Constraints a route parameter to be an integer within a
+                            given range of values.</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="regex" />
+                                <label class="form-check-label">Regex</label>
+                            </div>
+                            <input class="ms-3 form-control form-control-sm w-50" type="text" name="pattern"
+                                placeholder="ab+c" />
+                        </div>
+                        <p class="form-text d-none">Constraints a route parameter to be an integer within a
+                            given range of values.</p>
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary js-save">Ok</button>
+                </div>
             </div>
-        </template>
+        </div>
     </div>
-</div>
-</div>
+</template>
 <script>
     function initialize() {
         initOverviewScript();
@@ -713,7 +708,7 @@
 <script>
     $(function () {
         $('.js-query-constraint-button').click(function () {
-            const modal = $($('#constraints-config-modal').html());
+            const modal = $($('#inline-constraint-modal').html());
             let list = $(this).siblings('div.js-query-constraint-list');
             const id = list.data('id');
             const name = list.data('name');
