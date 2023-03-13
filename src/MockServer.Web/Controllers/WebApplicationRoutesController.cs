@@ -23,11 +23,24 @@ public class WebApplicationRoutesController : Controller
         _webApplicationRouteWebService = webApplicationRouteWebService;
     }
 
-    [GetAuthUserWebApplicationId(RouteName.WebApplicationName, RouteName.WebApplicationId)]
     public async Task<IActionResult> Index(int WebApplicationId)
     {
         var vm = await _webApplicationRouteWebService.GetIndexModel(WebApplicationId);
         return View("Views/WebApplications/Routes/Index.cshtml", vm);
+    }
+
+    [AjaxOnly]
+    public async Task<IActionResult> IndexKnockoutAjax(int WebApplicationId)
+    {
+        var vm = await _webApplicationRouteWebService.GetIndexModel(WebApplicationId);
+        return Ok(vm.Routes);
+    }
+
+    [HttpGet("ko")]
+    public async Task<IActionResult> IndexKnockout(int WebApplicationId)
+    {
+        var vm = await _webApplicationRouteWebService.GetIndexModel(WebApplicationId);
+        return View("Views/WebApplications/Routes/IndexKo.cshtml", vm);
     }
 
     [AjaxOnly]
@@ -77,8 +90,7 @@ public class WebApplicationRoutesController : Controller
         return NoContent();
     }
 
-    [AjaxOnly]
-    [HttpGet("{RouteId:int}")]
+    [HttpGet("{RouteId:int}/view")]
     [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> View(int RouteId)
     {
@@ -106,6 +118,15 @@ public class WebApplicationRoutesController : Controller
             var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
             return View("Views/WebApplications/Routes/Details.cshtml", vm);
         }
+    }
+
+    [AjaxOnly]
+    [HttpGet("{RouteId:int}")]
+    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
+    public async Task<IActionResult> DetailsAjax(int RouteId)
+    {
+        var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
+        return Ok(vm);
     }
 
     [HttpPost("{RouteId:int}/change-integration-type")]
