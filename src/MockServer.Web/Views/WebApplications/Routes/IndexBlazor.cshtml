@@ -3,102 +3,17 @@
 @{
     ViewData["Title"] = Model.WebApplication.Name;
 }
-@section Scripts {
-<script type="text/javascript" src="lib/knockout/knockout-3.5.1.js"></script>
-}
-<script>
-    function AppViewModel() {
-        var self = this;
-
-        self.routes = ko.observableArray([]);
-
-        var baseUri = '@Url.Action(nameof(WebApplicationRoutesController.IndexKnockoutAjax), new { WebApplicationName = Model.WebApplication.Name})';
-        $.getJSON(baseUri, self.routes);
-
-        self.selectedRouteId = ko.observable(null);
-        self.selectedRoute = ko.observable(null);
-
-        // Select a route
-        self.showDetails = function (routeId) {
-            self.selectedRouteId(routeId);
-            var tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.DetailsApi), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})'
-            $.get(tempUrl.replace('-9999', routeId), function (data) {
-                console.log(JSON.stringify(data));
-                self.selectedRoute(data);
-            });
-        }
-    }
-    $(function () {
-        ko.applyBindings(new AppViewModel());
-    });
-</script>
 <div class="row">
     <div class="col-2">
         <partial name="/Views/WebApplications/_SideBar.cshtml" model="Model.WebApplication">
     </div>
     <div class="col-10">
         <div class="row">
-            <div class="col-3">
-                <div class="d-flex mt-1">
-                    <input class="form-control form-control-sm me-1 js-search-input" type="text" placeholder="Search">
-                    <button class="btn btn-sm bg-violet-500 text-white js-new-button"><i
-                            class="bi bi-plus"></i></button>
-                </div>
-                <div class="route-list-container">
-                    <ul data-bind="foreach: routes" class="list-group list-group-flush mt-2">
-                        <li class="list-group-item px-2 py-1">
-                            <div class="row">
-                                <div data-bind="click: function() { $parent.showDetails(id); }" class="col"
-                                    style="position: relative;">
-                                    <span data-bind="text: name"></span>
-                                    <div>
-                                        <small data-bind="text: method" class="badge rounded-pill text-white me-1"
-                                            style="width: 60px;"></small>
-                                        <small data-bind="text: path" class="text-muted"></small>
-                                    </div>
-                                </div>
-                                <div class="p-0 my-auto" style="width: 40px;">
-                                    <button class="btn btn-sm btn-context-menu" type="button"><i
-                                            class="bi bi-three-dots"></i></button>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-9 h-100" id="route-details" data-bind="with: selectedRoute">
-                <div class="card mt-1">
-                    <div class="card-header">
-                        Basic Info
-                    </div>
-                    <div class="card-body">
-                        <div>
-                            <small>Name</small>
-                            <input type="text" data-bind="value: name" class="form-control form-control-sm"
-                                aria-autocomplete="none">
-                        </div>
-                        <div class="mt-1 d-flex">
-                            <div>
-                                <small>Method</small>
-                                <select data-bind="options: methodSelectListItem,optionsText:'Text',value:method"
-                                    class="form-select form-select-sm w-auto me-2">
-                                </select>
-                            </div>
-                            <div class="flex-fill">
-                                <small>Path</small>
-                                <input type="text" data-bind="value: path" class="form-control form-control-sm">
-                            </div>
-                        </div>
-                        <div class="mt-1">
-                            <small>Url</small>
-                            <div class="input-group input-group-sm">
-                                <input type="text" data-bind="value: url" class="form-control" readonly>
-                                <button type="button" class="input-group-text "><i class="bi bi-clipboard"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @(await
+            Html.RenderComponentAsync<MockServer.Web.Views.WebApplications.Routes.Component._IndexBlazor>(RenderMode.ServerPrerendered,
+            new {
+                IndexModel = Model
+            }))
         </div>
         <style>
             .context-menu {
@@ -253,15 +168,3 @@
     }
 </script>
 <!-- Conext menu: End -->
-<!-- Open request: Start -->
-<script>
-    $('body').on('click', '.js-route-info', function () {
-        const tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.View), "ProjectRequests", new {ProjectName = @Model.WebApplication.Name, RequestId = Constants.TemporaryId})';
-        const selected = $(this).closest('li');
-        selected.parent().find('li').removeClass('bg-gray');
-        selected.addClass('bg-gray');
-        const id = selected.data('route-id');
-        alert(id);
-    })
-</script>
-<!-- Open request: End -->

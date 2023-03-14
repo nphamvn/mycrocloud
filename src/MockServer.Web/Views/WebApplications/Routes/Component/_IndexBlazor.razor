@@ -1,0 +1,62 @@
+@using Controllers
+@using Models.WebApplications.Routes
+<div class="col-3">
+    <div class="d-flex mt-1">
+        <input class="form-control form-control-sm me-1 js-search-input" type="text" placeholder="Search">
+        <button class="btn btn-sm bg-violet-500 text-white js-new-button"><i class="bi bi-plus"></i></button>
+    </div>
+    <div class="route-list-container">
+        <ul class="list-group list-group-flush mt-2">
+            @foreach (var route in IndexModel.Routes)
+            {
+                <li data-route-id="@route.Id" class="list-group-item px-2 py-1">
+                    <div class="row">
+                        <div class="col" style="position: relative;">
+                            <a onclick="event.preventDefault()" href="#"
+                            class="text-decoration-none stretched-link">@route.Name</a>
+                            <div>
+                                <small class="badge rounded-pill text-white me-1 @route.MethodBadgeColor"
+                                style="width: 60px;">@route.Method</small>
+                                <small class="text-muted">/@route.Path</small>
+                            </div>
+                        </div>
+                        <div class="p-0 my-auto" style="width: 40px;">
+                            <button class="btn btn-sm btn-context-menu" type="button"><i
+                                class="bi bi-three-dots"></i></button>
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+<div class="col-9" id="route-details">
+    <div>Details</div>
+    <div class="card" style="width:22rem">
+        <div class="card-body">
+            <h3 class="card-title">@Title</h3>
+            <p class="card-text">@ChildContent</p>
+            <button @onclick="OnYes">Yes!</button>
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public RouteIndexModel IndexModel { get; set; }
+    public string Data { get; set; } = string.Empty;
+    private void ShowDetails()
+    {
+        Data = "Button Clicked";
+    }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    private void OnYes()
+    {
+        Console.WriteLine("Write to the console in C#! 'Yes' button selected.");
+    }
+}

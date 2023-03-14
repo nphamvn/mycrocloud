@@ -1,0 +1,164 @@
+@using MockServer.Web.Controllers
+@model MockServer.Web.Models.WebApplications.Routes.RouteIndexModel
+@{
+    ViewData["Title"] = Model.WebApplication.Name;
+}
+@section Scripts {
+@* <script src="https://unpkg.com/browse/vue@3.3.0-alpha.4/dist/vue.global.prod.js"></script> *@
+}
+<style>
+    .context-menu {
+        position: absolute;
+        width: 60px;
+    }
+</style>
+<div class="row">
+    <div class="col-2">
+        <partial name="/Views/WebApplications/_SideBar.cshtml" model="Model.WebApplication">
+    </div>
+    <div id="app" class="col-10">
+        <div class="row">
+            <div class="col-3">
+                <div class="d-flex mt-1">
+                    <input v-model="searchTerm" v-on:keyup="handleSearch" class="form-control form-control-sm me-1" type="text"
+                        placeholder="Search">
+                    <button class="btn btn-sm bg-violet-500 text-white js-new-button">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </div>
+                <div class="route-list-container">
+                    <ul v-if="routes.length > 0" class="list-group list-group-flush mt-2">
+                        <li v-for="route in routes" :key="route.id" class="list-group-item px-2 py-1">
+                            <div class="row">
+                                <div v-on:click="showDetails(route.id)" class="col" style="position: relative;">
+                                    <a onclick="event.preventDefault()" href="#"
+                                        class="text-decoration-none stretched-link">{{route.name}}</a>
+                                    <div>
+                                        <small class="badge rounded-pill text-white me-1"
+                                            style="width: 60px;">{{route.method}}</small>
+                                        <small class="text-muted">/{{route.path}}</small>
+                                    </div>
+                                </div>
+                                <div class="p-0 my-auto" style="width: 40px;">
+                                    <button class="btn btn-sm btn-context-menu" type="button"><i
+                                            class="bi bi-three-dots"></i></button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div v-else>
+                        No route
+                    </div>
+                </div>
+            </div>
+            <div class="col-9 h-100" id="route-details">
+                <div v-if="selectedRoute">
+                    <div class="card mt-1">
+                        <div class="card-header">
+                            Basic Info
+                        </div>
+                        <div class="card-body">
+                            <div>
+                                <small>Name</small>
+                                <input type="text" v-model="selectedRoute.name" class="form-control form-control-sm"
+                                    aria-autocomplete="none">
+                            </div>
+                            <div class="mt-1 d-flex">
+                                <div>
+                                    <small>Method</small>
+                                    <select v-model="selectedRoute.method"
+                                        class="form-select form-select-sm w-auto me-2">
+                                        <option v-for="method in selectedRoute.methodSelectListItem"
+                                            :value="method.value" :key="method.value">
+                                            {{method.text}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="flex-fill">
+                                    <small>Path</small>
+                                    <input type="text" v-model="selectedRoute.path"
+                                        class="form-control form-control-sm">
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <small>Url</small>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control" v-model="selectedRoute.url" readonly>
+                                    <button type="button" class="input-group-text "><i
+                                            class="bi bi-clipboard"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-else>
+                    Click to show details
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<template id="context-menu-template">
+    <div class="btn-group-vertical dropdown-menu context-menu" role="group">
+        <button name="btnDelete" type="button" class="dropdown-item btn btn-default text-danger">Delete</button>
+    </div>
+</template>
+<!-- Modal -->
+<template id="requestDeleteConfirmModalTemplate">
+    <div class="modal fade" id="requestDeleteConfirmModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Delete confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are your sure want to delete request?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button name="btnDelete" type="button" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+    const {createApp, onMounted, ref} = Vue
+    const {debounce } = lodash
+    const app = createApp({
+        setup() {
+            const routes = ref([]);
+            const selectedRoute = ref(null);
+            const selectedRouteId = ref(null);
+
+            const searchTerm = ref('');
+            const handleSearch = debounce(() => {
+                console.log('searching for', searchTerm.value)
+                // perform the search here
+            }, 500);
+            const showDetails = async id => {
+                var tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.DetailsApi), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
+                const response = await fetch(tempUrl.replace('-9999', id));
+                const routeDetails = await response.json();
+                selectedRouteId.value = id;
+                selectedRoute.value = routeDetails;
+            }
+            onMounted(() => {
+                const routeList = '@Html.Raw(Json.Serialize(Model.Routes))'
+                routes.value = JSON.parse(routeList)
+            })
+
+            return {
+                routes,
+                selectedRoute,
+                selectedRouteId,
+                search,
+                showDetails
+            }
+        }
+    });
+    app.mount('#app');
+</script>

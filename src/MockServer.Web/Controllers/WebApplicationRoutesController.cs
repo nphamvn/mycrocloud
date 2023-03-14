@@ -29,6 +29,20 @@ public class WebApplicationRoutesController : Controller
         return View("Views/WebApplications/Routes/Index.cshtml", vm);
     }
 
+    [HttpGet("blazor")]
+    public async Task<IActionResult> IndexWithBlazor(int WebApplicationId)
+    {
+        var vm = await _webApplicationRouteWebService.GetIndexModel(WebApplicationId);
+        return View("Views/WebApplications/Routes/IndexBlazor.cshtml", vm);
+    }
+
+    [HttpGet("vue")]
+    public async Task<IActionResult> IndexWithVue(int WebApplicationId)
+    {
+        var vm = await _webApplicationRouteWebService.GetIndexModel(WebApplicationId);
+        return View("Views/WebApplications/Routes/IndexWithVue.cshtml", vm);
+    }
+
     [AjaxOnly]
     public async Task<IActionResult> IndexKnockoutAjax(int WebApplicationId)
     {
@@ -120,10 +134,9 @@ public class WebApplicationRoutesController : Controller
         }
     }
 
-    [AjaxOnly]
-    [HttpGet("{RouteId:int}")]
+    [HttpGet("api/{RouteId:int}")]
     [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> DetailsAjax(int RouteId)
+    public async Task<IActionResult> DetailsApi(int RouteId)
     {
         var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
         return Ok(vm);
