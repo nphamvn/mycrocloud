@@ -6,7 +6,6 @@ using MockServer.Web.Attributes;
 using MockServer.Web.Filters;
 using MockServer.Web.Models.Common;
 using MockServer.Web.Models.WebApplications.Routes;
-using MockServer.Web.Models.WebApplications.Routes.Authorizations;
 using MockServer.Web.Models.WebApplications.Routes.Integrations.MockIntegrations;
 using MockServer.Web.Services;
 using RouteName = MockServer.Web.Common.Constants.RouteName;
@@ -27,6 +26,21 @@ public class WebApplicationRoutesController : Controller
     {
         var vm = await _webApplicationRouteWebService.GetIndexModel(WebApplicationId);
         return View("Views/WebApplications/Routes/Index.cshtml", vm);
+    }
+
+    [HttpGet("api")]
+    public async Task<IActionResult> AjaxIndex(int WebApplicationId)
+    {
+        var vm = await _webApplicationRouteWebService.GetIndexModel(WebApplicationId);
+        return Ok(vm.Routes.Select(r => new
+        {
+            r.Id,
+            r.Name,
+            r.Method,
+            r.Path,
+            IntegrationType = (int)r.IntegrationType,
+            r.Description
+        }));
     }
 
     [HttpGet("blazor")]
@@ -122,10 +136,21 @@ public class WebApplicationRoutesController : Controller
 
     [HttpGet("api/{RouteId:int}")]
     [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> DetailsApi(int RouteId)
+    public async Task<IActionResult> GetRouteJson(int RouteId)
     {
         var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
-        return Ok(vm);
+        return Ok(new {
+            vm.Id,
+            vm.Name,
+            vm.Method,
+            vm.Path,
+            Url = "vm.Url",
+            vm.IntegrationType,
+            Authorization = new {
+                Type = (int)vm.Authorization.Type,
+                Policies = vm.Authorization.PolicyIds
+            }
+        });
     }
 
     [AjaxOnly]

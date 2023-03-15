@@ -51,6 +51,14 @@ public class WebApplicationsController : BaseController
         return RedirectToAction(nameof(Overview), Request.RouteValues);
     }
 
+    [HttpGet("{WebApplicationName}/json")]
+    [GetAuthUserWebApplicationId(RouteName.WebApplicationName, RouteName.WebApplicationId)]
+    public async Task<IActionResult> GetAppJson(int WebApplicationId)
+    {
+        var vm = await _webApplicationWebService.Get(WebApplicationId);
+        return Ok(vm);
+    }
+
     [HttpGet("{WebApplicationName}/overview")]
     [GetAuthUserWebApplicationId(RouteName.WebApplicationName, RouteName.WebApplicationId)]
     public async Task<IActionResult> Overview(int WebApplicationId)

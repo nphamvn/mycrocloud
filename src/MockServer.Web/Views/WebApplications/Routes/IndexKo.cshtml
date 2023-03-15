@@ -21,7 +21,7 @@
         // Select a route
         self.showDetails = function (routeId) {
             self.selectedRouteId(routeId);
-            var tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.DetailsApi), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})'
+            var tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.GetRouteJson), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})'
             $.get(tempUrl.replace('-9999', routeId), function (data) {
                 console.log(JSON.stringify(data));
                 self.selectedRoute(data);

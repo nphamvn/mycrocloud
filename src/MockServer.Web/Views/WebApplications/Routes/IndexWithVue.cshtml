@@ -4,8 +4,12 @@
     ViewData["Title"] = Model.WebApplication.Name;
 }
 @section Scripts {
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify@3.1.9/dist/vuetify.min.js"></script>
 }
+<link href="
+https://cdn.jsdelivr.net/npm/vuetify@3.1.9/dist/vuetify.min.css
+" rel="stylesheet">
 <style>
     .context-menu {
         position: absolute;
@@ -20,9 +24,9 @@
         <div class="row">
             <div class="col-3">
                 <div class="d-flex mt-1">
-                    <input v-model="searchTerm" class="form-control form-control-sm me-1" type="text"
-                        placeholder="Search">
-                    <button class="btn btn-sm bg-violet-500 text-white js-new-button">
+                    <input v-model="searchTerm" @@keyup="delayedSearch" class="form-control form-control-sm me-1"
+                        type="text" placeholder="Search">
+                    <button @@click="newRoute" class="btn btn-sm bg-violet-500 text-white">
                         <i class="bi bi-plus"></i>
                     </button>
                 </div>
@@ -33,44 +37,109 @@
             </div>
             <div class="col-9 h-100" id="route-details">
                 <div v-if="selectedRoute">
-                    <div class="card mt-1">
-                        <div class="card-header">
-                            Basic Info
-                        </div>
-                        <div class="card-body">
-                            <div>
-                                <small>Name</small>
-                                <input type="text" v-model="selectedRoute.name" class="form-control form-control-sm"
-                                    aria-autocomplete="none">
+                    <form v-on:submit.prevent="onSubmit">
+                        <div class="card mt-1">
+                            <div class="card-header">
+                                Basic Info
                             </div>
-                            <div class="mt-1 d-flex">
+                            <div class="card-body">
                                 <div>
-                                    <small>Method</small>
-                                    <select v-model="selectedRoute.method"
-                                        class="form-select form-select-sm w-auto me-2">
-                                        <option v-for="method in selectedRoute.methodSelectListItem"
-                                            :value="method.value" :key="method.value">
-                                            {{method.text}}
-                                        </option>
+                                    <small>Name</small>
+                                    <input type="text" v-model="selectedRoute.name" class="form-control form-control-sm"
+                                        aria-autocomplete="none">
+                                </div>
+                                <div class="mt-1 d-flex">
+                                    <div>
+                                        <small>Method</small>
+                                        <select v-model="selectedRoute.method"
+                                            class="form-select form-select-sm w-auto me-2">
+                                            <option v-for="method in methods" :value="method" :key="method">
+                                                {{method}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="flex-fill">
+                                        <small>Path</small>
+                                        <input type="text" v-model="selectedRoute.path"
+                                            class="form-control form-control-sm">
+                                    </div>
+                                </div>
+                                <div class="mt-1">
+                                    <small>Url</small>
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" class="form-control" v-model="selectedRoute.url" readonly>
+                                        <button type="button" class="input-group-text ">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mt-1">
+                            <div class="card-header">
+                                Integration Type
+                            </div>
+                            <div class="card-body">
+                                <small>Integration Type</small>
+                                <div class="mt-1">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" value="1"
+                                            v-model="selectedRoute.integrationType">
+                                        <label class="form-check-label">Mock Integration</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" value="2"
+                                            v-model="selectedRoute.integrationType">
+                                        <label class="form-check-label">Direct Forwarding</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" value="3"
+                                            v-model="selectedRoute.integrationType">
+                                        <label class="form-check-label">Function Trigger</label>
+                                    </div>
+                                </div>
+                                <p class="form-text">If you change the integration type, configuration for current type
+                                    will
+                                    be lost.</p>
+                            </div>
+                        </div>
+                        <div class="card mt-1">
+                            <div class="card-header">
+                                Authorization
+                            </div>
+                            <div class="card-body">
+                                <div>
+                                    <small>Authorization Type</small>
+                                    <div class="mt-1">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" value="0"
+                                                v-model="selectedRoute.authorization.type">
+                                            <label class="form-check-label">None</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" value="1"
+                                                v-model="selectedRoute.authorization.type">
+                                            <label class="form-check-label">Allow Anonymous</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" value="2"
+                                                v-model="selectedRoute.authorization.type">
+                                            <label class="form-check-label">Authorize</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-1">
+                                    <small>Policy</small>
+                                    <select v-model="selectedRoute.authorization.policies" multiple="multiple"
+                                        data-placeholder="Select policies...">
                                     </select>
                                 </div>
-                                <div class="flex-fill">
-                                    <small>Path</small>
-                                    <input type="text" v-model="selectedRoute.path"
-                                        class="form-control form-control-sm">
-                                </div>
-                            </div>
-                            <div class="mt-1">
-                                <small>Url</small>
-                                <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control" v-model="selectedRoute.url" readonly>
-                                    <button type="button" class="input-group-text ">
-                                        <i class="bi bi-clipboard"></i>
-                                    </button>
-                                </div>
                             </div>
                         </div>
-                    </div>
+                        <div>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
                 </div>
                 <div v-else>
                     Click to show details
@@ -107,7 +176,6 @@
 </template>
 <template id="route-list-template">
     <div>
-        <h1>Route List</h1>
         <ul v-if="routes.length > 0" class="list-group list-group-flush mt-2">
             <li v-for="route in routes" :key="route.id" class="list-group-item px-2 py-1">
                 <div class="row">
@@ -115,20 +183,19 @@
                         <a onclick="event.preventDefault()" href="#"
                             class="text-decoration-none stretched-link">{{route.name}}</a>
                         <div>
-                            <small class="badge rounded-pill text-white me-1"
-                                style="width: 60px;">{{route.method}}</small>
+                            <small class="badge rounded-pill me-1" style="width: 60px;"
+                                :class="getMethodClass(route.method)">{{route.method}}</small>
                             <small class="text-muted">/{{route.path}}</small>
                         </div>
                     </div>
                     <div class="p-0 my-auto" style="width: 40px;">
-                        <button class="btn btn-sm btn-context-menu" type="button">
+                        <button v-on:click="showContextMenu(route.id)" class="btn btn-sm" type="button">
                             <i class="bi bi-three-dots"></i>
                         </button>
                     </div>
                 </div>
             </li>
         </ul>
-        <button @@click="createRoute()">New Route</button>
     </div>
 </template>
 <script>
@@ -150,37 +217,86 @@
             },
             createRoute() {
                 this.$emit('create-route');
+            },
+            getMethodClass(method) {
+                switch (method) {
+                    case 'DELETE': return 'text-red';
+                    case 'POST': return 'text-orange';
+                    case 'PUT': return 'text-yellow';
+                    case 'GET': return 'text-green';
+                    default: return 'text-blue';
+                }
+            },
+            showContextMenu(id) {
+                //TODO: show context menu
+            },
+            showDeleteConfirmDialog(id) {
+                //TOOD: show confirm diaglog
+            },
+            delete(id) {
+                //TODO: Delete
+                this.$emit('route-deleted', id);
             }
         }
     };
+    let timeout = null;
     const {createApp, onMounted, ref} = Vue
+    const {createVuetify} = Vuetify
+    const vuetify = createVuetify()
     const app = createApp({
         setup() {
+            const webapp = ref({});
             const routes = ref([]);
             const selectedRoute = ref(null);
             const selectedRouteId = ref(null);
             const searchTerm = ref('');
-
+            const methods = ['GET', 'POST', 'PUT', 'DELETE'];
             const showDetails = async id => {
-                var tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.DetailsApi), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
+                var tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.GetRouteJson), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
                 const response = await fetch(tempUrl.replace('-9999', id));
                 const routeDetails = await response.json();
                 selectedRouteId.value = id;
                 selectedRoute.value = routeDetails;
             }
+            const delayedSearch = () => {
+                clearTimeout(timeout);
+                // Make a new timeout set to go off in 800ms
+                timeout = setTimeout(() => {
+                    alert(searchTerm.value);
+                }, 1000);
+            }
+            const newRoute = () => {
+                selectedRoute.value = {
+                    method: 'POST'
+                };
+            }
+            const onSubmit = () => {
+                
+            }
             onMounted(() => {
-                const routeList = '@Html.Raw(Json.Serialize(Model.Routes))';
-                routes.value = JSON.parse(routeList)
+                fetch('@Url.Action(nameof(WebApplicationsController.GetAppJson), "WebApplications", new {WebApplicationName = Model.WebApplication.Name})')
+                    .then(res => res.json())
+                    .then(res => webapp.value = res);
+                fetch('@Url.Action(nameof(WebApplicationRoutesController.AjaxIndex), new {WebApplicationName = Model.WebApplication.Name})')
+                    .then(res => res.json())
+                    .then(res => routes.value = res);
             })
 
             return {
                 routes,
                 selectedRoute,
                 selectedRouteId,
-                showDetails
+                showDetails,
+                newRoute,
+                delayedSearch,
+                searchTerm,
+                methods,
+                webapp,
+                onSubmit
             }
         }
     });
     app.component('route-list', RouteList);
+    app.use(vuetify)
     app.mount('#app');
 </script>
