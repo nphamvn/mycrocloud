@@ -7,18 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Entities\**" />
+    <Compile Remove="Enums\**" />
+    <EmbeddedResource Remove="Entities\**" />
+    <EmbeddedResource Remove="Enums\**" />
+    <None Remove="Entities\**" />
+    <None Remove="Enums\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Entities\" />
     <None Remove="Models\" />
-    <None Remove="Entities\Response\" />
     <None Remove="Enums\" />
-    <None Remove="Entities\Request\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Entities\" />
     <Folder Include="Models\" />
-    <Folder Include="Entities\Response\" />
-    <Folder Include="Enums\" />
-    <Folder Include="Entities\Request\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Jint" Version="3.0.0-beta-2046" />

@@ -18,10 +18,8 @@ public class TemplateParserMatcherRouteService : IRouteResolver
 
     public async Task<RouteResolveResult> Resolve(string method, string path, ICollection<Route> routes)
     {
-        if (!path.StartsWith("/"))
-        {
-            path = "/" + path;
-        }
+        //ensure that path is ended with slash
+        path = $"{path.TrimEnd('/')}/";
         int matchCount = 0;
         foreach (var route in routes)
         {

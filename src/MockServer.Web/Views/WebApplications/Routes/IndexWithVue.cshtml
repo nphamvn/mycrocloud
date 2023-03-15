@@ -4,7 +4,7 @@
     ViewData["Title"] = Model.WebApplication.Name;
 }
 @section Scripts {
-@* <script src="https://unpkg.com/browse/vue@3.3.0-alpha.4/dist/vue.global.prod.js"></script> *@
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 }
 <style>
     .context-menu {
@@ -20,35 +20,15 @@
         <div class="row">
             <div class="col-3">
                 <div class="d-flex mt-1">
-                    <input v-model="searchTerm" v-on:keyup="handleSearch" class="form-control form-control-sm me-1" type="text"
+                    <input v-model="searchTerm" class="form-control form-control-sm me-1" type="text"
                         placeholder="Search">
                     <button class="btn btn-sm bg-violet-500 text-white js-new-button">
                         <i class="bi bi-plus"></i>
                     </button>
                 </div>
                 <div class="route-list-container">
-                    <ul v-if="routes.length > 0" class="list-group list-group-flush mt-2">
-                        <li v-for="route in routes" :key="route.id" class="list-group-item px-2 py-1">
-                            <div class="row">
-                                <div v-on:click="showDetails(route.id)" class="col" style="position: relative;">
-                                    <a onclick="event.preventDefault()" href="#"
-                                        class="text-decoration-none stretched-link">{{route.name}}</a>
-                                    <div>
-                                        <small class="badge rounded-pill text-white me-1"
-                                            style="width: 60px;">{{route.method}}</small>
-                                        <small class="text-muted">/{{route.path}}</small>
-                                    </div>
-                                </div>
-                                <div class="p-0 my-auto" style="width: 40px;">
-                                    <button class="btn btn-sm btn-context-menu" type="button"><i
-                                            class="bi bi-three-dots"></i></button>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                    <div v-else>
-                        No route
-                    </div>
+                    <route-list :routes="routes" @@click-route="showDetails" @@edit-route="editRoute"
+                        @@create-route="createRoute"></route-list>
                 </div>
             </div>
             <div class="col-9 h-100" id="route-details">
@@ -84,8 +64,9 @@
                                 <small>Url</small>
                                 <div class="input-group input-group-sm">
                                     <input type="text" class="form-control" v-model="selectedRoute.url" readonly>
-                                    <button type="button" class="input-group-text "><i
-                                            class="bi bi-clipboard"></i></button>
+                                    <button type="button" class="input-group-text ">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -124,21 +105,62 @@
         </div>
     </div>
 </template>
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<template id="route-list-template">
+    <div>
+        <h1>Route List</h1>
+        <ul v-if="routes.length > 0" class="list-group list-group-flush mt-2">
+            <li v-for="route in routes" :key="route.id" class="list-group-item px-2 py-1">
+                <div class="row">
+                    <div v-on:click="click(route.id)" class="col" style="position: relative;">
+                        <a onclick="event.preventDefault()" href="#"
+                            class="text-decoration-none stretched-link">{{route.name}}</a>
+                        <div>
+                            <small class="badge rounded-pill text-white me-1"
+                                style="width: 60px;">{{route.method}}</small>
+                            <small class="text-muted">/{{route.path}}</small>
+                        </div>
+                    </div>
+                    <div class="p-0 my-auto" style="width: 40px;">
+                        <button class="btn btn-sm btn-context-menu" type="button">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <button @@click="createRoute()">New Route</button>
+    </div>
+</template>
 <script>
+    // Define the RouteList component
+    const RouteList = {
+        props: {
+            routes: {
+                type: Array,
+                required: true
+            }
+        },
+        template: '#route-list-template',
+        methods: {
+            click(id) {
+                this.$emit('click-route', id);
+            },
+            editRoute(route) {
+                this.$emit('edit-route', route);
+            },
+            createRoute() {
+                this.$emit('create-route');
+            }
+        }
+    };
     const {createApp, onMounted, ref} = Vue
-    const {debounce } = lodash
     const app = createApp({
         setup() {
             const routes = ref([]);
             const selectedRoute = ref(null);
             const selectedRouteId = ref(null);
-
             const searchTerm = ref('');
-            const handleSearch = debounce(() => {
-                console.log('searching for', searchTerm.value)
-                // perform the search here
-            }, 500);
+
             const showDetails = async id => {
                 var tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.DetailsApi), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
                 const response = await fetch(tempUrl.replace('-9999', id));
@@ -147,7 +169,7 @@
                 selectedRoute.value = routeDetails;
             }
             onMounted(() => {
-                const routeList = '@Html.Raw(Json.Serialize(Model.Routes))'
+                const routeList = '@Html.Raw(Json.Serialize(Model.Routes))';
                 routes.value = JSON.parse(routeList)
             })
 
@@ -155,10 +177,10 @@
                 routes,
                 selectedRoute,
                 selectedRouteId,
-                search,
                 showDetails
             }
         }
     });
+    app.component('route-list', RouteList);
     app.mount('#app');
 </script>

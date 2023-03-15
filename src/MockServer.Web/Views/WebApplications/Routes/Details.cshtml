@@ -525,7 +525,7 @@
     function initOverviewScript() {
         $('.js-basic-edit-button').click(function () {
             $.get({
-                url: '@Url.Action(nameof(WebApplicationRoutesController.GetEditPartial), "ProjectRequests", new {ProjectName = Model.WebApplication.Name, RequestId = Model.Id})',
+                url: '@Url.Action(nameof(WebApplicationRoutesController.Edit), "ProjectRequests", new {ProjectName = Model.WebApplication.Name, RequestId = Model.Id})',
                 success: function (data) {
                     const html = data;
                     const partial = $('<div></div>').html(data);

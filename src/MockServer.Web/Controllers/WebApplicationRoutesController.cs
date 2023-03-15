@@ -51,7 +51,7 @@ public class WebApplicationRoutesController : Controller
     }
 
     [HttpGet("ko")]
-    public async Task<IActionResult> IndexKnockout(int WebApplicationId)
+    public async Task<IActionResult> KnockoutIndex(int WebApplicationId)
     {
         var vm = await _webApplicationRouteWebService.GetIndexModel(WebApplicationId);
         return View("Views/WebApplications/Routes/IndexKo.cshtml", vm);
@@ -81,16 +81,6 @@ public class WebApplicationRoutesController : Controller
     }
 
     [AjaxOnly]
-    [HttpGet("{RouteId:int}/edit")]
-    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> GetEditPartial(int WebApplicationId, int RouteId)
-    {
-        var vm = await _webApplicationRouteWebService.GetEditRouteModel(RouteId);
-        ViewData["FormMode"] = "Edit";
-        return PartialView("Views/Requests/_CreateRequestPartial.cshtml", vm);
-    }
-
-    [AjaxOnly]
     [HttpPost("{RouteId:int}/edit")]
     [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> Edit(int RouteId, RouteSaveModel request)
@@ -104,34 +94,30 @@ public class WebApplicationRoutesController : Controller
         return NoContent();
     }
 
-    [HttpGet("{RouteId:int}/view")]
+    [AjaxOnly]
+    [HttpGet("{RouteId:int}/details")]
     [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> View(int RouteId)
+    public async Task<IActionResult> AjaxIndexDetails(int RouteId)
     {
         var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
-        return PartialView("Views/Requests/_RequestOpen.cshtml", vm);
+        return PartialView("Views/WebApplications/Routes/_IndexRouteDetails.cshtml", vm);
     }
 
-    [HttpGet("{RouteId:int}")]
+    [HttpGet("edit/{RouteId:int}")]
     [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> Details(int RouteId, string tab = "overview")
+    public async Task<IActionResult> Edit(int RouteId, string tab = "overview")
     {
+        var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
         ViewData["Tab"] = tab;
-        if (tab.Equals("Overview", StringComparison.OrdinalIgnoreCase))
-        {
-            var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
-            return View("Views/WebApplications/Routes/Details.cshtml", vm);
-        }
-        else if(tab.Equals("Integration", StringComparison.OrdinalIgnoreCase))
-        {
-            var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
-            return View("Views/WebApplications/Routes/Details.cshtml", vm);
-        }
-        else 
-        {
-            var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
-            return View("Views/WebApplications/Routes/Details.cshtml", vm);
-        }
+        return View("Views/WebApplications/Routes/Details.cshtml", vm);
+    }
+
+    [HttpPost("edit/{RouteId:int}")]
+    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
+    public async Task<IActionResult> ChangeIntegrationType(int RouteId, RouteIntegrationType Type)
+    {
+        await _webApplicationRouteWebService.ChangeIntegrationType(RouteId, Type);
+        return RedirectToAction(nameof(Edit), Request.RouteValues);
     }
 
     [HttpGet("api/{RouteId:int}")]
@@ -142,41 +128,12 @@ public class WebApplicationRoutesController : Controller
         return Ok(vm);
     }
 
-    [HttpPost("{RouteId:int}/change-integration-type")]
-    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> ChangeIntegrationType(int RouteId, RouteIntegrationType Type)
-    {
-        await _webApplicationRouteWebService.ChangeIntegrationType(RouteId, Type);
-        return RedirectToAction(nameof(Details), Request.RouteValues);
-    }
-
     [AjaxOnly]
     [HttpPost("{RouteId:int}")]
     [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> Edit(int WebApplicationId, int RouteId, RouteViewModel vm)
     {
         return Ok(vm);
-    }
-
-    [AjaxOnly]
-    [HttpGet("{RouteId:int}/authorization")]
-    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> GetAuthorizationPartial(int WebApplicationId, int id)
-    {
-        var vm = await _webApplicationRouteWebService.GetAuthorizationViewModel(WebApplicationId, id);
-        return PartialView("Views/Requests/_AuthorizationConfigPartial.cshtml", vm);
-    }
-
-    [AjaxOnly]
-    [HttpPost("{RouteId:int}/authorization")]
-    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> ConfigAuthorization(int WebApplicationId, int RouteId, AuthorizationSaveModel auth)
-    {
-        await _webApplicationRouteWebService.AttachAuthorization(RouteId, auth);
-        return Ok(new AjaxResult<AuthorizationSaveModel>
-        {
-            Data = auth
-        });
     }
 
     //[AjaxOnly]
