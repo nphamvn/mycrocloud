@@ -53,7 +53,7 @@ https://cdn.jsdelivr.net/npm/vuetify@3.1.9/dist/vuetify.min.css
                                         <small>Method</small>
                                         <select v-model="selectedRoute.method"
                                             class="form-select form-select-sm w-auto me-2">
-                                            <option v-for="method in methods" :value="method" :key="method">
+                                            <option v-for="method in Methods" :value="method" :key="method">
                                                 {{method}}
                                             </option>
                                         </select>
@@ -82,25 +82,14 @@ https://cdn.jsdelivr.net/npm/vuetify@3.1.9/dist/vuetify.min.css
                             <div class="card-body">
                                 <small>Integration Type</small>
                                 <div class="mt-1">
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" value="1"
+                                    <div v-for="type in IntegrationTypes" class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" :value="type.value"
                                             v-model="selectedRoute.integrationType">
-                                        <label class="form-check-label">Mock Integration</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" value="2"
-                                            v-model="selectedRoute.integrationType">
-                                        <label class="form-check-label">Direct Forwarding</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" value="3"
-                                            v-model="selectedRoute.integrationType">
-                                        <label class="form-check-label">Function Trigger</label>
+                                        <label class="form-check-label">{{type.text}}</label>
                                     </div>
                                 </div>
                                 <p class="form-text">If you change the integration type, configuration for current type
-                                    will
-                                    be lost.</p>
+                                    will be lost.</p>
                             </div>
                         </div>
                         <div class="card mt-1">
@@ -111,20 +100,10 @@ https://cdn.jsdelivr.net/npm/vuetify@3.1.9/dist/vuetify.min.css
                                 <div>
                                     <small>Authorization Type</small>
                                     <div class="mt-1">
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" value="0"
+                                        <div v-for="type in AuthorizationTypes" class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" :value="type.value"
                                                 v-model="selectedRoute.authorization.type">
-                                            <label class="form-check-label">None</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" value="1"
-                                                v-model="selectedRoute.authorization.type">
-                                            <label class="form-check-label">Allow Anonymous</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" value="2"
-                                                v-model="selectedRoute.authorization.type">
-                                            <label class="form-check-label">Authorize</label>
+                                            <label class="form-check-label">{{type.text}}</label>
                                         </div>
                                     </div>
                                 </div>
@@ -133,6 +112,133 @@ https://cdn.jsdelivr.net/npm/vuetify@3.1.9/dist/vuetify.min.css
                                     <select v-model="selectedRoute.authorization.policies" multiple="multiple"
                                         data-placeholder="Select policies...">
                                     </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mt-1">
+                            <div class="card-header">
+                                Request Validation
+                            </div>
+                            <div class="card-body">
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button type="button" class="nav-link active py-1" data-bs-toggle="tab"
+                                            data-bs-target="#request-param-tab">Queries</button>
+                                    </li>
+                                    <li class="nav-item">
+                                        <button type="button" class="nav-link py-1" data-bs-toggle="tab"
+                                            data-bs-target="#request-header-tab">Headers</button>
+                                    </li>
+                                    <li class="nav-item">
+                                        <button type="button" class="nav-link py-1" data-bs-toggle="tab"
+                                            data-bs-target="#request-body-tab">Body</button>
+                                    </li>
+                                </ul>
+                                <div class="tab-content" style="min-height: 200px;">
+                                    <div id="request-param-tab" class="tab-pane fade show active p-2" role="tabpanel">
+                                        <table id="request-params" class="table table-sm p-0 m-0">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 20%" scope="col">Key</th>
+                                                    <th style="width: 75%" scope="col">Constraints</th>
+                                                    <th style="width: 5%" scope="col">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="query in selectedRoute.requestQueries">
+                                                    <td class="align-middle"><input v-model="query.key" type="text"
+                                                            class="form-control form-control-sm param-key"
+                                                            placeholder="key" autocomplete="off">
+                                                    </td>
+                                                    <td class="align-middle">
+                                                        <div class="d-flex">
+                                                            <select class="js-query-constraint-list" multiple></select>
+                                                            <button class="ms-2 js-query-constraint-button">
+                                                                <i class="bi bi-box-arrow-in-up-right"></i></button>
+                                                        </div>
+                                                    </td>
+                                                    <td class="align-middle"><button
+                                                            class="btn param-delete text-gray btn-show-on-hover"><i
+                                                                class="bi bi-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div id="request-header-tab" class="tab-pane fade p-2" role="tabpanel">
+                                        <table id="request-header-table" class="table table-sm p-0 m-0">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 20%" scope="col">Header</th>
+                                                    <th style="width: 75%" scope="col">Constraints</th>
+                                                    <th style="width: 5%" scope="col">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="align-middle"><input type="text"
+                                                            class="form-control form-control-sm" placeholder="name">
+                                                    </td>
+                                                    <td class="align-middle"><input type="hidden">
+                                                    </td>
+                                                    <td class="align-middle"><button
+                                                            class="btn header-delete text-gray btn-show-on-hover"><i
+                                                                class="bi bi-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div id="request-body-tab" class="tab-pane fade p-2" role="tabpanel">
+                                        <div class="mt-1">
+                                            <div>
+                                                <div class="form-check me-5">
+                                                    <input class="form-check-input" type="checkbox">
+                                                    <label class="form-check-label">Required</label>
+                                                </div>
+                                                <div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox">
+                                                        <label class="form-check-label">Match Exactly</label>
+                                                    </div>
+                                                    <div>
+                                                        <textarea class="form-control"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card mt-2">
+                                                <div class="card-header">
+                                                    Fields Constrains
+                                                </div>
+                                                <div class="card-body">
+                                                    <p>Tips: </p>
+                                                    <table id="request-header-table" class="table table-sm">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width: 20%" scope="col">Field</th>
+                                                                <th style="width: 75%" scope="col">Constraints</th>
+                                                                <th style="width: 5%" scope="col">Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td class="align-middle"><input type="text"
+                                                                        class="form-control form-control-sm"
+                                                                        placeholder="field">
+                                                                </td>
+                                                                <td class="align-middle"><input type="hidden">
+                                                                </td>
+                                                                <td class="align-middle"><button
+                                                                        class="btn header-delete text-gray btn-show-on-hover"><i
+                                                                            class="bi bi-trash"></i></button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -155,8 +261,7 @@ https://cdn.jsdelivr.net/npm/vuetify@3.1.9/dist/vuetify.min.css
 </template>
 <!-- Modal -->
 <template id="requestDeleteConfirmModalTemplate">
-    <div class="modal fade" id="requestDeleteConfirmModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="requestDeleteConfirmModal" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -196,6 +301,156 @@ https://cdn.jsdelivr.net/npm/vuetify@3.1.9/dist/vuetify.min.css
                 </div>
             </li>
         </ul>
+    </div>
+</template>
+<template id="inline-constraint-modal">
+    <div class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Constraints</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="required" />
+                            <label class="form-check-label">Required</label>
+                        </div>
+                        <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="type" />
+                                <label class="form-check-label">Type</label>
+                            </div>
+                            <select class="ms-3 form-select form-select-sm" style="width: 100px;" name="type">
+                                <option value="int">Int</option>
+                                <option value="bool">Boolean</option>
+                                <option value="datetime">Datetime</option>
+                                <option value="decimal">Decimal</option>
+                                <option value="double">Double</option>
+                                <option value="float">Float</option>
+                                <option value="guid">GUID</option>
+                                <option value="long">Long</option>
+                            </select>
+                        </div>
+                        <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="minlength" />
+                                <label class="form-check-label">Minimum Length</label>
+                            </div>
+                            <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
+                                name="minlength" placeholder="0" />
+                        </div>
+                        <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="maxlength" />
+                                <label class="form-check-label">Maximum Length</label>
+                            </div>
+                            <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
+                                name="maxlength" placeholder="100" />
+                        </div>
+                        <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="length" />
+                                <label class="form-check-label">Length</label>
+                            </div>
+                            <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
+                                name="length" placeholder="50" />
+                        </div>
+                        <p class="form-text d-none">Constrains value to be a string of a given length or within
+                            a given range of lengths.</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="min" />
+                                <label class="form-check-label">Min</label>
+                            </div>
+                            <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
+                                name="min" placeholder="0" />
+                        </div>
+                        <p class="form-text d-none">Constrains a route parameter to be a long with a minimum
+                            value.</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="max" />
+                                <label class="form-check-label">Max</label>
+                            </div>
+                            <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
+                                name="max" placeholder="100" />
+                        </div>
+                        <p class="form-text d-none">Constrains a route parameter to be an integer with a maximum
+                            value.</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="range" />
+                                <label class="form-check-label">Range</label>
+                            </div>
+                            <div class="ms-3 d-flex">
+                                <input class="form-control form-control-sm" style="width: 100px;" type="number"
+                                    name="range-min" placeholder="1" />
+                                <label class="form-label mx-2">~</label>
+                                <input class="form-control form-control-sm" style="width: 100px;" type="number"
+                                    name="range-max" placeholder="100" />
+                            </div>
+                        </div>
+                        <p class="form-text d-none">Constraints a route parameter to be an integer within a
+                            given range of values.</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="alpha" />
+                                <label class="form-check-label">Alpha</label>
+                            </div>
+                        </div>
+                        <p class="form-text d-none">Constraints a route parameter to be an integer within a given range
+                            of values.</p>
+                    </div>
+                    <hr />
+                    <div>
+                        <div class="d-flex">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="regex" />
+                                <label class="form-check-label">Regex</label>
+                            </div>
+                            <input class="ms-3 form-control form-control-sm w-50" type="text" name="pattern"
+                                placeholder="ab+c" />
+                        </div>
+                        <p class="form-text d-none">Constraints a route parameter to be an integer within a
+                            given range of values.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Ok</button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 <script>
@@ -241,8 +496,8 @@ https://cdn.jsdelivr.net/npm/vuetify@3.1.9/dist/vuetify.min.css
     };
     let timeout = null;
     const {createApp, onMounted, ref} = Vue
-    const {createVuetify} = Vuetify
-    const vuetify = createVuetify()
+    //const {createVuetify} = Vuetify
+    //const vuetify = createVuetify()
     const app = createApp({
         setup() {
             const webapp = ref({});
@@ -250,7 +505,10 @@ https://cdn.jsdelivr.net/npm/vuetify@3.1.9/dist/vuetify.min.css
             const selectedRoute = ref(null);
             const selectedRouteId = ref(null);
             const searchTerm = ref('');
-            const methods = ['GET', 'POST', 'PUT', 'DELETE'];
+            const Methods = null;
+            const AuthorizationTypes = null;
+            const IntegrationTypes = null;
+
             const showDetails = async id => {
                 var tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.GetRouteJson), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
                 const response = await fetch(tempUrl.replace('-9999', id));
@@ -262,8 +520,18 @@ https://cdn.jsdelivr.net/npm/vuetify@3.1.9/dist/vuetify.min.css
                 clearTimeout(timeout);
                 // Make a new timeout set to go off in 800ms
                 timeout = setTimeout(() => {
-                    alert(searchTerm.value);
-                }, 1000);
+                    const IndexUrl = '@Url.Action(nameof(WebApplicationRoutesController.AjaxIndex), new {WebApplicationName = Model.WebApplication.Name})';
+                    const params = {
+                        searchTerm: searchTerm.value
+                    };
+                    const query_params = new URLSearchParams(params);
+                    fetch({
+                        url: IndexUrl.trimEnd('?') + '?' + query_params,
+                        searchParams:
+                    })
+                        .then(res => res.json())
+                        .then(res => routes.value = res);
+                }, 800);
             }
             const newRoute = () => {
                 selectedRoute.value = {
@@ -271,15 +539,21 @@ https://cdn.jsdelivr.net/npm/vuetify@3.1.9/dist/vuetify.min.css
                 };
             }
             const onSubmit = () => {
-                
+
             }
             onMounted(() => {
                 fetch('@Url.Action(nameof(WebApplicationsController.GetAppJson), "WebApplications", new {WebApplicationName = Model.WebApplication.Name})')
                     .then(res => res.json())
                     .then(res => webapp.value = res);
-                fetch('@Url.Action(nameof(WebApplicationRoutesController.AjaxIndex), new {WebApplicationName = Model.WebApplication.Name})')
-                    .then(res => res.json())
-                    .then(res => routes.value = res);
+                routes.value = JSON.parse('@Html.Raw(Json.Serialize(Model.Routes.Select(r => new {
+                    r.Id,
+                    r.Name,
+                    r.Method,
+                    r.Path
+                    })))');
+                Methods = JSON.parse('@Html.Raw(Json.Serialize(Model.HttpMethodSelectListItem))');
+                AuthorizationTypes = JSON.parse('@Html.Raw(Json.Serialize(Model.AuthorizationTypeSelectListItem))');
+                IntegrationTypes = JSON.parse('@Html.Raw(Json.Serialize(Model.IntegrationTypeSelectListItem))');
             })
 
             return {
@@ -290,13 +564,15 @@ https://cdn.jsdelivr.net/npm/vuetify@3.1.9/dist/vuetify.min.css
                 newRoute,
                 delayedSearch,
                 searchTerm,
-                methods,
+                Methods,
+                AuthorizationTypes,
+                IntegrationTypes,
                 webapp,
                 onSubmit
             }
         }
     });
     app.component('route-list', RouteList);
-    app.use(vuetify)
+    //app.use(vuetify)
     app.mount('#app');
 </script>
