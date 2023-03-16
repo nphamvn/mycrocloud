@@ -45,7 +45,11 @@ public class WebApplicationWebService : BaseWebService, IWebApplicationWebServic
     public async Task<WebApplication> Get(int appId)
     {
         var app = await _webApplicationRepository.Get(appId);
-        return _mapper.Map<WebApplication>(app);
+        var mapped = _mapper.Map<WebApplication>(await _webApplicationRepository.Get(appId));
+        mapped.User = new() {
+            Id = app.Id
+        };
+        return mapped;
     }
 
     public async Task<WebApplicationIndexViewModel> GetIndexViewModel(WebApplicationSearchModel searchModel)

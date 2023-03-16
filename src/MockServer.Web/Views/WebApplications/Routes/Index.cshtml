@@ -98,7 +98,7 @@
                             Path: $('input[name=Path]', modal).val()
                         };
                         $.post({
-                            url: '@Url.Action(nameof(WebApplicationRoutesController.CreateAjax), "Requests", new {projectName = ViewData["ProjectName"]})',
+                            url: '@Url.Action(nameof(WebApplicationRoutesController.ApiCreate), "Requests", new {projectName = ViewData["ProjectName"]})',
                             data: request,
                             success: function (data) {
                                 $('#btnSave', modal).off('click');
@@ -185,7 +185,7 @@
     }
 
     function deleteRequest(id) {
-        const tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.Delete), "ProjectRequests", new { RequestId = Constants.TemporaryId})'
+        const tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.ApiDelete), "ProjectRequests", new { RequestId = Constants.TemporaryId})'
         $.post({
             async: false,
             url: tempUrl.replace(@Constants.TemporaryId, id),

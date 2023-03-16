@@ -69,7 +69,8 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         };
         var policies = await _webApplicationAuthorizationPolicyRepository.GetAll(vm.WebApplication.Id);
         vm.Authorization.PolicySelectListItem = policies
-                        .Select(p => new SelectListItem {
+                        .Select(p => new SelectListItem
+                        {
                             Value = p.Id.ToString(),
                             Text = p.Name,
                             Selected = vm.Authorization.PolicyIds.Contains(p.Id)
@@ -126,8 +127,6 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         var authorization = await _webApplicationRouteRepository.GetAuthorization(routeId);
         var vm = authorization != null ? _mapper.Map<AuthorizationViewModel>(authorization)
                                         : new AuthorizationViewModel();
-        //var AuthenticationSchemes = await _webApplicationWebService.Get()
-        //vm.AuthenticationSchemeSelectListItems = await _webApplicationWebService.(projectId);
         return vm;
     }
 
@@ -142,7 +141,9 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         var vm = new RouteIndexModel
         {
             WebApplication = await _webApplicationWebService.Get(appId),
-            Routes = _mapper.Map<IEnumerable<RouteIndexItem>>(await _webApplicationRouteRepository.GetByApplicationId(appId))
+            Routes = _mapper.Map<IEnumerable<RouteIndexItem>>(await _webApplicationRouteRepository.GetByApplicationId(appId)),
+            HttpMethodSelectListItem = HttpProtocolExtensions.CommonHttpMethods
+                                    .Select(m => new SelectListItem(m, m))
         };
         return vm;
     }
@@ -177,5 +178,30 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
     public Task ChangeIntegrationType(int routeId, RouteIntegrationType type)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<RoutePageModel> GetPageModel(int appId)
+    {
+        var vm = new RoutePageModel
+        {
+            WebApplication = await _webApplicationWebService.Get(appId),
+            Routes = _mapper.Map<IEnumerable<Models.WebApplications.Routes.Route>>(await _webApplicationRouteRepository.GetByApplicationId(appId)),
+            HttpMethodSelectListItem = HttpProtocolExtensions.CommonHttpMethods
+                                    .Select(m => new SelectListItem(m, m)),
+            IntegrationTypeSelectListItem = new List<SelectListItem>{
+                new("Mock Integration", ((int)RouteIntegrationType.MockIntegration).ToString()),
+                new("Direct Forwarding", ((int)RouteIntegrationType.DirectForwarding).ToString()),
+                new("Function Trigger", ((int)RouteIntegrationType.FunctionTrigger).ToString())
+            },
+            AuthorizationTypeSelectListItem = new List<SelectListItem>
+            {
+                new("None", ((int)AuthorizationType.None).ToString()),
+                new("Allow Anonymous", ((int)AuthorizationType.AllowAnonymous).ToString()),
+                new("Authorize", ((int)AuthorizationType.Authorize).ToString())
+            },
+        };
+        var policies = await _webApplicationAuthorizationPolicyRepository.GetAll(appId);
+        vm.PolicySelectListItem = policies.Select(p => new SelectListItem(p.Name, p.Id.ToString()));
+        return vm;
     }
 }
