@@ -31,12 +31,12 @@
                     </button>
                 </div>
                 <div class="route-list-container">
-                    <route-list :routes="routes" @@click-route="showDetails" @@edit-route="editRoute"
+                    <route-list :routes="routes" @@click-route="openRoute" @@edit-route="editRoute"
                         @@create-route="createRoute"></route-list>
                 </div>
             </div>
             <div class="col-9 h-100" id="route-details">
-                <div v-if="selectedRoute">
+                <div v-if="openingRoute">
                     <form v-on:submit.prevent="onSubmit">
                         <div class="card mt-1">
                             <div class="card-header">
@@ -45,13 +45,13 @@
                             <div class="card-body">
                                 <div>
                                     <small>Name</small>
-                                    <input type="text" v-model="selectedRoute.name" class="form-control form-control-sm"
+                                    <input type="text" v-model="openingRoute.name" class="form-control form-control-sm"
                                         aria-autocomplete="none">
                                 </div>
                                 <div class="mt-1 d-flex">
                                     <div>
                                         <small>Method</small>
-                                        <select v-model="selectedRoute.method"
+                                        <select v-model="openingRoute.method"
                                             class="form-select form-select-sm w-auto me-2">
                                             @foreach (var method in Model.HttpMethodSelectListItem)
                                             {
@@ -61,7 +61,7 @@
                                     </div>
                                     <div class="flex-fill">
                                         <small>Path</small>
-                                        <input type="text" v-model="selectedRoute.path"
+                                        <input type="text" v-model="openingRoute.path"
                                             class="form-control form-control-sm">
                                     </div>
                                 </div>
@@ -69,7 +69,7 @@
                                     <small>Url</small>
                                     <div class="input-group input-group-sm">
                                         <input type="text" class="form-control"
-                                            :value="RouteBaseUrl + '/' + selectedRoute.path" readonly>
+                                            :value="openingRoute.method + ' ' + '@(string.Format("https://u{0}-{1}.mockserver.com", Model.WebApplication.User.Id, Model.WebApplication.Name))' + '/' + openingRoute.path" readonly>
                                         <button type="button" class="input-group-text ">
                                             <i class="bi bi-clipboard"></i>
                                         </button>
@@ -87,7 +87,7 @@
                                     @foreach (var type in Model.IntegrationTypeSelectListItem)
                                     {
                                         <div class="form-check form-check-inline">
-                                            <input v-model="selectedRoute.integrationType" class="form-check-input"
+                                            <input v-model="openingRoute.integrationType" class="form-check-input"
                                             type="radio" value="@type.Value">
                                             <label class="form-check-label">@type.Text</label>
                                         </div>
@@ -109,7 +109,7 @@
                                         {
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="radio" value="@type.Value"
-                                                v-model="selectedRoute.authorization.type">
+                                                v-model="openingRoute.authorization.type">
                                                 <label class="form-check-label">@type.Text</label>
                                             </div>
                                         }
@@ -117,7 +117,7 @@
                                 </div>
                                 <div class="mt-1">
                                     <small>Policy</small>
-                                    <select class="form-select" v-model="selectedRoute.authorization.policies"
+                                    <select class="form-select" v-model="openingRoute.authorization.policies"
                                         multiple="multiple" data-placeholder="Select policies...">
                                         @foreach (var policy in Model.PolicySelectListItem)
                                         {
@@ -157,7 +157,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="query in selectedRoute.requestQueries">
+                                                <tr v-for="query in openingRoute.requestQueries">
                                                     <td class="align-middle"><input v-model="query.key" type="text"
                                                             class="form-control form-control-sm param-key"
                                                             placeholder="key" autocomplete="off">
@@ -509,32 +509,20 @@
     const {createApp, onMounted, ref} = Vue
     const app = createApp({
         setup() {
-            const webapp = ref({});
+            const webapp = ref(null);
             const routes = ref([]);
-            const selectedRoute = ref(null);
+            const openingRoute = ref(null);
             const mode = ref();
-            const selectedRouteId = ref(null);
+            const openingRouteId = ref(null);
             const searchTerm = ref('');
             const RouteBaseUrl = '@string.Format("https://u{0}-{1}.mockserver.com", Model.WebApplication.User.Id, Model.WebApplication.Name)';
-            const showDetails = async id => {
-                let tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.ApiGet), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
-                const response = await fetch(tempUrl.replace('-9999', id));
-                const routeDetails = await response.json();
+            const openRoute = async id => {
                 if (mode.value !== 'EDIT') {
                     mode.value = 'EDIT';
                 }
-                selectedRouteId.value = id;
-                selectedRoute.value = routeDetails;
+                let tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.ApiGet), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
                 axios.get(tempUrl.replace('-9999', id))
-
-                    // thenで成功した場合の処理
-                    .then((res) => {
-                        //alert(JSON.stringify(res.data))
-                    })
-                    // catchでエラー時の挙動を定義
-                    .catch(err => {
-                        //console.log("err:", err);
-                    });
+                    .then(res => openingRoute.value = res.data)
             }
             const delayedSearch = () => {
                 clearTimeout(timeout);
@@ -554,7 +542,7 @@
             }
             const newRoute = () => {
                 mode.value = 'CREATE';
-                selectedRoute.value = {
+                openingRoute.value = {
                     name: '',
                     method: 'GET',
                     path: '',
@@ -571,35 +559,30 @@
                     url = '@Url.Action(nameof(WebApplicationRoutesController.ApiCreate), "WebApplicationRoutes", new { WebApplicationName = Model.WebApplication.Name})';
                 } else {
                     let tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.ApiEdit), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
-                    url = tempUrl.replace('-9999', selectedRoute.value.id);
+                    url = tempUrl.replace('-9999', openingRoute.value.id);
                 }
-                let route = selectedRoute.value;
-                axios.post(url, {data: {
-                    "route": route
-                }})
-                    .then((response) => {
-                        alert(JSON.stringify(response.data));
+                let route = openingRoute.value;
+                axios.post(url, route)
+                    .then((res) => {
+                        alert(JSON.stringify(res.data));
                     });
             }
             onMounted(() => {
-                fetch('@Url.Action(nameof(WebApplicationsController.GetAppJson), "WebApplications", new {WebApplicationName = Model.WebApplication.Name})')
-                    .then(res => res.json())
-                    .then(res => webapp.value = res);
+                webapp.value = JSON.parse('@Html.Raw(Json.Serialize(Model.WebApplication))');
                 routes.value = JSON.parse('@Html.Raw(Json.Serialize(Model.Routes.Select(r => new {
                     r.Id,
                     r.Name,
                     r.Method,
                     r.Path
                     })))');
-                webapp.value = JSON.parse('@Html.Raw(Json.Serialize(Model.WebApplication))');
             })
 
             return {
                 routes,
                 RouteBaseUrl,
-                selectedRoute,
-                selectedRouteId,
-                showDetails,
+                openingRoute,
+                openingRouteId,
+                openRoute,
                 newRoute,
                 delayedSearch,
                 searchTerm,
