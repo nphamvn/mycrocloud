@@ -365,23 +365,10 @@
             class="dropdown-item btn btn-default text-danger">Delete</button>
     </div>
 </template>
-<style>
-    .modal-mask {
-        position: fixed;
-        z-index: 9998;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        transition: opacity 0.3s ease;
-    }
-</style>
 <template id="validation-attributes-modal-template">
-    <transition name="modal-fade">
-        <div class="modal-mask" style="width: 600px;">
-            <div class="modal-content modal-container">
+    <div id="validationAttributesModal" class="modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
                 <div class="modal-header">
                     <h6 class="modal-title">Validation Attributes</h6>
                     <button type="button" class="btn-close" v-on:click="close"></button>
@@ -392,11 +379,11 @@
                             <div class="d-flex">
                                 <select v-model="attr.name" class="form-select form-select-sm w-auto me-1">
                                     <option :value="null" selected>Attribute Name</option>
-                                    <option v-for="item in attrSelectListItem" :value="item.value">{{item.text}}
+                                    <option v-for="item in builtInValdationAttributes" :value="item.name">{{item.name}}
                                     </option>
                                 </select>
                                 <input type="text" v-model="attr.parameters" class="form-control form-control-sm"
-                                    placeholder="Attribute Parameters" />
+                                    :placeholder="placeholder" />
                                 <button type="button" class="btn text-gray btn-show-on-hover" @@click="remove(index)">
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -413,7 +400,7 @@
                 </div>
             </div>
         </div>
-    </transition>
+    </div>
 </template>
 <template id="validation-attributes-list-template">
     <div class="d-flex">
@@ -464,9 +451,17 @@
             }
         },
         data: function () {
+            console.log(JSON.stringify(JSON.parse('@Html.Raw(Json.Serialize(Model.BuiltInValdationAttributes))')))
             return {
                 attrs: JSON.parse(JSON.stringify(this.attributes || [])),
-                attrSelectListItem: JSON.parse('@Html.Raw(Json.Serialize(Model.ValidationAttributeSelectListItem))')
+                builtInValdationAttributes: JSON.parse('@Html.Raw(Json.Serialize(Model.BuiltInValdationAttributes))')
+            }
+        },
+        computed: {
+            placeholder() {
+                //const selectedOption = this.builtInValdationAttributes.find(item => item.name === this.attr.name)
+                //return selectedOption ? selectedOption.parameterDescription : 'Attribute parameters'
+                return 'work'
             }
         }
     }
@@ -524,7 +519,8 @@
     }
 
     let timeout = null;
-    const {createApp, onMounted, ref} = Vue
+    const {createApp, onMounted, ref, nextTick} = Vue
+    const {Modal} = bootstrap
     const app = createApp({
         setup() {
             const webapp = ref(null);
@@ -565,6 +561,7 @@
                     routes.value = response.data
                 }, 800);
             }
+
             const newRoute = () => {
                 mode.value = 'CREATE';
                 openingRoute.value = {
@@ -596,7 +593,6 @@
                 let route = openingRoute.value;
                 axios.post(url, route)
                     .then((res) => {
-                        //alert(JSON.stringify(res.data));
                     });
             }
             const discardChange = () => {
@@ -621,16 +617,22 @@
                 openingRoute.value.requestBody.fieldValidationAttributes = openingRoute.value.requestBody.fieldValidationAttributes || []
                 openingRoute.value.requestBody.fieldValidationAttributes.push({name: null, attributes: []})
             }
+
+            let validationAttributesModal = null;
             const validationAttributesModalVisible = ref(false)
             const validationAttributesModalAttributes = ref(null)
             let onValidationAttributesModalSavedHandler
-
-            const showValidationAttributesModal = (attributes, onValidationAttributesModalSavedHandler) => {
+            const showValidationAttributesModal = async (attributes, onValidationAttributesModalSavedHandler) => {
                 validationAttributesModalAttributes.value = attributes
                 this.onValidationAttributesModalSavedHandler = onValidationAttributesModalSavedHandler
                 validationAttributesModalVisible.value = true
+                await nextTick()
+                this.validationAttributesModal = new bootstrap.Modal(document.getElementById("validationAttributesModal"), {})
+                this.validationAttributesModal.show()
             }
             const closeValidationAttributesModal = () => {
+                this.validationAttributesModal.hide()
+                this.validationAttributesModal = null
                 validationAttributesModalVisible.value = false
                 this.onValidationAttributesModalSavedHandler = null
             }
@@ -666,10 +668,10 @@
                 addRow,
                 addRequesBodyField,
                 validationAttributesModalVisible,
+                validationAttributesModalAttributes,
                 showValidationAttributesModal,
                 onValidationAttributesModalSaved,
-                closeValidationAttributesModal,
-                validationAttributesModalAttributes
+                closeValidationAttributesModal
             }
         }
     });

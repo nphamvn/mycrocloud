@@ -77,14 +77,4 @@ public class WebApplicationWebService : BaseWebService, IWebApplicationWebServic
             await _webApplicationRepository.Update(app);
         }
     }
-
-    public async Task SetAccessibility(int appId, WebApplicationAccessibility accessibility)
-    {
-        var app = await _webApplicationRepository.Get(appId);
-        if (app != null)
-        {
-            app.Accessibility = accessibility;
-            await _webApplicationRepository.Update(app);
-        }
-    }
 }

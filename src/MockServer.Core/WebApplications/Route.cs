@@ -13,7 +13,5 @@ public class Route : BaseEntity
     public IList<RouteRequestHeader> RequestHeaders { get; set; }
     public IList<RouteRequestQuery> RequestQueries { get; set; }
     public RouteRequestBody RequestBody { get; set; }
-    public WebApplication WebApplication { get; set; }
-    public RouteIntegration Intergration { get; set; }
 }
 

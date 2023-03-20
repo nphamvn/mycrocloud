@@ -23,13 +23,11 @@ public class WebApplicationRepository : IWebApplicationRepository
                         UserId,
                         Name,
                         Description,
-                        Accessibility,
                         CreatedAt
                     ) VALUES (
                         @UserId,
                         @Name,
                         @Description,
-                        @Accessibility,
                         datetime('now','localtime')
                     );
                 """;
@@ -38,8 +36,7 @@ public class WebApplicationRepository : IWebApplicationRepository
         {
             UserId = userId,
             Name = app.Name,
-            Description = app.Description,
-            Accessibility = (int)app.Accessibility
+            Description = app.Description
         });
     }
 
@@ -183,7 +180,6 @@ public class WebApplicationRepository : IWebApplicationRepository
                 SET
                     Name = @Name,
                     Description = @Description,
-                    Accessibility = @Accessibility,
                     UpdatedAt = datetime('now','localtime')
                 WHERE
                     Id = @Id;
@@ -193,8 +189,7 @@ public class WebApplicationRepository : IWebApplicationRepository
         {
             Id = app.Id,
             Name = app.Name,
-            Description = app.Description,
-            Accessibility = (int)app.Accessibility
+            Description = app.Description
         });
     }
 }

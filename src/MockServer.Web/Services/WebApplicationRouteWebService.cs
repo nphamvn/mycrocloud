@@ -11,6 +11,7 @@ using CoreRoute = MockServer.Core.WebApplications.Route;
 using CoreAuthorization = MockServer.Core.WebApplications.Security.Authorization;
 using CoreMockIntegration = MockServer.Core.WebApplications.MockIntegration;
 using MockServer.Core.WebApplications.Security;
+using MockServer.Web.Shared;
 
 namespace MockServer.Web.Services;
 
@@ -202,10 +203,15 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         };
         var policies = await _webApplicationAuthorizationPolicyRepository.GetAll(appId);
         vm.PolicySelectListItem = policies.Select(p => new SelectListItem(p.Name, p.Id.ToString()));
-        vm.ValidationAttributeSelectListItem = new List<SelectListItem>
+        vm.BuiltInValdationAttributes = new List<BuiltInValdationAttributeDescription>
         {
-            new ("Required", "Required"),
-            new ("Range", "Range")
+            new () {
+                Name = "Required"
+            },
+            new () {
+                Name = "Range",
+                ParameterDescription = "Type, Min, Max"
+            }
         };
         return vm;
     }
