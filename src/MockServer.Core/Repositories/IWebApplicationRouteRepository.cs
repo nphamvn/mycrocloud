@@ -8,7 +8,7 @@ public interface IWebApplicationRouteRepository
     Task<int> Create(int appId, Route request);
     Task<Route> Find(int appId, string method, string path);
     Task<Route> GetById(int id);
-    Task<IEnumerable<Route>> GetByApplicationId(int appId);
+    Task<IEnumerable<Route>> GetByApplicationId(int appId, string searchTerm, string sort);
     Task Update(int id, Route route);
     Task Delete(int id);
     Task AttachAuthorization(int id, Authorization authorization);

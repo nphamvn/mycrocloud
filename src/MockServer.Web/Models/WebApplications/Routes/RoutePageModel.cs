@@ -10,4 +10,5 @@ public class RoutePageModel
     public IEnumerable<SelectListItem> AuthorizationTypeSelectListItem { get; set; }
     public IEnumerable<SelectListItem> IntegrationTypeSelectListItem { get; set; }
     public IEnumerable<SelectListItem> PolicySelectListItem { get; set; }
+    public IEnumerable<SelectListItem> ValidationAttributeSelectListItem { get; set; }
 }

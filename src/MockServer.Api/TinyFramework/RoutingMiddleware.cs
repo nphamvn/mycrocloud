@@ -28,7 +28,7 @@ public class RoutingMiddleware : IMiddleware
         string key = app.Id.ToString();
         if (!await _cacheService.Exists(app.Id.ToString()))
         {
-            var requests = await _requestRepository.GetByApplicationId(app.Id);
+            var requests = await _requestRepository.GetByApplicationId(app.Id, "", "");
             registeredRoutes = requests.Select(r => new Route
             {
                 Id = r.Id,

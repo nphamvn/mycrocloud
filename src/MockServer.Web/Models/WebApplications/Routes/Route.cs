@@ -15,7 +15,7 @@ public class Route
     public Authorization Authorization { get; set; }
     public IList<RouteRequestHeader> RequestHeaders { get; set; }
     public IList<RouteRequestQuery> RequestQueries { get; set; }
-    public RouteRequestBody Body { get; set; }
+    public RouteRequestBody RequestBody { get; set; }
     public RouteIntegrationViewModel Integration { get; set; }
     public int ApplicationId { get; set; }
     public WebApplication WebApplication { get; set; }

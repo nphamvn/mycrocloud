@@ -26,16 +26,16 @@ public class WebApplicationRoutesController : Controller
     #region Regular MVC
 
     [HttpGet]
-    public async Task<IActionResult> Index(int WebApplicationId)
+    public async Task<IActionResult> Index(int WebApplicationId, string SearchTerm, string Sort)
     {
         if (IndexRender == "SSR")
         {
-            var vm = await _webApplicationRouteWebService.GetIndexModel(WebApplicationId);
+            var vm = await _webApplicationRouteWebService.GetIndexModel(WebApplicationId, SearchTerm, Sort);
             return View("Views/WebApplications/Routes/Index.cshtml", vm);
         }
         else
         {
-            var pm = await _webApplicationRouteWebService.GetPageModel(WebApplicationId);
+            var pm = await _webApplicationRouteWebService.GetPageModel(WebApplicationId, SearchTerm, Sort);
             return View("Views/WebApplications/Routes/IndexWithVue.cshtml", pm);
         }
     }
@@ -69,9 +69,9 @@ public class WebApplicationRoutesController : Controller
     #region API
 
     [HttpGet("api")]
-    public async Task<IActionResult> ApiIndex(int WebApplicationId)
+    public async Task<IActionResult> ApiIndex(int WebApplicationId, string SearchTerm, string Sort)
     {
-        var vm = await _webApplicationRouteWebService.GetIndexModel(WebApplicationId);
+        var vm = await _webApplicationRouteWebService.GetIndexModel(WebApplicationId, SearchTerm, Sort);
         return Ok(vm.Routes.Select(r => new
         {
             r.Id,

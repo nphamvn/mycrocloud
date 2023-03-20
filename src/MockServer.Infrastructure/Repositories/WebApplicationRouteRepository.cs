@@ -132,7 +132,7 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
         });
     }
 
-    public async Task<IEnumerable<Route>> GetByApplicationId(int appId)
+    public async Task<IEnumerable<Route>> GetByApplicationId(int appId, string searchTerm, string sort)
     {
         var query =
                 """
@@ -146,13 +146,28 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
                     WebApplicationRoute r
                 WHERE
                     r.WebApplicationId = @WebApplicationId
+                /**/
+                """;
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            query +=
+                    """
+                    AND r.Name LIKE @Query OR r.PATH LIKE @Query
+                    """;
+        }
+        if (!string.IsNullOrEmpty(sort))
+        {
+            query +=
+                """
+                /**/
                 ORDER BY r.Id
                 """;
-
+        }
         using var connection = new SqliteConnection(_connectionString);
         return await connection.QueryAsync<Route>(query, new
         {
-            WebApplicationId = appId
+            WebApplicationId = appId,
+            Query =  "%" + searchTerm + "%"
         });
     }
 

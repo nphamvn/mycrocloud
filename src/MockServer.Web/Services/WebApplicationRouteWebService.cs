@@ -136,12 +136,12 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         await _webApplicationRouteRepository.AttachAuthorization(routeId, authorization);
     }
 
-    public async Task<RouteIndexModel> GetIndexModel(int appId)
+    public async Task<RouteIndexModel> GetIndexModel(int appId, string searchTerm = "", string sort = "")
     {
         var vm = new RouteIndexModel
         {
             WebApplication = await _webApplicationWebService.Get(appId),
-            Routes = _mapper.Map<IEnumerable<RouteIndexItem>>(await _webApplicationRouteRepository.GetByApplicationId(appId)),
+            Routes = _mapper.Map<IEnumerable<RouteIndexItem>>(await _webApplicationRouteRepository.GetByApplicationId(appId, searchTerm, sort)),
             HttpMethodSelectListItem = HttpProtocolExtensions.CommonHttpMethods
                                     .Select(m => new SelectListItem(m, m))
         };
@@ -180,12 +180,12 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         throw new NotImplementedException();
     }
 
-    public async Task<RoutePageModel> GetPageModel(int appId)
+    public async Task<RoutePageModel> GetPageModel(int appId, string searchTerm, string sort)
     {
         var vm = new RoutePageModel
         {
             WebApplication = await _webApplicationWebService.Get(appId),
-            Routes = _mapper.Map<IEnumerable<Models.WebApplications.Routes.Route>>(await _webApplicationRouteRepository.GetByApplicationId(appId)),
+            Routes = _mapper.Map<IEnumerable<Models.WebApplications.Routes.Route>>(await _webApplicationRouteRepository.GetByApplicationId(appId, searchTerm, sort)),
             HttpMethodSelectListItem = HttpProtocolExtensions.CommonHttpMethods
                                     .Select(m => new SelectListItem(m, m)),
             IntegrationTypeSelectListItem = new List<SelectListItem>{
@@ -202,6 +202,11 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         };
         var policies = await _webApplicationAuthorizationPolicyRepository.GetAll(appId);
         vm.PolicySelectListItem = policies.Select(p => new SelectListItem(p.Name, p.Id.ToString()));
+        vm.ValidationAttributeSelectListItem = new List<SelectListItem>
+        {
+            new ("Required", "Required"),
+            new ("Range", "Range")
+        };
         return vm;
     }
 }

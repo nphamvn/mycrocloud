@@ -129,3 +129,7 @@ function createKey(charCount) {
 function log(obj) {
   console.log(obj);
 }
+function log(name, obj) {
+  var str = JSON.stringify(obj, null, 2);
+  console.log(name + ": " + str);
+}

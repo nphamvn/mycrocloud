@@ -31,8 +31,9 @@
                     </button>
                 </div>
                 <div class="route-list-container">
-                    <route-list :routes="routes" @@click-route="openRoute" @@edit-route="editRoute"
-                        @@create-route="createRoute"></route-list>
+                    <route-list :routes="routes" :selected_id="openingRouteId" @@click-route="openRoute"
+                        @@edit-route="editRoute" @@create-route="createRoute"
+                        @@show-context-menu="showContextMenu"></route-list>
                 </div>
             </div>
             <div class="col-9 h-100" id="route-details">
@@ -69,7 +70,8 @@
                                     <small>Url</small>
                                     <div class="input-group input-group-sm">
                                         <input type="text" class="form-control"
-                                            :value="openingRoute.method + ' ' + '@(string.Format("https://u{0}-{1}.mockserver.com", Model.WebApplication.User.Id, Model.WebApplication.Name))' + '/' + openingRoute.path" readonly>
+                                            :value="openingRoute.method + ' ' + '@(string.Format("https://u{0}-{1}.mockserver.com", Model.WebApplication.User.Id, Model.WebApplication.Name))' + '/' + openingRoute.path"
+                                            readonly>
                                         <button type="button" class="input-group-text ">
                                             <i class="bi bi-clipboard"></i>
                                         </button>
@@ -93,8 +95,8 @@
                                         </div>
                                     }
                                 </div>
-                                <p class="form-text">If you change the integration type, configuration for current type
-                                    will be lost.</p>
+                                <p class="form-text">Changing the integration type will result in the loss of the
+                                    current integration configuration.</p>
                             </div>
                         </div>
                         <div class="card mt-1">
@@ -135,7 +137,7 @@
                                 <ul class="nav nav-tabs" role="tablist">
                                     <li class="nav-item" role="presentation">
                                         <button type="button" class="nav-link active py-1" data-bs-toggle="tab"
-                                            data-bs-target="#request-param-tab">Queries</button>
+                                            data-bs-target="#request-param-tab">Query</button>
                                     </li>
                                     <li class="nav-item">
                                         <button type="button" class="nav-link py-1" data-bs-toggle="tab"
@@ -148,104 +150,147 @@
                                 </ul>
                                 <div class="tab-content" style="min-height: 200px;">
                                     <div id="request-param-tab" class="tab-pane fade show active p-2" role="tabpanel">
-                                        <table id="request-params" class="table table-sm p-0 m-0">
+                                        <table class="table table-sm p-0 m-0">
                                             <thead>
                                                 <tr>
                                                     <th style="width: 20%" scope="col">Key</th>
-                                                    <th style="width: 75%" scope="col">Constraints</th>
+                                                    <th style="width: 75%" scope="col">Attributes</th>
                                                     <th style="width: 5%" scope="col">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="query in openingRoute.requestQueries">
-                                                    <td class="align-middle"><input v-model="query.key" type="text"
-                                                            class="form-control form-control-sm param-key"
-                                                            placeholder="key" autocomplete="off">
+                                                <tr v-for="(query, index) in openingRoute.requestQueries">
+                                                    <td class="align-middle">
+                                                        <input type="text" v-model="query.key"
+                                                            class="form-control form-control-sm" placeholder="key"
+                                                            autocomplete="off">
                                                     </td>
                                                     <td class="align-middle">
                                                         <div class="d-flex">
-                                                            <select class="js-query-constraint-list" multiple></select>
-                                                            <button class="ms-2 js-query-constraint-button">
-                                                                <i class="bi bi-box-arrow-in-up-right"></i></button>
+                                                            <select style="display: none;" v-model="query.attributes"
+                                                                multiple></select>
+                                                            <validation-attributes-list
+                                                                :attributes="query.attributes"></validation-attributes-list>
+                                                            <button type="button" class="ms-auto"
+                                                                v-on:click="showValidationAttributesModal(query.attributes, attrs => query.attributes = attrs)">
+                                                                <i class="bi bi-box-arrow-in-up-right"></i>
+                                                            </button>
                                                         </div>
                                                     </td>
-                                                    <td class="align-middle"><button
-                                                            class="btn param-delete text-gray btn-show-on-hover"><i
-                                                                class="bi bi-trash"></i></button>
+                                                    <td class="align-middle">
+                                                        <button type="button" class="btn text-gray btn-show-on-hover"
+                                                            v-on:click="openingRoute.requestQueries.splice(index, 1)">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             </tbody>
                                         </table>
+                                        <div class="mt-1">
+                                            <button type="button" class="btn btn-secondary btn-sm"
+                                                v-on:click="addRow('requestQueries')">Add</button>
+                                        </div>
                                     </div>
                                     <div id="request-header-tab" class="tab-pane fade p-2" role="tabpanel">
                                         <table id="request-header-table" class="table table-sm p-0 m-0">
                                             <thead>
                                                 <tr>
                                                     <th style="width: 20%" scope="col">Header</th>
-                                                    <th style="width: 75%" scope="col">Constraints</th>
+                                                    <th style="width: 75%" scope="col">Attributes</th>
                                                     <th style="width: 5%" scope="col">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td class="align-middle"><input type="text"
-                                                            class="form-control form-control-sm" placeholder="name">
+                                                <tr v-for="(header, index) in openingRoute.requestHeaders">
+                                                    <td class="align-middle">
+                                                        <input type="text" v-model="header.name"
+                                                            class="form-control form-control-sm" placeholder="name"
+                                                            autocomplete="off" aria-autocomplete="none">
                                                     </td>
-                                                    <td class="align-middle"><input type="hidden">
+                                                    <td class="align-middle">
+                                                        <div class="d-flex">
+                                                            <select style="display: none;" v-model="header.attributes"
+                                                                multiple></select>
+                                                            <validation-attributes-list
+                                                                :attributes="header.attributes"></validation-attributes-list>
+                                                            <button type="button" class="ms-auto"
+                                                                v-on:click="showValidationAttributesModal(header.attributes, attrs => header.attributes = attrs)">
+                                                                <i class="bi bi-box-arrow-in-up-right"></i>
+                                                            </button>
+                                                        </div>
                                                     </td>
-                                                    <td class="align-middle"><button
-                                                            class="btn header-delete text-gray btn-show-on-hover"><i
-                                                                class="bi bi-trash"></i></button>
+                                                    <td class="align-middle">
+                                                        <button type="button" class="btn text-gray btn-show-on-hover"
+                                                            v-on:click="openingRoute.requestHeaders.splice(index, 1)">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             </tbody>
                                         </table>
+                                        <div class="mt-1">
+                                            <button type="button" class="btn btn-secondary btn-sm"
+                                                v-on:click="addRow('requestHeaders')">Add</button>
+                                        </div>
                                     </div>
                                     <div id="request-body-tab" class="tab-pane fade p-2" role="tabpanel">
                                         <div class="mt-1">
-                                            <div>
-                                                <div class="form-check me-5">
-                                                    <input class="form-check-input" type="checkbox">
-                                                    <label class="form-check-label">Required</label>
-                                                </div>
-                                                <div>
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox">
-                                                        <label class="form-check-label">Match Exactly</label>
-                                                    </div>
-                                                    <div>
-                                                        <textarea class="form-control"></textarea>
-                                                    </div>
-                                                </div>
-                                            </div>
                                             <div class="card mt-2">
                                                 <div class="card-header">
-                                                    Fields Constrains
+                                                    Fields Validation
                                                 </div>
                                                 <div class="card-body">
-                                                    <table id="request-header-table" class="table table-sm">
+                                                    <div>
+                                                        <p class="form-text">To refer to the entire body object, enter a
+                                                            period (.) in the field name, and to refer to a specific
+                                                            field
+                                                            of the body object, simply enter the field name in without
+                                                            the period prefix.</p>
+                                                    </div>
+                                                    <table class="table table-sm">
                                                         <thead>
                                                             <tr>
                                                                 <th style="width: 20%" scope="col">Field</th>
-                                                                <th style="width: 75%" scope="col">Constraints</th>
+                                                                <th style="width: 75%" scope="col">Attributes</th>
                                                                 <th style="width: 5%" scope="col">Actions</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td class="align-middle"><input type="text"
+                                                            <tr
+                                                                v-for="(field, index) in openingRoute.requestBody.fieldValidationAttributes">
+                                                                <td class="align-middle">
+                                                                    <input type="text" v-model="field.name"
                                                                         class="form-control form-control-sm"
-                                                                        placeholder="field">
+                                                                        placeholder="name" autocomplete="off"
+                                                                        aria-autocomplete="none">
                                                                 </td>
-                                                                <td class="align-middle"><input type="hidden">
+                                                                <td class="align-middle">
+                                                                    <div class="d-flex">
+                                                                        <select style="display: none;"
+                                                                            v-model="field.attributes"
+                                                                            multiple></select>
+                                                                        <validation-attributes-list
+                                                                            :attributes="field.attributes"></validation-attributes-list>
+                                                                        <button type="button" class="ms-auto"
+                                                                            v-on:click="showValidationAttributesModal(field.attributes, attrs => field.attributes = attrs)">
+                                                                            <i class="bi bi-box-arrow-in-up-right"></i>
+                                                                        </button>
+                                                                    </div>
                                                                 </td>
-                                                                <td class="align-middle"><button
-                                                                        class="btn header-delete text-gray btn-show-on-hover"><i
-                                                                            class="bi bi-trash"></i></button>
+                                                                <td class="align-middle">
+                                                                    <button type="button"
+                                                                        class="btn text-gray btn-show-on-hover"
+                                                                        v-on:click="openingRoute.requestBody.fieldValidationAttributes.splice(index, 1)">
+                                                                        <i class="bi bi-trash"></i>
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
+                                                    <div class="mt-1">
+                                                        <button type="button" class="btn btn-secondary btn-sm"
+                                                            v-on:click="addRequesBodyField">Add</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -253,8 +298,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-1">
-                            <button type="submit" class="btn btn-primary">Save</button>
+                        <div class="mt-1 d-flex">
+                            <button type="button" @@click="discardChange"
+                                class="btn btn-secondary ms-auto">Cancle</button>
+                            <button type="submit" class="btn btn-primary ms-2">Save</button>
                         </div>
                     </form>
                 </div>
@@ -263,14 +310,11 @@
                 </div>
             </div>
         </div>
+        <validation-attributes-modal v-if="validationAttributesModalVisible"
+            :attributes="validationAttributesModalAttributes" @@save="onValidationAttributesModalSaved"
+            @@close="closeValidationAttributesModal"></validation-attributes-modal>
     </div>
 </div>
-<template id="context-menu-template">
-    <div class="btn-group-vertical dropdown-menu context-menu" role="group">
-        <button name="btnDelete" type="button" class="dropdown-item btn btn-default text-danger">Delete</button>
-    </div>
-</template>
-<!-- Modal -->
 <template id="requestDeleteConfirmModalTemplate">
     <div class="modal fade" id="requestDeleteConfirmModal" aria-hidden="true">
         <div class="modal-dialog">
@@ -293,7 +337,8 @@
 <template id="route-list-template">
     <div>
         <ul v-if="routes.length > 0" class="list-group list-group-flush mt-2">
-            <li v-for="route in routes" :key="route.id" class="list-group-item px-2 py-1">
+            <li v-for="route in routes" :key="route.id" class="list-group-item px-2 py-1"
+                :class="{'bg-gray': route.id === selected_id}">
                 <div class="row">
                     <div v-on:click="click(route.id)" class="col" style="position: relative;">
                         <a onclick="event.preventDefault()" href="#"
@@ -305,7 +350,7 @@
                         </div>
                     </div>
                     <div class="p-0 my-auto" style="width: 40px;">
-                        <button v-on:click="showContextMenu(route.id)" class="btn btn-sm" type="button">
+                        <button v-on:click="showContextMenu(route.id, $event)" class="btn btn-sm" type="button">
                             <i class="bi bi-three-dots"></i>
                         </button>
                     </div>
@@ -314,160 +359,122 @@
         </ul>
     </div>
 </template>
-<template id="inline-constraint-modal">
-    <div class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
+<template id="route-list-context-menu-template">
+    <div class="btn-group-vertical dropdown-menu context-menu" role="group">
+        <button type="button" v-on:click="showRouteDeleteConfirmModal"
+            class="dropdown-item btn btn-default text-danger">Delete</button>
+    </div>
+</template>
+<style>
+    .modal-mask {
+        position: fixed;
+        z-index: 9998;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        transition: opacity 0.3s ease;
+    }
+</style>
+<template id="validation-attributes-modal-template">
+    <transition name="modal-fade">
+        <div class="modal-mask" style="width: 600px;">
+            <div class="modal-content modal-container">
                 <div class="modal-header">
-                    <h5 class="modal-title">Constraints</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h6 class="modal-title">Validation Attributes</h6>
+                    <button type="button" class="btn-close" v-on:click="close"></button>
                 </div>
                 <div class="modal-body">
-                    <div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="required" />
-                            <label class="form-check-label">Required</label>
-                        </div>
-                        <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
-                    </div>
-                    <hr />
-                    <div>
-                        <div class="d-flex">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="type" />
-                                <label class="form-check-label">Type</label>
+                    <ul class="list-group list-group-flush">
+                        <li v-for="(attr, index) in attrs" class="list-group-item">
+                            <div class="d-flex">
+                                <select v-model="attr.name" class="form-select form-select-sm w-auto me-1">
+                                    <option :value="null" selected>Attribute Name</option>
+                                    <option v-for="item in attrSelectListItem" :value="item.value">{{item.text}}
+                                    </option>
+                                </select>
+                                <input type="text" v-model="attr.parameters" class="form-control form-control-sm"
+                                    placeholder="Attribute Parameters" />
+                                <button type="button" class="btn text-gray btn-show-on-hover" @@click="remove(index)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </div>
-                            <select class="ms-3 form-select form-select-sm" style="width: 100px;" name="type">
-                                <option value="int">Int</option>
-                                <option value="bool">Boolean</option>
-                                <option value="datetime">Datetime</option>
-                                <option value="decimal">Decimal</option>
-                                <option value="double">Double</option>
-                                <option value="float">Float</option>
-                                <option value="guid">GUID</option>
-                                <option value="long">Long</option>
-                            </select>
-                        </div>
-                        <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
-                    </div>
-                    <hr />
-                    <div>
-                        <div class="d-flex">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="minlength" />
-                                <label class="form-check-label">Minimum Length</label>
-                            </div>
-                            <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
-                                name="minlength" placeholder="0" />
-                        </div>
-                        <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
-                    </div>
-                    <hr />
-                    <div>
-                        <div class="d-flex">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="maxlength" />
-                                <label class="form-check-label">Maximum Length</label>
-                            </div>
-                            <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
-                                name="maxlength" placeholder="100" />
-                        </div>
-                        <p class="form-text d-none">Used to enforce that a non-parameter value is present</p>
-                    </div>
-                    <hr />
-                    <div>
-                        <div class="d-flex">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="length" />
-                                <label class="form-check-label">Length</label>
-                            </div>
-                            <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
-                                name="length" placeholder="50" />
-                        </div>
-                        <p class="form-text d-none">Constrains value to be a string of a given length or within
-                            a given range of lengths.</p>
-                    </div>
-                    <hr />
-                    <div>
-                        <div class="d-flex">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="min" />
-                                <label class="form-check-label">Min</label>
-                            </div>
-                            <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
-                                name="min" placeholder="0" />
-                        </div>
-                        <p class="form-text d-none">Constrains a route parameter to be a long with a minimum
-                            value.</p>
-                    </div>
-                    <hr />
-                    <div>
-                        <div class="d-flex">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="max" />
-                                <label class="form-check-label">Max</label>
-                            </div>
-                            <input class="ms-3 form-control form-control-sm" style="width: 100px;" type="number"
-                                name="max" placeholder="100" />
-                        </div>
-                        <p class="form-text d-none">Constrains a route parameter to be an integer with a maximum
-                            value.</p>
-                    </div>
-                    <hr />
-                    <div>
-                        <div class="d-flex">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="range" />
-                                <label class="form-check-label">Range</label>
-                            </div>
-                            <div class="ms-3 d-flex">
-                                <input class="form-control form-control-sm" style="width: 100px;" type="number"
-                                    name="range-min" placeholder="1" />
-                                <label class="form-label mx-2">~</label>
-                                <input class="form-control form-control-sm" style="width: 100px;" type="number"
-                                    name="range-max" placeholder="100" />
-                            </div>
-                        </div>
-                        <p class="form-text d-none">Constraints a route parameter to be an integer within a
-                            given range of values.</p>
-                    </div>
-                    <hr />
-                    <div>
-                        <div class="d-flex">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="alpha" />
-                                <label class="form-check-label">Alpha</label>
-                            </div>
-                        </div>
-                        <p class="form-text d-none">Constraints a route parameter to be an integer within a given range
-                            of values.</p>
-                    </div>
-                    <hr />
-                    <div>
-                        <div class="d-flex">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="regex" />
-                                <label class="form-check-label">Regex</label>
-                            </div>
-                            <input class="ms-3 form-control form-control-sm w-50" type="text" name="pattern"
-                                placeholder="ab+c" />
-                        </div>
-                        <p class="form-text d-none">Constraints a route parameter to be an integer within a
-                            given range of values.</p>
+                        </li>
+                    </ul>
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-secondary btn-sm" @@click="add">Add</button>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">Ok</button>
+                <div class="modal-footer p-2">
+                    <button type="button" class="btn btn-secondary" v-on:click="close">Close</button>
+                    <button type="button" class="btn btn-primary" v-on:click="save">Save</button>
                 </div>
             </div>
         </div>
+    </transition>
+</template>
+<template id="validation-attributes-list-template">
+    <div class="d-flex">
+        <span v-for="attr in attributes" class="me-1 bg-gray py-1 px-2 rounded">{{attributeAsString(attr)}}</span>
     </div>
 </template>
 <script>
-    // Define the RouteList component
+    const ValidationAttributesList = {
+        props: {
+            attributes: {
+                type: Array,
+                default: () => ({})
+            }
+        },
+        template: '#validation-attributes-list-template',
+        methods: {
+            attributeAsString(attr) {
+                return attr.name;
+                if (attr.parameters) {
+                    return `${attr.name}(${attr.parameters})`;
+                } else {
+                    return attr.name;
+                }
+            }
+        }
+    }
+    const ValidationAttributesModal = {
+        template: '#validation-attributes-modal-template',
+        props: {
+            attributes: {
+                type: Object,
+                default: () => ({})
+            }
+        },
+        methods: {
+            close() {
+                this.$emit('close')
+            },
+            save() {
+                //TODO: Validation here
+                this.$emit('save', this.attrs)
+            },
+            add() {
+                this.attrs.push({name: null, parameters: ''});
+            },
+            remove(index) {
+                this.attrs.splice(index, 1)
+            }
+        },
+        data: function () {
+            return {
+                attrs: JSON.parse(JSON.stringify(this.attributes || [])),
+                attrSelectListItem: JSON.parse('@Html.Raw(Json.Serialize(Model.ValidationAttributeSelectListItem))')
+            }
+        }
+    }
     const RouteList = {
         props: {
+            selected_id: {
+                type: Number
+            },
             routes: {
                 type: Array,
                 required: true
@@ -493,8 +500,9 @@
                     default: return 'text-blue';
                 }
             },
-            showContextMenu(id) {
+            showContextMenu(id, event) {
                 //TODO: show context menu
+                this.$emit('show-context-menu', id, event);
             },
             showDeleteConfirmDialog(id) {
                 //TOOD: show confirm diaglog
@@ -504,7 +512,17 @@
                 this.$emit('route-deleted', id);
             }
         }
-    };
+    }
+    const RouteListContextMenu = {
+        template: '#route-list-context-menu-template',
+        props: {
+
+        },
+        methods: {
+
+        }
+    }
+
     let timeout = null;
     const {createApp, onMounted, ref} = Vue
     const app = createApp({
@@ -512,8 +530,9 @@
             const webapp = ref(null);
             const routes = ref([]);
             const openingRoute = ref(null);
+            let openingRouteOriginalValue = null;
             const mode = ref();
-            const openingRouteId = ref(null);
+            const openingRouteId = ref(0);
             const searchTerm = ref('');
             const RouteBaseUrl = '@string.Format("https://u{0}-{1}.mockserver.com", Model.WebApplication.User.Id, Model.WebApplication.Name)';
             const openRoute = async id => {
@@ -522,36 +541,49 @@
                 }
                 let tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.ApiGet), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
                 axios.get(tempUrl.replace('-9999', id))
-                    .then(res => openingRoute.value = res.data)
+                    .then(res => {
+                        openingRoute.value = res.data
+                        openingRoute.value.requestBody = openingRoute.value.requestBody || {}
+                        this.openingRouteOriginalValue = JSON.parse(JSON.stringify(openingRoute.value));
+                        openingRouteId.value = id
+                    })
             }
             const delayedSearch = () => {
+                const IndexUrl = '@Url.Action(nameof(WebApplicationRoutesController.ApiIndex), new {WebApplicationName = Model.WebApplication.Name})'
                 clearTimeout(timeout);
-                // Make a new timeout set to go off in 800ms
-                timeout = setTimeout(() => {
-                    const IndexUrl = '@Url.Action(nameof(WebApplicationRoutesController.ApiIndex), new {WebApplicationName = Model.WebApplication.Name})';
+                timeout = setTimeout(async () => {
                     const params = {
-                        searchTerm: searchTerm.value
-                    };
+                        SearchTerm: searchTerm.value
+                    }
                     const query_params = new URLSearchParams(params);
-                    fetch({
-                        url: IndexUrl.trimEnd('?') + '?' + query_params
-                    })
-                        .then(res => res.json())
-                        .then(res => routes.value = res);
+                    let reqOptions = {
+                        method: "GET",
+                        url: IndexUrl.trimEnd('?') + '?' + query_params.toString()
+                    }
+                    let response = await axios.request(reqOptions);
+                    console.log(JSON.stringify(response.data));
+                    routes.value = response.data
                 }, 800);
             }
             const newRoute = () => {
                 mode.value = 'CREATE';
                 openingRoute.value = {
-                    name: '',
+                    id: 0,
+                    name: 'untitled',
                     method: 'GET',
                     path: '',
                     integrationType: 1,
                     authorization: {
                         type: 0,
                         policies: []
-                    }
+                    },
+                    requestBody: {}
                 }
+                routes.value.unshift(openingRoute.value)
+                openingRouteId.value = 0
+            }
+            const showContextMenu = (id, event) => {
+                log(id)
             }
             const onSubmit = () => {
                 let url = ''
@@ -564,17 +596,57 @@
                 let route = openingRoute.value;
                 axios.post(url, route)
                     .then((res) => {
-                        alert(JSON.stringify(res.data));
+                        //alert(JSON.stringify(res.data));
                     });
             }
+            const discardChange = () => {
+                if (mode.value === 'EDIT') {
+                    openingRoute.value = this.openingRouteOriginalValue
+                    this.openingRouteOriginalValue = JSON.parse(JSON.stringify(openingRoute.value))
+                } else {
+                    //CREATE
+                    routes.value.splice(0, 1)
+                    openingRoute.value = null
+                    openingRouteId.value = null
+                }
+            }
+            const addRow = (prop) => {
+                openingRoute.value[prop] = openingRoute.value[prop] || [];
+                openingRoute.value[prop].push({
+                    name: null,
+                    attributes: []
+                });
+            }
+            const addRequesBodyField = () => {
+                openingRoute.value.requestBody.fieldValidationAttributes = openingRoute.value.requestBody.fieldValidationAttributes || []
+                openingRoute.value.requestBody.fieldValidationAttributes.push({name: null, attributes: []})
+            }
+            const validationAttributesModalVisible = ref(false)
+            const validationAttributesModalAttributes = ref(null)
+            let onValidationAttributesModalSavedHandler
+
+            const showValidationAttributesModal = (attributes, onValidationAttributesModalSavedHandler) => {
+                validationAttributesModalAttributes.value = attributes
+                this.onValidationAttributesModalSavedHandler = onValidationAttributesModalSavedHandler
+                validationAttributesModalVisible.value = true
+            }
+            const closeValidationAttributesModal = () => {
+                validationAttributesModalVisible.value = false
+                this.onValidationAttributesModalSavedHandler = null
+            }
+            const onValidationAttributesModalSaved = (attributes) => {
+                this.onValidationAttributesModalSavedHandler(attributes)
+                validationAttributesModalVisible.value = false
+                this.onValidationAttributesModalSavedHandler = null
+            }
             onMounted(() => {
-                webapp.value = JSON.parse('@Html.Raw(Json.Serialize(Model.WebApplication))');
+                webapp.value = JSON.parse('@Html.Raw(Json.Serialize(Model.WebApplication))')
                 routes.value = JSON.parse('@Html.Raw(Json.Serialize(Model.Routes.Select(r => new {
                     r.Id,
                     r.Name,
                     r.Method,
                     r.Path
-                    })))');
+                    })))')
             })
 
             return {
@@ -584,15 +656,25 @@
                 openingRouteId,
                 openRoute,
                 newRoute,
+                showContextMenu,
                 delayedSearch,
                 searchTerm,
                 webapp,
                 onSubmit,
-                mode
+                discardChange,
+                mode,
+                addRow,
+                addRequesBodyField,
+                validationAttributesModalVisible,
+                showValidationAttributesModal,
+                onValidationAttributesModalSaved,
+                closeValidationAttributesModal,
+                validationAttributesModalAttributes
             }
         }
     });
-    app.component('route-list', RouteList);
-    //app.use(vuetify)
+    app.component('route-list', RouteList)
+    app.component('validation-attributes-modal', ValidationAttributesModal)
+    app.component('validation-attributes-list', ValidationAttributesList)
     app.mount('#app');
 </script>
