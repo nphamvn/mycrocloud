@@ -68,6 +68,12 @@ public class WebApplicationRoutesController : Controller
 
     #region API
 
+    [HttpPost("api/user/create")]
+    public async Task<IActionResult> ApiCreateUser(int WebApplicationId, [FromBody] User user)
+    {
+        return Ok(user);
+    }
+
     [HttpGet("api")]
     public async Task<IActionResult> ApiIndex(int WebApplicationId, string SearchTerm, string Sort)
     {
@@ -84,16 +90,16 @@ public class WebApplicationRoutesController : Controller
     }
 
     [HttpPost("api/create")]
-    public async Task<IActionResult> ApiCreate(int WebApplicationId, RouteSaveModel request)
+    public async Task<IActionResult> ApiCreate(int WebApplicationId, [FromBody] RouteSaveModel route)
     {
-        if (await _webApplicationRouteWebService.ValidateCreate(WebApplicationId, request, ModelState))
+        if (await _webApplicationRouteWebService.ValidateCreate(WebApplicationId, route, ModelState))
         {
             return Ok(new AjaxResult<RouteSaveModel>
             {
                 Errors = new List<Error> { new("something went wrong") }
             });
         }
-        int id = await _webApplicationRouteWebService.Create(WebApplicationId, request);
+        int id = await _webApplicationRouteWebService.Create(WebApplicationId, route);
         return Ok(AjaxResult.Success());
     }
 
@@ -119,9 +125,8 @@ public class WebApplicationRoutesController : Controller
 
     [HttpPost("api/edit/{RouteId:int}")]
     [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> ApiEdit(int RouteId, [FromBody]RouteSaveModel route)
+    public async Task<IActionResult> ApiEdit(int RouteId, [FromBody] RouteSaveModel route)
     {
-        return Ok(route);
         if (!await _webApplicationRouteWebService.ValidateEdit(RouteId, route, ModelState))
         {
             IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
@@ -161,4 +166,10 @@ public class WebApplicationRoutesController : Controller
         });
     }
     #endregion
+}
+
+public class User
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
 }

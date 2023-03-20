@@ -5,7 +5,6 @@
 }
 @section Scripts {
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vuetify@3.1.9/dist/vuetify.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"
     integrity="sha512-LUKzDoJKOLqnxGWWIBM4lzRBlxcva2ZTztO8bTcWPmDSpkErWx0bSP4pdsjNH8kiHAUPaT06UXcb+vOEZH+HpQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -315,25 +314,6 @@
             @@close="closeValidationAttributesModal"></validation-attributes-modal>
     </div>
 </div>
-<template id="requestDeleteConfirmModalTemplate">
-    <div class="modal fade" id="requestDeleteConfirmModal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Delete confirm</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are your sure want to delete request?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button name="btnDelete" type="button" class="btn btn-danger">Delete</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
 <template id="route-list-template">
     <div>
         <ul v-if="routes.length > 0" class="list-group list-group-flush mt-2">
@@ -359,12 +339,6 @@
         </ul>
     </div>
 </template>
-<template id="route-list-context-menu-template">
-    <div class="btn-group-vertical dropdown-menu context-menu" role="group">
-        <button type="button" v-on:click="showRouteDeleteConfirmModal"
-            class="dropdown-item btn btn-default text-danger">Delete</button>
-    </div>
-</template>
 <template id="validation-attributes-modal-template">
     <div id="validationAttributesModal" class="modal">
         <div class="modal-dialog">
@@ -379,11 +353,12 @@
                             <div class="d-flex">
                                 <select v-model="attr.name" class="form-select form-select-sm w-auto me-1">
                                     <option :value="null" selected>Attribute Name</option>
-                                    <option v-for="item in builtInValdationAttributes" :value="item.name">{{item.name}}
+                                    <option v-for="item in builtInValdationAttributes" :value="item.name">
+                                        {{item.name}}
                                     </option>
                                 </select>
                                 <input type="text" v-model="attr.parameters" class="form-control form-control-sm"
-                                    :placeholder="placeholder" />
+                                    :placeholder="computeParametersPlaceholder(attr)" />
                                 <button type="button" class="btn text-gray btn-show-on-hover" @@click="remove(index)">
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -395,13 +370,39 @@
                     </div>
                 </div>
                 <div class="modal-footer p-2">
-                    <button type="button" class="btn btn-secondary" v-on:click="close">Close</button>
+                    <button type="button" class="btn btn-secondary" v-on:click="close">Cancel</button>
                     <button type="button" class="btn btn-primary" v-on:click="save">Save</button>
                 </div>
             </div>
         </div>
     </div>
 </template>
+<template id="requestDeleteConfirmModalTemplate">
+    <div class="modal fade" id="requestDeleteConfirmModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Delete confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are your sure want to delete request?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button name="btnDelete" type="button" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<template id="route-list-context-menu-template">
+    <div class="btn-group-vertical dropdown-menu context-menu" role="group">
+        <button type="button" v-on:click="showRouteDeleteConfirmModal"
+            class="dropdown-item btn btn-default text-danger">Delete</button>
+    </div>
+</template>
+
 <template id="validation-attributes-list-template">
     <div class="d-flex">
         <span v-for="attr in attributes" class="me-1 bg-gray py-1 px-2 rounded">{{attributeAsString(attr)}}</span>
@@ -451,17 +452,18 @@
             }
         },
         data: function () {
-            console.log(JSON.stringify(JSON.parse('@Html.Raw(Json.Serialize(Model.BuiltInValdationAttributes))')))
+            const attrs = JSON.parse(JSON.stringify(this.attributes || []));
             return {
-                attrs: JSON.parse(JSON.stringify(this.attributes || [])),
+                attrs: attrs,
                 builtInValdationAttributes: JSON.parse('@Html.Raw(Json.Serialize(Model.BuiltInValdationAttributes))')
             }
         },
         computed: {
-            placeholder() {
-                //const selectedOption = this.builtInValdationAttributes.find(item => item.name === this.attr.name)
-                //return selectedOption ? selectedOption.parameterDescription : 'Attribute parameters'
-                return 'work'
+            computeParametersPlaceholder() {
+                return (attr) => {
+                    const selectedOption = this.builtInValdationAttributes.find(item => item.name === attr.name)
+                    return selectedOption ? selectedOption.parameterDescription : 'Attribute parameters'
+                }
             }
         }
     }
@@ -520,7 +522,6 @@
 
     let timeout = null;
     const {createApp, onMounted, ref, nextTick} = Vue
-    const {Modal} = bootstrap
     const app = createApp({
         setup() {
             const webapp = ref(null);
@@ -585,15 +586,13 @@
             const onSubmit = () => {
                 let url = ''
                 if (mode.value === 'CREATE') {
-                    url = '@Url.Action(nameof(WebApplicationRoutesController.ApiCreate), "WebApplicationRoutes", new { WebApplicationName = Model.WebApplication.Name})';
+                    url = '@Url.Action(nameof(WebApplicationRoutesController.ApiCreate), "WebApplicationRoutes", new { WebApplicationName = Model.WebApplication.Name})'
                 } else {
-                    let tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.ApiEdit), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
+                    let tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.ApiEdit), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})'
                     url = tempUrl.replace('-9999', openingRoute.value.id);
                 }
-                let route = openingRoute.value;
-                axios.post(url, route)
-                    .then((res) => {
-                    });
+                axios.post(url, openingRoute.value)
+                    .then(res => console.log(JSON.stringify(res.data)));
             }
             const discardChange = () => {
                 if (mode.value === 'EDIT') {
@@ -618,7 +617,7 @@
                 openingRoute.value.requestBody.fieldValidationAttributes.push({name: null, attributes: []})
             }
 
-            let validationAttributesModal = null;
+            let validationAttributesModalObj = null;
             const validationAttributesModalVisible = ref(false)
             const validationAttributesModalAttributes = ref(null)
             let onValidationAttributesModalSavedHandler
@@ -627,17 +626,20 @@
                 this.onValidationAttributesModalSavedHandler = onValidationAttributesModalSavedHandler
                 validationAttributesModalVisible.value = true
                 await nextTick()
-                this.validationAttributesModal = new bootstrap.Modal(document.getElementById("validationAttributesModal"), {})
-                this.validationAttributesModal.show()
+                this.validationAttributesModalObj = new bootstrap.Modal(document.getElementById("validationAttributesModal"), {})
+                this.validationAttributesModalObj.show()
             }
             const closeValidationAttributesModal = () => {
-                this.validationAttributesModal.hide()
-                this.validationAttributesModal = null
+                this.validationAttributesModalObj.hide()
+                this.validationAttributesModalObj = null
                 validationAttributesModalVisible.value = false
                 this.onValidationAttributesModalSavedHandler = null
             }
             const onValidationAttributesModalSaved = (attributes) => {
                 this.onValidationAttributesModalSavedHandler(attributes)
+
+                this.validationAttributesModalObj.hide()
+                this.validationAttributesModalObj = null
                 validationAttributesModalVisible.value = false
                 this.onValidationAttributesModalSavedHandler = null
             }

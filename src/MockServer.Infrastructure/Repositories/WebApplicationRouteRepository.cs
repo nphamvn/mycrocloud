@@ -191,12 +191,12 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
             RequestId = requestId
         });
     }
-    public async Task Update(int id, Route request)
+    public async Task Update(int id, Route route)
     {
         var query =
                     """
                     UPDATE
-                        Requests
+                        WebApplicationRoute
                     SET
                         Name = @Name,
                         Method = @Method,
@@ -209,10 +209,10 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
         await connection.ExecuteAsync(query, new
         {
             Id = id,
-            Name = request.Name,
-            Method = request.Method,
-            Path = request.Path,
-            Description = request.Description
+            Name = route.Name,
+            Method = route.Method,
+            Path = route.Path,
+            Description = route.Description
         });
     }
 
