@@ -1,5 +1,6 @@
 @using MockServer.Core.WebApplications
 @using MockServer.Web.Controllers
+@using MockServer.Web.Controllers.Api
 @using MockServer.Web.Models.WebApplications.Routes
 @model MockServer.Web.Models.WebApplications.Routes.RouteViewModel
 @{
@@ -689,7 +690,7 @@
         };
 
         $.post({
-            url: '@Url.Action(nameof(WebApplicationRoutesController.MockIntegration), "Requests", new { ProjectName = ViewData["ProjectName"], RequestId = ViewData["RequestId"]})',
+            url: '@Url.Action(nameof(WebApplicationRoutesApiController.MockIntegration), "Requests", new { ProjectName = ViewData["ProjectName"], RequestId = ViewData["RequestId"]})',
             data: {
                 RequestParams: params,
                 RequestHeaders: headers,

@@ -8,6 +8,7 @@ namespace MockServer.Web.Services;
 
 public interface IWebApplicationRouteWebService
 {
+    Task<IEnumerable<RouteIndexItem>> GetList(int appId, string searchTerm, string sort);
     Task<RouteIndexModel> GetIndexModel(int appId, string searchTerm, string sort);
     Task<RoutePageModel> GetPageModel(int appId, string searchTerm, string sort);
     Task<bool> ValidateCreate(int appId, RouteSaveModel route, ModelStateDictionary modelState);

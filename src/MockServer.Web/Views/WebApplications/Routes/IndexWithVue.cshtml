@@ -1,4 +1,4 @@
-@using MockServer.Web.Controllers
+@using MockServer.Web.Controllers.Api
 @model MockServer.Web.Models.WebApplications.Routes.RoutePageModel
 @{
     ViewData["Title"] = Model.WebApplication.Name;
@@ -30,9 +30,8 @@
                     </button>
                 </div>
                 <div class="route-list-container">
-                    <route-list :routes="routes" :selected_id="openingRouteId" @@click-route="openRoute"
-                        @@edit-route="editRoute" @@create-route="createRoute"
-                        @@show-context-menu="showContextMenu"></route-list>
+                    <route-list :routes="routes" @@click-route="openRoute" :selected_id="openingRouteId"
+                        @@route-deleted=""></route-list>
                 </div>
             </div>
             <div class="col-9 h-100" id="route-details">
@@ -168,8 +167,10 @@
                                                         <div class="d-flex">
                                                             <select style="display: none;" v-model="query.attributes"
                                                                 multiple></select>
-                                                            <validation-attributes-list
-                                                                :attributes="query.attributes"></validation-attributes-list>
+                                                            <div class="d-flex">
+                                                                <span v-for="attr in query.attributes"
+                                                                    class="me-1 bg-gray py-1 px-2 rounded">{{attr.name}}</span>
+                                                            </div>
                                                             <button type="button" class="ms-auto"
                                                                 v-on:click="showValidationAttributesModal(query.attributes, attrs => query.attributes = attrs)">
                                                                 <i class="bi bi-box-arrow-in-up-right"></i>
@@ -210,8 +211,10 @@
                                                         <div class="d-flex">
                                                             <select style="display: none;" v-model="header.attributes"
                                                                 multiple></select>
-                                                            <validation-attributes-list
-                                                                :attributes="header.attributes"></validation-attributes-list>
+                                                            <div class="d-flex">
+                                                                <span v-for="attr in header.attributes"
+                                                                    class="me-1 bg-gray py-1 px-2 rounded">{{attr.name}}</span>
+                                                            </div>
                                                             <button type="button" class="ms-auto"
                                                                 v-on:click="showValidationAttributesModal(header.attributes, attrs => header.attributes = attrs)">
                                                                 <i class="bi bi-box-arrow-in-up-right"></i>
@@ -268,8 +271,10 @@
                                                                         <select style="display: none;"
                                                                             v-model="field.attributes"
                                                                             multiple></select>
-                                                                        <validation-attributes-list
-                                                                            :attributes="field.attributes"></validation-attributes-list>
+                                                                        <div class="d-flex">
+                                                                            <span v-for="attr in field.attributes"
+                                                                                class="me-1 bg-gray py-1 px-2 rounded">{{attr.name}}</span>
+                                                                        </div>
                                                                         <button type="button" class="ms-auto"
                                                                             v-on:click="showValidationAttributesModal(field.attributes, attrs => field.attributes = attrs)">
                                                                             <i class="bi bi-box-arrow-in-up-right"></i>
@@ -315,28 +320,48 @@
     </div>
 </div>
 <template id="route-list-template">
-    <div>
-        <ul v-if="routes.length > 0" class="list-group list-group-flush mt-2">
-            <li v-for="route in routes" :key="route.id" class="list-group-item px-2 py-1"
-                :class="{'bg-gray': route.id === selected_id}">
-                <div class="row">
-                    <div v-on:click="click(route.id)" class="col" style="position: relative;">
-                        <a onclick="event.preventDefault()" href="#"
-                            class="text-decoration-none stretched-link">{{route.name}}</a>
-                        <div>
-                            <small class="badge rounded-pill me-1" style="width: 60px;"
-                                :class="getMethodClass(route.method)">{{route.method}}</small>
-                            <small class="text-muted">/{{route.path}}</small>
-                        </div>
-                    </div>
-                    <div class="p-0 my-auto" style="width: 40px;">
-                        <button v-on:click="showContextMenu(route.id, $event)" class="btn btn-sm" type="button">
-                            <i class="bi bi-three-dots"></i>
-                        </button>
+    <ul v-if="routes.length > 0" class="list-group list-group-flush mt-2">
+        <li v-for="route in routes" :key="route.id" class="list-group-item px-2 py-1"
+            :class="{'bg-gray': route.id === selected_id}">
+            <div class="row">
+                <div v-on:click="click(route.id)" class="col" style="position: relative;">
+                    <a onclick="event.preventDefault()" href="#"
+                        class="text-decoration-none stretched-link">{{route.name}}</a>
+                    <div>
+                        <small class="badge rounded-pill me-1" style="width: 60px;"
+                            :class="getMethodClass(route.method)">{{route.method}}</small>
+                        <small class="text-muted">/{{route.path}}</small>
                     </div>
                 </div>
-            </li>
-        </ul>
+                <div class="p-0 my-auto" style="width: 40px;">
+                    <button v-on:click="showActionsMenu(route.id, $event)" class="btn btn-sm" type="button">
+                        <i class="bi bi-three-dots"></i>
+                    </button>
+                </div>
+            </div>
+        </li>
+    </ul>
+    <div v-if="itemActionsMenuVisible" class="btn-group-vertical dropdown-menu context-menu" role="group">
+        <button type="button" v-on:click="showDeleteConfirmModal"
+            class="dropdown-item btn btn-default text-danger">Delete</button>
+    </div>
+    <div v-if="routeDeleteConfirmModalVisible" class="modal fade" id="routeDeleteConfirmModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete confirm</h5>
+                    <button type="button" class="btn-close" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are your sure want to delete route?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary">Cancel</button>
+                    <button type="button" class="btn btn-danger"
+                        v-on:click="deleteRoute(itemActionsMenuClickedRouteId)">Delete</button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 <template id="validation-attributes-modal-template">
@@ -377,35 +402,9 @@
         </div>
     </div>
 </template>
-<template id="requestDeleteConfirmModalTemplate">
-    <div class="modal fade" id="requestDeleteConfirmModal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Delete confirm</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are your sure want to delete request?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button name="btnDelete" type="button" class="btn btn-danger">Delete</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
-<template id="route-list-context-menu-template">
-    <div class="btn-group-vertical dropdown-menu context-menu" role="group">
-        <button type="button" v-on:click="showRouteDeleteConfirmModal"
-            class="dropdown-item btn btn-default text-danger">Delete</button>
-    </div>
-</template>
-
 <template id="validation-attributes-list-template">
     <div class="d-flex">
-        <span v-for="attr in attributes" class="me-1 bg-gray py-1 px-2 rounded">{{attributeAsString(attr)}}</span>
+        <span v-for="attr in attributes" class="me-1 bg-gray py-1 px-2 rounded">{{attr.name}}</span>
     </div>
 </template>
 <script>
@@ -497,26 +496,32 @@
                     default: return 'text-blue';
                 }
             },
-            showContextMenu(id, event) {
+            showActionsMenu(id, event) {
                 //TODO: show context menu
-                this.$emit('show-context-menu', id, event);
+                //this.$emit('show-context-menu', id, event);
+                this.itemActionsMenuClickedRouteId = id
+                this.itemActionsMenuVisible = true
             },
-            showDeleteConfirmDialog(id) {
+            async showDeleteConfirmModal(id) {
                 //TOOD: show confirm diaglog
+                this.routeDeleteConfirmModalVisible = true
+                await nextTick()
+                let modal = new bootstrap.Modal(document.getElementById('routeDeleteConfirmModal'), {})
+                modal.show()
             },
-            delete(id) {
-                //TODO: Delete
-                this.$emit('route-deleted', id);
+            deleteRoute(id) {
+                axios.post(DeleteUrl.trimEnd('?') + `RouteId=${id}`)
+                    .then(res => {
+                        this.$emit('route-deleted', id);
+                    });
             }
-        }
-    }
-    const RouteListContextMenu = {
-        template: '#route-list-context-menu-template',
-        props: {
-
         },
-        methods: {
-
+        data: function () {
+            return {
+                itemActionsMenuVisible: false,
+                itemActionsMenuClickedRouteId: null,
+                routeDeleteConfirmModalVisible: false
+            }
         }
     }
 
@@ -536,7 +541,7 @@
                 if (mode.value !== 'EDIT') {
                     mode.value = 'EDIT';
                 }
-                let tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.ApiGet), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
+                let tempUrl = '@Url.Action(nameof(WebApplicationRoutesApiController.Get),"WebApplicationRoutesApi", new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
                 axios.get(tempUrl.replace('-9999', id))
                     .then(res => {
                         openingRoute.value = res.data
@@ -546,7 +551,7 @@
                     })
             }
             const delayedSearch = () => {
-                const IndexUrl = '@Url.Action(nameof(WebApplicationRoutesController.ApiIndex), new {WebApplicationName = Model.WebApplication.Name})'
+                const IndexUrl = '@Url.Action(nameof(WebApplicationRoutesApiController.List), "WebApplicationRoutesApi", new {WebApplicationName = Model.WebApplication.Name})'
                 clearTimeout(timeout);
                 timeout = setTimeout(async () => {
                     const params = {
@@ -580,19 +585,19 @@
                 routes.value.unshift(openingRoute.value)
                 openingRouteId.value = 0
             }
-            const showContextMenu = (id, event) => {
-                log(id)
-            }
             const onSubmit = () => {
                 let url = ''
                 if (mode.value === 'CREATE') {
-                    url = '@Url.Action(nameof(WebApplicationRoutesController.ApiCreate), "WebApplicationRoutes", new { WebApplicationName = Model.WebApplication.Name})'
+                    url = '@Url.Action(nameof(WebApplicationRoutesApiController.Create), "WebApplicationRoutesApi", new { WebApplicationName = Model.WebApplication.Name})'
                 } else {
-                    let tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.ApiEdit), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})'
+                    let tempUrl = '@Url.Action(nameof(WebApplicationRoutesApiController.Edit), "WebApplicationRoutesApi", new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})'
                     url = tempUrl.replace('-9999', openingRoute.value.id);
                 }
+                console.log(url)
+                console.log(JSON.stringify(openingRoute.value))
                 axios.post(url, openingRoute.value)
-                    .then(res => console.log(JSON.stringify(res.data)));
+                    .then(res => console.log(JSON.stringify(res.data)))
+                    .catch(err => console.log(err));
             }
             const discardChange = () => {
                 if (mode.value === 'EDIT') {
@@ -643,6 +648,15 @@
                 validationAttributesModalVisible.value = false
                 this.onValidationAttributesModalSavedHandler = null
             }
+            const onRouteDeleted = (id) => {
+                const index = routes.value.findIndex(r => r.id === id);
+                if (index > -1) {
+                    if (openingRouteId === id) {
+                        openRoute.value = null
+                    }
+                    routes.value.splice(index, 1)
+                }
+            }
             onMounted(() => {
                 webapp.value = JSON.parse('@Html.Raw(Json.Serialize(Model.WebApplication))')
                 routes.value = JSON.parse('@Html.Raw(Json.Serialize(Model.Routes.Select(r => new {
@@ -660,13 +674,13 @@
                 openingRouteId,
                 openRoute,
                 newRoute,
-                showContextMenu,
                 delayedSearch,
                 searchTerm,
                 webapp,
                 onSubmit,
                 discardChange,
                 mode,
+                onRouteDeleted,
                 addRow,
                 addRequesBodyField,
                 validationAttributesModalVisible,

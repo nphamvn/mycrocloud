@@ -1,4 +1,4 @@
-@using MockServer.Web.Controllers
+@using MockServer.Web.Controllers.Api
 @model MockServer.Web.Models.WebApplications.Routes.RouteIndexModel
 @{
     ViewData["Title"] = Model.WebApplication.Name;
@@ -12,7 +12,7 @@
 
         self.routes = ko.observableArray([]);
 
-        var baseUri = '@Url.Action(nameof(WebApplicationRoutesController.ApiIndex), new { WebApplicationName = Model.WebApplication.Name})';
+        var baseUri = '@Url.Action(nameof(WebApplicationRoutesApiController.List), new { WebApplicationName = Model.WebApplication.Name})';
         $.getJSON(baseUri, self.routes);
 
         self.selectedRouteId = ko.observable(null);
@@ -21,7 +21,7 @@
         // Select a route
         self.showDetails = function (routeId) {
             self.selectedRouteId(routeId);
-            var tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.ApiGet), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})'
+            var tempUrl = '@Url.Action(nameof(WebApplicationRoutesApiController.Get), new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})'
             $.get(tempUrl.replace('-9999', routeId), function (data) {
                 console.log(JSON.stringify(data));
                 self.selectedRoute(data);
@@ -140,7 +140,7 @@
     $(function () {
         $('.js-new-request-button').click(function () {
             $.get({
-                url: '@Url.Action(nameof(WebApplicationRoutesController.GetCreatePartial), "ProjectRequests", new {ProjectName = Model.WebApplication.Name})',
+                url: '@Url.Action(nameof(WebApplicationRoutesApiController.Create), "ProjectRequests", new {ProjectName = Model.WebApplication.Name})',
                 success: function (data) {
                     const html = data;
                     const partial = $('#ajax-partial').html(html);
@@ -155,7 +155,7 @@
                             Path: $('input[name=Path]', modal).val()
                         };
                         $.post({
-                            url: '@Url.Action(nameof(WebApplicationRoutesController.ApiCreate), "Requests", new {projectName = ViewData["ProjectName"]})',
+                            url: '@Url.Action(nameof(WebApplicationRoutesApiController.Create), "Requests", new {projectName = ViewData["ProjectName"]})',
                             data: request,
                             success: function (data) {
                                 $('#btnSave', modal).off('click');
@@ -242,7 +242,7 @@
     }
 
     function deleteRequest(id) {
-        const tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.ApiDelete), "ProjectRequests", new { RequestId = Constants.TemporaryId})'
+        const tempUrl = '@Url.Action(nameof(WebApplicationRoutesApiController.Delete), "ProjectRequests", new { RequestId = Constants.TemporaryId})'
         $.post({
             async: false,
             url: tempUrl.replace(@Constants.TemporaryId, id),
@@ -256,7 +256,7 @@
 <!-- Open request: Start -->
 <script>
     $('body').on('click', '.js-route-info', function () {
-        const tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.View), "ProjectRequests", new {ProjectName = @Model.WebApplication.Name, RequestId = Constants.TemporaryId})';
+        const tempUrl = '@Url.Action(nameof(WebApplicationRoutesApiController.Get), "ProjectRequests", new {ProjectName = @Model.WebApplication.Name, RequestId = Constants.TemporaryId})';
         const selected = $(this).closest('li');
         selected.parent().find('li').removeClass('bg-gray');
         selected.addClass('bg-gray');

@@ -1,4 +1,5 @@
 @using MockServer.Web.Controllers
+@using MockServer.Web.Controllers.Api
 @model MockServer.Web.Models.WebApplications.Routes.RouteIndexModel
 @{
     ViewData["Title"] = Model.WebApplication.Name;
@@ -98,7 +99,7 @@
                             Path: $('input[name=Path]', modal).val()
                         };
                         $.post({
-                            url: '@Url.Action(nameof(WebApplicationRoutesController.ApiCreate), "Requests", new {projectName = ViewData["ProjectName"]})',
+                            url: '@Url.Action(nameof(WebApplicationRoutesApiController.Create), "Requests", new {projectName = ViewData["ProjectName"]})',
                             data: request,
                             success: function (data) {
                                 $('#btnSave', modal).off('click');
@@ -185,7 +186,7 @@
     }
 
     function deleteRequest(id) {
-        const tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.ApiDelete), "ProjectRequests", new { RequestId = Constants.TemporaryId})'
+        const tempUrl = '@Url.Action(nameof(WebApplicationRoutesApiController.Delete), "ProjectRequests", new { RequestId = Constants.TemporaryId})'
         $.post({
             async: false,
             url: tempUrl.replace(@Constants.TemporaryId, id),

@@ -215,4 +215,9 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         };
         return vm;
     }
+
+    public async Task<IEnumerable<RouteIndexItem>> GetList(int appId, string searchTerm, string sort)
+    {
+        return _mapper.Map<IEnumerable<RouteIndexItem>>(await _webApplicationRouteRepository.GetByApplicationId(appId, searchTerm, sort));
+    }
 }

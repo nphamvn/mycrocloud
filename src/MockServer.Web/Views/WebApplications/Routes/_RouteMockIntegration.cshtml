@@ -1,4 +1,5 @@
 @using MockServer.Web.Controllers
+@using MockServer.Web.Controllers.Api
 @model MockServer.Web.Models.WebApplications.Routes.Integrations.MockIntegrations.MockIntegrationViewModel
 <div class="mock-integration-details">
     <form method="post">
@@ -170,7 +171,7 @@
             language: 'json',
             automaticLayout: true
         });
-        $.get('@Url.Action(nameof(WebApplicationRoutesController.MockIntegration), new { WebApplicationName = ViewData["WebApplicationName"], RouteId = ViewData["RouteId"]})', function (data) {
+        $.get('@Url.Action(nameof(WebApplicationRoutesApiController.MockIntegration), new { WebApplicationName = ViewData["WebApplicationName"], RouteId = ViewData["RouteId"]})', function (data) {
             const code = data.data.code;
             const responseBodyText = data.data.responseBodyText;
             if (code !== null) {
@@ -197,7 +198,7 @@
         const responseDelay = $('input[name="ResponseDelay"]').prop('checked');
         const responseDelayTime = $('input[name="ResponseDelayTime"]').val();
         $.post({
-            url: '@Url.Action(nameof(WebApplicationRoutesController.MockIntegration), new { WebApplicationName = ViewData["WebApplicationName"], RouteId = ViewData["RouteId"]})',
+            url: '@Url.Action(nameof(WebApplicationRoutesApiController.MockIntegration), new { WebApplicationName = ViewData["WebApplicationName"], RouteId = ViewData["RouteId"]})',
             data: {
                 code: code,
                 responseHeaders: [],
