@@ -186,7 +186,7 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         var vm = new RoutePageModel
         {
             WebApplication = await _webApplicationWebService.Get(appId),
-            Routes = _mapper.Map<IEnumerable<Models.WebApplications.Routes.Route>>(await _webApplicationRouteRepository.GetByApplicationId(appId, searchTerm, sort)),
+            Routes = _mapper.Map<IEnumerable<RouteIndexItem>>(await _webApplicationRouteRepository.GetByApplicationId(appId, searchTerm, sort)),
             HttpMethodSelectListItem = HttpProtocolExtensions.CommonHttpMethods
                                     .Select(m => new SelectListItem(m, m)),
             IntegrationTypeSelectListItem = new List<SelectListItem>{

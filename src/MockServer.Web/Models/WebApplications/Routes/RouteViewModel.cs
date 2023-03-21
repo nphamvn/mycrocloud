@@ -16,19 +16,9 @@ public class RouteViewModel
     public AuthorizationViewModel Authorization { get; set; }
     public RouteIntegrationViewModel Integration { get; set; }
     public WebApplication WebApplication { get; set; }
-    public IList<RouteRequestHeaderViewModel> RequestHeaders { get; set; }
-    public IList<RouteRequestQueryViewModel> RequestQueries { get; set; }
-    public RouteRequestBodyViewModel RequestBody { get; set; }
-    public int ApplicationId { get; set; }
+    public IList<RequestQueryValidationItemSaveModel> RequestQueryValidationItems { get; set; }
+    public IList<RequestHeaderValidationItemSaveModel> RequestHeaderValidationItems { get; set; }
+    public IList<RequestBodyValidationItemSaveModel> RequestBodyValidationItems { get; set; }
     public string Url => string.Format("https://{0}.{1}.mockserver.com:5000/{2}", WebApplication.Name, WebApplication.User.Username, Path);
     public IEnumerable<SelectListItem> MethodSelectListItem { get; set; }
-    public string MethodTextColor
-        => Method switch
-        {
-            "DELETE" => "text-red",
-            "POST" => "text-orange",
-            "PUT" => "text-yellow",
-            "GET" => "text-green",
-            _ => "text-red"
-        };
 }

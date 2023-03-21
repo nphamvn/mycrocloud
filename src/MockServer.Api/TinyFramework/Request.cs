@@ -12,8 +12,8 @@ public class Request
     public WebApplication WebApplication { get; set; }
     public HttpContext HttpContext { get; set; }
     public Authorization Authorization { get; set; }
-    public IList<RouteRequestHeader> RequestHeaders { get; set; }
-    public IList<RouteRequestQuery> RequestQueries { get; set; }
-    public RouteRequestBody Body { get; set; }
+    public IList<RequestQueryValidationItem> RequestQueryValidationItems { get; set; }
+    public IList<RequestHeaderValidationItem> RequestHeaderValidationItems { get; set; }
+    public IList<RequestBodyValidationItem> RequestBodyValidationItems { get; set; }
     public RouteIntegration Integration { get; set; } 
 }

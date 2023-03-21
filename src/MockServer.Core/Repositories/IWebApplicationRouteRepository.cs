@@ -13,12 +13,6 @@ public interface IWebApplicationRouteRepository
     Task Delete(int id);
     Task AttachAuthorization(int id, Authorization authorization);
     Task<Authorization> GetAuthorization(int id);
-    Task<IEnumerable<RouteRequestHeader>> GetRequestHeaders(int id);
-    Task UpdateRequestHeader(int id, IList<RouteRequestHeader> headers);
-    Task<IEnumerable<RouteRequestQuery>> GetRequestQueries(int id);
-    Task UpdateRequestQuery(int id, IList<RouteRequestQuery> queries);
-    Task<RouteRequestBody> GetRequestBody(int id);
-    Task UpdateRequestBody(int id, RouteRequestBody body);
     Task<MockIntegration> GetMockIntegration(int id);
     Task UpdateMockIntegration(int id, MockIntegration integration);
     Task<DirectForwardingIntegration> GetDirectForwardingIntegration(int id);

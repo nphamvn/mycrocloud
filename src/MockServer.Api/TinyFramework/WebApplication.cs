@@ -67,9 +67,9 @@ public class WebApplication : IWebApplication
             }
         }
 
-        if (_useMiddlewares.ContainsKey(nameof(ConstraintValidationMiddleware)))
+        if (_useMiddlewares.ContainsKey(nameof(RequestValidationMiddleware)))
         {
-            middleware = _useMiddlewares[nameof(ConstraintValidationMiddleware)];
+            middleware = _useMiddlewares[nameof(RequestValidationMiddleware)];
             result = await middleware.InvokeAsync(context);
 
             if (result != MiddlewareInvokeResult.Next)

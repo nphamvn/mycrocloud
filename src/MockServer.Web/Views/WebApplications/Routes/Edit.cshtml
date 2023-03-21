@@ -121,27 +121,27 @@
                                 </thead>
                                 <tbody>
                                     @{
-                                        if (Model.RequestQueries == null)
+                                        if (Model.RequestQueryValidationItems == null)
                                         {
-                                            Model.RequestQueries = new List<RouteRequestQueryViewModel>();
+                                            Model.RequestQueryValidationItems = new List<RequestQueryValidationItemSaveModel>();
                                         }
-                                        Model.RequestQueries.Add(new());
+                                        Model.RequestQueryValidationItems.Add(new());
                                     }
-                                    @for (int i = 0; i < Model.RequestQueries.Count; i++)
+                                    @for (int i = 0; i < Model.RequestQueryValidationItems.Count; i++)
                                     {
                                         <tr>
-                                            <td class="align-middle"><input asp-for="RequestQueries[i].Key" type="text"
+                                            <td class="align-middle"><input asp-for="RequestQueryValidationItems[i].Key" type="text"
                                                 class="form-control form-control-sm param-key" placeholder="key"
                                                 autocomplete="off">
                                             </td>
                                             <td class="align-middle">
                                                 <div class="d-flex">
                                                     <div class="js-query-constraint-list"
-                                                    data-id="@Html.IdFor(m => m.RequestQueries[i].Constraints)"
-                                                    data-name="@Html.NameFor(m => m.RequestQueries[i].Constraints)">
-                                                        @for (int j = 0; j < Model.RequestQueries[i].Constraints.Count; j++)
+                                                    data-id="@Html.IdFor(m => m.RequestQueryValidationItems[i].Attributes)"
+                                                    data-name="@Html.NameFor(m => m.RequestQueryValidationItems[i].Attributes)">
+                                                        @for (int j = 0; j < Model.RequestQueryValidationItems[i].Attributes.Count; j++)
                                                         {
-                                                            <input type="hidden" asp-for="RequestQueries[i].Constraints[j]">
+                                                                    <input type="hidden" asp-for="RequestQueryValidationItems[i].Attributes[j]">
                                                         }
                                                     </div>
                                                     <select class="js-query-constraint-list" multiple></select>
@@ -213,20 +213,20 @@
                                 </thead>
                                 <tbody>
                                     @{
-                                        if (Model.RequestHeaders == null)
+                                        if (Model.RequestHeaderValidationItems == null)
                                         {
-                                            Model.RequestHeaders = new List<RouteRequestHeaderViewModel>();
+                                            Model.RequestHeaderValidationItems = new List<RequestHeaderValidationItemSaveModel>();
                                         }
-                                        Model.RequestHeaders.Add(new());
+                                        Model.RequestHeaderValidationItems.Add(new());
                                     }
-                                    @for (int i = 0; i < Model.RequestHeaders.Count; i++)
+                                    @for (int i = 0; i < Model.RequestHeaderValidationItems.Count; i++)
                                     {
                                         <tr>
                                             <td class="align-middle"><input type="text" class="form-control form-control-sm"
-                                                asp-for="RequestHeaders[i].Name" placeholder="name">
+                                                asp-for="RequestHeaderValidationItems[i].Name" placeholder="name">
                                             </td>
                                             <td class="align-middle"><input type="hidden"
-                                                asp-for="RequestHeaders[i].Constraints">
+                                                asp-for="RequestHeaderValidationItems[i].Attributes">
                                             </td>
                                             <td class="align-middle"><button
                                                 class="btn header-delete text-gray btn-show-on-hover"><i
@@ -258,31 +258,11 @@
                             </template>
                         </div>
                         <div id="request-body-tab" class="tab-pane fade p-2" role="tabpanel">
-                            @if (Model.RequestBody == null)
+                            @if (Model.RequestBodyValidationItems == null)
                             {
-                                Model.RequestBody = new RouteRequestBodyViewModel
-                                {
-                                    Constraints = new List<string>()
-                                };
+                                Model.RequestBodyValidationItems = new List<RequestBodyValidationItemSaveModel>();
                             }
                             <div class="mt-1">
-                                <div>
-                                    <div class="form-check me-5">
-                                        <input class="form-check-input" type="checkbox"
-                                            checked="@(Model.RequestBody.Constraints.Contains("Required"))">
-                                        <label class="form-check-label">Required</label>
-                                    </div>
-                                    <div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox"
-                                                checked="@(Model.RequestBody.Constraints.Contains("MatchExactly"))">
-                                            <label class="form-check-label">Match Exactly</label>
-                                        </div>
-                                        <div>
-                                            <textarea class="form-control"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="card mt-2">
                                     <div class="card-header">
                                         Fields Constrains
@@ -298,24 +278,16 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @{
-                                                    if (Model.RequestBody.FieldConstraints == null)
-                                                    {
-                                                        Model.RequestBody.FieldConstraints = new
-                                                        List<RouteRequestBodyFieldConstraint>();
-                                                    }
-                                                    Model.RequestBody.FieldConstraints.Add(new());
-                                                }
-                                                @for (int i = 0; i < Model.RequestBody.FieldConstraints.Count; i++)
+                                                @for (int i = 0; i < Model.RequestBodyValidationItems.Count; i++)
                                                 {
                                                     <tr>
                                                         <td class="align-middle"><input type="text"
                                                             class="form-control form-control-sm"
-                                                            asp-for="RequestBody.FieldConstraints[i].Field"
+                                                            asp-for="RequestBodyValidationItems[i].Field"
                                                             placeholder="field">
                                                         </td>
                                                         <td class="align-middle"><input type="hidden"
-                                                            asp-for="RequestBody.FieldConstraints[i].Constraints">
+                                                            asp-for="RequestBodyValidationItems[i].Attributes">
                                                         </td>
                                                         <td class="align-middle"><button
                                                             class="btn header-delete text-gray btn-show-on-hover"><i

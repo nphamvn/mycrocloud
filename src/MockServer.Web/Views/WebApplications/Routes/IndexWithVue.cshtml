@@ -31,7 +31,7 @@
                 </div>
                 <div class="route-list-container">
                     <route-list :routes="routes" @@click-route="openRoute" :selected_id="openingRouteId"
-                        @@route-deleted=""></route-list>
+                        @@route-deleted="onRouteDeleted"></route-list>
                 </div>
             </div>
             <div class="col-9 h-100" id="route-details">
@@ -510,7 +510,8 @@
                 modal.show()
             },
             deleteRoute(id) {
-                axios.post(DeleteUrl.trimEnd('?') + `RouteId=${id}`)
+                const DeleteUrl = '@Url.Action(nameof(WebApplicationRoutesApiController.Delete), "WebApplicationRoutesApi", new {WebApplicationName = Model.WebApplication.Name})'
+                axios.post(DeleteUrl.trimEnd('?') + `?RouteId=${id}`)
                     .then(res => {
                         this.$emit('route-deleted', id);
                     });

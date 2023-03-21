@@ -56,9 +56,9 @@ public class Host
             app.UseMiddleware<AuthenticationMiddleware>(app.AuthenticationSchemeHandlerMap);
         }
 
-        if (coreApp.UseMiddlewares.Contains(nameof(ConstraintValidationMiddleware)))
+        if (coreApp.UseMiddlewares.Contains(nameof(RequestValidationMiddleware)))
         {
-            app.UseMiddleware<ConstraintValidationMiddleware>();
+            app.UseMiddleware<RequestValidationMiddleware>();
         }
 
         await app.Handle(_context);

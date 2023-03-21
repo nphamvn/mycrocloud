@@ -32,15 +32,14 @@ public class RequestValidationMiddleware : IMiddleware
     public async Task<MiddlewareInvokeResult> InvokeAsync(HttpContext context)
     {
         var route = context.Items[typeof(CoreRoute).Name] as CoreRoute;
-        ArgumentNullException.ThrowIfNull(route);
-        var queries = route.RequestQueries;
+        var queries = route.RequestQueryValidationItems;
         foreach (var query in queries.OrEmptyIfNull())
         {
             _fromQueryDataBinder.Query = query.Key;
             var value = _fromQueryDataBinder.Get(context);
-            if (query.Constraints?.Count > 0)
+            if (query.Attributes?.Count > 0)
             {
-                List<IConstraint> constraints = BuildConstraints(query.Constraints);
+                List<IConstraint> constraints = BuildConstraints(query.Attributes.Select(attr => string.IsNullOrEmpty(attr.Parameter)? attr.Name : $"{attr.Name}({attr.Parameter})").ToList());
                 foreach (var constraint in constraints)
                 {
                     if (!constraint.Match(value))
@@ -52,14 +51,14 @@ public class RequestValidationMiddleware : IMiddleware
                 }
             }
         }
-        var headers = route.RequestHeaders;
+        var headers = route.RequestHeaderValidationItems;
         foreach (var header in headers.OrEmptyIfNull())
         {
             _fromHeaderDataBinder.Name = header.Name;
             var value = _fromHeaderDataBinder.Get(context);
-            if (header.Constraints?.Count > 0)
+            if (header.Attributes?.Count > 0)
             {
-                var constraints = BuildConstraints(header.Constraints);
+                var constraints = BuildConstraints(header.Attributes.Select(attr => string.IsNullOrEmpty(attr.Parameter) ? attr.Name : $"{attr.Name}({attr.Parameter})").ToList());
                 foreach (var constraint in constraints)
                 {
                     if (!constraint.Match(value))
@@ -71,58 +70,41 @@ public class RequestValidationMiddleware : IMiddleware
                 }
             }
         }
-        var body = route.RequestBody;
-        if (body?.Constraints?.Count > 0)
+        var body = route.RequestBodyValidationItems;
+        var text = _fromBodyDataBinder.Get(context) as string;
+        dynamic data = JsonSerializer.Deserialize<ExpandoObject>(text);
+        foreach (var field in body.OrEmptyIfNull())
         {
-            var text = _fromBodyDataBinder.Get(context) as string;
-            List<IConstraint> constraints;
-            constraints = BuildConstraints(route.RequestBody.Constraints);
+            // Split the field name into its path components
+            string[] path = field.Field.Split('.');
+            // Traverse the path to the nested field
+            dynamic fieldData = data;
+            foreach (string fieldName in path)
+            {
+                if (!ExpandoObjectHelper.PropertyExist(fieldData, fieldName))
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    await context.Response.WriteAsync($"The body is not valid.");
+                    return MiddlewareInvokeResult.End;
+                }
+                if (fieldData is ExpandoObject obj)
+                {
+                    ((IDictionary<string, object>)obj).TryGetValue(fieldName, out fieldData);
+                }
+                //fieldData = fieldData[fieldName];
+            }
+
+            List<IConstraint> constraints = BuildConstraints(field.Attributes.Select(attr => string.IsNullOrEmpty(attr.Parameter) ? attr.Name : $"{attr.Name}({attr.Parameter})").ToList());
             foreach (var constraint in constraints)
             {
-                if (!constraint.Match(text))
+                if (!constraint.Match(fieldData))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     await context.Response.WriteAsync($"The body is not valid.");
                     return MiddlewareInvokeResult.End;
                 }
             }
-            if (body.FieldConstraints?.Count > 0)
-            {
-                dynamic data = JsonSerializer.Deserialize<ExpandoObject>(text);
-                foreach (var field in body.FieldConstraints)
-                {
-                    // Split the field name into its path components
-                    string[] path = field.Field.Split('.');
-                    // Traverse the path to the nested field
-                    dynamic fieldData = data;
-                    foreach (string fieldName in path)
-                    {
-                        if (!ExpandoObjectHelper.PropertyExist(fieldData, fieldName))
-                        {
-                            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                            await context.Response.WriteAsync($"The body is not valid.");
-                            return MiddlewareInvokeResult.End;
-                        }
-                        if (fieldData is ExpandoObject obj)
-                        {
-                            ((IDictionary<string, object>)obj).TryGetValue(fieldName, out fieldData);
-                        }
-                    }
-
-                    constraints = BuildConstraints(field.Constraints);
-                    foreach (var constraint in constraints)
-                    {
-                        if (!constraint.Match(fieldData))
-                        {
-                            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                            await context.Response.WriteAsync($"The body is not valid.");
-                            return MiddlewareInvokeResult.End;
-                        }
-                    }
-                }
-            }
         }
-        
         return MiddlewareInvokeResult.Next;
     }
 

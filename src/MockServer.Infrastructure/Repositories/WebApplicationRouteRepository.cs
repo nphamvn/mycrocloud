@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using MockServer.Core.Repositories;
@@ -123,9 +122,9 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
                 """;
         using var connection = new SqliteConnection(_connectionString);
         SqlMapper.AddTypeHandler(new JsonTypeHandler<Authorization>());
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RouteRequestQuery>>());
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RouteRequestHeader>>());
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteRequestBody>());
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RequestQueryValidationItem>>());
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RequestHeaderValidationItem>>());
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RequestBodyValidationItem>>());
         return await connection.QuerySingleOrDefaultAsync<Route>(query, new
         {
             Id = id
@@ -171,26 +170,6 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
         });
     }
 
-    public async Task<RouteRequestBody> GetRequestBody(int requestId)
-    {
-        var query =
-                   """
-                    SELECT
-                        Required,
-                        MatchExactly,
-                        Format,
-                        Text
-                    FROM
-                        RequestBody
-                    WHERE
-                        RequestId = @RequestId
-                   """;
-        using var connection = new SqliteConnection(_connectionString);
-        return await connection.QuerySingleOrDefaultAsync<RouteRequestBody>(query, new
-        {
-            RequestId = requestId
-        });
-    }
     public async Task Update(int id, Route route)
     {
         var query =
@@ -214,81 +193,6 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
             Path = route.Path,
             Description = route.Description
         });
-    }
-
-    public async Task UpdateRequestHeader(int id, IList<RouteRequestHeader> headers)
-    {
-        using var connection = new SqliteConnection(_connectionString);
-        await connection.OpenAsync();
-        using var transaction = await connection.BeginTransactionAsync();
-        try
-        {
-            const string query =
-                            """
-                                UPDATE
-                                    Requests
-                                SET
-                                    Headers = @Headers
-                                WHERE
-                                    Id = @Id
-                                """;
-            SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RouteRequestHeader>>());
-            await connection.ExecuteAsync(query, new
-            {
-                Headers = headers
-            }, transaction);
-            await transaction.CommitAsync();
-        }
-        catch (Exception)
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
-    }
-
-    public async Task UpdateRequestQuery(int id, IList<RouteRequestQuery> parameters)
-    {
-        using var connection = new SqliteConnection(_connectionString);
-        await connection.OpenAsync();
-        using var transaction = await connection.BeginTransactionAsync();
-        try
-        {
-            const string query =
-                                """
-                                UPDATE
-                                    Requests
-                                SET
-                                    Parameters = @Parameters
-                                WHERE
-                                    Id = @Id
-                                """;
-            SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RouteRequestQuery>>());
-            await connection.ExecuteAsync(query, new
-            {
-                Parameters = parameters
-            }, transaction);
-            await transaction.CommitAsync();
-        }
-        catch (Exception)
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
-    }
-
-    public Task UpdateRequestBody(int id, RouteRequestBody body)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<RouteRequestQuery>> GetRequestQueries(int id)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<RouteRequestHeader>> GetRequestHeaders(int id)
-    {
-        throw new NotImplementedException();
     }
 
     public Task AttachAuthorization(int id, Authorization authorization)

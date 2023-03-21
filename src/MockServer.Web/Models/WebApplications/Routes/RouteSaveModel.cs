@@ -17,6 +17,9 @@ public class RouteSaveModel
     [Required]
     public string Method { get; set; }
     public string Description { get; set; }
+    public IList<RequestQueryValidationItemSaveModel> RequestQueryValidationItems { get; set; }
+    public IList<RequestHeaderValidationItemSaveModel> RequestHeaderValidationItems { get; set; }
+    public IList<RequestBodyValidationItemSaveModel> RequestBodyValidationItems { get; set; }
     public WebApplication? WebApplication { get; set; }
     public IEnumerable<SelectListItem>? HttpMethodSelectListItems { get; set; }
 }

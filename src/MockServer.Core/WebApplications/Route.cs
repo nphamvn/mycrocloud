@@ -10,8 +10,8 @@ public class Route : BaseEntity
     public string Description { get; set; }
     public string Method { get; set; }
     public Authorization Authorization { get; set; }
-    public IList<RouteRequestHeader> RequestHeaders { get; set; }
-    public IList<RouteRequestQuery> RequestQueries { get; set; }
-    public RouteRequestBody RequestBody { get; set; }
+    public IList<RequestQueryValidationItem> RequestQueryValidationItems { get; set; }
+    public IList<RequestHeaderValidationItem> RequestHeaderValidationItems { get; set; }
+    public IList<RequestBodyValidationItem> RequestBodyValidationItems { get; set; }
 }
 

@@ -4,7 +4,7 @@ using CoreWebApplication = MockServer.Core.WebApplications.WebApplication;
 using CoreRoute = MockServer.Core.WebApplications.Route;
 using CoreMockIntegrationResponseHeader = MockServer.Core.WebApplications.MockIntegrationResponseHeader;
 using WebApplication = MockServer.Web.Models.WebApplications.WebApplication;
-using Route = MockServer.Web.Models.WebApplications.Routes.Route;
+//using Route = MockServer.Web.Models.WebApplications.Routes.Route;
 using MockServer.Web.Models.WebApplications.Routes;
 using MockServer.Web.Models.WebApplications.Routes.Integrations.MockIntegrations;
 using CoreMockIntegration = MockServer.Core.WebApplications.MockIntegration;
@@ -28,7 +28,7 @@ public class WebApplicationProfile : Profile
         CreateMap<CoreWebApplication, WebApplicationCreateModel>().ReverseMap();
         CreateMap<CoreWebApplication, WebApplicationViewModel>();
         
-        CreateMap<CoreRoute, Route>();
+        //CreateMap<CoreRoute, Route>();
         CreateMap<CoreRoute, RouteIndexItem>();
         CreateMap<CoreRoute,RouteSaveModel >().ReverseMap();
         CreateMap<CoreRoute, RouteViewModel>();

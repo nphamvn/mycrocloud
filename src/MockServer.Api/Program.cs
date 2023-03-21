@@ -38,7 +38,7 @@ builder.Services.AddScoped<AuthorizationMiddleware>();
 builder.Services.AddSingleton<FromQueryDataBinder>();
 builder.Services.AddSingleton<FromHeaderDataBinder>();
 builder.Services.AddSingleton<FromBodyDataBinder>();
-builder.Services.AddScoped<ConstraintValidationMiddleware>();
+builder.Services.AddScoped<RequestValidationMiddleware>();
 builder.Services.AddSingleton<ConstraintBuilder>(x =>
 {
     return ActivatorUtilities.CreateInstance<ConstraintBuilder>(x, ConstraintBuilder.GetDefaultConstraintMap());
