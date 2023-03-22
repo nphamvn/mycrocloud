@@ -47,10 +47,7 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         vm.WebApplication.User = AuthUser;
         if (route.IntegrationType == RouteIntegrationType.MockIntegration)
         {
-            var integration = _mapper.Map<MockIntegrationViewModel>(await _webApplicationRouteRepository.GetMockIntegration(routeId));
-            integration.ResponseStatusCodeSelectListItems = HttpProtocolExtensions.CommonHttpStatusCode
-                                                            .Select(c => new SelectListItem(c.ToString(), ((int)c).ToString()));
-            vm.Integration = integration;
+            vm.Integration = _mapper.Map<MockIntegrationViewModel>(await _webApplicationRouteRepository.GetMockIntegration(routeId));
         }
         else if (route.IntegrationType == RouteIntegrationType.DirectForwarding)
         {
@@ -62,6 +59,10 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         }
         vm.MethodSelectListItem = HttpProtocolExtensions.CommonHttpMethods
                                     .Select(m => new SelectListItem(m, m));
+        if (vm.Authorization == null)
+        {
+            vm.Authorization = new();
+        }
         vm.Authorization.AuthorizationTypeSelectListItem = new List<SelectListItem>
         {
             new("None", nameof(AuthorizationType.None)),

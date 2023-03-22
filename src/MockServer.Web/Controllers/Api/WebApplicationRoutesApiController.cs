@@ -59,7 +59,7 @@ public class WebApplicationRoutesApiController : ApiController
     [HttpPost("create")]
     public async Task<IActionResult> Create(int WebApplicationId, [FromBody] RouteSaveModel route)
     {
-        if (await _webApplicationRouteWebService.ValidateCreate(WebApplicationId, route, ModelState))
+        if (!await _webApplicationRouteWebService.ValidateCreate(WebApplicationId, route, ModelState))
         {
             return Ok(new AjaxResult<RouteSaveModel>
             {
@@ -67,7 +67,7 @@ public class WebApplicationRoutesApiController : ApiController
             });
         }
         int id = await _webApplicationRouteWebService.Create(WebApplicationId, route);
-        return Ok(AjaxResult.Success());
+        return Ok(id);
     }
 
     [HttpPost("edit/{RouteId:int}")]

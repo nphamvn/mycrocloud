@@ -30,11 +30,10 @@
                     </button>
                 </div>
                 <div class="route-list-container">
-                    <route-list :routes="routes" @@click-route="openRoute" :selected_id="openingRouteId"
-                        @@route-deleted="onRouteDeleted"></route-list>
+                    <route-list :routes="routes" @@click-route="openRoute" @@route-deleted="onRouteDeleted"></route-list>
                 </div>
             </div>
-            <div class="col-9 h-100" id="route-details">
+            <div class="col-9">
                 <div v-if="openingRoute">
                     <form v-on:submit.prevent="onSubmit">
                         <div class="card mt-1">
@@ -301,6 +300,10 @@
                                     </div>
                                 </div>
                             </div>
+                            <validation-attributes-modal v-if="validationAttributesModalVisible"
+                                :attributes="validationAttributesModalAttributes"
+                                @@save="onValidationAttributesModalSaved"
+                                @@close="closeValidationAttributesModal"></validation-attributes-modal>
                         </div>
                         <div class="mt-1 d-flex">
                             <button type="button" @@click="discardChange"
@@ -314,9 +317,6 @@
                 </div>
             </div>
         </div>
-        <validation-attributes-modal v-if="validationAttributesModalVisible"
-            :attributes="validationAttributesModalAttributes" @@save="onValidationAttributesModalSaved"
-            @@close="closeValidationAttributesModal"></validation-attributes-modal>
     </div>
 </div>
 <template id="route-list-template">
@@ -402,31 +402,7 @@
         </div>
     </div>
 </template>
-<template id="validation-attributes-list-template">
-    <div class="d-flex">
-        <span v-for="attr in attributes" class="me-1 bg-gray py-1 px-2 rounded">{{attr.name}}</span>
-    </div>
-</template>
 <script>
-    const ValidationAttributesList = {
-        props: {
-            attributes: {
-                type: Array,
-                default: () => ({})
-            }
-        },
-        template: '#validation-attributes-list-template',
-        methods: {
-            attributeAsString(attr) {
-                return attr.name;
-                if (attr.parameters) {
-                    return `${attr.name}(${attr.parameters})`;
-                } else {
-                    return attr.name;
-                }
-            }
-        }
-    }
     const ValidationAttributesModal = {
         template: '#validation-attributes-modal-template',
         props: {
@@ -468,9 +444,6 @@
     }
     const RouteList = {
         props: {
-            selected_id: {
-                type: Number
-            },
             routes: {
                 type: Array,
                 required: true
@@ -479,6 +452,7 @@
         template: '#route-list-template',
         methods: {
             click(id) {
+                this.selected_id = id
                 this.$emit('click-route', id);
             },
             editRoute(route) {
@@ -497,31 +471,38 @@
                 }
             },
             showActionsMenu(id, event) {
-                //TODO: show context menu
-                //this.$emit('show-context-menu', id, event);
                 this.itemActionsMenuClickedRouteId = id
                 this.itemActionsMenuVisible = true
             },
             async showDeleteConfirmModal(id) {
-                //TOOD: show confirm diaglog
                 this.routeDeleteConfirmModalVisible = true
                 await nextTick()
-                let modal = new bootstrap.Modal(document.getElementById('routeDeleteConfirmModal'), {})
+                const modalEl = document.getElementById(this.routeDeleteConfirmModalId)
+                let modal = new bootstrap.Modal(modalEl, {})
+                modalEl.addEventListener('hidden.bs.modal', function (event) {
+                    modal.dispose()
+                    this.routeDeleteConfirmModalVisible = false
+                })
                 modal.show()
             },
             deleteRoute(id) {
                 const DeleteUrl = '@Url.Action(nameof(WebApplicationRoutesApiController.Delete), "WebApplicationRoutesApi", new {WebApplicationName = Model.WebApplication.Name})'
                 axios.post(DeleteUrl.trimEnd('?') + `?RouteId=${id}`)
-                    .then(res => {
-                        this.$emit('route-deleted', id);
+                    .then(res => this.$emit('route-deleted', id))
+                    .then(async () => {
+                        let modal = bootstrap.Modal.getInstance(document.getElementById(this.routeDeleteConfirmModalId), {})
+                        modal.dispose()
+                        this.routeDeleteConfirmModalVisible = false
                     });
             }
         },
         data: function () {
             return {
+                selected_id: null,
                 itemActionsMenuVisible: false,
                 itemActionsMenuClickedRouteId: null,
-                routeDeleteConfirmModalVisible: false
+                routeDeleteConfirmModalVisible: false,
+                routeDeleteConfirmModalId: 'routeDeleteConfirmModal'
             }
         }
     }
@@ -597,7 +578,13 @@
                 console.log(url)
                 console.log(JSON.stringify(openingRoute.value))
                 axios.post(url, openingRoute.value)
-                    .then(res => console.log(JSON.stringify(res.data)))
+                    .then(res => {
+                        console.log(JSON.stringify(res.data))
+                        if (mode.value === 'CREATE') {
+                            openingRoute.value.id = res.data
+                            openingRouteId.value = res.data
+                        }
+                    })
                     .catch(err => console.log(err));
             }
             const discardChange = () => {
@@ -694,6 +681,5 @@
     });
     app.component('route-list', RouteList)
     app.component('validation-attributes-modal', ValidationAttributesModal)
-    app.component('validation-attributes-list', ValidationAttributesList)
     app.mount('#app');
 </script>
