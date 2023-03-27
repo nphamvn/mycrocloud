@@ -15,14 +15,14 @@ public class FunctionsController: BaseController
     [HttpGet]
     public async Task<IActionResult> Index() {
         var model = await _functionWebService.GetIndexViewModel();
-        return View(model);
+        return View("/Views/Functions/Index.cshtml", model);
     }
 
     [HttpGet("create")]
     public async Task<IActionResult> Create()
     {
         var model = await _functionWebService.GetCreateModel();
-        return View(model);
+        return View("/Views/Functions/Save.cshtml", model);
     }
 
     [HttpPost("create")]
@@ -36,7 +36,7 @@ public class FunctionsController: BaseController
     public async Task<IActionResult> Edit(int FunctionId)
     {
         var model = await _functionWebService.GetEditModel(FunctionId);
-        return View(model);
+        return View("/Views/Functions/Save.cshtml", model);
     }
 
     [HttpPost("edit/{FunctionId:int}")]
@@ -46,7 +46,7 @@ public class FunctionsController: BaseController
         return RedirectToAction(nameof(Index));
     }
 
-    [HttpPost("test-function")]
+    [HttpPost("test")]
     public async Task<IActionResult> TestFunction(IFormFile codeFile)
     {
         using (var reader = new StreamReader(codeFile.OpenReadStream()))

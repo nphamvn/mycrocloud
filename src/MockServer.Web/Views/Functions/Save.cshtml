@@ -1,0 +1,14 @@
+@model MockServer.Web.Models.Function.FunctionSaveModel
+<form method="post">
+    <div>
+        <label asp-for="Name"></label>
+        <input type="text" asp-for="Name" placeholder="Function name" autocomplete="off">
+    </div>
+    <div>
+        <label asp-for="RuntimeId"></label>
+        <select asp-for="RuntimeId" asp-items="Model.RuntimeSelectListItem"></select>
+    </div>
+    <div>
+        <button type="submit">Save</button>
+    </div>
+</form>

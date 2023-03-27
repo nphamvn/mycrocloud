@@ -567,7 +567,6 @@
                         url: IndexUrl.trimEnd('?') + '?' + query_params.toString()
                     }
                     let response = await axios.request(reqOptions);
-                    console.log(JSON.stringify(response.data));
                     routes.value = response.data
                 }, 800);
             }

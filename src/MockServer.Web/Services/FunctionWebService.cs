@@ -1,6 +1,9 @@
 using System.CodeDom.Compiler;
+using AutoMapper;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CSharp;
 using MockServer.Core.Functions;
+using MockServer.Core.Repositories;
 using MockServer.Web.Models.Function;
 using MockServer.Web.Services.Interfaces;
 
@@ -8,43 +11,67 @@ namespace MockServer.Web.Services;
 
 public class FunctionWebService : BaseWebService, IFunctionWebService
 {
-    public FunctionWebService(IHttpContextAccessor contextAccessor) : base(contextAccessor)
+    private readonly IFunctionRepository _functionRepository;
+    private readonly IMapper _mapper;
+
+    public FunctionWebService
+                    (IHttpContextAccessor contextAccessor,
+                    IFunctionRepository functionRepository,
+                    IMapper mapper
+                    ) : base(contextAccessor)
     {
+        _functionRepository = functionRepository;
+        _mapper = mapper;
     }
 
     public Task Create(FunctionSaveModel function)
     {
-        throw new NotImplementedException();
+        var coreFunction = _mapper.Map<Core.Functions.Function>(function);
+        return _functionRepository.Add(AuthUser.Id, coreFunction);
     }
 
     public Task Delete(int functionId)
     {
-        throw new NotImplementedException();
+        return _functionRepository.Delete(functionId);
     }
 
     public Task Edit(int functionId, FunctionSaveModel function)
     {
-        throw new NotImplementedException();
+        var coreFunction = _mapper.Map<Core.Functions.Function>(function);
+        return _functionRepository.Update(functionId, coreFunction);
     }
 
-    public Task<FunctionViewModel> Get(int functionId)
+    public async Task<FunctionSaveModel> GetCreateModel()
     {
-        throw new NotImplementedException();
+        var model = new FunctionSaveModel();
+        var runtimes = await _functionRepository.GetAvailableRuntimes();
+        model.RuntimeSelectListItem = runtimes.Select(r => new SelectListItem
+        {
+            Value = r.Id.ToString(),
+            Text = r.Name
+        });
+        return model;
     }
 
-    public Task<FunctionSaveModel> GetCreateModel()
+    public async Task<FunctionSaveModel> GetEditModel(int functionId)
     {
-        throw new NotImplementedException();
+        var function = await _functionRepository.Get(functionId);
+        var model = _mapper.Map<FunctionSaveModel>(function);
+        var runtimes = await _functionRepository.GetAvailableRuntimes();
+        model.RuntimeSelectListItem = runtimes.Select(r => new SelectListItem
+        {
+            Value = r.Id.ToString(),
+            Text = r.Name
+        });
+        return model;
     }
 
-    public Task<FunctionSaveModel> GetEditModel(int functionId)
+    public async Task<FunctionIndexViewModel> GetIndexViewModel()
     {
-        throw new NotImplementedException();
-    }
-
-    public Task<FunctionIndexViewModel> GetIndexViewModel()
-    {
-        throw new NotImplementedException();
+        var model = new FunctionIndexViewModel();
+        var functions = await _functionRepository.GetAll(AuthUser.Id);
+        model.Functions = _mapper.Map<IEnumerable<FunctionIndexItem>>(functions);
+        return model;
     }
 
     public async Task<FunctionTestResult> Test(FunctionSaveModel function)
@@ -70,5 +97,14 @@ public class FunctionWebService : BaseWebService, IFunctionWebService
         }
         result.Passed = true;
         return result;
+    }
+
+    public class MapperProfile : Profile
+    {
+        public MapperProfile()
+        {
+            CreateMap<Core.Functions.Function, FunctionSaveModel>().ReverseMap();
+            CreateMap<Core.Functions.Function, FunctionIndexItem>();
+        }
     }
 }
