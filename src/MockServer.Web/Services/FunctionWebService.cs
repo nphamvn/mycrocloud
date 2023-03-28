@@ -44,7 +44,7 @@ public class FunctionWebService : BaseWebService, IFunctionWebService
     public async Task<FunctionSaveModel> GetCreateModel()
     {
         var model = new FunctionSaveModel();
-        var runtimes = await _functionRepository.GetAvailableRuntimes();
+        var runtimes = await _functionRepository.GetAllRuntimes();
         model.RuntimeSelectListItem = runtimes.Select(r => new SelectListItem
         {
             Value = r.Id.ToString(),
@@ -57,7 +57,7 @@ public class FunctionWebService : BaseWebService, IFunctionWebService
     {
         var function = await _functionRepository.Get(functionId);
         var model = _mapper.Map<FunctionSaveModel>(function);
-        var runtimes = await _functionRepository.GetAvailableRuntimes();
+        var runtimes = await _functionRepository.GetAllRuntimes();
         model.RuntimeSelectListItem = runtimes.Select(r => new SelectListItem
         {
             Value = r.Id.ToString(),

@@ -28,6 +28,10 @@ public class FunctionsController: BaseController
     [HttpPost("create")]
     public async Task<IActionResult> Create(FunctionSaveModel function)
     {
+        if (!ModelState.IsValid)
+        {
+            return View("/Views/Functions/Save.cshtml", function);;
+        }
         await _functionWebService.Create(function);
         return RedirectToAction(nameof(Index));
     }

@@ -9,5 +9,5 @@ public interface IFunctionRepository
     Task<int> Add(int userId, Function function);
     Task Update(int id, Function function);
     Task Delete(int id);
-    Task<IEnumerable<Runtime>> GetAvailableRuntimes();
+    Task<IEnumerable<Runtime>> GetAllRuntimes();
 }
