@@ -2,9 +2,11 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
 using Duende.IdentityServer;
+using Duende.IdentityServer.Extensions;
 using Duende.IdentityServer.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.HttpOverrides;
 using MockServer.IdentityServer.Services;
 using Serilog;
 
@@ -71,6 +73,11 @@ internal static class HostingExtensions
 
         builder.Services.AddTransient<IProfileService, ProfileService>();
 
+        builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders =
+                ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        });
         return builder.Build();
     }
 
@@ -82,11 +89,16 @@ internal static class HostingExtensions
         {
             app.UseDeveloperExceptionPage();
         }
+        else
+        {
+            app.UseForwardedHeaders();
+        }
 
         // uncomment if you want to add a UI
         app.UseStaticFiles();
         app.UseRouting();
 
+        
         app.UseIdentityServer();
 
         // uncomment if you want to add a UI

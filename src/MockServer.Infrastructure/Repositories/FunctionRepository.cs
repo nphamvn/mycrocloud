@@ -14,7 +14,7 @@ public class FunctionRepository : IFunctionRepository
     }
     public Task<int> Add(int userId, Function function)
     {
-        const string sql = 
+        const string sql =
             """
             INSERT INTO
                 Function(
@@ -26,7 +26,8 @@ public class FunctionRepository : IFunctionRepository
                 VALUES (
                     @UserId,
                     @Name,
-                    @RuntimeId
+                    @RuntimeId,
+                    @Description
                 )
             """;
         using var connection = new SqliteConnection(_connectionString);

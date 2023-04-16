@@ -3,6 +3,7 @@ using MockServer.Web.Extentions;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
@@ -21,8 +22,7 @@ builder.Services.AddAuthentication(options =>
     .AddCookie("Cookies")
     .AddOpenIdConnect("oidc", options =>
     {
-        options.Authority = "https://localhost:5001";
-
+        options.Authority = configuration["IdentityServer:Authority"];
         options.ClientId = "web";
         options.ClientSecret = "secret";
         options.ResponseType = "code";
@@ -32,6 +32,7 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Add("profile");
         options.GetClaimsFromUserInfoEndpoint = true;
         options.SaveTokens = true;
+        options.RequireHttpsMetadata = false;
     });
 
 var app = builder.Build();

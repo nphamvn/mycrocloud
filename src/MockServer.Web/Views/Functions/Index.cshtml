@@ -6,11 +6,11 @@
 <div class="mt-1">
     @if (Model.Functions.Count() > 0)
     {
-        <ul>
+        <ul class="list-group list-group-flush">
             @foreach (var function in Model.Functions)
             {
-                <li>
-                    @function.Name
+                <li class="list-item">
+                    <a href="@Url.Action(nameof(FunctionsController.Edit), new { FunctionId = function.Id})" class="">@function.Name</a>
                 </li>
             }
         </ul>

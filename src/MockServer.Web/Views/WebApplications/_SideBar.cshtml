@@ -18,7 +18,7 @@
         </li>
         <li class="nav-item">
             <a href="@Url.Action(nameof(WebApplicationRoutesController.Index), "WebApplicationRoutes" ,new {WebApplicationName=Model.Name})"
-                class="nav-link @(controller.Equals("WebApplicationRoutes", StringComparison.OrdinalIgnoreCase) && action.Equals("IndexWithVue",
+                class="nav-link @(controller.Equals("WebApplicationRoutes", StringComparison.OrdinalIgnoreCase) && action.Equals("Index",
                 StringComparison.OrdinalIgnoreCase) ?"active":"") py-1" role="tab">Routes</a>
         </li>
         <li class="nav-item">
