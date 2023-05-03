@@ -5,6 +5,7 @@
 }
 @section Scripts {
     <script src="lib/vue/vue.global.js"></script>
+    <script src="lib/vue/vee-validate.min.js"></script>
     <script src="lib/axios/axios.min.js"></script>
 }
 <style>
@@ -701,5 +702,6 @@
     app.component('route-list', RouteList)
     app.component('route-edit', RouteEdit)
     app.component('validation-attributes-modal', ValidationAttributesModal)
-    app.mount('#app');
+    app.use(VeeValidate)
+    app.mount('#app')
 </script>

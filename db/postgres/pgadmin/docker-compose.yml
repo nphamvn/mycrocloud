@@ -1,0 +1,10 @@
+version: '3'
+services:
+  pgadmin4:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pvnam95@hotmail.com
+      PGADMIN_DEFAULT_PASSWORD: 9xs3wVYkwSSSiG
+    ports:
+      - "80:80"
+    restart: always

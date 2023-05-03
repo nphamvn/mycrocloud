@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:15.2-alpine
+    container_name: postgres
+    #command: -c 'config_file=/etc/postgresql/postgresql.conf' # 追加
+    ports:
+      - 5432:5432
+    volumes:
+      - db-store:/var/lib/postgresql/data
+      #- ./script:/docker-entrypoint-initdb.d
+      #- ./config/postgresql.conf:/etc/postgresql/postgresql.conf # 追加
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=YJVeuWV5Mj7eDr
+volumes:
+  db-store:
