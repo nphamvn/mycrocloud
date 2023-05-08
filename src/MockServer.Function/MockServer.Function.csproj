@@ -7,6 +7,7 @@
     <DockerComposeProjectPath>../docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'MockServer.CallbackExecutor' " />
   <ItemGroup>
     <None Remove="Interfaces\" />
     <None Remove="Callbacks\" />

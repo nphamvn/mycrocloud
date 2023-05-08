@@ -1,0 +1,34 @@
+<h1>Login</h1>
+<div class="row">
+    <div class="col-6">
+        Local Login
+        <form method="post" action="@Url.Action("LocalLogin", "Account")">
+            <div>
+                <label>Email</label>
+                <input type="email" name="email" value="pvnam95@hotmail.com">
+            </div>
+            <div>
+                <label>Password</label>
+                <input type="password" name="password" value="zzz">
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    <div class="col-6">
+        External Login
+        <div>
+            <form method="post" action="@Url.Action("ExternalLogin", "Account")">
+                <input type="hidden" name="provider" value="Auth0">
+                <button type="submit">Login with Auth0</button>
+            </form>
+            <form method="post" action="@Url.Action("ExternalLogin", "Account")">
+                <input type="hidden" name="provider" value="Google">
+                <button type="submit">Login with Google</button>
+            </form>
+            <form method="post" action="@Url.Action("ExternalLogin", "Account")">
+                <input type="hidden" name="provider" value="OAuth20Server">
+                <button type="submit">Login with OAuth20Server</button>
+            </form>
+        </div>
+    </div>
+</div>

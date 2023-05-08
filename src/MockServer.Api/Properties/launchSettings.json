@@ -12,7 +12,6 @@
     "MockServer.ReverseProxyServer": {
       "commandName": "Project",
       "launchUrl": "swagger",
-      "launchBrowser": false,
       "applicationUrl": "https://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

@@ -5,7 +5,7 @@
             "name": "MockServer.Identity",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build_ids",
             "program": "${workspaceFolder}/MockServer.Identity/bin/Debug/net6.0/MockServer.Identity.dll",
             "args": [],
             "cwd": "${workspaceFolder}/MockServer.Identity",

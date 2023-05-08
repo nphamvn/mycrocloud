@@ -1,4 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Identity;
+using MockServer.Web.Authentication;
 using MockServer.Web.Extentions;
 using Serilog;
 
@@ -14,28 +21,92 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddControllersWithViews();
 //builder.Services.AddServerSideBlazor();
 JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
-builder.Services.AddAuthentication(options =>
+// builder.Services
+//         .AddAuthentication()
+//         // .AddCookie("LocalCookieScheme", "Local Cookie Scheme", options => {
+//         //     options.Cookie.Name = "LocalCookieScheme";
+//         // })
+//         .AddScheme<MyAuthenticationOptions, MyAuthenticationHandler>("MyAuthenticationScheme", options => {
+            
+//         })
+//         ;
+// builder.Services.AddAuthentication(options =>
+//     {
+//         options.DefaultScheme = "Cookies";
+//         options.DefaultChallengeScheme = "oidc";
+//     })
+//     .AddCookie("Cookies")
+//     .AddOpenIdConnect("oidc", options =>
+//     {
+//         options.Authority = configuration["IdentityServer:Authority"];
+//         options.ClientId = "web";
+//         options.ClientSecret = "secret";
+//         options.ResponseType = "code";
+
+//         options.Scope.Clear();
+//         options.Scope.Add("openid");
+//         options.Scope.Add("profile");
+//         options.GetClaimsFromUserInfoEndpoint = true;
+//         options.SaveTokens = true;
+//         options.RequireHttpsMetadata = false;
+//     });
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+builder.Services
+    .AddAuthentication(options =>
     {
-        options.DefaultScheme = "Cookies";
-        options.DefaultChallengeScheme = "oidc";
+        options.DefaultScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultChallengeScheme = IdentityConstants.ExternalScheme;
     })
-    .AddCookie("Cookies")
-    .AddOpenIdConnect("oidc", options =>
-    {
-        options.Authority = configuration["IdentityServer:Authority"];
-        options.ClientId = "web";
-        options.ClientSecret = "secret";
-        options.ResponseType = "code";
+    .AddCookie(IdentityConstants.ApplicationScheme, options => {
 
-        options.Scope.Clear();
-        options.Scope.Add("openid");
-        options.Scope.Add("profile");
-        options.GetClaimsFromUserInfoEndpoint = true;
-        options.SaveTokens = true;
-        options.RequireHttpsMetadata = false;
-    });
+    })
+    .AddCookie(IdentityConstants.ExternalScheme, options => {
 
+    })
+    .AddOpenIdConnect("Auth0", options => {
+        options.Authority = $"https://{configuration["Auth0:Domain"]}";
+        options.ClientId = configuration["Auth0:ClientId"];
+        options.ClientSecret = configuration["Auth0:ClientSecret"];
+        options.CallbackPath = new PathString("/auth0-callback");
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+    })
+    .AddGoogle(GoogleDefaults.AuthenticationScheme, options => {
+        options.ClientId = "1003248858371-s5bsd1mre1dvi635pflp0fm2tpcl8sj1.apps.googleusercontent.com";
+        options.ClientSecret = "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";
+        options.CallbackPath = new PathString("/signin-google");
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+        options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
+    })
+    // .AddOpenIdConnect("Google", options => {
+    //     options.Authority = "https://accounts.google.com";
+    //     options.ClientId = "1003248858371-s5bsd1mre1dvi635pflp0fm2tpcl8sj1.apps.googleusercontent.com";
+    //     options.ClientSecret = "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";
+    //     options.CallbackPath = new PathString("/signin-google");
+    //     options.ResponseType = "code";
+    //     options.GetClaimsFromUserInfoEndpoint = true;
+    // })
+    // .AddOpenIdConnect("OAuth20Server", options => {
+    //     options.Authority = "https://localhost:7275";
+    //     options.ClientId = "1";
+    //     options.ClientSecret = "123456789";
+    //     options.CallbackPath = new PathString("/signin-oidc");
+    //     options.ResponseType = "code";
+    //     options.GetClaimsFromUserInfoEndpoint = true;
+    // })
+    ;
 var app = builder.Build();
+
+app.Use(async (context, next) =>
+{
+    // Log the incoming request
+    var request = context.Request;
+    var message = $"Request: {request.Method} {request.Path}";
+    Console.WriteLine(message);
+
+    // Call the next middleware in the pipeline
+    await next();
+});
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

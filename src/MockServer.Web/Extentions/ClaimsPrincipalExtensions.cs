@@ -14,7 +14,7 @@ namespace MockServer.Web.Extentions
             {
                 var user = new User
                 {
-                    Id = Convert.ToInt32(principal.FindFirstValue("sub")),
+                    UserId = Convert.ToInt32(principal.FindFirstValue("user_id")),
                     Username = principal.FindFirstValue("name"),
                     Email = principal.FindFirstValue("email"),
                     AvatarUrl = principal.FindFirstValue("avatar_url")

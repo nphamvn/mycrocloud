@@ -5,23 +5,101 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'MockServer.WebMVC' " />
   <ItemGroup>
+    <ProjectReference Include="..\MockServer.Infrastructure\MockServer.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\aspnetcore\src\Security\Authentication\Core\src\Microsoft.AspNetCore.Authentication.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\aspnetcore\src\Security\Authentication\Google\src\Microsoft.AspNetCore.Authentication.Google.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\aspnetcore\src\Security\Authentication\OpenIdConnect\src\Microsoft.AspNetCore.Authentication.OpenIdConnect.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
     <ProjectReference Include="..\MockServer.Core\MockServer.Core.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
-    <ProjectReference Include="..\MockServer.Infrastructure\MockServer.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\aspnetcore\src\Http\Authentication.Abstractions\src\Microsoft.AspNetCore.Authentication.Abstractions.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\aspnetcore\src\Security\Authentication\Cookies\src\Microsoft.AspNetCore.Authentication.Cookies.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\aspnetcore\src\Http\Authentication.Core\src\Microsoft.AspNetCore.Authentication.Core.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\aspnetcore\src\Security\Authentication\OAuth\src\Microsoft.AspNetCore.Authentication.OAuth.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\aspnetcore\src\Identity\Core\src\Microsoft.AspNetCore.Identity.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\aspnetcore\src\Identity\EntityFrameworkCore\src\Microsoft.AspNetCore.Identity.EntityFrameworkCore.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" Version="4.0.1" />
     <PackageReference Include="AutoMapper" Version="12.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.14" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.14" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Version="6.0.14" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.16">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.16" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.8" />
     <PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="5.2.2" />
     <PackageReference Include="System.CodeDom" Version="8.0.0-preview.1.23110.8" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.27.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Microsoft.AspNetCore.Authentication" />
+    <None Remove="Microsoft.Net.Http.Headers" />
+    <None Remove="Microsoft.AspNetCore.Connections.Abstractions" />
+    <None Remove="Microsoft.AspNetCore.Http.Abstractions" />
+    <None Remove="Microsoft.AspNetCore.Http" />
+    <None Remove="Microsoft.AspNetCore.Http.Features" />
+    <None Remove="Microsoft.AspNetCore.WebUtilities" />
+    <None Remove="Microsoft.Extensions.Features" />
+    <None Remove="Microsoft.Extensions.ObjectPool" />
+    <None Remove="Microsoft.AspNetCore.Authentication.Cookies" />
+    <None Remove="Microsoft.AspNetCore.Authentication.Core" />
+    <None Remove="Microsoft.AspNetCore.Mvc.Core" />
+    <None Remove="Microsoft.AspNetCore.Authentication.Abstractions" />
+    <None Remove="Microsoft.AspNetCore.Authentication.Google" />
+    <None Remove="Microsoft.AspNetCore.Authentication.OAuth" />
+    <None Remove="Microsoft.AspNetCore.Identity" />
+    <None Remove="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.AspNetCore.Authentication.Abstractions">
+      <HintPath>..\..\..\aspnetcore\artifacts\bin\Microsoft.AspNetCore.Authentication.Abstractions\Debug\net6.0\Microsoft.AspNetCore.Authentication.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Authentication.Core">
+      <HintPath>..\..\..\aspnetcore\artifacts\bin\Microsoft.AspNetCore.Authentication.Core\Debug\net6.0\Microsoft.AspNetCore.Authentication.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Authentication.Cookies">
+      <HintPath>..\..\..\aspnetcore\artifacts\bin\Microsoft.AspNetCore.Authentication.Cookies\Debug\net6.0\Microsoft.AspNetCore.Authentication.Cookies.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Authentication">
+      <HintPath>..\..\..\aspnetcore\artifacts\bin\Microsoft.AspNetCore.Authentication\Debug\net6.0\Microsoft.AspNetCore.Authentication.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Authentication.Google">
+      <HintPath>..\..\..\aspnetcore\artifacts\bin\Microsoft.AspNetCore.Authentication.Google\Debug\net6.0\Microsoft.AspNetCore.Authentication.Google.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Authentication.OAuth">
+      <HintPath>..\..\..\aspnetcore\artifacts\bin\Microsoft.AspNetCore.Authentication.OAuth\Debug\net6.0\Microsoft.AspNetCore.Authentication.OAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Identity">
+      <HintPath>..\..\..\aspnetcore\artifacts\bin\Microsoft.AspNetCore.Identity\Debug\net6.0\Microsoft.AspNetCore.Identity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore">
+      <HintPath>..\..\..\aspnetcore\artifacts\bin\Microsoft.AspNetCore.Identity.EntityFrameworkCore\Debug\net6.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

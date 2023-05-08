@@ -1,6 +1,8 @@
+using MockServer.Core.Identity;
+
 namespace MockServer.Core.Repositories;
 
-public class IUserRepository
+public interface IUserRepository
 {
-    
+    Task<User> FindUserByEmail(string email);
 }
