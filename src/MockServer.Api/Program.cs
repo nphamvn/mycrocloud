@@ -1,6 +1,6 @@
 using MockServer.Core.Repositories;
 using MockServer.Core.Services;
-using MockServer.Infrastructure.Repositories;
+using MockServer.Infrastructure.Repositories.PostgreSql;
 using MockServer.Api.Extentions;
 using MockServer.Api.Interfaces;
 using MockServer.Api.Middlewares;

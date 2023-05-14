@@ -3,6 +3,7 @@
 namespace MockServer.Core.WebApplications;
 public class Route : BaseEntity
 {
+    public int RouteId { get; set; }
     public int WebApplicationId { get; set; }
     public RouteIntegrationType IntegrationType { get; set; }
     public string Name { get; set; }

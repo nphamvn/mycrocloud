@@ -44,7 +44,7 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         var route = await _webApplicationRouteRepository.GetById(routeId);
         var vm = _mapper.Map<RouteViewModel>(route);
         vm.WebApplication = await _webApplicationWebService.Get(route.WebApplicationId);
-        vm.WebApplication.User = AuthUser;
+        //vm.WebApplication.User = AuthUser;
         if (route.IntegrationType == RouteIntegrationType.MockIntegration)
         {
             vm.Integration = _mapper.Map<MockIntegrationViewModel>(await _webApplicationRouteRepository.GetMockIntegration(routeId));
@@ -159,7 +159,7 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
     {
         var vm = new RouteSaveModel();
         vm.WebApplication = await _webApplicationWebService.Get(appId);
-        vm.WebApplication.User = AuthUser;
+        //vm.WebApplication.User = AuthUser;
         vm.HttpMethodSelectListItems = HttpProtocolExtensions.CommonHttpMethods
                                         .Select(m => new SelectListItem(m, m));
         return vm;

@@ -1,12 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MockServer.Core.WebApplications;
 using MockServer.Web.Attributes;
 using MockServer.Web.Filters;
-using MockServer.Web.Models.Common;
 using MockServer.Web.Models.WebApplications.Routes;
-using MockServer.Web.Models.WebApplications.Routes.Integrations.MockIntegrations;
 using MockServer.Web.Services;
 using RouteName = MockServer.Web.Common.Constants.RouteName;
 namespace MockServer.Web.Controllers;
@@ -31,12 +28,12 @@ public class WebApplicationRoutesController : Controller
         if (IndexRender == "SSR")
         {
             var vm = await _webApplicationRouteWebService.GetIndexModel(WebApplicationId, SearchTerm, Sort);
-            return View("Views/WebApplications/Routes/Index.cshtml", vm);
+            return View("/Views/WebApplications/Routes/Index.cshtml", vm);
         }
         else
         {
             var pm = await _webApplicationRouteWebService.GetPageModel(WebApplicationId, SearchTerm, Sort);
-            return View("Views/WebApplications/Routes/IndexWithVue.cshtml", pm);
+            return View("/Views/WebApplications/Routes/IndexWithVue.cshtml", pm);
         }
     }
 
@@ -45,7 +42,7 @@ public class WebApplicationRoutesController : Controller
     public async Task<IActionResult> GetCreatePartial(int WebApplicationId)
     {
         var model = await _webApplicationRouteWebService.GetCreateRouteModel(WebApplicationId);
-        return PartialView("Views/ProjectRequests/_CreateRequestPartial.cshtml", model);
+        return PartialView("/Views/WebApplications/WebApplications.Create.cshtml", model);
     }
 
     [HttpGet("edit/{RouteId:int}")]
@@ -54,7 +51,7 @@ public class WebApplicationRoutesController : Controller
     {
         var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
         ViewData["Tab"] = tab;
-        return View("Views/WebApplications/Routes/Edit.cshtml", vm);
+        return View("/Views/WebApplications/Routes/Edit.cshtml", vm);
     }
 
     [HttpPost("edit/{RouteId:int}")]

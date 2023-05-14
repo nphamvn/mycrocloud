@@ -1,0 +1,7 @@
+@using MockServer.Web.Controllers
+<h1>Settings</h1>
+<div>
+    <form action="@Url.Action(nameof(AccountController.ConnectGitHub))" method="post">
+        <button type="submit">Connect To GitHub</button>
+    </form>
+</div>

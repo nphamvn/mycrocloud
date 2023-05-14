@@ -5,7 +5,7 @@ using MockServer.Core.Interfaces;
 using MockServer.Core.Repositories;
 using MockServer.Core.Services;
 using MockServer.Core.Settings;
-using MockServer.Infrastructure.Repositories;
+using MockServer.Infrastructure.Repositories.PostgreSql;
 using MockServer.Web.Services;
 using MockServer.Web.Services.Interfaces;
 
@@ -15,30 +15,23 @@ namespace MockServer.Web.Extentions
     {
         public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
         {
-            var ConnectionString = configuration.GetConnectionString("SQLite");
             var settings = new GlobalSettings();
-            settings.Sqlite = new SqlSettings { ConnectionString = configuration.GetConnectionString("SQLite") };
             services.AddSingleton<GlobalSettings>(s => settings);
-            services.AddTransient<IApiKeyService, ApiKeyService>();
+            services.Configure<PostgresSettings>(configuration.GetSection("Database:Application"));
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
             services.AddHttpContextAccessor();
             services.AddDbContext<IdentityDbContext>(options => {
-                options.UseNpgsql("Host=npham.me;Database=MockServer_Identity;Username=postgres;Password=YJVeuWV5Mj7eDr",
-                b => b.MigrationsAssembly("MockServer.Web"));
-                //options.UseSqlServer("Data Source=localhost;Initial Catalog=MockServer_Identity;User Id=sa;Password=48QcSDDojw8Rug;");
+                var provider = configuration.GetValue<string>("Database:Identity:Provider");
+                var connectionString = configuration.GetValue<string>("Database:Identity:ConnectionString");
+                if (provider == "PostgresSql")
+                {
+                    var assemblyName = typeof(Program).Assembly.GetName().Name;
+                    options.UseNpgsql(connectionString, b => b.MigrationsAssembly(assemblyName));
+                }
             });
-            // services.AddIdentity<IdentityUser, IdentityRole>(options => {
-            // })
-            // .AddEntityFrameworkStores<IdentityDbContext>()
-            // .AddDefaultTokenProviders();
             services.AddIdentityCore<IdentityUser>()
                     .AddEntityFrameworkStores<IdentityDbContext>();
-            //services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>, UserClaimsPrincipalFactory<IdentityUser, IdentityRole>>();
-            //services.AddScoped<IUserConfirmation<IdentityUser>, DefaultUserConfirmation<IdentityUser>>();
             services.AddScoped<UserManager<IdentityUser>>();
-
-            services.AddScoped<IUserRepository,UserRepository>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IWebApplicationRepository, WebApplicationRepository>();
             services.AddScoped<IWebApplicationRouteRepository, WebApplicationRouteRepository>();

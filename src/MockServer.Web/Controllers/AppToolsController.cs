@@ -11,7 +11,7 @@ public class AppToolsController : BaseController
     {
         ViewData["Url"] = url ?? "http://localhost:5000/dev/render-expression-template";
         ViewData["Method"] = method;
-        return View("Views/AppTools/HttpRequestSender.cshtml");
+        return View("/Views/AppTools/HttpRequestSender.cshtml");
     }
 
     [AllowAnonymous]

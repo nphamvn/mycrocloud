@@ -92,7 +92,7 @@ public class MockIntegrationJintHandler : RequestHandler
     }
     private IDatabaseAdapter CreateAdapter(string database)
     {
-        var findTask = _databaseRepository.Find(_webApplication.UserId, database);
+        var findTask = _databaseRepository.FindByUserId(_webApplication.UserId, database);
         findTask.Wait();
         var db = findTask.Result;
         if (db != null)

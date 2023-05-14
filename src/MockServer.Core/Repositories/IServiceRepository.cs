@@ -4,5 +4,5 @@ namespace MockServer.Core.Repositories;
 
 public interface IServiceRepository
 {
-    Task<IEnumerable<Service>> GetServices(int userid);
+    Task<IEnumerable<Service>> GetServices(string userid);
 }

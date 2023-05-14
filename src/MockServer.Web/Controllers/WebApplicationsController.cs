@@ -22,14 +22,14 @@ public class WebApplicationsController : BaseController
     public async Task<IActionResult> Index(WebApplicationIndexViewModel fm)
     {
         var vm = await _webApplicationWebService.GetIndexViewModel(fm.Search);
-        return View("Views/WebApplications/WebApplications.Index.cshtml", vm);
+        return View("/Views/WebApplications/WebApplications.Index.cshtml", vm);
     }
 
     [HttpGet("create")]
     public async Task<IActionResult> Create()
     {
         var vm = new WebApplicationCreateModel();
-        return View("Views/WebApplications/WebApplications.Create.cshtml", vm);
+        return View("/Views/WebApplications/WebApplications.Create.cshtml", vm);
     }
 
     [HttpPost("create")]
@@ -37,11 +37,11 @@ public class WebApplicationsController : BaseController
     {
         if (!ModelState.IsValid)
         {
-            return View("Views/WebApplications/WebApplications.Create.cshtml", app);
+            return View("/Views/WebApplications/WebApplications.Create.cshtml", app);
         }
         await _webApplicationWebService.Create(app);
 
-        return RedirectToAction(nameof(View), new { ProjectName = app.Name });
+        return RedirectToAction(nameof(Overview), new { ProjectName = app.Name });
     }
 
     [HttpGet("{WebApplicationName}")]
@@ -64,6 +64,6 @@ public class WebApplicationsController : BaseController
     public async Task<IActionResult> Overview(int WebApplicationId)
     {
         var vm = await _webApplicationWebService.Get(WebApplicationId);
-        return View("Views/WebApplications/WebApplications.Overview.cshtml", vm);
+        return View("/Views/WebApplications/WebApplications.Overview.cshtml", vm);
     }
 }

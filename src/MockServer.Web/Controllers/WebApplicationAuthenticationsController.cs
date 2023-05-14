@@ -24,7 +24,7 @@ public class WebApplicationAuthenticationsController: BaseController
     public async Task<IActionResult> Settings(int WebApplicationId)
     {
         var model = await _webApplicationAuthenticationWebService.GetAuthenticationSettingsModel(WebApplicationId);
-        return View("Views/WebApplications/Authentications/Settings.cshtml", model);
+        return View("/Views/WebApplications/Authentications/Settings.cshtml", model);
     }
 
     [HttpPost("settings")]
@@ -38,14 +38,14 @@ public class WebApplicationAuthenticationsController: BaseController
     public async Task<IActionResult> Schemes(int WebApplicationId)
     {
         var model = await _webApplicationAuthenticationWebService.GetIndexViewModel(WebApplicationId);
-        return View("Views/WebApplications/Authentications/SchemeList.cshtml", model);
+        return View("/Views/WebApplications/Authentications/SchemeList.cshtml", model);
     }
 
     [HttpGet("schemes/jwtbearer/new")]
     public async Task<IActionResult> NewJwtBearerScheme(int WebApplicationId)
     {
         var model = await _webApplicationAuthenticationWebService.GetCreateJwtBearerSchemeModel(WebApplicationId);
-        return View("Views/WebApplications/Authentications/SaveJwtBearerScheme.cshtml", model);
+        return View("/Views/WebApplications/Authentications/SaveJwtBearerScheme.cshtml", model);
     }
 
     [HttpPost("schemes/jwtbearer/new")]
@@ -59,7 +59,7 @@ public class WebApplicationAuthenticationsController: BaseController
     public async Task<IActionResult> EditJwtBearerScheme(int WebApplicationId, int SchemeId)
     {
         var model = await _webApplicationAuthenticationWebService.GetEditJwtBearerSchemeModel(WebApplicationId, SchemeId);
-        return View("Views/WebApplications/Authentications/SaveJwtBearerScheme.cshtml", model);
+        return View("/Views/WebApplications/Authentications/SaveJwtBearerScheme.cshtml", model);
     }
 
     [HttpPost("schemes/jwtbearer/edit/{SchemeId:int}")]
@@ -73,13 +73,13 @@ public class WebApplicationAuthenticationsController: BaseController
     public async Task<IActionResult> NewApiKeyScheme(int WebApplicationId)
     {
         var model = await _webApplicationAuthenticationWebService.GetCreateJwtBearerSchemeModel(WebApplicationId);
-        return View("Views/ProjectSettings/Auth/JWT/Create.cshtml", model);
+        return View("/Views/WebApplications/Authentications/SaveJwtBearerScheme.cshtml", model);
     }
 
     [HttpGet("schemes/apikey/edit/{SchemeId:int}")]
     public async Task<IActionResult> EditApiKeyScheme(int WebApplicationId, int SchemeId)
     {
         var model = await _webApplicationAuthenticationWebService.GetEditJwtBearerSchemeModel(WebApplicationId, SchemeId);
-        return View("Views/ProjectSettings/Auth/JWT/Create.cshtml", model);
+        return View("/Views/WebApplications/Authentications/SaveJwtBearerScheme.cshtml", model);
     }
 }

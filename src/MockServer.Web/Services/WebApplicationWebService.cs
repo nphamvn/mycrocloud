@@ -1,6 +1,5 @@
 using AutoMapper;
 using MockServer.Core.Repositories;
-using MockServer.Core.WebApplications;
 using MockServer.Web.Models.WebApplications;
 using CoreWebApplication = MockServer.Core.WebApplications.WebApplication;
 using WebApplication = MockServer.Web.Models.WebApplications.WebApplication;
@@ -24,7 +23,7 @@ public class WebApplicationWebService : BaseWebService, IWebApplicationWebServic
 
     public async Task Create(WebApplicationCreateModel app)
     {
-        var existing = await _webApplicationRepository.Find(AuthUser.Id, app.Name);
+        var existing = await _webApplicationRepository.FindByUserId(AuthUser.Id, app.Name);
         if (existing != null)
         {
             return;
@@ -47,7 +46,7 @@ public class WebApplicationWebService : BaseWebService, IWebApplicationWebServic
         var app = await _webApplicationRepository.Get(appId);
         var mapped = _mapper.Map<WebApplication>(await _webApplicationRepository.Get(appId));
         mapped.User = new() {
-            Id = app.Id
+            Id = app.WebApplicationId
         };
         return mapped;
     }
@@ -74,7 +73,7 @@ public class WebApplicationWebService : BaseWebService, IWebApplicationWebServic
         if (app != null)
         {
             app.Name = name;
-            await _webApplicationRepository.Update(app);
+            await _webApplicationRepository.Update(appId, app);
         }
     }
 }

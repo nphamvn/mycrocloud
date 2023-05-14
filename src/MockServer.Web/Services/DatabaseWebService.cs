@@ -82,7 +82,7 @@ public class DatabaseWebService : BaseWebService, IDatabaseWebService
     public Task Edit(int id, SaveDatabaseViewModel vm)
     {
         var db = _mapper.Map<Database>(vm);
-        return _databaseRepository.Update(AuthUser.Id, db);
+        return _databaseRepository.Update(id, db);
     }
 
     public async Task<string> GetData(int id)

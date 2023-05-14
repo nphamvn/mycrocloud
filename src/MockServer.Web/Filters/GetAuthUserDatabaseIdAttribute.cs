@@ -16,7 +16,7 @@ public class GetAuthUserDatabaseIdAttribute : ActionFilterAttribute
     }
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var user = context.HttpContext.User.Parse<User>();
+        var user = context.HttpContext.User.ToIdentityUser();
         var databaseRepository = context.HttpContext.RequestServices.GetService<IDatabaseRepository>();
         string databaseName = null;
         if (context.ActionArguments.ContainsKey(_databaseNameKey))
@@ -29,7 +29,7 @@ public class GetAuthUserDatabaseIdAttribute : ActionFilterAttribute
         }
         if (!string.IsNullOrEmpty(databaseName))
         {
-            var database = await databaseRepository.Find(user.Id, databaseName);
+            var database = await databaseRepository.FindByUserId(user.Id, databaseName);
             if (database != null)
             {
                 context.ActionArguments[_databaseIdKey] = database.Id;

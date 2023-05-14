@@ -7,7 +7,14 @@ public class GlobalSettings
     }
     public SqlSettings Sqlite { get; set; }
 }
-public class SqlSettings
+public class SqlSettings : DatabaseOptions
+{
+}
+public class PostgresSettings : DatabaseOptions
+{
+}
+
+public class DatabaseOptions
 {
     public string ConnectionString { get; set; }
 }

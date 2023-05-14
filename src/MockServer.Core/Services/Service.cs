@@ -4,7 +4,7 @@ namespace MockServer.Core.Services;
 
 public class Service: BaseEntity
 {
-    public int UserId { get; set; }
+    public string UserId { get; set; }
     public User User { get; set; }
     public ServiceType Type { get; set; }
     public string Name { get; set; }

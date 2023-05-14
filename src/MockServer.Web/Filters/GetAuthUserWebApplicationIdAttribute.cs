@@ -16,7 +16,7 @@ public class GetAuthUserWebApplicationIdAttribute : ActionFilterAttribute
     }
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var user = context.HttpContext.User.Parse<User>();
+        var user = context.HttpContext.User.ToIdentityUser();
         var projectRepository = context.HttpContext.RequestServices.GetService<IWebApplicationRepository>();
         string projectName = null;
         if (context.ActionArguments.ContainsKey(_projectNameKey))
@@ -29,7 +29,7 @@ public class GetAuthUserWebApplicationIdAttribute : ActionFilterAttribute
         }
         if (!string.IsNullOrEmpty(projectName))
         {
-            var project = await projectRepository.Find(user.Id, projectName);
+            var project = await projectRepository.FindByUserId(user.Id, projectName);
             if (project != null)
             {
                 context.ActionArguments[_projectIdKey] = project.Id;

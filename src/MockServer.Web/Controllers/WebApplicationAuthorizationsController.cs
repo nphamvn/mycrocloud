@@ -22,14 +22,14 @@ public class WebApplicationAuthorizationsController : BaseController
     public async Task<IActionResult> PolicyIndex(int WebApplicationId)
     {
         var model = await _webApplicationAuthorizationWebService.GetPolicyIndexViewModel(WebApplicationId);
-        return View("Views/WebApplications/Authorization/Policy/Index.cshtml", model);
+        return View("/Views/WebApplications/Authorization/Policy/Index.cshtml", model);
     }
 
     [HttpGet("policies/create")]
     public async Task<IActionResult> PolicyCreate(int WebApplicationId)
     {
         var model = await _webApplicationAuthorizationWebService.GetPolicyCreateModel(WebApplicationId);
-        return View("Views/WebApplications/Authorization/Policy/Save.cshtml", model);
+        return View("/Views/WebApplications/Authorization/Policy/Save.cshtml", model);
     }
 
     [HttpPost("policies/create")]
@@ -39,7 +39,7 @@ public class WebApplicationAuthorizationsController : BaseController
         {
             var temp = await _webApplicationAuthorizationWebService.GetPolicyCreateModel(WebApplicationId);
             model.WebApplication = temp.WebApplication;
-            return View("Views/WebApplications/Authorization/Policy/Save.cshtml", model); 
+            return View("/Views/WebApplications/Authorization/Policy/Save.cshtml", model); 
         }
         await _webApplicationAuthorizationWebService.CreatePolicy(WebApplicationId, model);
         return RedirectToAction(nameof(PolicyIndex), Request.RouteValues);
@@ -49,7 +49,7 @@ public class WebApplicationAuthorizationsController : BaseController
     public async Task<IActionResult> PolicyEdit(int PolicyId)
     {
         var model = await _webApplicationAuthorizationWebService.GetPolicyEditModel(PolicyId);
-        return View("Views/WebApplications/Authorization/Policy/Save.cshtml", model);
+        return View("/Views/WebApplications/Authorization/Policy/Save.cshtml", model);
     }
 
     [HttpPost("policies/{PolicyId:int}/edit")]
