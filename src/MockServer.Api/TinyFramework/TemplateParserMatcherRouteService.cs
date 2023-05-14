@@ -1,27 +1,21 @@
 using Microsoft.AspNetCore.Routing.Template;
-using MockServer.Core.Repositories;
-using MockServer.Api.Interfaces;
 
 namespace MockServer.Api.TinyFramework;
 
 public class TemplateParserMatcherRouteService : IRouteResolver
 {
-    private readonly ICacheService _cacheService;
-    private readonly IWebApplicationRouteRepository _requestRepository;
-    
-    public TemplateParserMatcherRouteService(ICacheService cacheService, 
-        IWebApplicationRouteRepository requestRepository)
-    {
-        _cacheService = cacheService;
-        _requestRepository = requestRepository;
-    }
+    private readonly ICollection<Route> _routes;
 
-    public async Task<RouteResolveResult> Resolve(string method, string path, ICollection<Route> routes)
+    public TemplateParserMatcherRouteService(ICollection<Route> routes)
+    {
+        this._routes = routes;
+    }
+    public async Task<RouteResolveResult> Resolve(string method, string path)
     {
         //ensure that path is ended with slash
         path = $"{path.TrimEnd('/')}/";
         int matchCount = 0;
-        foreach (var route in routes)
+        foreach (var route in _routes)
         {
             var template = TemplateParser.Parse(route.RouteTemplate);
             var matcher = new TemplateMatcher(template, new RouteValueDictionary());

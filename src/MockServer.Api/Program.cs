@@ -12,6 +12,7 @@ using Host = MockServer.Api.TinyFramework.Host;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using System.Text.Json;
 using MockServer.Core.Databases;
+using MockServer.Core.Settings;
 
 var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,7 @@ var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IFactoryService, FactoryService>();
 builder.Services.AddOptions();
 builder.Services.AddGlobalSettings(builder.Configuration);
+builder.Services.Configure<PostgresSettings>(builder.Configuration.GetSection("Database:Application"));
 builder.Services.AddOptions<VirtualHostOptions>()
                 .BindConfiguration(VirtualHostOptions.Section);
 builder.Services.Configure<DatabaseAdapterOptions>(options =>
@@ -48,7 +50,7 @@ builder.Services.AddScoped<IWebApplicationRouteRepository, WebApplicationRouteRe
 builder.Services.AddScoped<IWebApplicationRepository, WebApplicationRepository>();
 builder.Services.AddScoped<IDatabaseRepository, DatabaseRespository>();
 builder.Services.AddScoped<ICacheService, MemoryCacheService>();
-builder.Services.AddScoped<IRouteResolver, TemplateParserMatcherRouteService>();
+//builder.Services.AddScoped<IRouteResolver, TemplateParserMatcherRouteService>();
 builder.Services.AddScoped<WebApplicationResolver>();
 builder.Services.AddSingleton<DataBinderProvider>(x =>
 {

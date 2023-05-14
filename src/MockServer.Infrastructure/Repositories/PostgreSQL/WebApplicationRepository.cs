@@ -74,21 +74,22 @@ public class WebApplicationRepository : BaseRepository, IWebApplicationRepositor
         var query =
                 """
                 SELECT 
-                    id, 
+                    web_application_id, 
                     user_id, 
                     "name", 
-                    description, 
+                    description,
+                    enabled,
                     created_at, 
                     updated_at
                 FROM
                     web_application
                 WHERE
-                    id = @id;
+                    web_application_id = @web_application_id;
                 """;
         using var connection = new NpgsqlConnection(ConnectionString);
         return await connection.QuerySingleOrDefaultAsync<WebApplication>(query, new
         {
-            id = id
+            web_application_id = id
         });
     }
 

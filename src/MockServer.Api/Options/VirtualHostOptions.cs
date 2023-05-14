@@ -10,5 +10,6 @@ public class VirtualHostOptions
     public int UsernameHostIndex { get; set; }
     public string ApplicationNameSource { get; set; }
     public int ApplicationNameHostIndex { get; set; }
+    public string WebApplicationIdHeader { get; set; }
     public const string Section = "VirtualHost";
 }

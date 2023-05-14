@@ -27,7 +27,7 @@ public class Host
 
     public async Task Run()
     {
-        var coreApp = _context.Items[nameof(WebApplication)] as CoreWebApplication;
+        var coreApp = _context.Items[HttpContextItemConstants.WebApplication] as CoreWebApplication;
         ArgumentNullException.ThrowIfNull(coreApp);
         var builder = WebApplication.CreateBuilder(_provider);
         var app = builder.Build(coreApp);

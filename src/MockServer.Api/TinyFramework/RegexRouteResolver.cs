@@ -4,7 +4,13 @@ namespace MockServer.Api.TinyFramework;
 
 public class RegexRouteResolver : IRouteResolver
 {
-    public async Task<RouteResolveResult> Resolve(string method, string path, ICollection<Route> routes)
+    private readonly ICollection<Route> _routes;
+
+    public RegexRouteResolver(ICollection<Route> routes)
+    {
+        _routes = routes;
+    }
+    public async Task<RouteResolveResult> Resolve(string method, string path)
     {
         var routeTemplates = new Dictionary<string, int>();
 
@@ -12,7 +18,7 @@ public class RegexRouteResolver : IRouteResolver
         {
             return new RouteResolveResult
             {
-                Route = routes.FirstOrDefault(r => r.Id == id)
+                Route = _routes.FirstOrDefault(r => r.Id == id)
             };
         }
         else
@@ -26,7 +32,7 @@ public class RegexRouteResolver : IRouteResolver
                 {
                     var result = new RouteResolveResult
                     {
-                        Route = routes.FirstOrDefault(r => r.Id == route.Value)
+                        Route = _routes.FirstOrDefault(r => r.Id == route.Value)
                     };
 
                     // Extract the route parameter names and values

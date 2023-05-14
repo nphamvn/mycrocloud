@@ -2,42 +2,53 @@ using System.Net;
 using Microsoft.Extensions.Options;
 using MockServer.Api.Options;
 using MockServer.Core.Repositories;
-using CoreWebApplication = MockServer.Core.WebApplications.WebApplication;
 namespace MockServer.Api.Middlewares;
 
 public class WebApplicationResolver : IMiddleware
 {
-    private readonly IWebApplicationRepository _projectRepository;
+    private readonly IWebApplicationRepository _webApplicationRepository;
     private readonly VirtualHostOptions _virtualHostOptions;
     public WebApplicationResolver(
-        IWebApplicationRepository projectRepository,
+        IWebApplicationRepository webApplicationRepository,
         IOptions<VirtualHostOptions> virtualHostOptions)
     {
-        _projectRepository = projectRepository;
+        _webApplicationRepository = webApplicationRepository;
         _virtualHostOptions = virtualHostOptions.Value;
     }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        //var host = context.Request.Host.Host;
-        //var username = host.Split('.')[_virtualHostOptions.UsernameHostIndex];
-        //var appName = host.Split('.')[_virtualHostOptions.ApplicationNameHostIndex];
-        //<username>-<>.api.npham.me
-        //var app = await _projectRepository.FindByUsername(username, appName);
-        const string AppIdHeader = "X-App-Id";
-        if(!context.Request.Headers.TryGetValue(AppIdHeader, out var appId)) {
+        if(!context.Request.Headers.TryGetValue(_virtualHostOptions.WebApplicationIdHeader, out var appId)) {
             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
             await context.Response.WriteAsync($"not found");
             return;
         }
-        var app = await _projectRepository.Get(int.Parse(appId));
-        if (app == null || app.Blocked)
+        if (!int.TryParse(appId.ToString().TrimStart('0'), out var id))
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+            await context.Response.WriteAsync($"not found");
+            return;
+        }
+        var app = await _webApplicationRepository.Get(id);
+        if (app == null)
         {
             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
             await context.Response.WriteAsync($"Application '{appId}' not found");
             return;
         }
-        context.Items[typeof(CoreWebApplication).Name] = app;
+        if (app.Blocked)
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+            await context.Response.WriteAsync($"Application '{appId}' not found");
+            return;
+        }
+        if (!app.Enabled)
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+            await context.Response.WriteAsync($"Application '{appId}' not found");
+            return;
+        }
+        context.Items[HttpContextItemConstants.WebApplication] = app;
         await next.Invoke(context);
     }
 }

@@ -2,38 +2,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "MockServer.Identity",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build_ids",
-            "program": "${workspaceFolder}/MockServer.Identity/bin/Debug/net6.0/MockServer.Identity.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/MockServer.Identity",
-            "stopAtEntry": false,
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development",
-                "ASPNETCORE_URLS":"https://localhost:5001"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
-            },
-            "requireExactSource": false
-        },
-        {
             "name": "MockServer.Web",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build_web",
-            "program": "${workspaceFolder}/MockServer.Web/bin/Debug/net6.0/MockServer.Web.dll",
+            "program": "${workspaceFolder}/src/MockServer.Web/bin/Debug/net6.0/MockServer.Web.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/MockServer.Web",
+            "cwd": "${workspaceFolder}/src/MockServer.Web",
             "stopAtEntry": false,
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
                 "ASPNETCORE_URLS":"https://localhost:5002"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
+                "/Views": "${workspaceFolder}/src/MockServer.Web/Views"
             },
             "requireExactSource": false
         },
@@ -46,9 +28,9 @@
             "request": "launch",
             "preLaunchTask": "build_api",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/MockServer.Api/bin/Debug/net6.0/MockServer.Api.dll",
+            "program": "${workspaceFolder}/src/MockServer.Api/bin/Debug/net6.0/MockServer.Api.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/MockServer.Api",
+            "cwd": "${workspaceFolder}/src/MockServer.Api",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             // "serverReadyAction": {
@@ -59,7 +41,7 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
+                "/Views": "${workspaceFolder}/src/MockServer.Api/Views"
             }
         }
     ]

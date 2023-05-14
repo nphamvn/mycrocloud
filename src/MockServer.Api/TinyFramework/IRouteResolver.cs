@@ -2,7 +2,7 @@ namespace MockServer.Api.TinyFramework;
 
 public interface IRouteResolver
 {
-    Task<RouteResolveResult> Resolve(string method, string path, ICollection<Route> routes);
+    Task<RouteResolveResult> Resolve(string method, string path);
 }
 
 public class RouteResolveResult
