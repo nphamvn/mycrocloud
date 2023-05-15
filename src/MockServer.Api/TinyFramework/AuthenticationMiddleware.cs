@@ -12,7 +12,7 @@ public class AuthenticationMiddleware : IMiddleware
     }
     public async Task<MiddlewareInvokeResult> InvokeAsync(HttpContext context)
     {
-        var app = context.Items[typeof(CoreWebApplication).Name] as CoreWebApplication;
+        var app = context.Items[Constants.HttpContextItem.WebApplication] as CoreWebApplication;
         var schemes = new List<AuthenticationScheme>(this._schemeHandlerMap.Keys);
         IAuthenticationHandler handler;
         AuthenticateResult result;

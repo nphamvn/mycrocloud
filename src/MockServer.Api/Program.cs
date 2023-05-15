@@ -50,7 +50,7 @@ builder.Services.AddScoped<IWebApplicationRouteRepository, WebApplicationRouteRe
 builder.Services.AddScoped<IWebApplicationRepository, WebApplicationRepository>();
 builder.Services.AddScoped<IDatabaseRepository, DatabaseRespository>();
 builder.Services.AddScoped<ICacheService, MemoryCacheService>();
-//builder.Services.AddScoped<IRouteResolver, TemplateParserMatcherRouteService>();
+builder.Services.AddScoped<IRouteResolver, TemplateParserMatcherRouteService>();
 builder.Services.AddScoped<WebApplicationResolver>();
 builder.Services.AddSingleton<DataBinderProvider>(x =>
 {
@@ -81,18 +81,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    var virtualHostOptions = builder.Configuration.GetSection(VirtualHostOptions.Section).Get<VirtualHostOptions>();
-    if (virtualHostOptions.Enabled)
-    {
-        app.Use(async (context, next) =>
-        {
-            context.Request.Host = new HostString(virtualHostOptions.Host, virtualHostOptions.Port);
-            await next.Invoke(context);
-        });
-    }
-}
 //Enable CORS
 app.UseCors(MyAllowSpecificOrigins);
 //Validate route

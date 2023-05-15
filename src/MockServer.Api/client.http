@@ -6,6 +6,9 @@ Authorization: "Bearer token"
 ###
 GET  http://localhost:5003/todos/1
 X-Web-Application-Id: 0000000001
-###
 
+###
 GET https://jsonplaceholder.typicode.com/todos/1
+
+###
+GET  http://localhost:5003/todos/1

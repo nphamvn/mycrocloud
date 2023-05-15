@@ -2,7 +2,6 @@ using System.Net;
 using MockServer.Api.Interfaces;
 using MockServer.Core.Repositories;
 using CoreWebApplication = MockServer.Core.WebApplications.WebApplication;
-using CoreRoute = MockServer.Core.WebApplications.Route;
 using MockServer.Core.Services;
 
 namespace MockServer.Api.TinyFramework;
@@ -23,7 +22,7 @@ public class RoutingMiddleware : IMiddleware
     }
     public async Task<MiddlewareInvokeResult> InvokeAsync(HttpContext context)
     {   
-        var app = context.Items[HttpContextItemConstants.WebApplication] as CoreWebApplication;
+        var app = context.Items[Constants.HttpContextItem.WebApplication] as CoreWebApplication;
         ArgumentNullException.ThrowIfNull(app);
         ICollection<Route> registeredRoutes;
         string key = app.Id.ToString();
@@ -51,7 +50,7 @@ public class RoutingMiddleware : IMiddleware
             return MiddlewareInvokeResult.End;
         }
         var route = await _routeRepository.GetById(result.Route.Id);
-        context.Items[HttpContextItemConstants.Route] = route;
+        context.Items[Constants.HttpContextItem.Route] = route;
         context.Request.RouteValues = result.RouteValues;
         return MiddlewareInvokeResult.Next;
     }
