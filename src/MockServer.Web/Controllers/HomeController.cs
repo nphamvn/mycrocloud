@@ -15,10 +15,12 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
+        _logger.LogInformation(nameof(Index));
         return View();
     }
     public IActionResult Privacy()
     {
+        _logger.LogInformation(nameof(Privacy));
         return View();
     }
 

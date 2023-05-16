@@ -8,6 +8,7 @@ var configuration = builder.Configuration;
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
+builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 builder.Services.ConfigureServices(builder.Configuration);
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
@@ -53,16 +54,16 @@ builder.Services
     ;
 var app = builder.Build();
 
-app.Use(async (context, next) =>
-{
-    // Log the incoming request
-    var request = context.Request;
-    var message = $"Request: {request.Method} {request.Path}";
-    Console.WriteLine(message);
+// app.Use(async (context, next) =>
+// {
+//     // Log the incoming request
+//     var request = context.Request;
+//     var message = $"Request: {request.Method} {request.Path}";
+//     Console.WriteLine(message);
 
-    // Call the next middleware in the pipeline
-    await next();
-});
+//     // Call the next middleware in the pipeline
+//     await next();
+// });
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

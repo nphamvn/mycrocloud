@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using MockServer.Core.Interfaces;
 using MockServer.Core.Repositories;
-using MockServer.Core.Services;
 using MockServer.Core.Settings;
 using MockServer.Infrastructure.Repositories.PostgreSql;
 using MockServer.Web.Services;
