@@ -44,10 +44,7 @@ public class WebApplicationWebService : BaseWebService, IWebApplicationWebServic
     public async Task<WebApplication> Get(int appId)
     {
         var app = await _webApplicationRepository.Get(appId);
-        var mapped = _mapper.Map<WebApplication>(await _webApplicationRepository.Get(appId));
-        mapped.User = new() {
-            Id = app.WebApplicationId
-        };
+        var mapped = _mapper.Map<WebApplication>(app);
         return mapped;
     }
 

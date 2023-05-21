@@ -5,11 +5,6 @@
     var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
 }
 <div class="d-flex flex-column flex-shrink-0">
-    <a href="@Url.Action(nameof(WebApplicationsController.Home), "WebApplications" ,new {WebApplicationName=Model.Name})"
-        class="link-dark text-decoration-none">
-        <span class="fs-5">@Model.Name</span>
-    </a>
-    <hr class="my-1">
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
             <a href="@Url.Action(nameof(WebApplicationsController.Overview), "WebApplications" ,new {WebApplicationName=Model.Name})"

@@ -4,41 +4,36 @@ using MockServer.Core.Repositories;
 
 namespace MockServer.Web.Filters;
 
-public class ValidateProjectRequestAttribute : ActionFilterAttribute
+public class ValidateRouteWebApplicationAttribute : BaseActionFilterAttribute
 {
-    private readonly string _projectIdKey;
-    private readonly string _requestIdKey;
-    public ValidateProjectRequestAttribute(string projectIdKey, string requestIdKey)
+    private readonly string _appIdKey;
+    private readonly string _routeIdKey;
+    public ValidateRouteWebApplicationAttribute(string appIdKey, string routeIdKey)
     {
-        _projectIdKey = projectIdKey;
-        _requestIdKey = requestIdKey;
+        _appIdKey = appIdKey;
+        _routeIdKey = routeIdKey;
     }
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        int? projectId = null;
-        int? requestId = null;
-        if (context.ActionArguments.ContainsKey(_projectIdKey))
+        int appId;
+        int routeId;
+        if (BaseActionFilterAttribute.TryGetActionArgumentValue<int>(context, _appIdKey, out appId) ||
+            BaseActionFilterAttribute.TryGetRouteDataValue<int>(context, _appIdKey, out appId))
         {
-            projectId = (int)context.ActionArguments[_projectIdKey];
-        }
-        else if (context.RouteData.Values.ContainsKey(_projectIdKey))
-        {
-            projectId = Convert.ToInt32((string)context.RouteData.Values[_projectIdKey]);
+            
         }
 
-        if (context.ActionArguments.ContainsKey(_requestIdKey))
+        if (BaseActionFilterAttribute.TryGetActionArgumentValue<int>(context, _routeIdKey, out routeId) ||
+            BaseActionFilterAttribute.TryGetRouteDataValue<int>(context, _routeIdKey, out routeId))
         {
-            requestId = (int)context.ActionArguments[_requestIdKey];
+            
         }
-        else if (context.RouteData.Values.ContainsKey(_requestIdKey))
+        
+        if (appId is > 0 && routeId is > 0)
         {
-            requestId = Convert.ToInt32((string)context.RouteData.Values[_requestIdKey]);
-        }
-        if (projectId is > 0 && requestId is > 0)
-        {
-            var requestRepository = context.HttpContext.RequestServices.GetService<IWebApplicationRouteRepository>();
-            var request = await requestRepository.GetById(requestId.Value);
-            if (request == null || request.WebApplicationId != projectId)
+            var webApplicationRouteRepository = context.HttpContext.RequestServices.GetService<IWebApplicationRouteRepository>();
+            var route = await webApplicationRouteRepository.GetById(routeId);
+            if (route == null || route.WebApplicationId != appId)
             {
                 context.Result = new BadRequestObjectResult(context.ModelState);
                 return;

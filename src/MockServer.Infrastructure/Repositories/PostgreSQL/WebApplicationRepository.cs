@@ -48,7 +48,7 @@ public class WebApplicationRepository : BaseRepository, IWebApplicationRepositor
         var query =
                 """
                 SELECT 
-                    id, 
+                    web_application_id WebApplicationId,
                     user_id, 
                     "name", 
                     description, 
@@ -74,7 +74,7 @@ public class WebApplicationRepository : BaseRepository, IWebApplicationRepositor
         var query =
                 """
                 SELECT 
-                    web_application_id, 
+                    web_application_id WebApplicationId, 
                     user_id, 
                     "name", 
                     description,
@@ -128,7 +128,7 @@ public class WebApplicationRepository : BaseRepository, IWebApplicationRepositor
         var sql =
                 """
                 SELECT 
-                    id, 
+                    web_application_id, 
                     user_id, 
                     "name", 
                     description, 

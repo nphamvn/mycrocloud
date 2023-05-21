@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MockServer.Core.Repositories;
 using MockServer.Core.Settings;
 using MockServer.Infrastructure.Repositories.PostgreSql;
+using MockServer.Web.Areas.Identity.Services;
 using MockServer.Web.Services;
 using MockServer.Web.Services.Interfaces;
 
@@ -23,14 +24,15 @@ namespace MockServer.Web.Extentions
                 var connectionString = configuration.GetValue<string>("Database:Identity:ConnectionString");
                 if (provider == "PostgresSql")
                 {
-                    var assemblyName = typeof(Program).Assembly.GetName().Name;
-                    options.UseNpgsql(connectionString, b => b.MigrationsAssembly(assemblyName));
+                    options.UseNpgsql(connectionString, b => b.MigrationsAssembly(typeof(Program).Assembly.GetName().Name));
                 }
             });
             services.AddIdentityCore<IdentityUser>()
                     .AddEntityFrameworkStores<IdentityDbContext>();
             services.AddScoped<UserManager<IdentityUser>>();
-            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<SignInManager<IdentityUser>>();
+            services.AddTransient<IEmailSender, SendGridEmailSender>(); 
+
             services.AddScoped<IWebApplicationRepository, WebApplicationRepository>();
             services.AddScoped<IWebApplicationRouteRepository, WebApplicationRouteRepository>();
             services.AddScoped<IWebApplicationAuthenticationSchemeRepository, WebApplicationAuthenticationSchemeRepository>();

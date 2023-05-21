@@ -20,38 +20,27 @@ public class WebApplicationRouteRepository : BaseRepository, IWebApplicationRout
                 """
                 INSERT INTO web_application_route(
                     web_application_id,
-                    integration_type,
                     name,
                     method,
                     path,
-                    description,
-                    "authorization",
-                    request_query,
-                    request_header,
-                    request_body)
+                    description)
                 VALUES (
                     @web_application_id,
-                    @integration_type,
                     @name, 
                     @method,
                     @path, 
-                    @description,
-                    @authorization,
-                    @request_query,
-                    @request_header,
-                    @request_body);
-                RETURNING Id;
+                    @description)
+                RETURNING route_id;
                 """;
 
         using var connection = new NpgsqlConnection(ConnectionString);
         return await connection.QuerySingleAsync<int>(query, new
         {
-            WebApplicationId = appId,
-            IntegrationType = (int)route.IntegrationType,
-            Name = route.Name,
-            Method = route.Method,
-            Path = route.Path,
-            Description = route.Description
+            web_application_id = appId,
+            name = route.Name,
+            method = route.Method,
+            path = route.Path,
+            description = route.Description
         });
     }
 
@@ -76,28 +65,30 @@ public class WebApplicationRouteRepository : BaseRepository, IWebApplicationRout
     public async Task<Route> Find(int appId, string method, string path)
     {
         var query =
-                """
-                SELECT
-                    r.Id,
-                    r.WebApplicationId,
-                    r.IntegrationType,
-                    r.Name,
-                    r.Method,
-                    r.Path,
-                    r.Description,
-                    r.Authorization
-                FROM
-                    WebApplicationRoute r
-                INNER JOIN
-                    WebApplication p ON r.WebApplicationId = p.Id AND r.WebApplicationId = @WebApplicationId
-                WHERE
-                    upper(r.method) = upper(@method) AND 
-                    upper(r.Path) = upper(@path);
-                """;
+"""
+SELECT
+    route_id,
+    web_application_id,
+    integration_type,
+    name,
+    method,
+    path,
+    description,
+    "authorization",
+    request_query,
+    request_header,
+    request_body
+FROM
+    web_application_route
+WHERE
+    web_application_id = @web_application_id AND
+    upper(method) = upper(@method) AND 
+    upper(path) = upper(@path);
+""";
         using var connection = new NpgsqlConnection(ConnectionString);
         return await connection.QuerySingleOrDefaultAsync<Route>(query, new
         {
-            WebApplicationId = appId,
+            web_application_id = appId,
             method = method,
             path = path
         });
@@ -106,24 +97,24 @@ public class WebApplicationRouteRepository : BaseRepository, IWebApplicationRout
     public async Task<Route> GetById(int id)
     {
         var query =
-                """
-                SELECT
-                    r.Id,
-                    r.WebApplicationId,
-                    r.IntegrationType,
-                    r.Name,
-                    r.Method,
-                    r.Path,
-                    r.Description,
-                    r.Authorization,
-                    r.RequestQueries,
-                    r.RequestHeaders,
-                    r.RequestBody
-                FROM 
-                    WebApplicationRoute r
-                WHERE 
-                    r.Id = @Id
-                """;
+"""
+SELECT
+    route_id RouteId,
+    web_application_id WebApplicationId,
+    integration_type,
+    name,
+    method,
+    path,
+    description,
+    "authorization",
+    request_query,
+    request_header,
+    request_body
+FROM
+    web_application_route
+WHERE 
+    route_id = @route_id
+""";
         using var connection = new NpgsqlConnection(ConnectionString);
         SqlMapper.AddTypeHandler(new JsonTypeHandler<Authorization>());
         SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RequestQueryValidationItem>>());
@@ -131,32 +122,32 @@ public class WebApplicationRouteRepository : BaseRepository, IWebApplicationRout
         SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<RequestBodyValidationItem>>());
         return await connection.QuerySingleOrDefaultAsync<Route>(query, new
         {
-            Id = id
+            route_id = id
         });
     }
 
     public async Task<IEnumerable<Route>> GetByApplicationId(int appId, string searchTerm, string sort)
     {
         var query =
-                """
-                SELECT 
-                    route_id,
-                    web_application_id,
-                    integration_type,
-                    "name",
-                    "method",
-                    "path",
-                    description,
-                    "authorization",
-                    request_query,
-                    request_header,
-                    request_body
-                FROM
-                    web_application_route
-                WHERE
-                    web_application_id = @web_application_id
-                /**/
-                """;
+"""
+SELECT 
+    route_id RouteId,
+    web_application_id,
+    integration_type,
+    "name",
+    "method",
+    "path",
+    description,
+    "authorization",
+    request_query,
+    request_header,
+    request_body
+FROM
+    web_application_route
+WHERE
+    web_application_id = @web_application_id
+/**/
+""";
         if (!string.IsNullOrEmpty(searchTerm))
         {
             query +=

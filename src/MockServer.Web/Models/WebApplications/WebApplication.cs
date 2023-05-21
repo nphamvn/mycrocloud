@@ -6,7 +6,7 @@ namespace MockServer.Web.Models.WebApplications;
 
 public class WebApplication
 {
-    public int Id { get; set; }
+    public int WebApplicationId { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
     public WebApplicationAccessibility Accessibility { get; set; }

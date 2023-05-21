@@ -16,9 +16,14 @@ namespace MockServer.Web.Controllers.Api;
 public class WebApplicationRoutesApiController : ApiController
 {
     private readonly IWebApplicationRouteWebService _webApplicationRouteWebService;
-    public WebApplicationRoutesApiController(IWebApplicationRouteWebService webApplicationRouteWebService)
+    private readonly IWebApplicationWebService _webApplicationWebService;
+
+    public WebApplicationRoutesApiController(
+        IWebApplicationRouteWebService webApplicationRouteWebService,
+        IWebApplicationWebService webApplicationWebService)
     {
         _webApplicationRouteWebService = webApplicationRouteWebService;
+        _webApplicationWebService = webApplicationWebService;
     }
 
     [HttpGet]
@@ -27,7 +32,7 @@ public class WebApplicationRoutesApiController : ApiController
         var routes = await _webApplicationRouteWebService.GetList(WebApplicationId, SearchTerm, Sort);
         return Ok(routes.Select(r => new
         {
-            r.Id,
+            r.RouteId,
             r.Name,
             r.Method,
             r.Path,
@@ -37,22 +42,17 @@ public class WebApplicationRoutesApiController : ApiController
     }
 
     [HttpGet("{RouteId:int}")]
-    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
+    [ValidateRouteWebApplication(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> Get(int RouteId)
     {
-        var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
+        var route = await _webApplicationRouteWebService.GetDetails(RouteId);
         return Ok(new
         {
-            vm.Id,
-            vm.Name,
-            vm.Method,
-            vm.Path,
-            vm.IntegrationType,
-            Authorization = new
-            {
-                Type = (int)vm.Authorization.Type,
-                Policies = vm.Authorization.PolicyIds
-            }
+            route.RouteId,
+            route.Name,
+            route.Method,
+            route.Path,
+            route.Description
         });
     }
 
@@ -71,7 +71,7 @@ public class WebApplicationRoutesApiController : ApiController
     }
 
     [HttpPost("edit/{RouteId:int}")]
-    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
+    [ValidateRouteWebApplication(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> Edit(int RouteId, [FromBody] RouteSaveModel route)
     {
         if (!await _webApplicationRouteWebService.ValidateEdit(RouteId, route, ModelState))
@@ -84,7 +84,7 @@ public class WebApplicationRoutesApiController : ApiController
     }
 
     [HttpPost("delete")]
-    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
+    [ValidateRouteWebApplication(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> Delete(int RouteId)
     {
         await _webApplicationRouteWebService.Delete(RouteId);
@@ -92,7 +92,7 @@ public class WebApplicationRoutesApiController : ApiController
     }
 
     [HttpGet("{RouteId:int}/mock-integration")]
-    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
+    [ValidateRouteWebApplication(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> MockIntegration(int RouteId)
     {
         var integration = await _webApplicationRouteWebService.GetMockIntegration(RouteId);
@@ -103,7 +103,7 @@ public class WebApplicationRoutesApiController : ApiController
     }
 
     [HttpPost("{RouteId:int}/mock-integration")]
-    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
+    [ValidateRouteWebApplication(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> MockIntegration(int RouteId, MockIntegrationSaveModel integration)
     {
         await _webApplicationRouteWebService.SaveMockIntegration(RouteId, integration);

@@ -15,9 +15,14 @@ public class WebApplicationRoutesController : Controller
 {
     private readonly string IndexRender = "vue";
     private readonly IWebApplicationRouteWebService _webApplicationRouteWebService;
-    public WebApplicationRoutesController(IWebApplicationRouteWebService webApplicationRouteWebService)
+    private readonly IConfiguration _configuration;
+
+    public WebApplicationRoutesController(
+        IWebApplicationRouteWebService webApplicationRouteWebService,
+        IConfiguration configuration)
     {
         _webApplicationRouteWebService = webApplicationRouteWebService;
+        _configuration = configuration;
     }
 
     #region Regular MVC
@@ -46,7 +51,7 @@ public class WebApplicationRoutesController : Controller
     }
 
     [HttpGet("edit/{RouteId:int}")]
-    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
+    [ValidateRouteWebApplication(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> Edit(int RouteId, string tab = "overview")
     {
         var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
@@ -55,7 +60,7 @@ public class WebApplicationRoutesController : Controller
     }
 
     [HttpPost("edit/{RouteId:int}")]
-    [ValidateProjectRequest(RouteName.WebApplicationId, RouteName.RouteId)]
+    [ValidateRouteWebApplication(RouteName.WebApplicationId, RouteName.RouteId)]
     public async Task<IActionResult> Edit(int WebApplicationId, int RouteId, RouteViewModel vm)
     {
         return Ok(vm);

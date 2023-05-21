@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc.Filters;
-using MockServer.Core.Identity;
 using MockServer.Core.Repositories;
 using MockServer.Web.Extentions;
 
@@ -7,32 +6,32 @@ namespace MockServer.Web.Filters;
 
 public class GetAuthUserWebApplicationIdAttribute : ActionFilterAttribute
 {
-    private readonly string _projectNameKey;
-    private readonly string _projectIdKey;
-    public GetAuthUserWebApplicationIdAttribute(string projectName, string projectId)
+    private readonly string _appNameKey;
+    private readonly string _setKey;
+    public GetAuthUserWebApplicationIdAttribute(string appNameKey, string setKey)
     {
-        _projectNameKey = projectName;
-        _projectIdKey = projectId;
+        _appNameKey = appNameKey;
+        _setKey = setKey;
     }
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var user = context.HttpContext.User.ToIdentityUser();
-        var projectRepository = context.HttpContext.RequestServices.GetService<IWebApplicationRepository>();
-        string projectName = null;
-        if (context.ActionArguments.ContainsKey(_projectNameKey))
+        var webApplicationRepository = context.HttpContext.RequestServices.GetService<IWebApplicationRepository>();
+        string appName = null;
+        if (context.ActionArguments.ContainsKey(_appNameKey))
         {
-            projectName = (string)context.ActionArguments[_projectNameKey];
+            appName = (string)context.ActionArguments[_appNameKey];
         }
-        else if (context.RouteData.Values.ContainsKey(_projectNameKey))
+        else if (context.RouteData.Values.ContainsKey(_appNameKey))
         {
-            projectName = (string)context.RouteData.Values[_projectNameKey];
+            appName = (string)context.RouteData.Values[_appNameKey];
         }
-        if (!string.IsNullOrEmpty(projectName))
+        if (!string.IsNullOrEmpty(appName))
         {
-            var project = await projectRepository.FindByUserId(user.Id, projectName);
-            if (project != null)
+            var app = await webApplicationRepository.FindByUserId(user.Id, appName);
+            if (app != null)
             {
-                context.ActionArguments[_projectIdKey] = project.Id;
+                context.ActionArguments[_setKey] = app.WebApplicationId;
             }
         }
         await base.OnActionExecutionAsync(context, next);

@@ -66,7 +66,7 @@
                                     <small>Url</small>
                                     <div class="input-group input-group-sm">
                                         <input type="text" class="form-control"
-                                            :value="openingRoute.method + ' ' + '@(string.Format("https://u{0}-{1}.mockserver.com", Model.WebApplication.User.Id, Model.WebApplication.Name))' + '/' + openingRoute.path"
+                                            :value="openingRoute.method + ' ' + '@(string.Format("https://wa-{0}.mockserver.com", Model.WebApplication.WebApplicationId.ToString("D10")))' + '/' + openingRoute.path"
                                             readonly>
                                         <button type="button" class="input-group-text ">
                                             <i class="bi bi-clipboard"></i>
@@ -541,7 +541,7 @@
             const mode = ref();
             const openingRouteId = ref(0);
             const searchTerm = ref('');
-            const RouteBaseUrl = '@string.Format("https://u{0}-{1}.mockserver.com", Model.WebApplication.User.Id, Model.WebApplication.Name)';
+            const RouteBaseUrl = '@string.Format("https://wa-{0}.mockserver.com", Model.WebApplication.WebApplicationId)';
             const openRoute = async id => {
                 if (mode.value !== 'EDIT') {
                     mode.value = 'EDIT';
@@ -668,7 +668,7 @@
             onMounted(() => {
                 webapp.value = JSON.parse('@Html.Raw(Json.Serialize(Model.WebApplication))')
                 routes.value = JSON.parse('@Html.Raw(Json.Serialize(Model.Routes.Select(r => new {
-                    r.Id,
+                    Id = r.RouteId,
                     r.Name,
                     r.Method,
                     r.Path

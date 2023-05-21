@@ -1,4 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Identity;
 using MockServer.Web.Extentions;
 using Serilog;
@@ -14,8 +13,8 @@ builder.Services.ConfigureServices(builder.Configuration);
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 //builder.Services.AddServerSideBlazor();
-JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 builder.Services
     .AddAuthentication(options =>
     {
@@ -26,24 +25,24 @@ builder.Services
     .AddCookie(IdentityConstants.ApplicationScheme, options => {
 
     })
-    .AddCookie(IdentityConstants.ExternalScheme, options => {
-
-    })
-    .AddOpenIdConnect("Auth0", options => {
+    .AddCookie(IdentityConstants.ExternalScheme)
+    .AddCookie(IdentityConstants.TwoFactorUserIdScheme)
+    .AddCookie(IdentityConstants.TwoFactorRememberMeScheme)
+    .AddOpenIdConnect("Auth0", "Auth0", options => {
         options.Authority = $"https://{configuration["Auth0:Domain"]}";
         options.ClientId = configuration["Auth0:ClientId"];
         options.ClientSecret = configuration["Auth0:ClientSecret"];
         options.CallbackPath = new PathString("/auth0-callback");
         options.SignInScheme = IdentityConstants.ExternalScheme;
     })
-    .AddOpenIdConnect("Google", options => {
+    .AddOpenIdConnect("Google", "Google", options => {
         options.Authority = "https://accounts.google.com";
         options.ClientId = configuration["Google:ClientId"];
         options.ClientSecret = configuration["Google:ClientSecret"];
         options.CallbackPath = new PathString("/signin-google");
         options.SignInScheme = IdentityConstants.ExternalScheme;
     })
-    .AddOpenIdConnect("Microsoft", options => {
+    .AddOpenIdConnect("Microsoft", "Microsoft", options => {
         options.Authority = $"https://login.microsoftonline.com/{configuration["Microsoft:TenantId"]}/v2.0";
         options.ClientId = configuration["Microsoft:ClientId"];
         options.ClientSecret = configuration["Microsoft:ClientSecret"];
@@ -54,16 +53,15 @@ builder.Services
     ;
 var app = builder.Build();
 
-// app.Use(async (context, next) =>
-// {
-//     // Log the incoming request
-//     var request = context.Request;
-//     var message = $"Request: {request.Method} {request.Path}";
-//     Console.WriteLine(message);
-
-//     // Call the next middleware in the pipeline
-//     await next();
-// });
+app.Use(async (context, next) =>
+{
+    // Log the incoming request
+    var request = context.Request;
+    var message = $"{request.Method} {request.Scheme}://{request.Host}{request.Path}";
+    app.Logger.LogInformation(message);
+    // Call the next middleware in the pipeline
+    await next();
+});
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -83,5 +81,6 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapRazorPages();
 //app.MapBlazorHub();
 app.Run();

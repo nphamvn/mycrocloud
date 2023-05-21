@@ -19,6 +19,7 @@ public interface IWebApplicationRouteWebService
     Task<RouteSaveModel> GetCreateRouteModel(int appId);
     Task Delete(int routeId);
     Task<RouteViewModel> GetViewModel(int routeId);
+    Task<RouteViewModel> GetDetails(int routeId);
     Task<AuthorizationViewModel> GetAuthorizationViewModel(int appId, int requestId);
     Task AttachAuthorization(int requestId, AuthorizationSaveModel auth);
     Task<MockIntegrationViewModel> GetMockIntegration(int requestId);

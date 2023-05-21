@@ -7,7 +7,7 @@ namespace MockServer.Web.Models.WebApplications.Routes;
 
 public class RouteViewModel
 {
-    public int Id { get; set; }
+    public int RouteId { get; set; }
     public string Name { get; set; }
     public RouteIntegrationType IntegrationType { get; set; }
     public string Path { get; set; }

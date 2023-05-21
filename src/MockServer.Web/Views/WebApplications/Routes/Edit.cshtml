@@ -5,7 +5,7 @@
 @model MockServer.Web.Models.WebApplications.Routes.RouteViewModel
 @{
     ViewData["WebApplicationName"] = Model.WebApplication.Name;
-    ViewData["RouteId"] = Model.Id;
+    ViewData["RouteId"] = Model.RouteId;
     var tab = ViewData["Tab"] as string;
 }
 <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -498,7 +498,7 @@
     function initOverviewScript() {
         $('.js-basic-edit-button').click(function () {
             $.get({
-                url: '@Url.Action(nameof(WebApplicationRoutesController.Edit), "ProjectRequests", new {ProjectName = Model.WebApplication.Name, RequestId = Model.Id})',
+                url: '@Url.Action(nameof(WebApplicationRoutesController.Edit), "ProjectRequests", new {ProjectName = Model.WebApplication.Name, RequestId = Model.RouteId})',
                 success: function (data) {
                     const html = data;
                     const partial = $('<div></div>').html(data);
@@ -513,7 +513,7 @@
                                 Path: $('input[name=Path]', modal).val()
                             };
                             $.post({
-                                url: '@Url.Action(nameof(WebApplicationRoutesController.Edit), "ProjectRequests", new {ProjectName = Model.WebApplication.Name, Model.Id})',
+                                url: '@Url.Action(nameof(WebApplicationRoutesController.Edit), "ProjectRequests", new {ProjectName = Model.WebApplication.Name, Model.RouteId})',
                                 data: request,
                                 success: function (data) {
                                     $('.js-save-button', modal).off('click');

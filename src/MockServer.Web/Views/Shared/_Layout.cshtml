@@ -50,17 +50,8 @@
                             <a class="nav-link text-white" href="@Url.Action(nameof(FunctionsController.Index), "Functions")">Functions</a>
                         </li>
                     </ul>
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        @using (Html.BeginForm(nameof(AccountController.Logout), "Account", null, FormMethod.Post))
-                        {
-                            <button class="btn text-white" type="submit">Logout</button>
-                        }
-                    }
-                    else
-                    {
-                        <a class="nav-link text-white"
-                        href="@Url.Action(nameof(AccountController.Login), "Account")">Login</a>
+                    @{
+                        await Html.RenderPartialAsync("_LoginPartial");
                     }
                 </div>
             </div>

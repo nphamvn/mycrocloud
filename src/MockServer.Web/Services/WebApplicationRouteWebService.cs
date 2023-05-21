@@ -69,7 +69,7 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
             new("Allow Anonymous", nameof(AuthorizationType.AllowAnonymous)),
             new("Authorize", nameof(AuthorizationType.Authorize))
         };
-        var policies = await _webApplicationAuthorizationPolicyRepository.GetAll(vm.WebApplication.Id);
+        var policies = await _webApplicationAuthorizationPolicyRepository.GetAll(vm.WebApplication.WebApplicationId);
         vm.Authorization.PolicySelectListItem = policies
                         .Select(p => new SelectListItem
                         {
@@ -219,6 +219,14 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
 
     public async Task<IEnumerable<RouteIndexItem>> GetList(int appId, string searchTerm, string sort)
     {
-        return _mapper.Map<IEnumerable<RouteIndexItem>>(await _webApplicationRouteRepository.GetByApplicationId(appId, searchTerm, sort));
+        var routes = await _webApplicationRouteRepository.GetByApplicationId(appId, searchTerm, sort);
+        return _mapper.Map<IEnumerable<RouteIndexItem>>(routes);
+    }
+
+    public async Task<RouteViewModel> GetDetails(int routeId)
+    {
+        var route = await _webApplicationRouteRepository.GetById(routeId);
+        var vm = _mapper.Map<RouteViewModel>(route);
+        return vm;
     }
 }
