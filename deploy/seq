@@ -1,5 +1,10 @@
-docker run --name mockserver.seq -d --restart unless-stopped -e ACCEPT_EULA=Y -e SEQ_FIRSTRUN_ADMINPASSWORDHASH=oaDB2eaqTAtT6W -p 5004:80 -p 5341:5341 datalust/seq
-
-docker run --name mockserver.seq -d --restart unless-stopped -e ACCEPT_EULA=Y -e SEQ_FIRSTRUN_ADMINPASSWORDHASH="FNQTZOU+2tEkuU+xFDHgS/8CXPdNllMFG4T/USrDYo7fXnhJYg==" -p 5341:5341 -p 5004:80 datalust/seq
-oaDB2eaqTAtT6W
-FNQTZOU+2tEkuU+xFDHgS/8CXPdNllMFG4T/USrDYo7fXnhJYg==
+docker run \
+    --name mockserver-seq \
+    -d --restart unless-stopped \
+    -e ACCEPT_EULA=Y \
+    -e SEQ_FIRSTRUN_ADMINPASSWORDHASH="FNQTZOU+2tEkuU+xFDHgS/8CXPdNllMFG4T/USrDYo7fXnhJYg==" \
+    --network mockserver-network \
+    -p 5341:5341 \
+    -p 5004:80 \
+    -v mockserver-seq-data \
+    datalust/seq
