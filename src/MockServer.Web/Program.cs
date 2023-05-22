@@ -23,27 +23,31 @@ builder.Services
         options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
         options.DefaultChallengeScheme = IdentityConstants.ExternalScheme;
     })
-    .AddCookie(IdentityConstants.ApplicationScheme, options => {
+    .AddCookie(IdentityConstants.ApplicationScheme, options =>
+    {
 
     })
     .AddCookie(IdentityConstants.ExternalScheme)
     .AddCookie(IdentityConstants.TwoFactorUserIdScheme)
     .AddCookie(IdentityConstants.TwoFactorRememberMeScheme)
-    .AddOpenIdConnect("Auth0", "Auth0", options => {
+    .AddOpenIdConnect("Auth0", "Auth0", options =>
+    {
         options.Authority = $"https://{configuration["Auth0:Domain"]}";
         options.ClientId = configuration["Auth0:ClientId"];
         options.ClientSecret = configuration["Auth0:ClientSecret"];
         options.CallbackPath = new PathString("/auth0-callback");
         options.SignInScheme = IdentityConstants.ExternalScheme;
     })
-    .AddOpenIdConnect("Google", "Google", options => {
+    .AddOpenIdConnect("Google", "Google", options =>
+    {
         options.Authority = "https://accounts.google.com";
         options.ClientId = configuration["Google:ClientId"];
         options.ClientSecret = configuration["Google:ClientSecret"];
         options.CallbackPath = new PathString("/signin-google");
         options.SignInScheme = IdentityConstants.ExternalScheme;
     })
-    .AddOpenIdConnect("Microsoft", "Microsoft", options => {
+    .AddOpenIdConnect("Microsoft", "Microsoft", options =>
+    {
         options.Authority = $"https://login.microsoftonline.com/{configuration["Microsoft:TenantId"]}/v2.0";
         options.ClientId = configuration["Microsoft:ClientId"];
         options.ClientSecret = configuration["Microsoft:ClientSecret"];
@@ -53,26 +57,15 @@ builder.Services
     })
     ;
 var app = builder.Build();
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
-
-app.Use(async (context, next) =>
-{
-    // Log the incoming request
-    var request = context.Request;
-    var message = $"{request.Method} {request.Scheme}://{request.Host}{request.Path}";
-    app.Logger.LogInformation(message);
-    // Call the next middleware in the pipeline
-    await next();
-});
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    });
     app.UseHsts();
 }
 
