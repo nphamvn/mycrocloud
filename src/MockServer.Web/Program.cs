@@ -15,6 +15,15 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 //builder.Services.AddServerSideBlazor();
+Func<Microsoft.AspNetCore.Authentication.OpenIdConnect.RedirectContext, Task> redirectToIdentityProvider = (ctx) =>
+{
+    const string localhost = "localhost";
+    if (!ctx.ProtocolMessage.RedirectUri.StartsWith(Uri.UriSchemeHttps) && !ctx.ProtocolMessage.RedirectUri.Contains(localhost))
+    {
+        ctx.ProtocolMessage.RedirectUri = ctx.ProtocolMessage.RedirectUri.Replace(Uri.UriSchemeHttp, Uri.UriSchemeHttps);
+    }
+    return Task.CompletedTask;
+};
 builder.Services
     .AddAuthentication(options =>
     {
@@ -34,6 +43,9 @@ builder.Services
         options.ClientSecret = configuration["Auth0:ClientSecret"];
         options.CallbackPath = new PathString("/auth0-callback");
         options.SignInScheme = IdentityConstants.ExternalScheme;
+        options.Events = new () {
+            OnRedirectToIdentityProvider = redirectToIdentityProvider
+        };
     })
     .AddOpenIdConnect("Google", "Google", options => {
         options.Authority = "https://accounts.google.com";
@@ -41,6 +53,9 @@ builder.Services
         options.ClientSecret = configuration["Google:ClientSecret"];
         options.CallbackPath = new PathString("/signin-google");
         options.SignInScheme = IdentityConstants.ExternalScheme;
+        options.Events = new () {
+            OnRedirectToIdentityProvider = redirectToIdentityProvider
+        };
     })
     .AddOpenIdConnect("Microsoft", "Microsoft", options => {
         options.Authority = $"https://login.microsoftonline.com/{configuration["Microsoft:TenantId"]}/v2.0";
@@ -49,6 +64,9 @@ builder.Services
         options.CallbackPath = new PathString("/signin-microsoft");
         options.SignInScheme = IdentityConstants.ExternalScheme;
         options.Scope.Add("email");
+        options.Events = new () {
+            OnRedirectToIdentityProvider = redirectToIdentityProvider
+        };
     })
     ;
 var app = builder.Build();
