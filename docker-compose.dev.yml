@@ -1,0 +1,42 @@
+version: '3'
+services:
+  db:
+    image: postgres:15.2-alpine
+    container_name: mockserver-postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - mockserver-postgres-volume:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=YJVeuWV5Mj7eDr
+    networks:
+      - mockserver-network
+  pgadmin4:
+    image: dpage/pgadmin4
+    container_name: mockserver-pgadmin4
+    ports:
+      - 5050:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=pvnam95@hotmail.com
+      - PGADMIN_DEFAULT_PASSWORD=9xs3wVYkwSSSiG
+    networks:
+      - mockserver-network
+  seq:
+    image: datalust/seq
+    container_name: mockserver-seq
+    ports:
+      - 5341:5341
+      - 5004:80
+    volumes:
+      - mockserver-seq-data
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_ADMINPASSWORDHASH="FNQTZOU+2tEkuU+xFDHgS/8CXPdNllMFG4T/USrDYo7fXnhJYg=="
+    networks:
+      - mockserver-network
+volumes:
+  mockserver-postgres-volume:
+  mockserver-seq-data:
+networks:
+  mockserver-network:
