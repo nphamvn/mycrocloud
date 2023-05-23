@@ -1,24 +1,22 @@
 using System.Net;
-using Microsoft.Extensions.Options;
-using MockServer.Api.Options;
 using MockServer.Core.Repositories;
 namespace MockServer.Api.Middlewares;
 
 public class WebApplicationResolver : IMiddleware
 {
     private readonly IWebApplicationRepository _webApplicationRepository;
-    private readonly VirtualHostOptions _virtualHostOptions;
+    private readonly IConfiguration _configuration;
     public WebApplicationResolver(
         IWebApplicationRepository webApplicationRepository,
-        IOptions<VirtualHostOptions> virtualHostOptions)
+        IConfiguration configuration)
     {
         _webApplicationRepository = webApplicationRepository;
-        _virtualHostOptions = virtualHostOptions.Value;
+        _configuration = configuration;
     }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        if(!context.Request.Headers.TryGetValue(_virtualHostOptions.WebApplicationIdHeader, out var appId)) {
+        if(!context.Request.Headers.TryGetValue(_configuration["WebApplicationIdHeader"], out var appId)) {
             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
             await context.Response.WriteAsync($"The requested resource was not found");
             return;

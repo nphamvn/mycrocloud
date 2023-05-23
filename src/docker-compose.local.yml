@@ -35,6 +35,12 @@ services:
       - SEQ_FIRSTRUN_ADMINPASSWORDHASH="FNQTZOU+2tEkuU+xFDHgS/8CXPdNllMFG4T/USrDYo7fXnhJYg=="
     networks:
       - mockserver-network
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.Web
+    networks:
+      - mockserver-network
 volumes:
   mockserver-postgres-volume:
   mockserver-seq-data:

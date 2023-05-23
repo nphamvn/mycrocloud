@@ -9,20 +9,17 @@ namespace MockServer.Api.TinyFramework;
 
 public class WebApplication : IWebApplication
 {
-    public string Id { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public User User { get; set; }
     public Dictionary<AuthenticationScheme, IAuthenticationHandler> AuthenticationSchemeHandlerMap { get; set; } = new();
     public List<string> UseMiddlewares { get; set; } = new();
     private Dictionary<string, IMiddleware> _useMiddlewares = new();
     public IServiceProvider ServiceProvider { get; set; }
     public IFactoryService FactoryService { get; set; }
-
+    public Func<HttpContext, Task> OnStartHandleRequest { get; set; } = (ctx) => Task.CompletedTask;
+    public Func<HttpContext, Task> OnCompleteHandleRequest { get; set; } = (ctx) => Task.CompletedTask;
     //Used to be mapped with AutoMapper
     public WebApplication()
     {
-        
+
     }
     //Used to create instance manually
     public WebApplication(IServiceProvider provider)
@@ -30,19 +27,20 @@ public class WebApplication : IWebApplication
         ServiceProvider = provider;
         FactoryService = ServiceProvider.GetRequiredService<IFactoryService>();
     }
-    
-    public static WebApplicationBuilder CreateBuilder(IServiceProvider provider){
+
+    public static WebApplicationBuilder CreateBuilder(IServiceProvider provider)
+    {
         return new WebApplicationBuilder(provider);
     }
 
-    public void UseMiddleware(IMiddleware middleware){
-        _useMiddlewares.Add(middleware.GetType().Name , middleware);
+    public void UseMiddleware(IMiddleware middleware)
+    {
+        _useMiddlewares.Add(middleware.GetType().Name, middleware);
     }
 
     public async Task Handle(HttpContext context)
     {
-        await BeforeHandle(context);
-
+        await OnStartHandleRequest(context);
         MiddlewareInvokeResult result = default;
         IMiddleware middleware;
         if (_useMiddlewares.ContainsKey(nameof(RoutingMiddleware)))
@@ -93,16 +91,6 @@ public class WebApplication : IWebApplication
 
         await handler.Handle(context);
 
-        await AfterHandle(context);
-    }
-
-    private async Task BeforeHandle(HttpContext context)
-    {
-
-    }
-
-    private async Task AfterHandle(HttpContext context)
-    {
-        
+        await OnCompleteHandleRequest(context);
     }
 }

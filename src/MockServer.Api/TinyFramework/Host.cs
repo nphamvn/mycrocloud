@@ -31,10 +31,6 @@ public class Host
         ArgumentNullException.ThrowIfNull(coreApp);
         var builder = WebApplication.CreateBuilder(_provider);
         var app = builder.Build(coreApp);
-        app.User = new User
-        {
-            Id = coreApp.UserId
-        };
         app.UseMiddleware<RoutingMiddleware>();
         if (coreApp.UseMiddlewares.Contains(nameof(AuthenticationMiddleware)))
         {
