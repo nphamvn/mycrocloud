@@ -41,6 +41,12 @@ services:
       dockerfile: Dockerfile.Web
     networks:
       - mockserver-network
+  api-gateways:
+    build:
+      context: .
+      dockerfile: Dockerfile.ApiGateways
+    networks:
+      - mockserver-network
 volumes:
   mockserver-postgres-volume:
   mockserver-seq-data:

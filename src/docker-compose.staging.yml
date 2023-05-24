@@ -43,7 +43,7 @@ services:
     networks:
       - mockserver-network
   api:
-    image: nphamvn/mock-server-api:latest
+    image: nphamvn/mock-server-api-gateways:latest
     container_name: mockserver-api
     ports:
       - 5002:80
