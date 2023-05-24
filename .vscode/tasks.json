@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/MockServer.Api/MockServer.Api.csproj",
+                "${workspaceFolder}/src/MockServer.ApiGateway/MockServer.ApiGateway.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],

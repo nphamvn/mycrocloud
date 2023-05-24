@@ -23,14 +23,14 @@
             // Use IntelliSense to find out which attributes exist for C# debugging
             // Use hover for the description of the existing attributes
             // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-            "name": "MockServer.Api",
+            "name": "MockServer.ApiGateway",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build_api",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/MockServer.Api/bin/Debug/net6.0/MockServer.Api.dll",
+            "program": "${workspaceFolder}/src/MockServer.ApiGateway/bin/Debug/net6.0/MockServer.ApiGateway.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/src/MockServer.Api",
+            "cwd": "${workspaceFolder}/src/MockServer.ApiGateway",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             // "serverReadyAction": {
@@ -41,7 +41,7 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceFolder}/src/MockServer.Api/Views"
+                "/Views": "${workspaceFolder}/src/MockServer.ApiGateway/Views"
             }
         }
     ]
