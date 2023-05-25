@@ -1,5 +1,6 @@
 ﻿namespace Ocelot.Configuration
 {
+    using MockServer.Core.WebApplications;
     using Ocelot.Configuration.File;
     using Ocelot.Values;
     using System.Collections.Generic;
@@ -28,6 +29,7 @@
         public int RouteId { get; set; }
         public string RouteTemplate { get; set; }
         public string Method { get; set; }
+        public RouteIntegrationType IntegrationType { get; set; }
         public UpstreamPathTemplate UpstreamTemplatePattern { get; private set; }
         public List<HttpMethod> UpstreamHttpMethod { get; private set; }
         public string UpstreamHost { get; private set; }

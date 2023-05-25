@@ -26,7 +26,7 @@ namespace Ocelot.RequestId.Middleware
 
         public async Task Invoke(HttpContext httpContext)
         {
-            SetOcelotRequestId(httpContext);
+            //SetOcelotRequestId(httpContext);
             await _next.Invoke(httpContext);
         }
 

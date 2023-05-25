@@ -34,130 +34,132 @@
             //     return;
             // }
 
-            var routeKeysConfigs = httpContext.Items.DownstreamRouteHolder().Route.DownstreamRouteConfig;
-            if (routeKeysConfigs == null || !routeKeysConfigs.Any())
-            {
-                var downstreamRouteHolder = httpContext.Items.DownstreamRouteHolder();
+            await Fire(httpContext, _next);
 
-                var tasks = new Task<HttpContext>[downstreamRouteHolder.Route.DownstreamRoute.Count];
+            // var routeKeysConfigs = httpContext.Items.DownstreamRouteHolder().Route.DownstreamRouteConfig;
+            // if (routeKeysConfigs == null || !routeKeysConfigs.Any())
+            // {
+            //     var downstreamRouteHolder = httpContext.Items.DownstreamRouteHolder();
 
-                for (var i = 0; i < downstreamRouteHolder.Route.DownstreamRoute.Count; i++)
-                {
-                    var newHttpContext = Copy(httpContext);
+            //     var tasks = new Task<HttpContext>[downstreamRouteHolder.Route.DownstreamRoute.Count];
 
-                    newHttpContext.Items
-                        .Add("RequestId", httpContext.Items["RequestId"]);
-                    newHttpContext.Items
-                        .SetIInternalConfiguration(httpContext.Items.IInternalConfiguration());
-                    newHttpContext.Items
-                        .UpsertTemplatePlaceholderNameAndValues(httpContext.Items.TemplatePlaceholderNameAndValues());
-                    newHttpContext.Items
-                        .UpsertDownstreamRoute(downstreamRouteHolder.Route.DownstreamRoute[i]);
+            //     for (var i = 0; i < downstreamRouteHolder.Route.DownstreamRoute.Count; i++)
+            //     {
+            //         var newHttpContext = Copy(httpContext);
 
-                    tasks[i] = Fire(newHttpContext, _next);
-                }
+            //         newHttpContext.Items
+            //             .Add("RequestId", httpContext.Items["RequestId"]);
+            //         newHttpContext.Items
+            //             .SetIInternalConfiguration(httpContext.Items.IInternalConfiguration());
+            //         newHttpContext.Items
+            //             .UpsertTemplatePlaceholderNameAndValues(httpContext.Items.TemplatePlaceholderNameAndValues());
+            //         newHttpContext.Items
+            //             .UpsertDownstreamRoute(downstreamRouteHolder.Route.DownstreamRoute[i]);
 
-                await Task.WhenAll(tasks);
+            //         tasks[i] = Fire(newHttpContext, _next);
+            //     }
 
-                var contexts = new List<HttpContext>();
+            //     await Task.WhenAll(tasks);
 
-                foreach (var task in tasks)
-                {
-                    var finished = await task;
-                    contexts.Add(finished);
-                }
+            //     var contexts = new List<HttpContext>();
 
-                await Map(httpContext, downstreamRouteHolder.Route, contexts);
-            }
-            else
-            {
-                httpContext.Items.UpsertDownstreamRoute(httpContext.Items.DownstreamRouteHolder().Route.DownstreamRoute[0]);
-                var mainResponse = await Fire(httpContext, _next);
+            //     foreach (var task in tasks)
+            //     {
+            //         var finished = await task;
+            //         contexts.Add(finished);
+            //     }
 
-                if (httpContext.Items.DownstreamRouteHolder().Route.DownstreamRoute.Count == 1)
-                {
-                    MapNotAggregate(httpContext, new List<HttpContext>() { mainResponse });
-                    return;
-                }
+            //     await Map(httpContext, downstreamRouteHolder.Route, contexts);
+            // }
+            // else
+            // {
+            //     httpContext.Items.UpsertDownstreamRoute(httpContext.Items.DownstreamRouteHolder().Route.DownstreamRoute[0]);
+            //     var mainResponse = await Fire(httpContext, _next);
 
-                var tasks = new List<Task<HttpContext>>();
+            //     if (httpContext.Items.DownstreamRouteHolder().Route.DownstreamRoute.Count == 1)
+            //     {
+            //         MapNotAggregate(httpContext, new List<HttpContext>() { mainResponse });
+            //         return;
+            //     }
 
-                if (mainResponse.Items.DownstreamResponse() == null)
-                {
-                    return;
-                }
+            //     var tasks = new List<Task<HttpContext>>();
 
-                var content = await mainResponse.Items.DownstreamResponse().Content.ReadAsStringAsync();
+            //     if (mainResponse.Items.DownstreamResponse() == null)
+            //     {
+            //         return;
+            //     }
 
-                var jObject = Newtonsoft.Json.Linq.JToken.Parse(content);
+            //     var content = await mainResponse.Items.DownstreamResponse().Content.ReadAsStringAsync();
 
-                for (var i = 1; i < httpContext.Items.DownstreamRouteHolder().Route.DownstreamRoute.Count; i++)
-                {
-                    var templatePlaceholderNameAndValues = httpContext.Items.TemplatePlaceholderNameAndValues();
+            //     var jObject = Newtonsoft.Json.Linq.JToken.Parse(content);
 
-                    var downstreamRoute = httpContext.Items.DownstreamRouteHolder().Route.DownstreamRoute[i];
+            //     for (var i = 1; i < httpContext.Items.DownstreamRouteHolder().Route.DownstreamRoute.Count; i++)
+            //     {
+            //         var templatePlaceholderNameAndValues = httpContext.Items.TemplatePlaceholderNameAndValues();
 
-                    var matchAdvancedAgg = routeKeysConfigs
-                        .FirstOrDefault(q => q.RouteKey == downstreamRoute.Key);
+            //         var downstreamRoute = httpContext.Items.DownstreamRouteHolder().Route.DownstreamRoute[i];
 
-                    if (matchAdvancedAgg != null)
-                    {
-                        var values = jObject.SelectTokens(matchAdvancedAgg.JsonPath).Select(s => s.ToString()).Distinct().ToList();
+            //         var matchAdvancedAgg = routeKeysConfigs
+            //             .FirstOrDefault(q => q.RouteKey == downstreamRoute.Key);
 
-                        foreach (var value in values)
-                        {
-                            var newHttpContext = Copy(httpContext);
+            //         if (matchAdvancedAgg != null)
+            //         {
+            //             var values = jObject.SelectTokens(matchAdvancedAgg.JsonPath).Select(s => s.ToString()).Distinct().ToList();
 
-                            var tPNV = httpContext.Items.TemplatePlaceholderNameAndValues();
-                            tPNV.Add(new PlaceholderNameAndValue("{" + matchAdvancedAgg.Parameter + "}", value.ToString()));
+            //             foreach (var value in values)
+            //             {
+            //                 var newHttpContext = Copy(httpContext);
 
-                            newHttpContext.Items
-                                .Add("RequestId", httpContext.Items["RequestId"]);
+            //                 var tPNV = httpContext.Items.TemplatePlaceholderNameAndValues();
+            //                 tPNV.Add(new PlaceholderNameAndValue("{" + matchAdvancedAgg.Parameter + "}", value.ToString()));
 
-                            newHttpContext.Items
-                                .SetIInternalConfiguration(httpContext.Items.IInternalConfiguration());
+            //                 newHttpContext.Items
+            //                     .Add("RequestId", httpContext.Items["RequestId"]);
 
-                            newHttpContext.Items
-                                .UpsertTemplatePlaceholderNameAndValues(tPNV);
+            //                 newHttpContext.Items
+            //                     .SetIInternalConfiguration(httpContext.Items.IInternalConfiguration());
 
-                            newHttpContext.Items
-                                .UpsertDownstreamRoute(downstreamRoute);
+            //                 newHttpContext.Items
+            //                     .UpsertTemplatePlaceholderNameAndValues(tPNV);
 
-                            tasks.Add(Fire(newHttpContext, _next));
-                        }
-                    }
-                    else
-                    {
-                        var newHttpContext = Copy(httpContext);
+            //                 newHttpContext.Items
+            //                     .UpsertDownstreamRoute(downstreamRoute);
 
-                        newHttpContext.Items
-                               .Add("RequestId", httpContext.Items["RequestId"]);
+            //                 tasks.Add(Fire(newHttpContext, _next));
+            //             }
+            //         }
+            //         else
+            //         {
+            //             var newHttpContext = Copy(httpContext);
 
-                        newHttpContext.Items
-                            .SetIInternalConfiguration(httpContext.Items.IInternalConfiguration());
+            //             newHttpContext.Items
+            //                    .Add("RequestId", httpContext.Items["RequestId"]);
 
-                        newHttpContext.Items
-                            .UpsertTemplatePlaceholderNameAndValues(templatePlaceholderNameAndValues);
+            //             newHttpContext.Items
+            //                 .SetIInternalConfiguration(httpContext.Items.IInternalConfiguration());
 
-                        newHttpContext.Items
-                            .UpsertDownstreamRoute(downstreamRoute);
+            //             newHttpContext.Items
+            //                 .UpsertTemplatePlaceholderNameAndValues(templatePlaceholderNameAndValues);
 
-                        tasks.Add(Fire(newHttpContext, _next));
-                    }
-                }
+            //             newHttpContext.Items
+            //                 .UpsertDownstreamRoute(downstreamRoute);
 
-                await Task.WhenAll(tasks);
+            //             tasks.Add(Fire(newHttpContext, _next));
+            //         }
+            //     }
 
-                var contexts = new List<HttpContext>() { mainResponse };
+            //     await Task.WhenAll(tasks);
 
-                foreach (var task in tasks)
-                {
-                    var finished = await task;
-                    contexts.Add(finished);
-                }
+            //     var contexts = new List<HttpContext>() { mainResponse };
 
-                await Map(httpContext, httpContext.Items.DownstreamRouteHolder().Route, contexts);
-            }
+            //     foreach (var task in tasks)
+            //     {
+            //         var finished = await task;
+            //         contexts.Add(finished);
+            //     }
+
+            //     await Map(httpContext, httpContext.Items.DownstreamRouteHolder().Route, contexts);
+            // }
         }
 
         private HttpContext Copy(HttpContext source)

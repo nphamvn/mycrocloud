@@ -132,8 +132,8 @@ WHERE
 """
 SELECT 
     route_id RouteId,
-    web_application_id,
-    integration_type,
+    web_application_id WebApplicationId,
+    integration_type IntegrationType,
     "name",
     "method",
     "path",

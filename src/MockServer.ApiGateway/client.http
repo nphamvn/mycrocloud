@@ -1,6 +1,6 @@
 GET  https://localhost:5104/posts/1
 ###
-GET  https://localhost:5104/todos/1
+GET  https://localhost:5104/foo
 X-Web-Application-Id: 0000000001
 ###
 GET  https://localhost:5104/foo

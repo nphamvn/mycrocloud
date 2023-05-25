@@ -14,11 +14,11 @@
         }
         public DownstreamRouteHolder(List<PlaceholderNameAndValue> templatePlaceholderNameAndValues, Route route)
         {
-            TemplatePlaceholderNameAndValues = templatePlaceholderNameAndValues;
+            //TemplatePlaceholderNameAndValues = templatePlaceholderNameAndValues;
             Route = route;
         }
 
-        public List<PlaceholderNameAndValue> TemplatePlaceholderNameAndValues { get; private set; }
+        //public List<PlaceholderNameAndValue> TemplatePlaceholderNameAndValues { get; private set; }
         public Route Route { get; set; }
         public RouteValueDictionary RoutValues { get; set; }
     }

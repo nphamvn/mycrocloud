@@ -50,6 +50,7 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
                 httpContext.Items.UpsertErrors(response.Errors);
                 return;
             }
+            httpContext.Items.UpsertDownstreamRoute(response.Data);
             await _next.Invoke(httpContext);
         }
 
@@ -59,7 +60,8 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
             {
                 RouteId = r.RouteId,
                 Method = r.Method,
-                RouteTemplate = r.Path
+                RouteTemplate = r.Path,
+                IntegrationType = r.IntegrationType
             }).ToList();
         }
     }

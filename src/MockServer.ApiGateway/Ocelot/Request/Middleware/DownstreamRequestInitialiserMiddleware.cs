@@ -26,19 +26,19 @@ namespace Ocelot.Request.Middleware
 
         public async Task Invoke(HttpContext httpContext)
         {
-            var downstreamRoute = httpContext.Items.DownstreamRoute();
+            // var downstreamRoute = httpContext.Items.DownstreamRoute();
 
-            var httpRequestMessage = await _requestMapper.Map(httpContext.Request, downstreamRoute);
+            // var httpRequestMessage = await _requestMapper.Map(httpContext.Request, downstreamRoute);
 
-            if (httpRequestMessage.IsError)
-            {
-                httpContext.Items.UpsertErrors(httpRequestMessage.Errors);
-                return;
-            }
+            // if (httpRequestMessage.IsError)
+            // {
+            //     httpContext.Items.UpsertErrors(httpRequestMessage.Errors);
+            //     return;
+            // }
 
-            var downstreamRequest = _creator.Create(httpRequestMessage.Data);
+            // var downstreamRequest = _creator.Create(httpRequestMessage.Data);
 
-            httpContext.Items.UpsertDownstreamRequest(downstreamRequest);
+            // httpContext.Items.UpsertDownstreamRequest(downstreamRequest);
 
             await _next.Invoke(httpContext);
         }
