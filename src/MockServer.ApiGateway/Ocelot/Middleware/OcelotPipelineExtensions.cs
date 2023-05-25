@@ -19,8 +19,9 @@ using System.Threading.Tasks;
 using Ocelot.DownstreamPathManipulation.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Ocelot.WebSockets.Middleware;
+// using Ocelot.WebSockets.Middleware;
 using Ocelot.Multiplexer;
+using Ocelot.WebApplicationFinder.Middleware;
 
 namespace Ocelot.Middleware
 {
@@ -30,7 +31,7 @@ namespace Ocelot.Middleware
             OcelotPipelineConfiguration pipelineConfiguration)
         {
             // this sets up the downstream context and gets the config
-            app.UseDownstreamContextMiddleware();
+            // app.UseDownstreamContextMiddleware();
 
             // This is registered to catch any global exceptions that are not handled
             // It also sets the Request Id if anything is set globally
@@ -49,10 +50,13 @@ namespace Ocelot.Middleware
             //     });
 
             // Allow the user to respond with absolutely anything they want.
-            app.UseIfNotNull(pipelineConfiguration.PreErrorResponderMiddleware);
+            // app.UseIfNotNull(pipelineConfiguration.PreErrorResponderMiddleware);
 
             // This is registered first so it can catch any errors and issue an appropriate response
             app.UseResponderMiddleware();
+
+            // Find the web application
+            app.UseWebApplicationFinderMiddleware();
 
             // Then we get the downstream route information
             app.UseDownstreamRouteFinderMiddleware();

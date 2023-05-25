@@ -31,6 +31,11 @@
             return _providers[nameof(DownstreamRouteFinder)];
         }
 
+        public IDownstreamRouteProvider Get()
+        {
+            return _providers[nameof(DownstreamRouteFinder)];
+        }
+
         private bool IsServiceDiscovery(ServiceProviderConfiguration config)
         {
             if (!string.IsNullOrEmpty(config?.Host) && config?.Port > 0 && !string.IsNullOrEmpty(config.Type))

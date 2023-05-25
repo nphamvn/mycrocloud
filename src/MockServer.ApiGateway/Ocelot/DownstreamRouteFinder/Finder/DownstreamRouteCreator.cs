@@ -135,5 +135,10 @@
             var loadBalancerKey = $"{downstreamTemplatePath}|{httpMethod}";
             return loadBalancerKey;
         }
+
+        public Response<DownstreamRouteHolder> Get(string upstreamUrlPath, string upstreamHttpMethod, List<Route> routes)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

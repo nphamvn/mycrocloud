@@ -33,9 +33,9 @@ namespace Ocelot.Errors.Middleware
             {
                 httpContext.RequestAborted.ThrowIfCancellationRequested();
 
-                var internalConfiguration = httpContext.Items.IInternalConfiguration();
+                //var internalConfiguration = httpContext.Items.IInternalConfiguration();
 
-                TrySetGlobalRequestId(httpContext, internalConfiguration);
+                //TrySetGlobalRequestId(httpContext, internalConfiguration);
 
                 Logger.LogDebug("ocelot pipeline started");
 

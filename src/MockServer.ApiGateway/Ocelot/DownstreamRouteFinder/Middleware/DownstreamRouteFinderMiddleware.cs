@@ -1,10 +1,13 @@
 namespace Ocelot.DownstreamRouteFinder.Middleware
 {
     using Microsoft.AspNetCore.Http;
+    using MockServer.Core.Repositories;
+    using Ocelot.Configuration;
     using Ocelot.DownstreamRouteFinder.Finder;
     using Ocelot.Infrastructure.Extensions;
     using Ocelot.Logging;
     using Ocelot.Middleware;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -12,32 +15,33 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly IDownstreamRouteProviderFactory _factory;
+        private readonly IWebApplicationRouteRepository _webApplicationRouteRepository;
 
         public DownstreamRouteFinderMiddleware(RequestDelegate next,
             IOcelotLoggerFactory loggerFactory,
-            IDownstreamRouteProviderFactory downstreamRouteFinder
+            IDownstreamRouteProviderFactory downstreamRouteFinder,
+            IWebApplicationRouteRepository webApplicationRouteRepository
             )
                 : base(loggerFactory.CreateLogger<DownstreamRouteFinderMiddleware>())
         {
             _next = next;
             _factory = downstreamRouteFinder;
+            _webApplicationRouteRepository = webApplicationRouteRepository;
         }
 
         public async Task Invoke(HttpContext httpContext)
         {
             var upstreamUrlPath = httpContext.Request.Path.ToString();
 
-            var upstreamQueryString = httpContext.Request.QueryString.ToString();
-
-            var upstreamHost = httpContext.Request.Headers["Host"];
-
             Logger.LogDebug($"Upstream url path is {upstreamUrlPath}");
 
-            var internalConfiguration = httpContext.Items.IInternalConfiguration();
+            var provider = _factory.Get();
 
-            var provider = _factory.Get(internalConfiguration);
+            var app = httpContext.Items.WebApplication();
 
-            var response = provider.Get(upstreamUrlPath, upstreamQueryString, httpContext.Request.Method, internalConfiguration, upstreamHost);
+            var applicableRoutes = await _webApplicationRouteRepository.GetByApplicationId(app.WebApplicationId, string.Empty, string.Empty);
+
+            var response = provider.Get(httpContext.Request.Method, httpContext.Request.Path, Map(applicableRoutes));
 
             if (response.IsError)
             {
@@ -46,16 +50,17 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
                 httpContext.Items.UpsertErrors(response.Errors);
                 return;
             }
-
-            var downstreamPathTemplates = string.Join(", ", response.Data.Route.DownstreamRoute.Select(r => r.DownstreamPathTemplate.Value));
-            Logger.LogDebug($"downstream templates are {downstreamPathTemplates}");
-
-            // why set both of these on HttpContext
-            httpContext.Items.UpsertTemplatePlaceholderNameAndValues(response.Data.TemplatePlaceholderNameAndValues);
-
-            httpContext.Items.UpsertDownstreamRoute(response.Data);
-
             await _next.Invoke(httpContext);
+        }
+
+        private List<Route> Map(IEnumerable<MockServer.Core.WebApplications.Route> routes)
+        {
+            return routes.Select(r => new Route
+            {
+                RouteId = r.RouteId,
+                Method = r.Method,
+                RouteTemplate = r.Path
+            }).ToList();
         }
     }
 }

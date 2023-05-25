@@ -1,5 +1,6 @@
 ﻿namespace Ocelot.Middleware
 {
+    using MockServer.Core.WebApplications;
     using Ocelot.Configuration;
     using Ocelot.DownstreamRouteFinder;
     using Ocelot.DownstreamRouteFinder.UrlMatcher;
@@ -112,6 +113,15 @@
         private static bool DoesntExist(this IDictionary<object, object> input, string key)
         {
             return !input.ContainsKey(key);
+        }
+
+        public static void SetWebApplication(this IDictionary<object, object> input, WebApplication application)
+        {
+            input.Upsert("WebApplication", application);
+        }
+        public static WebApplication WebApplication(this IDictionary<object, object> input)
+        {
+            return input.Get<WebApplication>("WebApplication");
         }
     }
 }

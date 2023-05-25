@@ -5,5 +5,6 @@
     public interface IDownstreamRouteProviderFactory
     {
         IDownstreamRouteProvider Get(IInternalConfiguration config);
+        IDownstreamRouteProvider Get();
     }
 }

@@ -21,7 +21,13 @@
             UpstreamTemplatePattern = upstreamTemplatePattern;
             Aggregator = aggregator;
         }
+        public Route()
+        {
 
+        }
+        public int RouteId { get; set; }
+        public string RouteTemplate { get; set; }
+        public string Method { get; set; }
         public UpstreamPathTemplate UpstreamTemplatePattern { get; private set; }
         public List<HttpMethod> UpstreamHttpMethod { get; private set; }
         public string UpstreamHost { get; private set; }

@@ -1,8 +1,13 @@
-﻿using Ocelot.Configuration;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing.Template;
+using Microsoft.AspNetCore.Routing;
+using Ocelot.Configuration;
 using Ocelot.DownstreamRouteFinder.UrlMatcher;
 using Ocelot.Responses;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Route = Ocelot.Configuration.Route;
 
 namespace Ocelot.DownstreamRouteFinder.Finder
 {
@@ -57,6 +62,28 @@ namespace Ocelot.DownstreamRouteFinder.Finder
             var templatePlaceholderNameAndValues = _placeholderNameAndValueFinder.Find(path, query, route.UpstreamTemplatePattern.OriginalValue);
 
             return new DownstreamRouteHolder(templatePlaceholderNameAndValues.Data, route);
+        }
+
+        public Response<DownstreamRouteHolder> Get(string upstreamHttpMethod, string upstreamUrlPath, List<Route> routes)
+        {
+            upstreamUrlPath = $"{upstreamUrlPath.TrimEnd('/')}/";
+            foreach (var route in routes)
+            {
+                var template = TemplateParser.Parse(route.RouteTemplate);
+                var matcher = new TemplateMatcher(template, new RouteValueDictionary());
+                var values = new RouteValueDictionary();
+                var match = matcher.TryMatch(new PathString(upstreamUrlPath), values);
+                if (match && (route.Method.Equals(upstreamHttpMethod, System.StringComparison.OrdinalIgnoreCase) || route.Method.Equals("*")))
+                {
+                    var holder = new DownstreamRouteHolder
+                    {
+                        Route = route,
+                        RoutValues = values,
+                    };
+                    return new OkResponse<DownstreamRouteHolder>(holder);
+                }
+            }
+            return new ErrorResponse<DownstreamRouteHolder>(new UnableToFindDownstreamRouteError(upstreamUrlPath, upstreamHttpMethod));
         }
     }
 }
