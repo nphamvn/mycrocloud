@@ -45,11 +45,11 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         var vm = _mapper.Map<RouteViewModel>(route);
         vm.WebApplication = await _webApplicationWebService.Get(route.WebApplicationId);
         //vm.WebApplication.User = AuthUser;
-        if (route.IntegrationType == RouteIntegrationType.MockIntegration)
+        if (route.IntegrationType == RouteIntegrationType.MockResponse)
         {
             vm.Integration = _mapper.Map<MockIntegrationViewModel>(await _webApplicationRouteRepository.GetMockIntegration(routeId));
         }
-        else if (route.IntegrationType == RouteIntegrationType.DirectForwarding)
+        else if (route.IntegrationType == RouteIntegrationType.RequestForward)
         {
 
         }
@@ -191,8 +191,8 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
             HttpMethodSelectListItem = HttpProtocolExtensions.CommonHttpMethods
                                     .Select(m => new SelectListItem(m, m)),
             IntegrationTypeSelectListItem = new List<SelectListItem>{
-                new("Mock Integration", ((int)RouteIntegrationType.MockIntegration).ToString()),
-                new("Direct Forwarding", ((int)RouteIntegrationType.DirectForwarding).ToString()),
+                new("Mock Integration", ((int)RouteIntegrationType.MockResponse).ToString()),
+                new("Direct Forwarding", ((int)RouteIntegrationType.RequestForward).ToString()),
                 new("Function Trigger", ((int)RouteIntegrationType.FunctionTrigger).ToString())
             },
             AuthorizationTypeSelectListItem = new List<SelectListItem>

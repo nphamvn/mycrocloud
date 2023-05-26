@@ -23,6 +23,8 @@ using Microsoft.AspNetCore.Http;
 using Ocelot.Multiplexer;
 using Ocelot.WebApplicationFinder.Middleware;
 using MockServer.Core.WebApplications;
+using MockServer.Core.WebApplications.Security;
+using Ocelot.PayloadValidation.Middleware;
 
 namespace Ocelot.Middleware
 {
@@ -60,10 +62,22 @@ namespace Ocelot.Middleware
             app.UseWebApplicationFinderMiddleware();
 
             // Then we get the downstream route information
-            app.UseDownstreamRouteFinderMiddleware();
+            app.UseRouteFinderMiddleware();
+            
+            app.UseWhen(ctx => {
+                var app = ctx.Items.WebApplication();
+                return app.UseMiddlewares.Contains("Authentication");
+            }, app => app.UseAuthenticationMiddleware());
+
+            app.UseWhen(ctx => {
+                var route = ctx.Items.DownstreamRoute();
+                return route.AuthorizationType != null && route.AuthorizationType != AuthorizationType.AllowAnonymous;
+            }, app => app.UseAuthorizationMiddleware());
+            
+            app.UsePayloadValidationMiddleware();
 
             // Multiplex the request if required
-            app.UseMultiplexingMiddleware();
+            //app.UseMultiplexingMiddleware();
             // app.UseWhen(ctxt => {
             //     var route = ctxt.Items.DownstreamRouteHolder().Route;
             //     return route.IntegrationType == RouteIntegrationType.MockIntegration;
@@ -102,14 +116,14 @@ namespace Ocelot.Middleware
             // Now we know where the client is going to go we can authenticate them.
             // We allow the ocelot middleware to be overriden by whatever the
             // user wants
-            if (pipelineConfiguration.AuthenticationMiddleware == null)
-            {
-                app.UseAuthenticationMiddleware();
-            }
-            else
-            {
-                //app.Use(pipelineConfiguration.AuthenticationMiddleware);
-            }
+            // if (pipelineConfiguration.AuthenticationMiddleware == null)
+            // {
+            //     app.UseAuthenticationMiddleware();
+            // }
+            // else
+            // {
+            //     app.Use(pipelineConfiguration.AuthenticationMiddleware);
+            // }
 
             // The next thing we do is look at any claims transforms in case this is important for authorization
             //app.UseClaimsToClaimsMiddleware();
@@ -121,14 +135,14 @@ namespace Ocelot.Middleware
             // can authorize the request
             // We allow the ocelot middleware to be overriden by whatever the
             // user wants
-            if (pipelineConfiguration.AuthorizationMiddleware == null)
-            {
-                app.UseAuthorizationMiddleware();
-            }
-            else
-            {
-                //app.Use(pipelineConfiguration.AuthorizationMiddleware);
-            }
+            // if (pipelineConfiguration.AuthorizationMiddleware == null)
+            // {
+            //     app.UseAuthorizationMiddleware();
+            // }
+            // else
+            // {
+            //     app.Use(pipelineConfiguration.AuthorizationMiddleware);
+            // }
 
             // Now we can run the claims to headers transformation middleware
             //app.UseClaimsToHeadersMiddleware();
@@ -152,7 +166,17 @@ namespace Ocelot.Middleware
             //app.UseOutputCacheMiddleware();
 
             //We fire off the request and set the response on the scoped data repo
-            //app.UseHttpRequesterMiddleware();
+            app.UseWhen(ctxt =>
+            {
+                var route = ctxt.Items.DownstreamRouteHolder().Route;
+                return route.IntegrationType == RouteIntegrationType.MockResponse;
+            }, app => app.UseRequestForwardingMiddleware());
+
+            app.UseWhen(ctxt =>
+            {
+                var route = ctxt.Items.DownstreamRouteHolder().Route;
+                return route.IntegrationType == RouteIntegrationType.RequestForward;
+            }, app => app.UseRequestForwardingMiddleware());
 
             return app.Build();
         }

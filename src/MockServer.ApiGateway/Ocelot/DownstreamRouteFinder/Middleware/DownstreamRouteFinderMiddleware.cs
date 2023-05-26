@@ -11,18 +11,18 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
     using System.Linq;
     using System.Threading.Tasks;
 
-    public class DownstreamRouteFinderMiddleware : OcelotMiddleware
+    public class RouteFinderMiddleware : OcelotMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly IDownstreamRouteProviderFactory _factory;
         private readonly IWebApplicationRouteRepository _webApplicationRouteRepository;
 
-        public DownstreamRouteFinderMiddleware(RequestDelegate next,
+        public RouteFinderMiddleware(RequestDelegate next,
             IOcelotLoggerFactory loggerFactory,
             IDownstreamRouteProviderFactory downstreamRouteFinder,
             IWebApplicationRouteRepository webApplicationRouteRepository
             )
-                : base(loggerFactory.CreateLogger<DownstreamRouteFinderMiddleware>())
+                : base(loggerFactory.CreateLogger<RouteFinderMiddleware>())
         {
             _next = next;
             _factory = downstreamRouteFinder;

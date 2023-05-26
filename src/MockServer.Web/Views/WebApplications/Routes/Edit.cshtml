@@ -316,11 +316,11 @@
             </div>
             <div class="card-body js-integration-details">
                 <form>
-                    @if (Model.IntegrationType == RouteIntegrationType.MockIntegration)
+                    @if (Model.IntegrationType == RouteIntegrationType.MockResponse)
                     {
                         <partial name="_RouteMockIntegration.cshtml" model="Model.Integration" />
                     }
-                    else if (Model.IntegrationType == RouteIntegrationType.DirectForwarding)
+                    else if (Model.IntegrationType == RouteIntegrationType.RequestForward)
                     {
                         <partial name="_DirectForwardingIntegration.cshtml" model="Model.Integration" />
                     }

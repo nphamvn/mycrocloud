@@ -7,17 +7,16 @@ namespace Ocelot.Requester.Middleware
     using Ocelot.Middleware;
     using System.Threading.Tasks;
     using Ocelot.Responses;
-    using Ocelot.DownstreamRouteFinder.Middleware;
 
-    public class HttpRequesterMiddleware : OcelotMiddleware
+    public class RequestForwardingMiddleware : OcelotMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly IHttpRequester _requester;
 
-        public HttpRequesterMiddleware(RequestDelegate next,
+        public RequestForwardingMiddleware(RequestDelegate next,
             IOcelotLoggerFactory loggerFactory,
             IHttpRequester requester)
-                : base(loggerFactory.CreateLogger<HttpRequesterMiddleware>())
+                : base(loggerFactory.CreateLogger<RequestForwardingMiddleware>())
         {
             _next = next;
             _requester = requester;
