@@ -13,8 +13,8 @@ public interface IWebApplicationRouteRepository
     Task Delete(int id);
     Task AttachAuthorization(int id, Authorization authorization);
     Task<Authorization> GetAuthorization(int id);
-    Task<MockIntegration> GetMockIntegration(int id);
-    Task UpdateMockIntegration(int id, MockIntegration integration);
+    Task<MockResponse> GetMockResponse(int id);
+    Task UpdateMockIntegration(int id, MockResponse integration);
     Task<DirectForwardingIntegration> GetDirectForwardingIntegration(int id);
     Task UpdateDirectForwardingIntegration(int id, DirectForwardingIntegration integration);
     Task<FunctionTriggerIntegration> GetFunctionTriggerIntegration(int id);

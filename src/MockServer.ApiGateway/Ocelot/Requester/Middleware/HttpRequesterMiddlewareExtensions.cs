@@ -2,11 +2,11 @@ namespace Ocelot.Requester.Middleware
 {
     using Microsoft.AspNetCore.Builder;
 
-    public static class RequestForwardingMiddlewareMiddlewareExtensions
+    public static class HttpRequesterMiddlewareExtensions
     {
-        public static IApplicationBuilder UseRequestForwardingMiddleware(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseHttpRequesterMiddleware(this IApplicationBuilder builder)
         {
-            return builder.UseMiddleware<RequestForwardingMiddleware>();
+            return builder.UseMiddleware<HttpRequesterMiddleware>();
         }
     }
 }

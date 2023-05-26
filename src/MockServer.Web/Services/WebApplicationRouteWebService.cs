@@ -9,7 +9,7 @@ using MockServer.Web.Models.WebApplications.Routes.Authorizations;
 using MockServer.Web.Models.WebApplications.Routes.Integrations.MockIntegrations;
 using CoreRoute = MockServer.Core.WebApplications.Route;
 using CoreAuthorization = MockServer.Core.WebApplications.Security.Authorization;
-using CoreMockIntegration = MockServer.Core.WebApplications.MockIntegration;
+using CoreMockIntegration = MockServer.Core.WebApplications.MockResponse;
 using MockServer.Core.WebApplications.Security;
 using MockServer.Web.Shared;
 
@@ -47,7 +47,7 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         //vm.WebApplication.User = AuthUser;
         if (route.IntegrationType == RouteIntegrationType.MockResponse)
         {
-            vm.Integration = _mapper.Map<MockIntegrationViewModel>(await _webApplicationRouteRepository.GetMockIntegration(routeId));
+            vm.Integration = _mapper.Map<MockIntegrationViewModel>(await _webApplicationRouteRepository.GetMockResponse(routeId));
         }
         else if (route.IntegrationType == RouteIntegrationType.RequestForward)
         {
@@ -167,7 +167,7 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
 
     public async Task<MockIntegrationViewModel> GetMockIntegration(int routeId)
     {
-        var integration = await _webApplicationRouteRepository.GetMockIntegration(routeId);
+        var integration = await _webApplicationRouteRepository.GetMockResponse(routeId);
         return _mapper.Map<MockIntegrationViewModel>(integration);
     }
 

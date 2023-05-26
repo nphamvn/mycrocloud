@@ -7,7 +7,7 @@ using WebApplication = MockServer.Web.Models.WebApplications.WebApplication;
 //using Route = MockServer.Web.Models.WebApplications.Routes.Route;
 using MockServer.Web.Models.WebApplications.Routes;
 using MockServer.Web.Models.WebApplications.Routes.Integrations.MockIntegrations;
-using CoreMockIntegration = MockServer.Core.WebApplications.MockIntegration;
+using CoreMockIntegration = MockServer.Core.WebApplications.MockResponse;
 using CoreAuthorizationPolicy = MockServer.Core.WebApplications.Security.Policy;
 using MockServer.Web.Models.WebApplications.Routes.Authorizations;
 using CoreAuthorization = MockServer.Core.WebApplications.Security.Authorization;

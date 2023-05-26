@@ -2,7 +2,7 @@ version: '3'
 services:
   db:
     image: postgres:15.2-alpine
-    container_name: mockserver-postgres
+    container_name: mockserver-database
     ports:
       - 5432:5432
     volumes:
@@ -29,22 +29,36 @@ services:
       - 5341:5341
       - 5004:80
     volumes:
-      - mockserver-seq-data
+      - mockserver-seq-data:/data
     environment:
       - ACCEPT_EULA=Y
-      - SEQ_FIRSTRUN_ADMINPASSWORDHASH="FNQTZOU+2tEkuU+xFDHgS/8CXPdNllMFG4T/USrDYo7fXnhJYg=="
+      - SEQ_FIRSTRUN_ADMINPASSWORDHASH=FNQTZOU+2tEkuU+xFDHgS/8CXPdNllMFG4T/USrDYo7fXnhJYg==
     networks:
       - mockserver-network
   web:
     build:
       context: .
-      dockerfile: Dockerfile.Web
+      dockerfile: MockServer.Web/Dockerfile
+    image: mockserver-web
+    container_name: mockserver-web
     networks:
       - mockserver-network
-  api-gateways:
+  api-gateway:
     build:
       context: .
-      dockerfile: Dockerfile.ApiGateways
+      dockerfile: MockServer.ApiGateway/Dockerfile
+    image: mockserver-api-gateway
+    container_name: mockserver-api-gateway
+    networks:
+      - mockserver-network
+  mock-responder:
+    build:
+      context: .
+      dockerfile: MockServer.MockResponder/Dockerfile
+    image: mockserver-mock-responder
+    container_name: mockserver-mock-responder
+    ports:
+      - 5005:80
     networks:
       - mockserver-network
 volumes:

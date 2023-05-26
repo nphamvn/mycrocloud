@@ -1,12 +1,20 @@
-﻿namespace MockServer.Core.WebApplications;
-public class MockIntegration : RouteIntegration
+﻿namespace MockServer.Core.WebApplications
 {
-    public string Code { get; set; }
-    public IList<MockIntegrationResponseHeader> ResponseHeaders { get; set; }
-    public string ResponseBodyText { get; set; }
-    public string ResponseBodyTextFormat { get; set; }
-    public int ResponseBodyTextRenderEngine { get; set; }
-    public int ResponseStatusCode { get; set; }
-    public bool ResponseDelay { get; set; }
-    public int ResponseDelayTime { get; set; }
+    public class MockResponse : RouteIntegration
+    {
+        public int ResponseId { get; set; }
+        public int RouteId { get; set; }
+        public int StatusCode { get; set; }
+        public Dictionary<string, string> Headers { get; set; }
+        public string BodyText { get; set; }
+        public string BodyTextFormat { get; set; }
+        public int BodyTextRenderEngine { get; set; }
+        public ResponseDelayType DelayType { get; set; }
+        public int? DelayFixedTime { get; set; }
+    }
+    public enum ResponseDelayType
+    {
+        NoDelay = 0,
+        Fixed
+    }
 }

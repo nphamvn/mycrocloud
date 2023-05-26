@@ -62,22 +62,22 @@ namespace Ocelot.Middleware
             app.UseWebApplicationFinderMiddleware();
 
             // Then we get the downstream route information
-            app.UseRouteFinderMiddleware();
+            app.UseDownstreamRouteFinderMiddleware();
             
-            app.UseWhen(ctx => {
-                var app = ctx.Items.WebApplication();
-                return app.UseMiddlewares.Contains("Authentication");
-            }, app => app.UseAuthenticationMiddleware());
+            // app.UseWhen(ctx => {
+            //     var app = ctx.Items.WebApplication();
+            //     return app.UseMiddlewares.Contains("Authentication");
+            // }, app => app.UseAuthenticationMiddleware());
 
-            app.UseWhen(ctx => {
-                var route = ctx.Items.DownstreamRoute();
-                return route.AuthorizationType != null && route.AuthorizationType != AuthorizationType.AllowAnonymous;
-            }, app => app.UseAuthorizationMiddleware());
+            // app.UseWhen(ctx => {
+            //     var route = ctx.Items.DownstreamRoute();
+            //     return route.AuthorizationType != null && route.AuthorizationType != AuthorizationType.AllowAnonymous;
+            // }, app => app.UseAuthorizationMiddleware());
             
-            app.UsePayloadValidationMiddleware();
+            //app.UsePayloadValidationMiddleware();
 
             // Multiplex the request if required
-            //app.UseMultiplexingMiddleware();
+            app.UseMultiplexingMiddleware();
             // app.UseWhen(ctxt => {
             //     var route = ctxt.Items.DownstreamRouteHolder().Route;
             //     return route.IntegrationType == RouteIntegrationType.MockIntegration;
@@ -100,7 +100,7 @@ namespace Ocelot.Middleware
             //app.UseHttpHeadersTransformationMiddleware();
 
             // Initialises downstream request
-            //app.UseDownstreamRequestInitialiser();
+            app.UseDownstreamRequestInitialiser();
 
             // We check whether the request is ratelimit, and if there is no continue processing
             //app.UseRateLimiting();
@@ -166,17 +166,7 @@ namespace Ocelot.Middleware
             //app.UseOutputCacheMiddleware();
 
             //We fire off the request and set the response on the scoped data repo
-            app.UseWhen(ctxt =>
-            {
-                var route = ctxt.Items.DownstreamRouteHolder().Route;
-                return route.IntegrationType == RouteIntegrationType.MockResponse;
-            }, app => app.UseRequestForwardingMiddleware());
-
-            app.UseWhen(ctxt =>
-            {
-                var route = ctxt.Items.DownstreamRouteHolder().Route;
-                return route.IntegrationType == RouteIntegrationType.RequestForward;
-            }, app => app.UseRequestForwardingMiddleware());
+           app.UseHttpRequesterMiddleware();
 
             return app.Build();
         }

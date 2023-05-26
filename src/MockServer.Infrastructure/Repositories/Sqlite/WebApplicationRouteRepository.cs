@@ -219,7 +219,7 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
         throw new NotImplementedException();
     }
 
-    public Task<MockIntegration> GetMockIntegration(int routeId)
+    public Task<MockResponse> GetMockResponse(int routeId)
     {
         var query =
                 """
@@ -239,13 +239,13 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
                 """;
         using var connection = new SqliteConnection(_connectionString);
         SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<MockIntegrationResponseHeader>>());
-        return connection.QuerySingleOrDefaultAsync<MockIntegration>(query, new
+        return connection.QuerySingleOrDefaultAsync<MockResponse>(query, new
         {
             RouteId = routeId
         });
     }
 
-    public Task UpdateMockIntegration(int id, MockIntegration integration)
+    public Task UpdateMockIntegration(int id, MockResponse integration)
     {
         var query =
                 """
@@ -265,17 +265,16 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
                 """;
         using var connection = new SqliteConnection(_connectionString);
         SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<MockIntegrationResponseHeader>>());
-        return connection.QuerySingleOrDefaultAsync<MockIntegration>(query, new
+        return connection.QuerySingleOrDefaultAsync<MockResponse>(query, new
         {
             RouteId = id,
-            Code = integration.Code,
-            ResponseHeaders = integration.ResponseHeaders,
-            ResponseBodyText = integration.ResponseBodyText,
-            ResponseBodyTextFormat = integration.ResponseBodyTextFormat,
-            ResponseBodyTextRenderEngine = integration.ResponseBodyTextRenderEngine,
-            ResponseStatusCode = integration.ResponseStatusCode,
-            ResponseDelay = integration.ResponseDelay,
-            ResponseDelayTime = integration.ResponseDelayTime
+            Headers = integration.Headers,
+            BodyText = integration.BodyText,
+            BodyTextFormat = integration.BodyTextFormat,
+            BodyTextRenderEngine = integration.BodyTextRenderEngine,
+            StatusCode = integration.StatusCode,
+            DelayType = integration.DelayType,
+            FixedDelayTime = integration.DelayFixedTime
         });
     }
 

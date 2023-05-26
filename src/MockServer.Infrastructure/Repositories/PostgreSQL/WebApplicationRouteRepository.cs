@@ -220,33 +220,33 @@ WHERE
         throw new NotImplementedException();
     }
 
-    public Task<MockIntegration> GetMockIntegration(int routeId)
+    public async Task<MockResponse> GetMockResponse(int routeId)
     {
         var query =
-                """
-                SELECT
-                    mi.Code,
-                    mi.ResponseHeaders,
-                    mi.ResponseBodyText,
-                    mi.ResponseBodyTextFormat,
-                    mi.ResponseBodyTextRenderEngine,
-                    mi.ResponseStatusCode,
-                    mi.ResponseDelay,
-                    mi.ResponseDelayTime
-                FROM
-                    WebApplicationRouteMockIntegration mi
-                WHERE
-                    RouteId = @RouteId
-                """;
+"""
+SELECT
+    response_id ResponseId,
+    route_id RouteId,
+    status_code StatusCode,
+    headers Headers,
+    body_text BodyText,
+    body_text_format BodyTextFormat,
+    delay_type DelayType,
+    delay_fixed_time DelayFixedTime
+FROM
+    web_application_route_mock_response
+WHERE
+    route_id = @route_id
+""";
         using var connection = new NpgsqlConnection(ConnectionString);
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<MockIntegrationResponseHeader>>());
-        return connection.QuerySingleOrDefaultAsync<MockIntegration>(query, new
+        //SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<MockIntegrationResponseHeader>>());
+        return await connection.QuerySingleOrDefaultAsync<MockResponse>(query, new
         {
-            RouteId = routeId
+            route_id = routeId
         });
     }
 
-    public Task UpdateMockIntegration(int id, MockIntegration integration)
+    public Task UpdateMockIntegration(int id, MockResponse integration)
     {
         var query =
                 """
@@ -266,17 +266,16 @@ WHERE
                 """;
         using var connection = new NpgsqlConnection(ConnectionString);
         SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<MockIntegrationResponseHeader>>());
-        return connection.QuerySingleOrDefaultAsync<MockIntegration>(query, new
+        return connection.QuerySingleOrDefaultAsync<MockResponse>(query, new
         {
             RouteId = id,
-            Code = integration.Code,
-            ResponseHeaders = integration.ResponseHeaders,
-            ResponseBodyText = integration.ResponseBodyText,
-            ResponseBodyTextFormat = integration.ResponseBodyTextFormat,
-            ResponseBodyTextRenderEngine = integration.ResponseBodyTextRenderEngine,
-            ResponseStatusCode = integration.ResponseStatusCode,
-            ResponseDelay = integration.ResponseDelay,
-            ResponseDelayTime = integration.ResponseDelayTime
+            ResponseHeaders = integration.Headers,
+            ResponseBodyText = integration.BodyText,
+            ResponseBodyTextFormat = integration.BodyTextFormat,
+            ResponseBodyTextRenderEngine = integration.BodyTextRenderEngine,
+            ResponseStatusCode = integration.StatusCode,
+            ResponseDelay = integration.DelayType,
+            ResponseDelayTime = integration.DelayFixedTime
         });
     }
 

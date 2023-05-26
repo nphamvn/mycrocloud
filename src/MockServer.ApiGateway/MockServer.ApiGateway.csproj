@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disabled</ImplicitUsings>
-    <RootNamespace>MockServer.OcelotApiGateway</RootNamespace>
+    <RootNamespace>MockServer.ApiGateway</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
