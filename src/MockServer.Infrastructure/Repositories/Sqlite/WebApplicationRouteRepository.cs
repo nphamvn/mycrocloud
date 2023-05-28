@@ -43,7 +43,7 @@ public class WebApplicationRouteRepository : IWebApplicationRouteRepository
         return await connection.QuerySingleAsync<int>(query, new
         {
             WebApplicationId = appId,
-            IntegrationType = (int)route.IntegrationType,
+            IntegrationType = (int)route.ResponseProvider,
             Name = route.Name,
             Method = route.Method,
             Path = route.Path,

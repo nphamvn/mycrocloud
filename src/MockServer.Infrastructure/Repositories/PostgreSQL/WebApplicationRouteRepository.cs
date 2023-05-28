@@ -133,7 +133,7 @@ WHERE
 SELECT 
     route_id RouteId,
     web_application_id WebApplicationId,
-    integration_type IntegrationType,
+    integration_type ResponseProvider,
     "name",
     "method",
     "path",
@@ -239,7 +239,7 @@ WHERE
     route_id = @route_id
 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        //SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<MockIntegrationResponseHeader>>());
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<Dictionary<string, string>>());
         return await connection.QuerySingleOrDefaultAsync<MockResponse>(query, new
         {
             route_id = routeId

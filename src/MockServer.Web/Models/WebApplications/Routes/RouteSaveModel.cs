@@ -7,7 +7,7 @@ namespace MockServer.Web.Models.WebApplications.Routes;
 public class RouteSaveModel
 {
     [Required]
-    public RouteIntegrationType IntegrationType { get; set; }
+    public ResponseProvider IntegrationType { get; set; }
     [Required]
     [StringLength(100, ErrorMessage = "Name length can't be more than 100.")]
     public string Name { get; set; }

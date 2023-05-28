@@ -47,7 +47,7 @@ namespace Ocelot.WebApplicationFinder.Middleware
             {
                 return;
             }
-
+            httpContext.Request.Headers.Remove(_configuration["WebApplicationIdHeader"]);
             httpContext.Items.SetWebApplication(app);
 
             await _next.Invoke(httpContext);

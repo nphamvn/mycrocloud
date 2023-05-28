@@ -45,15 +45,15 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         var vm = _mapper.Map<RouteViewModel>(route);
         vm.WebApplication = await _webApplicationWebService.Get(route.WebApplicationId);
         //vm.WebApplication.User = AuthUser;
-        if (route.IntegrationType == RouteIntegrationType.MockResponse)
+        if (route.ResponseProvider == ResponseProvider.MockResponse)
         {
             vm.Integration = _mapper.Map<MockIntegrationViewModel>(await _webApplicationRouteRepository.GetMockResponse(routeId));
         }
-        else if (route.IntegrationType == RouteIntegrationType.RequestForward)
+        else if (route.ResponseProvider == ResponseProvider.RequestForward)
         {
 
         }
-        else if (route.IntegrationType == RouteIntegrationType.FunctionTrigger)
+        else if (route.ResponseProvider == ResponseProvider.Function)
         {
 
         }
@@ -177,7 +177,7 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         await _webApplicationRouteRepository.UpdateMockIntegration(requestId, mapped);
     }
 
-    public Task ChangeIntegrationType(int routeId, RouteIntegrationType type)
+    public Task ChangeIntegrationType(int routeId, ResponseProvider type)
     {
         throw new NotImplementedException();
     }
@@ -191,9 +191,9 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
             HttpMethodSelectListItem = HttpProtocolExtensions.CommonHttpMethods
                                     .Select(m => new SelectListItem(m, m)),
             IntegrationTypeSelectListItem = new List<SelectListItem>{
-                new("Mock Integration", ((int)RouteIntegrationType.MockResponse).ToString()),
-                new("Direct Forwarding", ((int)RouteIntegrationType.RequestForward).ToString()),
-                new("Function Trigger", ((int)RouteIntegrationType.FunctionTrigger).ToString())
+                new("Mock Integration", ((int)ResponseProvider.MockResponse).ToString()),
+                new("Direct Forwarding", ((int)ResponseProvider.RequestForward).ToString()),
+                new("Function Trigger", ((int)ResponseProvider.Function).ToString())
             },
             AuthorizationTypeSelectListItem = new List<SelectListItem>
             {

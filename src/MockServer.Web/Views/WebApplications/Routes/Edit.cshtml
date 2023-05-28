@@ -316,15 +316,15 @@
             </div>
             <div class="card-body js-integration-details">
                 <form>
-                    @if (Model.IntegrationType == RouteIntegrationType.MockResponse)
+                    @if (Model.IntegrationType == ResponseProvider.MockResponse)
                     {
                         <partial name="_RouteMockIntegration.cshtml" model="Model.Integration" />
                     }
-                    else if (Model.IntegrationType == RouteIntegrationType.RequestForward)
+                    else if (Model.IntegrationType == ResponseProvider.RequestForward)
                     {
                         <partial name="_DirectForwardingIntegration.cshtml" model="Model.Integration" />
                     }
-                    else if (Model.IntegrationType == RouteIntegrationType.FunctionTrigger)
+                    else if (Model.IntegrationType == ResponseProvider.Function)
                     {
                         <partial name="_FunctionTriggerIntegration.cshtml" model="Model.Integration" />
                     }

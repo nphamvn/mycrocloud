@@ -62,7 +62,7 @@
                            <div class="col-sm-10 form-group">
                                 <div class="mb-1">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" value="@((int)RouteIntegrationType.MockResponse)"
+                                        <input class="form-check-input" type="radio" value="@((int)ResponseProvider.MockResponse)"
                                             asp-for="IntegrationType" checked>
                                         <label class="form-check-label">Mock Response</label>
                                     </div>
@@ -71,7 +71,7 @@
                                 </div>
                                 <div class="mb-1">
                                     <div class="form-check">
-                                            <input class="form-check-input" type="radio" value="@((int)RouteIntegrationType.RequestForward)"
+                                            <input class="form-check-input" type="radio" value="@((int)ResponseProvider.RequestForward)"
                                                     asp-for="IntegrationType">
                                                 <label class="form-check-label">From Forward</label>
                                             </div>
@@ -81,7 +81,7 @@
                                                 </div>
                                                     <div>
                                                         <div class="form-check">
-                                        <input class="form-check-input" type="radio" value="@((int)RouteIntegrationType.FunctionTrigger)"
+                                        <input class="form-check-input" type="radio" value="@((int)ResponseProvider.Function)"
                                             asp-for="IntegrationType">
                                         <label class="form-check-label">Function</label>
                                     </div>

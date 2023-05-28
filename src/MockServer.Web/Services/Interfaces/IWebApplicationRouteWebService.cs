@@ -24,5 +24,5 @@ public interface IWebApplicationRouteWebService
     Task AttachAuthorization(int requestId, AuthorizationSaveModel auth);
     Task<MockIntegrationViewModel> GetMockIntegration(int requestId);
     Task SaveMockIntegration(int requestId, MockIntegrationSaveModel integration);
-    Task ChangeIntegrationType(int routeId, RouteIntegrationType type);
+    Task ChangeIntegrationType(int routeId, ResponseProvider type);
 }

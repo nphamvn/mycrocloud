@@ -1,13 +1,11 @@
 GET  https://localhost:5104/posts/1
+
 ###
 GET  https://localhost:5104/foo
 X-Web-Application-Id: 0000000001
+
 ###
-GET  https://localhost:5104/foo
-X-Web-Application-Id: 0000000001
+GET  http://localhost:5000/posts/1
 
 ###
 GET https://jsonplaceholder.typicode.com/todos/1
-
-###
-GET  http://localhost:5003/todos/1

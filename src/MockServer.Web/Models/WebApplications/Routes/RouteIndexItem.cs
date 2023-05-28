@@ -6,7 +6,7 @@ public class RouteIndexItem
 {
     public int RouteId { get; set; }
     public string Name { get; set; }
-    public RouteIntegrationType IntegrationType { get; set; }
+    public ResponseProvider IntegrationType { get; set; }
     public string Path { get; set; }
     public string Method { get; set; }
     public string Description { get; set; }    

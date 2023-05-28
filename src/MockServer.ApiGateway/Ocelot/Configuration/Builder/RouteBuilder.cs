@@ -1,10 +1,12 @@
 ﻿namespace Ocelot.Configuration.Builder
 {
+    using ResponseProvider = MockServer.Core.WebApplications.ResponseProvider;
     using Ocelot.Configuration.File;
     using Ocelot.Values;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
+    using System;
 
     public class RouteBuilder
     {
@@ -14,6 +16,8 @@
         private List<DownstreamRoute> _downstreamRoutes;
         private List<AggregateRouteConfig> _downstreamRoutesConfig;
         private string _aggregator;
+        private ResponseProvider _responseProvider;
+        private int _id;
 
         public RouteBuilder()
         {
@@ -63,9 +67,21 @@
             return this;
         }
 
+        public RouteBuilder WithResponseProvider(ResponseProvider responseProvider) {
+            _responseProvider = responseProvider;
+            return this;
+        }
+        public RouteBuilder WithId(int id)
+        {
+            _id = id;
+            return this;
+        }
+
         public Route Build()
         {
             return new Route(
+                _id,
+                _responseProvider,
                 _downstreamRoutes,
                 _downstreamRoutesConfig,
                 _upstreamHttpMethod,

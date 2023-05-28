@@ -85,6 +85,7 @@
 
         private Uri MapUri(HttpRequest request)
         {
+            var uri = request.GetEncodedUrl();
             return new Uri(request.GetEncodedUrl());
         }
 

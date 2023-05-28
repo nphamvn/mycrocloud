@@ -12,7 +12,10 @@
       "UpstreamPathTemplate": "/posts/{id}",
       "UpstreamHttpMethod": [
         "Get"
-      ]
+      ],
+      "LoadBalancerOptions": {
+        "Type": "NoLoadBalancer"
+        }
     }
   ],
   "GlobalConfiguration": {

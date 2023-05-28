@@ -8,11 +8,24 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<PostgresSettings>(builder.Configuration.GetSection("Database:Application"));
 builder.Services.AddScoped<IWebApplicationRouteRepository, WebApplicationRouteRepository>();
 builder.Services.AddScoped<IHttpResponseRetriever, HttpResponseRetriever>();
+var routeIdKey = "__RouteId";
 var app = builder.Build();
-app.MapGet("/{routeId:int}", async (int routeId, HttpContext context, IHttpResponseRetriever service) =>
+app.Use( async (context, next) =>
 {
-    var responseMessage = await service.GetResponseMessage(routeId);
+    if (context.Request.Headers.TryGetValue(routeIdKey, out var routeIdHeaderValue))
+    {
+        if (int.TryParse(routeIdHeaderValue, out var routeId))
+        {
+            context.Items[routeIdKey] = routeId;
+            context.Request.Headers.Remove(routeIdKey);
+            await next.Invoke(context);
+        }
+    }
+});
+app.Run(async context => {
+    int routeId = (int)context.Items[routeIdKey];
+    var retriever = context.RequestServices.GetService<IHttpResponseRetriever>();
+    var responseMessage = await retriever.GetResponseMessage(routeId);
     await context.WriteResponseMessage(responseMessage);
 });
-
 app.Run();

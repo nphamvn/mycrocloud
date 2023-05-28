@@ -1,8 +1,8 @@
 ﻿namespace MockServer.Core.WebApplications;
-public enum RouteIntegrationType
+public enum ResponseProvider
 {
     MockResponse = 1,
     RequestForward = 2,
-    FunctionTrigger = 3
+    Function = 3
 }
 

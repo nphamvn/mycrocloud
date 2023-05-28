@@ -59,6 +59,7 @@ namespace Ocelot.DependencyInjection
             Services = services;
             Services.Configure<FileConfiguration>(configurationRoot);
             Services.Configure<PostgresSettings>(configurationRoot.GetSection("Database:Application"));
+            Services.Configure<MockResponderOptions>(configurationRoot.GetSection("MockResponder"));
 
             Services.TryAddSingleton<IWebApplicationRouteRepository, WebApplicationRouteRepository>();
             Services.TryAddSingleton<IWebApplicationRepository, WebApplicationRepository>();

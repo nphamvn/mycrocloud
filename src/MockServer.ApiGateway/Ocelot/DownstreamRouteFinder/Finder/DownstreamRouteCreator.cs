@@ -9,6 +9,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Ocelot.DownstreamRouteFinder.UrlMatcher;
+    using System.Threading.Tasks;
 
     public class DownstreamRouteCreator : IDownstreamRouteProvider
     {
@@ -137,6 +138,11 @@
         }
 
         public Response<DownstreamRouteHolder> Get(string upstreamUrlPath, string upstreamHttpMethod, List<Route> routes)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<Response<DownstreamRouteHolder>> Get(string upstreamUrlPath, string upstreamQueryString, string upstreamHttpMethod, List<Route> routes)
         {
             throw new System.NotImplementedException();
         }
