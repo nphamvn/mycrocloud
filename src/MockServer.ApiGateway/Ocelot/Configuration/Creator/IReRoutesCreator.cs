@@ -6,5 +6,6 @@ namespace Ocelot.Configuration.Creator
     public interface IRoutesCreator
     {
         List<Route> Create(FileConfiguration fileConfiguration);
+        List<Route> Create(IEnumerable<MockServer.Core.WebApplications.Route> routes);
     }
 }

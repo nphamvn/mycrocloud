@@ -22,69 +22,69 @@
             _cache = new ConcurrentDictionary<string, OkResponse<DownstreamRouteHolder>>();
         }
 
-        public Response<DownstreamRouteHolder> Get(string upstreamUrlPath, string upstreamQueryString, string upstreamHttpMethod, IInternalConfiguration configuration, string upstreamHost)
-        {
-            var serviceName = GetServiceName(upstreamUrlPath);
+        // public Response<DownstreamRouteHolder> Get(string upstreamUrlPath, string upstreamQueryString, string upstreamHttpMethod, IInternalConfiguration configuration, string upstreamHost)
+        // {
+        //     var serviceName = GetServiceName(upstreamUrlPath);
 
-            var downstreamPath = GetDownstreamPath(upstreamUrlPath);
+        //     var downstreamPath = GetDownstreamPath(upstreamUrlPath);
 
-            if (HasQueryString(downstreamPath))
-            {
-                downstreamPath = RemoveQueryString(downstreamPath);
-            }
+        //     if (HasQueryString(downstreamPath))
+        //     {
+        //         downstreamPath = RemoveQueryString(downstreamPath);
+        //     }
 
-            var downstreamPathForKeys = $"/{serviceName}{downstreamPath}";
+        //     var downstreamPathForKeys = $"/{serviceName}{downstreamPath}";
 
-            var loadBalancerKey = CreateLoadBalancerKey(downstreamPathForKeys, upstreamHttpMethod, configuration.LoadBalancerOptions);
+        //     var loadBalancerKey = CreateLoadBalancerKey(downstreamPathForKeys, upstreamHttpMethod, configuration.LoadBalancerOptions);
 
-            if (_cache.TryGetValue(loadBalancerKey, out var downstreamRouteHolder))
-            {
-                return downstreamRouteHolder;
-            }
+        //     if (_cache.TryGetValue(loadBalancerKey, out var downstreamRouteHolder))
+        //     {
+        //         return downstreamRouteHolder;
+        //     }
 
-            var qosOptions = _qoSOptionsCreator.Create(configuration.QoSOptions, downstreamPathForKeys, new List<string> { upstreamHttpMethod });
+        //     var qosOptions = _qoSOptionsCreator.Create(configuration.QoSOptions, downstreamPathForKeys, new List<string> { upstreamHttpMethod });
 
-            var upstreamPathTemplate = new UpstreamPathTemplateBuilder().WithOriginalValue(upstreamUrlPath).Build();
+        //     var upstreamPathTemplate = new UpstreamPathTemplateBuilder().WithOriginalValue(upstreamUrlPath).Build();
 
-            var downstreamRouteBuilder = new DownstreamRouteBuilder()
-                .WithServiceName(serviceName)
-                .WithLoadBalancerKey(loadBalancerKey)
-                .WithDownstreamPathTemplate(downstreamPath)
-                .WithUseServiceDiscovery(true)
-                .WithHttpHandlerOptions(configuration.HttpHandlerOptions)
-                .WithQosOptions(qosOptions)
-                .WithDownstreamScheme(configuration.DownstreamScheme)
-                .WithLoadBalancerOptions(configuration.LoadBalancerOptions)
-                .WithDownstreamHttpVersion(configuration.DownstreamHttpVersion)
-                .WithUpstreamPathTemplate(upstreamPathTemplate);
+        //     var downstreamRouteBuilder = new DownstreamRouteBuilder()
+        //         .WithServiceName(serviceName)
+        //         .WithLoadBalancerKey(loadBalancerKey)
+        //         .WithDownstreamPathTemplate(downstreamPath)
+        //         .WithUseServiceDiscovery(true)
+        //         .WithHttpHandlerOptions(configuration.HttpHandlerOptions)
+        //         .WithQosOptions(qosOptions)
+        //         .WithDownstreamScheme(configuration.DownstreamScheme)
+        //         .WithLoadBalancerOptions(configuration.LoadBalancerOptions)
+        //         .WithDownstreamHttpVersion(configuration.DownstreamHttpVersion)
+        //         .WithUpstreamPathTemplate(upstreamPathTemplate);
 
-            var rateLimitOptions = configuration.Routes != null
-                ? configuration.Routes
-                    .SelectMany(x => x.DownstreamRoute)
-                    .FirstOrDefault(x => x.ServiceName == serviceName)
-                : null;
+        //     var rateLimitOptions = configuration.Routes != null
+        //         ? configuration.Routes
+        //             .SelectMany(x => x.DownstreamRoute)
+        //             .FirstOrDefault(x => x.ServiceName == serviceName)
+        //         : null;
 
-            if (rateLimitOptions != null)
-            {
-                downstreamRouteBuilder
-                    .WithRateLimitOptions(rateLimitOptions.RateLimitOptions)
-                    .WithEnableRateLimiting(true);
-            }
+        //     if (rateLimitOptions != null)
+        //     {
+        //         downstreamRouteBuilder
+        //             .WithRateLimitOptions(rateLimitOptions.RateLimitOptions)
+        //             .WithEnableRateLimiting(true);
+        //     }
 
-            var downstreamRoute = downstreamRouteBuilder.Build();
+        //     var downstreamRoute = downstreamRouteBuilder.Build();
 
-            var route = new RouteBuilder()
-                .WithDownstreamRoute(downstreamRoute)
-                .WithUpstreamHttpMethod(new List<string>() { upstreamHttpMethod })
-                .WithUpstreamPathTemplate(upstreamPathTemplate)
-                .Build();
+        //     var route = new RouteBuilder()
+        //         .WithDownstreamRoute(downstreamRoute)
+        //         .WithUpstreamHttpMethod(new List<string>() { upstreamHttpMethod })
+        //         .WithUpstreamPathTemplate(upstreamPathTemplate)
+        //         .Build();
 
-            downstreamRouteHolder = new OkResponse<DownstreamRouteHolder>(new DownstreamRouteHolder(new List<PlaceholderNameAndValue>(), route));
+        //     downstreamRouteHolder = new OkResponse<DownstreamRouteHolder>(new DownstreamRouteHolder(new List<PlaceholderNameAndValue>(), route));
 
-            _cache.AddOrUpdate(loadBalancerKey, downstreamRouteHolder, (x, y) => downstreamRouteHolder);
+        //     _cache.AddOrUpdate(loadBalancerKey, downstreamRouteHolder, (x, y) => downstreamRouteHolder);
 
-            return downstreamRouteHolder;
-        }
+        //     return downstreamRouteHolder;
+        // }
 
         private static string RemoveQueryString(string downstreamPath)
         {

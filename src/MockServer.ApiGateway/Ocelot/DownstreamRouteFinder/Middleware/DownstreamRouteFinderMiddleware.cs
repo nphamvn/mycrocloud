@@ -22,11 +22,13 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly IDownstreamRouteProviderFactory _factory;
+        private readonly IRoutesCreator _routesCreator;
         private readonly IWebApplicationRouteRepository _webApplicationRouteRepository;
         private readonly MockResponderOptions _mockResponderOptions;
         public DownstreamRouteFinderMiddleware(RequestDelegate next,
             IOcelotLoggerFactory loggerFactory,
             IDownstreamRouteProviderFactory downstreamRouteFinder,
+            IRoutesCreator routesCreator,
             IWebApplicationRouteRepository webApplicationRouteRepository,
             IOptions<MockResponderOptions> mockResponderOptions
             )
@@ -34,6 +36,7 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
         {
             _next = next;
             _factory = downstreamRouteFinder;
+            _routesCreator = routesCreator;
             _webApplicationRouteRepository = webApplicationRouteRepository;
             _mockResponderOptions = mockResponderOptions.Value;
         }
@@ -48,21 +51,20 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
 
             Logger.LogDebug($"Upstream url path is {upstreamUrlPath}");
 
-            var provider = _factory.Get();
+            var provider = _factory.Get(nameof(DownstreamRouteFinder));
 
             var app = httpContext.Items.WebApplication();
 
             var applicableRoutes = await _webApplicationRouteRepository.GetByApplicationId(app.WebApplicationId, string.Empty, string.Empty);
-
-            var response = await provider.Get(upstreamUrlPath, upstreamQueryString, httpContext.Request.Method, Map(applicableRoutes));
-
+            var routes = _routesCreator.Create(applicableRoutes);
+            var response = await provider.Get(upstreamUrlPath, upstreamQueryString, httpContext.Request.Method, routes);
             if (response.IsError)
             {
                 Logger.LogWarning($"{MiddlewareName} setting pipeline errors. IDownstreamRouteFinder returned {response.Errors.ToErrorString()}");
                 httpContext.Items.UpsertErrors(response.Errors);
                 return;
             }
-            response.Data.Route.DownstreamRoute = await BuildDownstreamRoute(upstreamUrlPath, upstreamQueryString, httpContext.Request.Method, response.Data.Route);
+            await SetUpRoute(upstreamUrlPath, upstreamQueryString, httpContext.Request.Method, response.Data.Route);
             var downstreamPathTemplates = string.Join(", ", response.Data.Route.DownstreamRoute.Select(r => r.DownstreamPathTemplate.Value));
             Logger.LogDebug($"downstream templates are {downstreamPathTemplates}");
 
@@ -72,6 +74,10 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
             httpContext.Items.UpsertDownstreamRoute(response.Data);
 
             await _next.Invoke(httpContext);
+        }
+        private async Task SetUpRoute(string path, string query, string method, Route route)
+        {
+            route.DownstreamRoute = await BuildDownstreamRoute(path, query, method, route);
         }
         private async Task<List<DownstreamRoute>> BuildDownstreamRoute(string path, string query, string method, Route route)
         {
@@ -93,29 +99,64 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
                     .WithDownstreamAddresses(new() {
                         new (_mockResponderOptions.Host, _mockResponderOptions.Port)
                     });
-                    downstreamRoutes.Add(builder.Build());
                     break;
                 case ResponseProvider.RequestForward:
+                    var options = new
+                    {
+                        Path = "Path",
+                        ClaimsToHeaders = new List<ClaimToThing>(),
+                        ClaimsToClaims = new List<ClaimToThing>(),
+                        ClaimsToQueries = new List<ClaimToThing>(),
+                        ClaimsToDownstreamPath = new List<ClaimToThing>(),
+                        Scheme = "",
+                        Host = "",
+                        Port = 80,
+                        HttpVersion = "",
+                        HttpMethod = ""
+                    };
+                    builder
+                        //.WithKey(fileRoute.Key)
+                        .WithDownstreamPathTemplate(options.Path)
+                        //.WithUpstreamHttpMethod(fileRoute.UpstreamHttpMethod)
+                        //.WithUpstreamPathTemplate(upstreamTemplatePattern)
+                        //.WithIsAuthenticated(fileRouteOptions.IsAuthenticated)
+                        //.WithAuthenticationOptions(authOptionsForRoute)
+                        .WithClaimsToHeaders(options.ClaimsToHeaders)
+                        .WithClaimsToClaims(options.ClaimsToClaims)
+                        //.WithRouteClaimsRequirement(fileRoute.RouteClaimsRequirement)
+                        //.WithIsAuthorized(fileRouteOptions.IsAuthorized)
+                        .WithClaimsToQueries(options.ClaimsToQueries)
+                        .WithClaimsToDownstreamPath(options.ClaimsToDownstreamPath)
+                        //.WithRequestIdKey(requestIdKey)
+                        //.WithIsCached(fileRouteOptions.IsCached)
+                        //.WithCacheOptions(new CacheOptions(fileRoute.FileCacheOptions.TtlSeconds, region))
+                        .WithDownstreamScheme(options.Scheme)
+                        //.WithLoadBalancerOptions(lbOptions)
+                        .WithDownstreamAddresses(new() { new(options.Host, options.Port) })
+                        //.WithLoadBalancerKey(routeKey)
+                        //.WithQosOptions(qosOptions)
+                        //.WithEnableRateLimiting(fileRouteOptions.EnableRateLimiting)
+                        //.WithRateLimitOptions(rateLimitOption)
+                        //.WithHttpHandlerOptions(httpHandlerOptions)
+                        //.WithServiceName(fileRoute.ServiceName)
+                        //.WithServiceNamespace(fileRoute.ServiceNamespace)
+                        //.WithUseServiceDiscovery(fileRouteOptions.UseServiceDiscovery)
+                        //.WithUpstreamHeaderFindAndReplace(hAndRs.Upstream)
+                        //.WithDownstreamHeaderFindAndReplace(hAndRs.Downstream)
+                        //.WithDelegatingHandlers(fileRoute.DelegatingHandlers)
+                        //.WithAddHeadersToDownstream(hAndRs.AddHeadersToDownstream)
+                        //.WithAddHeadersToUpstream(hAndRs.AddHeadersToUpstream)
+                        //.WithDangerousAcceptAnyServerCertificateValidator(fileRoute.DangerousAcceptAnyServerCertificateValidator)
+                        //.WithSecurityOptions(securityOptions)
+                        .WithDownstreamHttpVersion(new Version(int.Parse(options.HttpVersion.Split("/")[0]), int.Parse(options.HttpVersion.Split("/")[1])))
+                        .WithDownStreamHttpMethod(options.HttpMethod)
+                        ;
                     break;
                 default:
                     throw new NotSupportedException(nameof(route.ResponseProvider));
             }
+            downstreamRoutes.Add(builder.Build());
             return downstreamRoutes;
-        }
-
-        private List<Route> Map(IEnumerable<MockServer.Core.WebApplications.Route> routes)
-        {
-            return routes.Select(r =>
-            {
-                var builder = new RouteBuilder();
-                return builder
-                    .WithId(r.RouteId)
-                    .WithUpstreamHttpMethod(new() { r.Method })
-                    .WithUpstreamPathTemplate(new UpstreamPathTemplate(r.Path, 1, false, r.Path))
-                    .WithResponseProvider(r.ResponseProvider)
-                    .Build();
-            })
-            .ToList();
         }
     }
 }

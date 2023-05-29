@@ -53,13 +53,13 @@ namespace Ocelot.Middleware
             //     });
 
             // Allow the user to respond with absolutely anything they want.
-            // app.UseIfNotNull(pipelineConfiguration.PreErrorResponderMiddleware);
+            app.UseIfNotNull(pipelineConfiguration.PreErrorResponderMiddleware);
 
             // This is registered first so it can catch any errors and issue an appropriate response
             app.UseResponderMiddleware();
 
             // Find the web application
-            app.UseWebApplicationFinderMiddleware();
+            app.UseDownstreamWebApplicationFinderMiddleware();
 
             // Then we get the downstream route information
             app.UseDownstreamRouteFinderMiddleware();

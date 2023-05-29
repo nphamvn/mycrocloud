@@ -5,6 +5,7 @@ namespace Ocelot.Configuration.Creator
     using Ocelot.Configuration.File;
     using System.Collections.Generic;
     using System.Linq;
+    using Ocelot.Values;
 
     public class RoutesCreator : IRoutesCreator
     {
@@ -69,6 +70,20 @@ namespace Ocelot.Configuration.Creator
                     return SetUpRoute(route, downstreamRoute);
                 })
                 .ToList();
+        }
+        public List<Route> Create(IEnumerable<MockServer.Core.WebApplications.Route> routes)
+        {
+            return routes.Select(r =>
+            {
+                var builder = new RouteBuilder();
+                return builder
+                    .WithId(r.RouteId)
+                    .WithUpstreamHttpMethod(new() { r.Method })
+                    .WithUpstreamPathTemplate(new UpstreamPathTemplate(r.Path, 1, false, r.Path))
+                    .WithResponseProvider(r.ResponseProvider)
+                    .Build();
+            })
+            .ToList();
         }
 
         private DownstreamRoute SetUpDownstreamRoute(FileRoute fileRoute, FileGlobalConfiguration globalConfiguration)

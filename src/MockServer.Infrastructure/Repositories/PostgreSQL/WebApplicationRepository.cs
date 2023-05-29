@@ -75,14 +75,14 @@ public class WebApplicationRepository : BaseRepository, IWebApplicationRepositor
                 """
                 SELECT 
                     web_application_id WebApplicationId, 
-                    user_id, 
-                    "name", 
-                    description,
-                    enabled,
-                    created_at, 
-                    updated_at
+                    user_id UserId, 
+                    "name" Name, 
+                    description Description,
+                    enabled Enabled,
+                    created_at CreatedAt, 
+                    updated_at UpdatedAt
                 FROM
-                    web_application
+                    web_application wa
                 WHERE
                     web_application_id = @web_application_id;
                 """;

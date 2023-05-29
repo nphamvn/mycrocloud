@@ -43,5 +43,8 @@
         ConnectionToDownstreamServiceError = 38,
         CouldNotFindLoadBalancerCreator = 39,
         ErrorInvokingLoadBalancerCreator = 40,
+        UnableToFindDownstreamWebApplicationError = 41,
+        WebApplicationIsBlockedError = 42,
+        WebApplicationIsNotEnabledError = 43
     }
 }

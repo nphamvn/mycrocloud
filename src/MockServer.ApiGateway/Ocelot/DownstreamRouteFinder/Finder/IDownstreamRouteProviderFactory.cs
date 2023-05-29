@@ -4,7 +4,7 @@
 
     public interface IDownstreamRouteProviderFactory
     {
-        IDownstreamRouteProvider Get(IInternalConfiguration config);
-        IDownstreamRouteProvider Get();
+        //IDownstreamRouteProvider Get(IInternalConfiguration config);
+        IDownstreamRouteProvider Get(string name);
     }
 }

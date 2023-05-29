@@ -5,7 +5,6 @@ namespace Ocelot.Middleware
     using Ocelot.Configuration.Repository;
     using Ocelot.Logging;
     using Microsoft.AspNetCore.Http;
-    using Ocelot.DownstreamRouteFinder.Middleware;
 
     public class ConfigurationMiddleware : OcelotMiddleware
     {
