@@ -191,14 +191,14 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
             HttpMethodSelectListItem = HttpProtocolExtensions.CommonHttpMethods
                                     .Select(m => new SelectListItem(m, m)),
             IntegrationTypeSelectListItem = new List<SelectListItem>{
-                new("Mock Integration", ((int)ResponseProvider.MockResponse).ToString()),
+                new("Mock Response", ((int)ResponseProvider.MockResponse).ToString()),
                 new("Direct Forwarding", ((int)ResponseProvider.RequestForward).ToString()),
                 new("Function Trigger", ((int)ResponseProvider.Function).ToString())
             },
             AuthorizationTypeSelectListItem = new List<SelectListItem>
             {
                 new("None", ((int)AuthorizationType.None).ToString()),
-                new("Allow Anonymous", ((int)AuthorizationType.AllowAnonymous).ToString()),
+                //new("Allow Anonymous", ((int)AuthorizationType.AllowAnonymous).ToString()),
                 new("Authorize", ((int)AuthorizationType.Authorize).ToString())
             },
         };

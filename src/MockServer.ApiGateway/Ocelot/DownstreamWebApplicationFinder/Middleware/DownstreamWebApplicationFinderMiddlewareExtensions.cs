@@ -1,6 +1,7 @@
 ﻿namespace Ocelot.WebApplicationFinder.Middleware
 {
     using Microsoft.AspNetCore.Builder;
+    using Ocelot.DownstreamWebApplicationFinder.Middleware;
 
     public static class DownstreamWebApplicationFinderMiddlewareExtensions
     {

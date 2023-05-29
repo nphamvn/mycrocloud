@@ -4,9 +4,9 @@
     ViewData["Title"] = Model.WebApplication.Name;
 }
 @section Scripts {
-    <script src="lib/vue/vue.global.js"></script>
-    <script src="lib/vue/vee-validate.min.js"></script>
-    <script src="lib/axios/axios.min.js"></script>
+<script src="lib/vue/vue.global.js"></script>
+<script src="lib/vue/vee-validate.min.js"></script>
+<script src="lib/axios/axios.min.js"></script>
 }
 <style>
     .context-menu {
@@ -29,7 +29,8 @@
                     </button>
                 </div>
                 <div class="route-list-container">
-                    <route-list :routes="routes" @@click-route="openRoute" @@route-deleted="onRouteDeleted"></route-list>
+                    <route-list :routes="routes" @@click-route="openRoute"
+                        @@route-deleted="onRouteDeleted"></route-list>
                 </div>
             </div>
             <div class="col-9">
@@ -77,26 +78,6 @@
                         </div>
                         <div class="card mt-1">
                             <div class="card-header">
-                                Integration
-                            </div>
-                            <div class="card-body">
-                                <small>Integration Type</small>
-                                <div class="mt-1">
-                                    @foreach (var type in Model.IntegrationTypeSelectListItem)
-                                    {
-                                        <div class="form-check form-check-inline">
-                                            <input v-model="openingRoute.integrationType" class="form-check-input"
-                                            type="radio" value="@type.Value">
-                                            <label class="form-check-label">@type.Text</label>
-                                        </div>
-                                    }
-                                </div>
-                                <p class="form-text">Changing the integration type will result in the loss of the
-                                    current integration configuration.</p>
-                            </div>
-                        </div>
-                        <div class="card mt-1">
-                            <div class="card-header">
                                 Authorization
                             </div>
                             <div class="card-body">
@@ -107,13 +88,13 @@
                                         {
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="radio" value="@type.Value"
-                                                v-model="openingRoute.authorization.type">
+                                                v-model="openingRoute.authorization.type" @@change="onRouteAuthorizationTypeChanged">
                                                 <label class="form-check-label">@type.Text</label>
                                             </div>
                                         }
                                     </div>
                                 </div>
-                                <div class="mt-1">
+                                <div v-show="openingRoute.authorization.type == 2" class="mt-1">
                                     <small>Policy</small>
                                     <select class="form-select" v-model="openingRoute.authorization.policies"
                                         multiple="multiple" data-placeholder="Select policies...">
@@ -304,6 +285,26 @@
                                 @@save="onValidationAttributesModalSaved"
                                 @@close="closeValidationAttributesModal"></validation-attributes-modal>
                         </div>
+                        <div class="card mt-1">
+                            <div class="card-header">
+                                Response
+                            </div>
+                            <div class="card-body">
+                                <small>Response Provider</small>
+                                <div class="mt-1">
+                                    @foreach (var type in Model.IntegrationTypeSelectListItem)
+                                    {
+                                        <div class="form-check form-check-inline">
+                                            <input v-model="openingRoute.integrationType" class="form-check-input"
+                                            type="radio" value="@type.Value">
+                                            <label class="form-check-label">@type.Text</label>
+                                        </div>
+                                    }
+                                </div>
+                                <p class="form-text">Changing the integration type will result in the loss of the
+                                    current integration configuration.</p>
+                            </div>
+                        </div>
                         <div class="mt-1 d-flex">
                             <button type="button" @@click="discardChange"
                                 class="btn btn-secondary ms-auto">Cancle</button>
@@ -363,9 +364,6 @@
         </div>
     </div>
 </template>
-<template id="route-edit-template">
-
-</template>
 <template id="validation-attributes-modal-template">
     <div id="validationAttributesModal" class="modal">
         <div class="modal-dialog">
@@ -422,7 +420,7 @@
                 this.$emit('save', this.attrs)
             },
             add() {
-                this.attrs.push({name: null, parameters: ''});
+                this.attrs.push({ name: null, parameters: '' });
             },
             remove(index) {
                 this.attrs.splice(index, 1)
@@ -509,29 +507,8 @@
         }
     }
 
-    const RouteEdit = {
-        template: "#route-edit-template",
-        props: {
-            route: {
-                type: Object
-            },
-            mode: String
-        },
-        data() {
-
-        },
-        computed: {
-
-        },
-        methods: {
-            save() {
-
-            }
-        }
-    }
-
     let timeout = null;
-    const {createApp, onMounted, ref, nextTick} = Vue
+    const { createApp, onMounted, ref, nextTick } = Vue
     const app = createApp({
         setup() {
             const webapp = ref(null);
@@ -627,7 +604,7 @@
             }
             const addRequesBodyField = () => {
                 openingRoute.value.requestBody.fieldValidationAttributes = openingRoute.value.requestBody.fieldValidationAttributes || []
-                openingRoute.value.requestBody.fieldValidationAttributes.push({name: null, attributes: []})
+                openingRoute.value.requestBody.fieldValidationAttributes.push({ name: null, attributes: [] })
             }
 
             let validationAttributesModalObj = null;
@@ -675,6 +652,11 @@
                     })))')
             })
 
+            const onRouteAuthorizationTypeChanged = () => {
+                if(openingRoute.value.authorization.type === 0 || openingRoute.value.authorization.type) {
+
+                }
+            }
             return {
                 routes,
                 RouteBaseUrl,
@@ -695,12 +677,12 @@
                 validationAttributesModalAttributes,
                 showValidationAttributesModal,
                 onValidationAttributesModalSaved,
-                closeValidationAttributesModal
+                closeValidationAttributesModal,
+                onRouteAuthorizationTypeChanged
             }
         }
     });
     app.component('route-list', RouteList)
-    app.component('route-edit', RouteEdit)
     app.component('validation-attributes-modal', ValidationAttributesModal)
     app.use(VeeValidate)
     app.mount('#app')

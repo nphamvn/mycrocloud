@@ -27,7 +27,9 @@ builder.Services
     {
 
     })
-    .AddCookie(IdentityConstants.ExternalScheme)
+    .AddCookie(IdentityConstants.ExternalScheme, options => {
+        options.LoginPath = "/identity/account/login";
+    })
     .AddCookie(IdentityConstants.TwoFactorUserIdScheme)
     .AddCookie(IdentityConstants.TwoFactorRememberMeScheme)
     .AddOpenIdConnect("Auth0", "Auth0", options =>

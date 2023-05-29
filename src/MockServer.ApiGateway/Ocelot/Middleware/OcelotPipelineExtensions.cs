@@ -6,8 +6,6 @@ using Ocelot.RequestId.Middleware;
 using Ocelot.Responder.Middleware;
 using Ocelot.Security.Middleware;
 using Ocelot.Authentication.Middleware;
-using Ocelot.Authorization.Middleware;
-using Ocelot.Cache.Middleware;
 using Ocelot.Claims.Middleware;
 using Ocelot.DownstreamRouteFinder.Middleware;
 using Ocelot.DownstreamUrlCreator.Middleware;
@@ -19,12 +17,8 @@ using System.Threading.Tasks;
 using Ocelot.DownstreamPathManipulation.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-// using Ocelot.WebSockets.Middleware;
 using Ocelot.Multiplexer;
 using Ocelot.WebApplicationFinder.Middleware;
-using MockServer.Core.WebApplications;
-using MockServer.Core.WebApplications.Security;
-using Ocelot.PayloadValidation.Middleware;
 
 namespace Ocelot.Middleware
 {
