@@ -13,29 +13,32 @@ public class WebApplicationAuthorizationPolicyRepository : BaseRepository, IWebA
     {
     }
 
-    public Task Add(int appId, Policy policy)
+    public async Task Add(int appId, Policy policy)
     {
         var query =
                 """
                 INSERT INTO 
-                    WebApplicationAuthorizationPolicy (
-                        WebApplicationId,
-                        Name,
-                        ConditionalExpressions
+                    web_application_authorization_policy (
+                        web_application_id,
+                        "name",
+                        description,
+                        claims
                     )
                     VALUES (
-                        @WebApplicationId,
-                        @Name,
-                        @ConditionalExpressions
+                        @web_application_id,
+                        @name,
+                        @description,
+                        @claims
                     );
                 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<List<string>>());
-        return connection.ExecuteAsync(query, new
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<Dictionary<string, string>>());
+        await connection.ExecuteAsync(query, new
         {
-            WebApplicationId = appId,
-            Name = policy.Name,
-            ConditionalExpressions = policy.ConditionalExpressions,
+            web_application_id = appId,
+            name = policy.Name,
+            description = policy.Description,
+            claims = policy.Claims
         });
     }
 
@@ -58,41 +61,43 @@ public class WebApplicationAuthorizationPolicyRepository : BaseRepository, IWebA
     public Task<Policy> Get(int policyId)
     {
         var query =
-                """
-                SELECT
-                    Id,
-                    WebApplicationId,
-                    Name,
-                    ConditionalExpressions
-                FROM
-                    WebApplicationAuthorizationPolicy
-                WHERE
-                    Id = @Id
-                """;
+"""
+SELECT
+    policy_id PolicyId,
+    web_application_id WebApplicationId,
+    name Name,
+    description Description,
+    claims Claims
+FROM
+    web_application_authorization_policy
+WHERE
+    policy_id = @policy_id
+""";
         using var connection = new NpgsqlConnection(ConnectionString);
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<List<string>>());
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<Dictionary<string, string>>());
         return connection.QuerySingleOrDefaultAsync<Policy>(query, new
         {
-            Id = policyId
+            policy_id = policyId
         });
     }
 
     public async Task<IEnumerable<Policy>> GetAll(int appId)
     {
         var query =
-                """
-                SELECT
-                    policy_id,
-                    web_application_id,
-                    name,
-                    conditional_expression ConditionalExpressions
-                FROM
-                    web_application_authorization_policy
-                WHERE
-                    web_application_id = @web_application_id
-                """;
+"""
+SELECT
+    policy_id PolicyId,
+    web_application_id WebApplicationId,
+    name Name,
+    description Description,
+    claims Claims
+FROM
+    web_application_authorization_policy
+WHERE
+    web_application_id = @web_application_id
+""";
         using var connection = new NpgsqlConnection(ConnectionString);
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<List<string>>());
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<Dictionary<string, string>>());
         return await connection.QueryAsync<Policy>(query, new
         {
             web_application_id = appId

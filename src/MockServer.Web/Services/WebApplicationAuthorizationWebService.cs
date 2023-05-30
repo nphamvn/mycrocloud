@@ -21,10 +21,15 @@ public class WebApplicationAuthorizationWebService : BaseWebService, IWebApplica
         _mapper = mapper;
     }
 
-    public async Task CreatePolicy(int appId, PolicySaveModel policy)
+    public async Task CreatePolicy(int appId, PolicySaveModel model)
     {
-        var mapped = _mapper.Map<CorePolicy>(policy);
-        await _webApplicationAuthorizationPolicyRepository.Add(appId, mapped);
+        var mapped = _mapper.Map<CorePolicy>(model);
+        var policy = new CorePolicy {
+            Name = model.Name,
+            Description = model.Description,
+            Claims = model.Claims.ToDictionary(k => k.Key, v => v.Value)
+        };
+        await _webApplicationAuthorizationPolicyRepository.Add(appId, policy);
     }
 
     public Task Delete(int policyId)

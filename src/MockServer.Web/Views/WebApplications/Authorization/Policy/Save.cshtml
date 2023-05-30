@@ -1,10 +1,10 @@
 @using MockServer.Web.Controllers
 @model MockServer.Web.Models.WebApplications.Authorizations.PolicySaveModel
 @{
-    if (Model.ConditionalExpressions.Count == 0)
+    @* if (Model.ConditionalExpressions.Count == 0)
     {
         Model.ConditionalExpressions.Add("");
-    }
+    } *@
     ViewData["Tab"] = "Policies";
 }
 <div class="row">
@@ -25,6 +25,33 @@
                     <span class="text-danger" asp-validation-for="Name"></span>
                 </div>
                 <div class="mt-2">
+                    <label asp-for="Description" class="form-label"></label>
+                    <input type="text" class="form-control" asp-for="Description" placeholder="Description" autocomplete="off"
+                        aria-autocomplete="none">
+                    <span class="text-danger" asp-validation-for="Description"></span>
+                </div>
+                <div class="mt-2">
+                    <label asp-for="Claims" class="form-label">Claims</label>
+                    <ul class="list-group list-group-flush px-0 js-expression-list">
+                        @if (!Model.Claims.Any())
+                        {
+                            Model.Claims.Add(new ("", ""));
+                        }
+                        @for (int i = 0; i < Model.Claims.Count; i++)
+                        {
+                            <li class="list-group-item ps-0">
+                                <div class="d-flex">
+                                    <input type="text" class="form-control me-2" asp-for="Claims[i].Key"
+                                    placeholder="Claim type ">
+                                    <input type="text" class="form-control me-2" asp-for="Claims[i].Value"
+                                    placeholder="Allowed values">
+                                    <button type="button" class="js-delete-button"><i class="bi bi-trash"></i></button>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                @* <div class="mt-2">
                     <label asp-for="ConditionalExpressions" class="form-label">Conditional Expressions</label>
                     <ul class="list-group list-group-flush px-0 js-expression-list">
                         @for (int i = 0; i < Model.ConditionalExpressions.Count; i++)
@@ -51,7 +78,7 @@
                     <div class="d-flex">
                         <button type="button" class="mt-1 ms-auto btn btn-sm btn-secondary js-add-button">Add</button>
                     </div>
-                </div>
+                </div> *@
                 <div class="mt-3">
                     <button type="submit" class="btn btn-primary">Save</button>
                     <button type="button" class="btn btn-secondary" onclick="location.href='@Url.Action(nameof(WebApplicationAuthorizationsController.PolicyIndex), new {WebApplicationName = Model.WebApplication.Name})'">Cancel</button>
@@ -73,8 +100,8 @@
     function renderExpressionListControl() {
         $('.js-expression-list li').each(function (index, e) {
             $('input', $(e))
-                .attr('id', `@(Html.IdFor(m => m.ConditionalExpressions))_${index}_`)
-                .attr('name', `@(Html.NameFor(m => m.ConditionalExpressions))[${index}]`);
+                .attr('id', `@(Html.IdFor(m => m.Claims))_${index}_Key`)
+                .attr('name', `@(Html.NameFor(m => m.Claims))[${index}].Value`);
         });
     }
 </script>

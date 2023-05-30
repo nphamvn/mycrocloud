@@ -58,6 +58,11 @@ builder.Services
         options.Scope.Add("email");
     })
     ;
+builder.Services.AddAuthorization(options => {
+    options.AddPolicy("xxx", policy => {
+        policy.RequireClaim("scopes", "xxx:yyy");
+    });
+});
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

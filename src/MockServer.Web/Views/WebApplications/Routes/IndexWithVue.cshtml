@@ -38,7 +38,7 @@
                     <form v-on:submit.prevent="onSubmit">
                         <div class="card mt-1">
                             <div class="card-header">
-                                Basic Info
+                                Request
                             </div>
                             <div class="card-body">
                                 <div>
@@ -74,35 +74,47 @@
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="card mt-1">
-                            <div class="card-header">
-                                Authorization
-                            </div>
-                            <div class="card-body">
-                                <div>
-                                    <small>Authorization Type</small>
-                                    <div class="mt-1">
-                                        @foreach (var type in Model.AuthorizationTypeSelectListItem)
-                                        {
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" value="@type.Value"
-                                                v-model="openingRoute.authorization.type" @@change="onRouteAuthorizationTypeChanged">
-                                                <label class="form-check-label">@type.Text</label>
+                                <div class="mt-1">
+                                    <a class="text-decoration-none" data-bs-toggle="collapse" href="#requestAuthorization" role="button"
+                                            aria-expanded="false" aria-controls="requestAuthorization">
+                                            Authorization
+                                    </a>
+                                    <div class="collapse" id="requestAuthorization">
+                                        <div class="card card-body">
+                                            <div>
+                                                <small>Authorization Type</small>
+                                                <div class="mt-1">
+                                                    @foreach (var type in Model.AuthorizationTypeSelectListItem)
+                                                    {
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" value="@type.Value"
+                                                            v-model="openingRoute.authorization.type"
+                                                            @@change="onRouteAuthorizationTypeChanged">
+                                                            <label class="form-check-label">@type.Text</label>
+                                                        </div>
+                                                    }
+                                                </div>
                                             </div>
-                                        }
+                                            <div v-show="openingRoute.authorization.type == 2" class="mt-1">
+                                                <small>Policy</small>
+                                                <select class="form-select"
+                                                    v-model="openingRoute.authorization.policies" multiple="multiple"
+                                                    data-placeholder="Select policies...">
+                                                    @foreach (var policy in Model.PolicySelectListItem)
+                                                    {
+                                                        <option value="@policy.Value">@policy.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div v-show="openingRoute.authorization.type == 2" class="mt-1">
-                                    <small>Policy</small>
-                                    <select class="form-select" v-model="openingRoute.authorization.policies"
-                                        multiple="multiple" data-placeholder="Select policies...">
-                                        @foreach (var policy in Model.PolicySelectListItem)
-                                        {
-                                            <option value="@policy.Value">@policy.Text</option>
-                                        }
-                                    </select>
+                                <div class="mt-1">
+                                    <a class="text-decoration-none" data-bs-toggle="collapse" href="#requestAuthorization" role="button"
+                                            aria-expanded="false" aria-controls="requestAuthorization">
+                                            Authorization
+                                    </a>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -653,7 +665,7 @@
             })
 
             const onRouteAuthorizationTypeChanged = () => {
-                if(openingRoute.value.authorization.type === 0 || openingRoute.value.authorization.type) {
+                if (openingRoute.value.authorization.type === 0 || openingRoute.value.authorization.type) {
 
                 }
             }
