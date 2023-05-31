@@ -23,7 +23,6 @@ public class WebApplicationAuthorizationWebService : BaseWebService, IWebApplica
 
     public async Task CreatePolicy(int appId, PolicySaveModel model)
     {
-        var mapped = _mapper.Map<CorePolicy>(model);
         var policy = new CorePolicy {
             Name = model.Name,
             Description = model.Description,
@@ -37,10 +36,14 @@ public class WebApplicationAuthorizationWebService : BaseWebService, IWebApplica
         return _webApplicationAuthorizationPolicyRepository.Delete(policyId);
     }
 
-    public async Task EditPolicy(int policyId, PolicySaveModel policy)
+    public async Task EditPolicy(int policyId, PolicySaveModel model)
     {
-        var mapped = _mapper.Map<CorePolicy>(policy);
-        await _webApplicationAuthorizationPolicyRepository.Update(policyId, mapped);
+        var policy = new CorePolicy {
+            Name = model.Name,
+            Description = model.Description,
+            Claims = model.Claims.ToDictionary(k => k.Key, v => v.Value)
+        };
+        await _webApplicationAuthorizationPolicyRepository.Update(policyId, policy);
     }
 
     public async Task<PolicySaveModel> GetPolicyCreateModel(int appId)

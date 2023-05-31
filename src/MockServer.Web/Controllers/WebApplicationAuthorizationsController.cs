@@ -29,40 +29,51 @@ public class WebApplicationAuthorizationsController : BaseController
     public async Task<IActionResult> PolicyCreate(int WebApplicationId)
     {
         var model = await _webApplicationAuthorizationWebService.GetPolicyCreateModel(WebApplicationId);
+        ViewData["HeadTitle"] = "Create new policy";
         return View("/Views/WebApplications/Authorization/Policy/Save.cshtml", model);
     }
 
     [HttpPost("policies/create")]
-    public async Task<IActionResult> PolicyCreate(int WebApplicationId, PolicySaveModel model)
+    public async Task<IActionResult> PolicyCreate(string WebApplicationName, int WebApplicationId, PolicySaveModel model)
     {
         if (!ModelState.IsValid)
         {
             var temp = await _webApplicationAuthorizationWebService.GetPolicyCreateModel(WebApplicationId);
             model.WebApplication = temp.WebApplication;
-            return View("/Views/WebApplications/Authorization/Policy/Save.cshtml", model); 
+            return View("/Views/WebApplications/Authorization/Policy/Save.cshtml", model);
         }
         await _webApplicationAuthorizationWebService.CreatePolicy(WebApplicationId, model);
-        return RedirectToAction(nameof(PolicyIndex), Request.RouteValues);
+        return RedirectToAction(nameof(PolicyIndex), new RouteValueDictionary
+        {
+            [RouteName.WebApplicationName] = WebApplicationName
+        });
     }
 
     [HttpGet("policies/{PolicyId:int}/edit")]
     public async Task<IActionResult> PolicyEdit(int PolicyId)
     {
         var model = await _webApplicationAuthorizationWebService.GetPolicyEditModel(PolicyId);
+        ViewData["HeadTitle"] = "Edit policy";
         return View("/Views/WebApplications/Authorization/Policy/Save.cshtml", model);
     }
 
     [HttpPost("policies/{PolicyId:int}/edit")]
-    public async Task<IActionResult> PolicyEdit(int PolicyId, PolicySaveModel model)
+    public async Task<IActionResult> PolicyEdit(string WebApplicationName, int PolicyId, PolicySaveModel model)
     {
         await _webApplicationAuthorizationWebService.EditPolicy(PolicyId, model);
-        return RedirectToAction(nameof(PolicyIndex), Request.RouteValues);
+        return RedirectToAction(nameof(PolicyIndex), new RouteValueDictionary
+        {
+            [RouteName.WebApplicationName] = WebApplicationName
+        });
     }
-    
+
     [HttpPost("policies/{PolicyId:int}/delete")]
-    public async Task<IActionResult> PolictDelete(int PolicyId)
+    public async Task<IActionResult> PolictDelete(string WebApplicationName, int PolicyId)
     {
         await _webApplicationAuthorizationWebService.Delete(PolicyId);
-        return RedirectToAction(nameof(PolicyIndex), Request.RouteValues);
+        return RedirectToAction(nameof(PolicyIndex), new RouteValueDictionary
+        {
+            [RouteName.WebApplicationName] = WebApplicationName
+        });
     }
 }

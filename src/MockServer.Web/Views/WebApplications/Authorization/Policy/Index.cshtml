@@ -32,10 +32,10 @@
                                 <td>@no</td>
                                 <td>
                                     <a class="text-decoration-none"
-                                href="@Url.Action(nameof(WebApplicationAuthorizationsController.PolicyEdit), "WebApplicationAuthorizations" ,new { WebApplicationName = Model.WebApplication.Name , PolicyId = policy.Id})">@policy.Name</a>
+                                href="@Url.Action(nameof(WebApplicationAuthorizationsController.PolicyEdit), "WebApplicationAuthorizations" ,new { WebApplicationName = Model.WebApplication.Name , PolicyId = policy.PolicyId})">@policy.Name</a>
                                 </td>
                                 <td>
-                                    <button data-id="@policy.Id" class="js-delete-button" data-bs-toggle="modal"
+                                    <button data-id="@policy.PolicyId" class="js-delete-button" data-bs-toggle="modal"
                                 data-bs-target="#delete-modal"><i class="bi bi-trash"></i></button>
                                 </td>
                             </tr>
@@ -55,13 +55,13 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="productmodel-Delete-delete-confirmation-title">Are you sure?</h4>
+                <h4 class="modal-title">Are you sure?</h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="/Admin/Product/Delete/1" method="post">
+            <form method="post">
                 <div class="form-horizontal">
                     <div class="modal-body">
-                        Are you sure you want to delete this item?
+                        Are you sure you want to delete this policy?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-bs-dismiss="modal">No, cancel</button>
@@ -78,7 +78,8 @@
     $('.js-delete-button').click(function () {
         const id = $(this).data('id');
         const modal = $('#delete-modal');
-        const tempUrl = '@Url.Action(nameof(WebApplicationAuthorizationsController.PolictDelete), new { WebApplicationName = Model.WebApplication.Name, PolicyId = -9999})';
+        const tempUrl = '@Url.Action(nameof(WebApplicationAuthorizationsController.PolictDelete),
+            new RouteValueDictionary { [Constants.RouteName.WebApplicationName] = Model.WebApplication.Name, [Constants.RouteName.PolicyId] = -9999})';
         $('form', modal).attr('action', tempUrl.replace('-9999', id));
     })
 </script>

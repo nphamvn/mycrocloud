@@ -42,23 +42,23 @@ public class WebApplicationAuthorizationPolicyRepository : BaseRepository, IWebA
         });
     }
 
-    public Task Delete(int policyId)
+    public async Task Delete(int policyId)
     {
         var query =
-                """
-                DELETE FROM
-                    WebApplicationAuthorizationPolicy
-                WHERE
-                    Id = @Id
-                """;
+"""
+DELETE FROM
+    web_application_authorization_policy
+WHERE
+    policy_id = @policy_id
+""";
         using var connection = new NpgsqlConnection(ConnectionString);
-        return connection.ExecuteAsync(query, new
+        await connection.ExecuteAsync(query, new
         {
-            Id = policyId
+            policy_id = policyId
         });
     }
 
-    public Task<Policy> Get(int policyId)
+    public async Task<Policy> Get(int policyId)
     {
         var query =
 """
@@ -75,7 +75,7 @@ WHERE
 """;
         using var connection = new NpgsqlConnection(ConnectionString);
         SqlMapper.AddTypeHandler(new JsonTypeHandler<Dictionary<string, string>>());
-        return connection.QuerySingleOrDefaultAsync<Policy>(query, new
+        return await connection.QuerySingleOrDefaultAsync<Policy>(query, new
         {
             policy_id = policyId
         });
@@ -104,25 +104,27 @@ WHERE
         });
     }
 
-    public Task Update(int id, Policy policy)
+    public async Task Update(int id, Policy policy)
     {
         var query =
-                """
-                UPDATE
-                    WebApplicationAuthorizationPolicy
-                SET
-                    Name = @Name,
-                    ConditionalExpressions = @ConditionalExpressions
-                WHERE
-                    Id = @Id
-                """;
+"""
+UPDATE
+    web_application_authorization_policy
+SET
+    name = @name,
+    description = @description,
+    claims = @claims
+WHERE
+    policy_id = @policy_id
+""";
         using var connection = new NpgsqlConnection(ConnectionString);
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<List<string>>());
-        return connection.ExecuteAsync(query, new
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<Dictionary<string, string>>());
+        await connection.ExecuteAsync(query, new
         {
-            Id = id,
-            Name = policy.Name,
-            ConditionalExpressions = policy.ConditionalExpressions
+            policy_id = id,
+            name = policy.Name,
+            description = policy.Description,
+            claims = policy.Claims
         });
     }
 }

@@ -10,8 +10,9 @@ public class Constants
         public const string RouteId = "RouteId";
         public const string DatabaseId = "DatabaseId";
         public const string DatabaseName = "DatabaseName";
+        public const string PolicyId = "PolicyId";
     }
-    public class Template
+    public class RouteTemplate
     {
         public const string ProjectsController = "[controller]";
         public const string ProjectsController_View = "{ProjectName}";

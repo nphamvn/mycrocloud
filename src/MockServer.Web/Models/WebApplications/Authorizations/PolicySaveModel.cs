@@ -17,14 +17,12 @@ public class PolicySaveModel : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         yield return ValidationResult.Success; 
-        Console.WriteLine("Validate");
         if (Claims.Count is not > 0)
         {
             yield return new ValidationResult("Please specify at least one claim", new string[] { nameof(Claims) });
         }
         else if (Claims.Any(c => string.IsNullOrEmpty(c.Key) || string.IsNullOrEmpty(c.Value)))
         {
-            Console.WriteLine("Expression must not be empty");
             yield return new ValidationResult("Expression must not be empty", new string[] { nameof(Claims) });
         }
     }

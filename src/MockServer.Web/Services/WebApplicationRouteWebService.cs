@@ -203,7 +203,7 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
             },
         };
         var policies = await _webApplicationAuthorizationPolicyRepository.GetAll(appId);
-        vm.PolicySelectListItem = policies.Select(p => new SelectListItem(p.Name, p.Id.ToString()));
+        vm.PolicySelectListItem = policies.Select(p => new SelectListItem(p.Name, p.PolicyId.ToString()));
         vm.BuiltInValdationAttributes = new List<BuiltInValdationAttributeDescription>
         {
             new () {
