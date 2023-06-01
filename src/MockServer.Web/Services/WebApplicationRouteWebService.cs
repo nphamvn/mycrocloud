@@ -73,9 +73,9 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         vm.Authorization.PolicySelectListItem = policies
                         .Select(p => new SelectListItem
                         {
-                            Value = p.Id.ToString(),
+                            Value = p.PolicyId.ToString(),
                             Text = p.Name,
-                            Selected = vm.Authorization.PolicyIds.Contains(p.Id)
+                            //Selected = vm.Authorization.PolicyIds.Contains(p.PolicyId)
                         });
         return vm;
     }
@@ -103,9 +103,6 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
     {
         var route = await _webApplicationRouteRepository.GetById(requestId);
         var vm = _mapper.Map<RouteSaveModel>(route);
-        vm.WebApplication = await _webApplicationWebService.Get(route.WebApplicationId);
-        vm.HttpMethodSelectListItems = HttpProtocolExtensions.CommonHttpMethods
-                                        .Select(m => new SelectListItem(m, m));
         return vm;
     }
 
@@ -190,7 +187,7 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
             Routes = _mapper.Map<IEnumerable<RouteIndexItem>>(await _webApplicationRouteRepository.GetByApplicationId(appId, searchTerm, sort)),
             HttpMethodSelectListItem = HttpProtocolExtensions.CommonHttpMethods
                                     .Select(m => new SelectListItem(m, m)),
-            IntegrationTypeSelectListItem = new List<SelectListItem>{
+            ResponseProviderSelectListItem = new List<SelectListItem>{
                 new("Mock Response", ((int)ResponseProvider.MockResponse).ToString()),
                 new("Direct Forwarding", ((int)ResponseProvider.RequestForward).ToString()),
                 new("Function Trigger", ((int)ResponseProvider.Function).ToString())
@@ -203,7 +200,7 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
             },
         };
         var policies = await _webApplicationAuthorizationPolicyRepository.GetAll(appId);
-        vm.PolicySelectListItem = policies.Select(p => new SelectListItem(p.Name, p.PolicyId.ToString()));
+        vm.AuthorizationPolicySelectListItem = policies.Select(p => new SelectListItem(p.Name, p.PolicyId.ToString()));
         vm.BuiltInValdationAttributes = new List<BuiltInValdationAttributeDescription>
         {
             new () {

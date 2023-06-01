@@ -1,0 +1,74 @@
+{
+    "id": 1,
+    "name": "name",
+    "request": {
+        "method": "path",
+        "path": "path",
+        "authorization": {
+            "type": "authorize",
+            "policyIds": [
+                1,
+                2,
+                3,
+                4,
+                5
+            ]
+        },
+        "queryValidation": [
+            {
+                "page": [
+                    "required",
+                    "integer",
+                    "range(1,20)"
+                ]
+            },
+            {
+                "name": [
+                    "length(1,100)"
+                ]
+            }
+        ],
+        "headerValidation": [
+            {
+                "page": [
+                    "required",
+                    "integer",
+                    "range(1,20)"
+                ]
+            },
+            {
+                "name": [
+                    "length(1,100)"
+                ]
+            }
+        ],
+        "bodyValidation": [
+            {
+                ".": {
+                    "equalTo": "body"
+                }
+            },
+            {
+                ".field1": {
+                    "equalTo": "field1"
+                }
+            }
+        ]
+    },
+    "response": {
+        "provider": "mock",
+        "mockProviderOptions": {
+            "status": 200,
+            "delay": {
+                "delayed": true,
+                "type": "fixed",
+                "time": 1000
+            },
+            "body": {
+                "text": "foo"
+            }
+        },
+        "proxyProviderOptions" : null,
+        "functionProviderOptions": null
+    }
+}

@@ -53,7 +53,7 @@
                                             class="form-select form-select-sm w-auto me-2">
                                             @foreach (var method in Model.HttpMethodSelectListItem)
                                             {
-                                                <option value="@method.Value">@method.Text</option>
+                                                    <option value="@method.Value">@method.Text</option>
                                             }
                                         </select>
                                     </div>
@@ -74,10 +74,10 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div class="mt-1">
-                                    <a class="text-decoration-none" data-bs-toggle="collapse" href="#requestAuthorization" role="button"
-                                            aria-expanded="false" aria-controls="requestAuthorization">
-                                            Authorization
+                                <div class="mt-2">
+                                    <a class="text-decoration-none" data-bs-toggle="collapse"
+                                        href="#requestAuthorization" role="button">
+                                        Authorization
                                     </a>
                                     <div class="collapse" id="requestAuthorization">
                                         <div class="card card-body">
@@ -86,12 +86,12 @@
                                                 <div class="mt-1">
                                                     @foreach (var type in Model.AuthorizationTypeSelectListItem)
                                                     {
-                                                        <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" value="@type.Value"
+                                                            <div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio" value="@type.Value"
                                                             v-model="openingRoute.authorization.type"
                                                             @@change="onRouteAuthorizationTypeChanged">
-                                                            <label class="form-check-label">@type.Text</label>
-                                                        </div>
+                                                                <label class="form-check-label">@type.Text</label>
+                                                            </div>
                                                     }
                                                 </div>
                                             </div>
@@ -100,184 +100,195 @@
                                                 <select class="form-select"
                                                     v-model="openingRoute.authorization.policies" multiple="multiple"
                                                     data-placeholder="Select policies...">
-                                                    @foreach (var policy in Model.PolicySelectListItem)
+                                                    @foreach (var policy in Model.AuthorizationPolicySelectListItem)
                                                     {
-                                                        <option value="@policy.Value">@policy.Text</option>
+                                                            <option value="@policy.Value">@policy.Text</option>
                                                     }
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="card mt-1">
-                            <div class="card-header">
-                                Request Validation
-                            </div>
-                            <div class="card-body">
-                                <ul class="nav nav-tabs" role="tablist">
-                                    <li class="nav-item" role="presentation">
-                                        <button type="button" class="nav-link active py-1" data-bs-toggle="tab"
-                                            data-bs-target="#request-param-tab">Query</button>
-                                    </li>
-                                    <li class="nav-item">
-                                        <button type="button" class="nav-link py-1" data-bs-toggle="tab"
-                                            data-bs-target="#request-header-tab">Headers</button>
-                                    </li>
-                                    <li class="nav-item">
-                                        <button type="button" class="nav-link py-1" data-bs-toggle="tab"
-                                            data-bs-target="#request-body-tab">Body</button>
-                                    </li>
-                                </ul>
-                                <div class="tab-content" style="min-height: 200px;">
-                                    <div id="request-param-tab" class="tab-pane fade show active p-2" role="tabpanel">
-                                        <table class="table table-sm p-0 m-0">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 20%" scope="col">Key</th>
-                                                    <th style="width: 75%" scope="col">Attributes</th>
-                                                    <th style="width: 5%" scope="col">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="(query, index) in openingRoute.requestQueries">
-                                                    <td class="align-middle">
-                                                        <input type="text" v-model="query.key"
-                                                            class="form-control form-control-sm" placeholder="key"
-                                                            autocomplete="off">
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        <div class="d-flex">
-                                                            <select style="display: none;" v-model="query.attributes"
-                                                                multiple></select>
-                                                            <div class="d-flex">
-                                                                <span v-for="attr in query.attributes"
-                                                                    class="me-1 bg-gray py-1 px-2 rounded">{{attr.name}}</span>
-                                                            </div>
-                                                            <button type="button" class="ms-auto"
-                                                                v-on:click="showValidationAttributesModal(query.attributes, attrs => query.attributes = attrs)">
-                                                                <i class="bi bi-box-arrow-in-up-right"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        <button type="button" class="btn text-gray btn-show-on-hover"
-                                                            v-on:click="openingRoute.requestQueries.splice(index, 1)">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <div class="mt-1">
-                                            <button type="button" class="btn btn-secondary btn-sm"
-                                                v-on:click="addRow('requestQueries')">Add</button>
-                                        </div>
-                                    </div>
-                                    <div id="request-header-tab" class="tab-pane fade p-2" role="tabpanel">
-                                        <table id="request-header-table" class="table table-sm p-0 m-0">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 20%" scope="col">Header</th>
-                                                    <th style="width: 75%" scope="col">Attributes</th>
-                                                    <th style="width: 5%" scope="col">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="(header, index) in openingRoute.requestHeaders">
-                                                    <td class="align-middle">
-                                                        <input type="text" v-model="header.name"
-                                                            class="form-control form-control-sm" placeholder="name"
-                                                            autocomplete="off" aria-autocomplete="none">
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        <div class="d-flex">
-                                                            <select style="display: none;" v-model="header.attributes"
-                                                                multiple></select>
-                                                            <div class="d-flex">
-                                                                <span v-for="attr in header.attributes"
-                                                                    class="me-1 bg-gray py-1 px-2 rounded">{{attr.name}}</span>
-                                                            </div>
-                                                            <button type="button" class="ms-auto"
-                                                                v-on:click="showValidationAttributesModal(header.attributes, attrs => header.attributes = attrs)">
-                                                                <i class="bi bi-box-arrow-in-up-right"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        <button type="button" class="btn text-gray btn-show-on-hover"
-                                                            v-on:click="openingRoute.requestHeaders.splice(index, 1)">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <div class="mt-1">
-                                            <button type="button" class="btn btn-secondary btn-sm"
-                                                v-on:click="addRow('requestHeaders')">Add</button>
-                                        </div>
-                                    </div>
-                                    <div id="request-body-tab" class="tab-pane fade p-2" role="tabpanel">
-                                        <div class="mt-1">
-                                            <div class="card mt-2">
-                                                <div class="card-header">
-                                                    Fields Validation
-                                                </div>
-                                                <div class="card-body">
-                                                    <div>
-                                                        <p class="form-text">To refer to the entire body object, enter a
-                                                            period (.) in the field name, and to refer to a specific
-                                                            field
-                                                            of the body object, simply enter the field name in without
-                                                            the period prefix.</p>
-                                                    </div>
-                                                    <table class="table table-sm">
-                                                        <thead>
-                                                            <tr>
-                                                                <th style="width: 20%" scope="col">Field</th>
-                                                                <th style="width: 75%" scope="col">Attributes</th>
-                                                                <th style="width: 5%" scope="col">Actions</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr
-                                                                v-for="(field, index) in openingRoute.requestBody.fieldValidationAttributes">
-                                                                <td class="align-middle">
-                                                                    <input type="text" v-model="field.name"
-                                                                        class="form-control form-control-sm"
-                                                                        placeholder="name" autocomplete="off"
-                                                                        aria-autocomplete="none">
-                                                                </td>
-                                                                <td class="align-middle">
+                                <div>
+                                    <a class="text-decoration-none" data-bs-toggle="collapse" href="#requestValidation"
+                                        role="button">
+                                        Request Validation
+                                    </a>
+                                    <div class="collapse" id="requestValidation">
+                                        <ul class="nav nav-tabs" role="tablist">
+                                            <li class="nav-item" role="presentation">
+                                                <button type="button" class="nav-link active py-1" data-bs-toggle="tab"
+                                                    data-bs-target="#request-param-tab">Query</button>
+                                            </li>
+                                            <li class="nav-item">
+                                                <button type="button" class="nav-link py-1" data-bs-toggle="tab"
+                                                    data-bs-target="#request-header-tab">Headers</button>
+                                            </li>
+                                            <li class="nav-item">
+                                                <button type="button" class="nav-link py-1" data-bs-toggle="tab"
+                                                    data-bs-target="#request-body-tab">Body</button>
+                                            </li>
+                                        </ul>
+                                        <div class="tab-content" style="min-height: 200px;">
+                                            <div id="request-param-tab" class="tab-pane show active p-2"
+                                                role="tabpanel">
+                                                <table class="table table-sm p-0 m-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width: 20%" scope="col">Key</th>
+                                                            <th style="width: 75%" scope="col">Attributes</th>
+                                                            <th style="width: 5%" scope="col">Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="(query, index) in openingRoute.requestQueries">
+                                                            <td class="align-middle">
+                                                                <input type="text" v-model="query.key"
+                                                                    class="form-control form-control-sm"
+                                                                    placeholder="key" autocomplete="off">
+                                                            </td>
+                                                            <td class="align-middle">
+                                                                <div class="d-flex">
+                                                                    <select style="display: none;"
+                                                                        v-model="query.attributes" multiple></select>
                                                                     <div class="d-flex">
-                                                                        <select style="display: none;"
-                                                                            v-model="field.attributes"
-                                                                            multiple></select>
-                                                                        <div class="d-flex">
-                                                                            <span v-for="attr in field.attributes"
-                                                                                class="me-1 bg-gray py-1 px-2 rounded">{{attr.name}}</span>
-                                                                        </div>
-                                                                        <button type="button" class="ms-auto"
-                                                                            v-on:click="showValidationAttributesModal(field.attributes, attrs => field.attributes = attrs)">
-                                                                            <i class="bi bi-box-arrow-in-up-right"></i>
-                                                                        </button>
+                                                                        <span v-for="attr in query.attributes"
+                                                                            class="me-1 bg-gray py-1 px-2 rounded">{{attr.name}}</span>
                                                                     </div>
-                                                                </td>
-                                                                <td class="align-middle">
-                                                                    <button type="button"
-                                                                        class="btn text-gray btn-show-on-hover"
-                                                                        v-on:click="openingRoute.requestBody.fieldValidationAttributes.splice(index, 1)">
-                                                                        <i class="bi bi-trash"></i>
+                                                                    <button type="button" class="ms-auto"
+                                                                        v-on:click="showValidationAttributesModal(query.attributes, attrs => query.attributes = attrs)">
+                                                                        <i class="bi bi-box-arrow-in-up-right"></i>
                                                                     </button>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                    <div class="mt-1">
-                                                        <button type="button" class="btn btn-secondary btn-sm"
-                                                            v-on:click="addRequesBodyField">Add</button>
+                                                                </div>
+                                                            </td>
+                                                            <td class="align-middle">
+                                                                <button type="button"
+                                                                    class="btn text-gray btn-show-on-hover"
+                                                                    v-on:click="openingRoute.requestQueries.splice(index, 1)">
+                                                                    <i class="bi bi-trash"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <div class="mt-1">
+                                                    <button type="button" class="btn btn-secondary btn-sm"
+                                                        v-on:click="addRow('requestQueries')">Add</button>
+                                                </div>
+                                            </div>
+                                            <div id="request-header-tab" class="tab-pane p-2" role="tabpanel">
+                                                <table id="request-header-table" class="table table-sm p-0 m-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width: 20%" scope="col">Header</th>
+                                                            <th style="width: 75%" scope="col">Attributes</th>
+                                                            <th style="width: 5%" scope="col">Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="(header, index) in openingRoute.requestHeaders">
+                                                            <td class="align-middle">
+                                                                <input type="text" v-model="header.name"
+                                                                    class="form-control form-control-sm"
+                                                                    placeholder="name" autocomplete="off"
+                                                                    aria-autocomplete="none">
+                                                            </td>
+                                                            <td class="align-middle">
+                                                                <div class="d-flex">
+                                                                    <select style="display: none;"
+                                                                        v-model="header.attributes" multiple></select>
+                                                                    <div class="d-flex">
+                                                                        <span v-for="attr in header.attributes"
+                                                                            class="me-1 bg-gray py-1 px-2 rounded">{{attr.name}}</span>
+                                                                    </div>
+                                                                    <button type="button" class="ms-auto"
+                                                                        v-on:click="showValidationAttributesModal(header.attributes, attrs => header.attributes = attrs)">
+                                                                        <i class="bi bi-box-arrow-in-up-right"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                            <td class="align-middle">
+                                                                <button type="button"
+                                                                    class="btn text-gray btn-show-on-hover"
+                                                                    v-on:click="openingRoute.requestHeaders.splice(index, 1)">
+                                                                    <i class="bi bi-trash"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <div class="mt-1">
+                                                    <button type="button" class="btn btn-secondary btn-sm"
+                                                        v-on:click="addRow('requestHeaders')">Add</button>
+                                                </div>
+                                            </div>
+                                            <div id="request-body-tab" class="tab-pane p-2" role="tabpanel">
+                                                <div class="mt-1">
+                                                    <div class="card mt-2">
+                                                        <div class="card-header">
+                                                            Fields Validation
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <div>
+                                                                <p class="form-text">To refer to the entire body object,
+                                                                    enter a
+                                                                    period (.) in the field name, and to refer to a
+                                                                    specific
+                                                                    field
+                                                                    of the body object, simply enter the field name in
+                                                                    without
+                                                                    the period prefix.</p>
+                                                            </div>
+                                                            <table class="table table-sm">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="width: 20%" scope="col">Field</th>
+                                                                        <th style="width: 75%" scope="col">Attributes
+                                                                        </th>
+                                                                        <th style="width: 5%" scope="col">Actions</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr
+                                                                        v-for="(field, index) in openingRoute.requestBody.fieldValidationAttributes">
+                                                                        <td class="align-middle">
+                                                                            <input type="text" v-model="field.name"
+                                                                                class="form-control form-control-sm"
+                                                                                placeholder="name" autocomplete="off"
+                                                                                aria-autocomplete="none">
+                                                                        </td>
+                                                                        <td class="align-middle">
+                                                                            <div class="d-flex">
+                                                                                <select style="display: none;"
+                                                                                    v-model="field.attributes"
+                                                                                    multiple></select>
+                                                                                <div class="d-flex">
+                                                                                    <span
+                                                                                        v-for="attr in field.attributes"
+                                                                                        class="me-1 bg-gray py-1 px-2 rounded">{{attr.name}}</span>
+                                                                                </div>
+                                                                                <button type="button" class="ms-auto"
+                                                                                    v-on:click="showValidationAttributesModal(field.attributes, attrs => field.attributes = attrs)">
+                                                                                    <i
+                                                                                        class="bi bi-box-arrow-in-up-right"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="align-middle">
+                                                                            <button type="button"
+                                                                                class="btn text-gray btn-show-on-hover"
+                                                                                v-on:click="openingRoute.requestBody.fieldValidationAttributes.splice(index, 1)">
+                                                                                <i class="bi bi-trash"></i>
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <div class="mt-1">
+                                                                <button type="button" class="btn btn-secondary btn-sm"
+                                                                    v-on:click="addRequesBodyField">Add</button>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -297,7 +308,7 @@
                             <div class="card-body">
                                 <small>Response Provider</small>
                                 <div class="mt-1">
-                                    @foreach (var type in Model.IntegrationTypeSelectListItem)
+                                    @foreach (var type in Model.ResponseProviderSelectListItem)
                                     {
                                         <div class="form-check form-check-inline">
                                             <input v-model="openingRoute.integrationType" class="form-check-input"
@@ -306,8 +317,7 @@
                                         </div>
                                     }
                                 </div>
-                                <p class="form-text">Changing the integration type will result in the loss of the
-                                    current integration configuration.</p>
+                                
                             </div>
                         </div>
                         <div class="mt-1 d-flex">
@@ -350,7 +360,7 @@
         <button type="button" v-on:click="showDeleteConfirmModal"
             class="dropdown-item btn btn-default text-danger">Delete</button>
     </div>
-    <div v-if="routeDeleteConfirmModalVisible" class="modal fade" :id="routeDeleteConfirmModalId" aria-hidden="true">
+    <div v-if="routeDeleteConfirmModalVisible" class="modal" :id="routeDeleteConfirmModalId" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

@@ -9,7 +9,7 @@ public class RoutePageModel
     public IEnumerable<RouteIndexItem> Routes { get; set; }
     public IEnumerable<SelectListItem> HttpMethodSelectListItem { get; set; }
     public IEnumerable<SelectListItem> AuthorizationTypeSelectListItem { get; set; }
-    public IEnumerable<SelectListItem> IntegrationTypeSelectListItem { get; set; }
-    public IEnumerable<SelectListItem> PolicySelectListItem { get; set; }
+    public IEnumerable<SelectListItem> AuthorizationPolicySelectListItem { get; set; }
+    public IEnumerable<SelectListItem> ResponseProviderSelectListItem { get; set; }
     public IEnumerable<BuiltInValdationAttributeDescription> BuiltInValdationAttributes { get; set; }
 }

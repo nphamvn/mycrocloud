@@ -26,7 +26,7 @@ public class WebApplicationAuthorizationWebService : BaseWebService, IWebApplica
         var policy = new CorePolicy {
             Name = model.Name,
             Description = model.Description,
-            Claims = model.Claims.ToDictionary(k => k.Key, v => v.Value)
+            Claims = (Core.WebApplications.Security.Claims)model.Claims.ToDictionary(k => k.Key, v => v.Value)
         };
         await _webApplicationAuthorizationPolicyRepository.Add(appId, policy);
     }
@@ -38,10 +38,12 @@ public class WebApplicationAuthorizationWebService : BaseWebService, IWebApplica
 
     public async Task EditPolicy(int policyId, PolicySaveModel model)
     {
+        var claims = new Core.WebApplications.Security.Claims();
+        model.Claims.ForEach(c => claims.Add(c.Key, c.Value));
         var policy = new CorePolicy {
             Name = model.Name,
             Description = model.Description,
-            Claims = model.Claims.ToDictionary(k => k.Key, v => v.Value)
+            Claims = claims
         };
         await _webApplicationAuthorizationPolicyRepository.Update(policyId, policy);
     }

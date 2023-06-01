@@ -74,7 +74,7 @@ WHERE
     policy_id = @policy_id
 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<Dictionary<string, string>>());
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<Claims>());
         return await connection.QuerySingleOrDefaultAsync<Policy>(query, new
         {
             policy_id = policyId
@@ -97,7 +97,7 @@ WHERE
     web_application_id = @web_application_id
 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<Dictionary<string, string>>());
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<Claims>());
         return await connection.QueryAsync<Policy>(query, new
         {
             web_application_id = appId
@@ -118,7 +118,7 @@ WHERE
     policy_id = @policy_id
 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<Dictionary<string, string>>());
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<Claims>());
         await connection.ExecuteAsync(query, new
         {
             policy_id = id,
