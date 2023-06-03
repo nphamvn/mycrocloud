@@ -5,32 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Entities\**" />
-    <Compile Remove="Enums\**" />
-    <EmbeddedResource Remove="Entities\**" />
-    <EmbeddedResource Remove="Enums\**" />
-    <None Remove="Entities\**" />
-    <None Remove="Enums\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Entities\" />
-    <None Remove="Models\" />
-    <None Remove="Enums\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Jint" Version="3.0.0-beta-2046" />
-    <PackageReference Include="JWT" Version="10.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.14" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.5.0-2.final" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
-    <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="6.27.0" />
-    <PackageReference Include="Yarp.ReverseProxy" Version="2.0.0" />
   </ItemGroup>
 </Project>

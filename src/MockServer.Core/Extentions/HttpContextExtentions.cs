@@ -2,8 +2,6 @@ using System.Dynamic;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
 
 namespace MockServer.Core.Extentions;
 
