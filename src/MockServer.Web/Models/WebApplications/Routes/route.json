@@ -2,7 +2,7 @@
     "id": 1,
     "name": "name",
     "request": {
-        "method": "path",
+        "method": "method",
         "path": "path",
         "authorization": {
             "type": "authorize",
@@ -12,7 +12,16 @@
                 3,
                 4,
                 5
-            ]
+            ],
+            "claims": {
+                "Roles": ["Element 1", "Element 2"],
+                "Role": "Single" 
+            }
+        },
+        "validation": {
+            "query": [],
+            "header": [],
+            "body": []
         },
         "queryValidation": [
             {

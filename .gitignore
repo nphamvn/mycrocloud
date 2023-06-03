@@ -452,3 +452,5 @@ $RECYCLE.BIN/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+src/MockServer.Web/web.mock-server.npham.me.conf
+src/MockServer.Web/wwwroot/css/tailwind.css
