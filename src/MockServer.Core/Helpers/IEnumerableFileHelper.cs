@@ -7,6 +7,7 @@ public static class IEnumerableFileHelper
     /// <summary>
     ///     Save a IEnumerable to a file.
     /// </summary>
+    [Obsolete("Obsolete")]
     public static void SaveToFileIEnum<T>(this IEnumerable<T> obj, string path, bool append = false)
     {
         var type = obj.GetType();
@@ -21,6 +22,7 @@ public static class IEnumerableFileHelper
     /// <summary>
     ///     Load a IEnumerable from a file.
     /// </summary>
+    [Obsolete("Obsolete")]
     public static IEnumerable<T> LoadFromFileIEnum<T>(this IEnumerable<T> dump, string path)
     {
         var type = dump.GetType();
@@ -36,6 +38,7 @@ public static class IEnumerableFileHelper
     /// <summary>
     ///     Save an object (Primitive, class, structure) to a file.
     /// </summary>
+    [Obsolete("Obsolete")]
     public static void SaveToFileObj<T>(this T obj, string path, bool append = false)
     {
         var type = obj.GetType();
@@ -50,6 +53,7 @@ public static class IEnumerableFileHelper
     /// <summary>
     ///     Load an object (Primitive, class, structure) from a file.
     /// </summary>
+    [Obsolete("Obsolete")]
     public static T LoadFromFileObj<T>(this T dump, string path)
     {
         var type = dump.GetType();
