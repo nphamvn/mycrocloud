@@ -9,6 +9,7 @@ using RouteName = MockServer.Web.Common.Constants.RouteName;
 
 namespace MockServer.Web.Controllers;
 
+[NonController]
 [GetAuthUserDatabaseId(RouteName.DatabaseName, RouteName.DatabaseId)]
 public class DatabasesController: BaseController
 {
