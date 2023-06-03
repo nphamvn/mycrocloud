@@ -4,6 +4,10 @@
     var availableSchemes = Model.AuthenticationSchemeSelectListItem.Where(i => !i.Selected);
     var selectedSchemes = Model.AuthenticationSchemeSelectListItem.Where(i => i.Selected);
 }
+@section Scripts {
+    <link rel="stylesheet" href="~/lib/jquery/dist/jquery-ui.css" />
+    <script src="~/lib/jquery/dist/jquery-ui.min.js"></script>
+}
 <style>
     .dragSortableItems .sortable-list {
         list-style: none;
