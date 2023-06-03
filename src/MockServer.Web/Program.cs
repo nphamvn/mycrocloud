@@ -59,8 +59,14 @@ builder.Services
     })
     ;
 builder.Services.AddAuthorization(options => {
-    options.AddPolicy("xxx", policy => {
-        policy.RequireClaim("scopes", "xxx:yyy");
+    options.AddPolicy("ReadWebApplication", policy => {
+        policy.RequireClaim("scopes", "webapp:read");
+    });
+    options.AddPolicy("WriteWebApplication", policy => {
+        policy.RequireClaim("scopes", "webapp:write");
+    });
+    options.AddPolicy("DeleteWebApplication", policy => {
+        policy.RequireClaim("scopes", "webapp:delete");
     });
 });
 var app = builder.Build();
