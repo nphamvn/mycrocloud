@@ -9,11 +9,12 @@ namespace MockServer.Web.Controllers;
 
 [Authorize]
 [Route("webapps")]
+[GetAuthUserWebApplicationId(RouteName.WebApplicationName, RouteName.WebApplicationId)]
 public class WebApplicationsController : BaseController
 {
-    private readonly IWebApplicationWebService _webApplicationWebService;
+    private readonly IWebApplicationService _webApplicationWebService;
 
-    public WebApplicationsController(IWebApplicationWebService webApplicationWebService)
+    public WebApplicationsController(IWebApplicationService webApplicationWebService)
     {
         _webApplicationWebService = webApplicationWebService;
     }
@@ -22,14 +23,14 @@ public class WebApplicationsController : BaseController
     public async Task<IActionResult> Index(WebApplicationIndexViewModel fm)
     {
         var vm = await _webApplicationWebService.GetIndexViewModel(fm.Search);
-        return View("/Views/WebApplications/WebApplications.Index.cshtml", vm);
+        return View("/Views/WebApplications/Index.cshtml", vm);
     }
 
     [HttpGet("create")]
-    public async Task<IActionResult> Create()
+    public Task<IActionResult> Create()
     {
         var vm = new WebApplicationCreateModel();
-        return View("/Views/WebApplications/WebApplications.Create.cshtml", vm);
+        return Task.FromResult<IActionResult>(View("/Views/WebApplications/Create.cshtml", vm));
     }
 
     [HttpPost("create")]
@@ -37,33 +38,32 @@ public class WebApplicationsController : BaseController
     {
         if (!ModelState.IsValid)
         {
-            return View("/Views/WebApplications/WebApplications.Create.cshtml", app);
+            return View("/Views/WebApplications/Create.cshtml", app);
         }
         await _webApplicationWebService.Create(app);
 
-        return RedirectToAction(nameof(Overview), new { ProjectName = app.Name });
+        return RedirectToAction(nameof(Overview), new { WebApplicationName = app.Name });
     }
 
     [HttpGet("{WebApplicationName}")]
-    [GetAuthUserWebApplicationId(RouteName.WebApplicationName, RouteName.WebApplicationId)]
-    public IActionResult Home(int WebApplicationId)
-    {
-        return RedirectToAction(nameof(Overview), Request.RouteValues);
-    }
-
-    [HttpGet("{WebApplicationName}/json")]
-    [GetAuthUserWebApplicationId(RouteName.WebApplicationName, RouteName.WebApplicationId)]
-    public async Task<IActionResult> GetAppJson(int WebApplicationId)
-    {
-        var vm = await _webApplicationWebService.Get(WebApplicationId);
-        return Ok(vm);
-    }
-
     [HttpGet("{WebApplicationName}/overview")]
-    [GetAuthUserWebApplicationId(RouteName.WebApplicationName, RouteName.WebApplicationId)]
     public async Task<IActionResult> Overview(int WebApplicationId)
     {
         var vm = await _webApplicationWebService.Get(WebApplicationId);
-        return View("/Views/WebApplications/WebApplications.Overview.cshtml", vm);
+        return View("/Views/WebApplications/Overview.cshtml", vm);
+    }
+    
+    [HttpPost("rename")]
+    public async Task<IActionResult> Rename(int WebApplicationId, string newName)
+    {
+        await _webApplicationWebService.Rename(WebApplicationId, newName);
+        return RedirectToAction(nameof(Index), new { WebApplicationName = newName });
+    }
+
+    [HttpPost("delete")]
+    public async Task<IActionResult> Delete(int WebApplicationId)
+    {
+        await _webApplicationWebService.Delete(WebApplicationId);
+        return RedirectToAction(nameof(Index));
     }
 }

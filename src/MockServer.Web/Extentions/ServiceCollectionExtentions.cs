@@ -5,6 +5,7 @@ using MockServer.Core.Repositories;
 using MockServer.Core.Settings;
 using MockServer.Infrastructure.Repositories.PostgreSql;
 using MockServer.Web.Areas.Identity.Services;
+using MockServer.Web.Repositories;
 using MockServer.Web.Services;
 using MockServer.Web.Services.Interfaces;
 
@@ -32,18 +33,17 @@ namespace MockServer.Web.Extentions
             services.AddScoped<UserManager<IdentityUser>>();
             services.AddScoped<SignInManager<IdentityUser>>();
             services.AddTransient<IEmailSender, SendGridEmailSender>(); 
-
+            
             services.AddScoped<IWebApplicationRepository, WebApplicationRepository>();
+            services.AddScoped<IWebApplicationWebRepository, WebApplicationWebRepository>();
             services.AddScoped<IWebApplicationRouteRepository, WebApplicationRouteRepository>();
             services.AddScoped<IWebApplicationAuthenticationSchemeRepository, WebApplicationAuthenticationSchemeRepository>();
             services.AddScoped<IWebApplicationAuthorizationPolicyRepository, WebApplicationAuthorizationPolicyRepository>();
-            //services.AddScoped<IDatabaseRepository, DatabaseRespository>();
-            services.AddScoped<IWebApplicationWebService, WebApplicationWebService>();
-            services.AddScoped<IWebApplicationRouteWebService, WebApplicationRouteWebService>();
+            services.AddScoped<IWebApplicationService, WebApplicationService>();
+            services.AddScoped<IWebApplicationRouteService, WebApplicationRouteService>();
             services.AddScoped<IWebApplicationAuthenticationWebService, WebApplicationAuthenticationWebService>();
             services.AddScoped<IWebApplicationAuthorizationWebService, WebApplicationAuthorizationWebService>();
             services.AddScoped<IServiceRepository, ServiceRepository>();
-            //services.AddScoped<IDatabaseWebService, DatabaseWebService>();
             services.AddScoped<IFunctionRepository, FunctionRepository>();
             services.AddScoped<IFunctionWebService, FunctionWebService>();
         }

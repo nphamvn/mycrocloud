@@ -9,3 +9,6 @@ scp -i ~/.ssh/keys/npham.me-nam -r publish/* nam@npham.me:/home/nam/workspaces/m
 
 #Build tailwindcss
 npx tailwindcss -i tailwind.input.css -o wwwroot/css/tailwind.css
+
+#Install library with LibMan
+libman install vue@3.3.4 --provider cdnjs --destination wwwroot/lib/vue --files vue.global.min.js

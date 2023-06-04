@@ -1,0 +1,124 @@
+@page "/empty"
+@{
+    Layout = "_Layout";
+}
+@section head {
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/tailwind.css" asp-append-version="true" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<script src="~/js/common.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<environment include="Development">
+    <!-- Development Environment -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <link href="lib/vuetify/vuetify.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css" />
+    <script src="lib/vue/vue.global.min.js"></script>
+    <script src="lib/axios/axios.min.js"></script>
+    <script src="lib/vuetify/vuetify.min.js"></script>
+</environment>
+<environment exclude="Development">
+    <!-- Not Development Environment -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"
+        integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@3.3.2/dist/vuetify.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css" />
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+        integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@3.3.2/dist/vuetify.min.js"></script>
+</environment>
+}
+@* <div id="app2">
+    <v-app>
+    <v-main>
+    <v-container>
+    <v-table density="compact">
+    <thead>
+    <tr>
+    <th class="text-left">
+    Name
+    </th>
+    <th class="text-left">
+    Calories
+    </th>
+    </tr>
+    </thead>
+    </v-table>
+    </v-container>
+    </v-main>
+    </v-app>
+    </div>
+
+    <script>
+    const app2 = Vue.createApp({
+    data() {
+    return {
+    desserts: [
+    {
+    name: 'Frozen Yogurt',
+    calories: 159,
+    },
+    {
+    name: 'Ice cream sandwich',
+    calories: 237,
+    },
+    ],
+    };
+    }
+    });
+
+    app2.use(Vuetify.createVuetify({
+    ssr: true,
+    }));
+    app2.mount('#app2');
+    </script> *@
+
+<div id="app2">
+    <v-table>
+        <thead>
+            <tr>
+                <th class="text-left">Name</th>
+                <th class="text-left">Calories</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="item in desserts" :key="item.name">
+                <td>{{ item.name }}</td>
+                <td>{{ item.calories }}</td>
+            </tr>
+        </tbody>
+    </v-table>
+</div>
+
+<script>
+    const app2 = Vue.createApp({
+        data() {
+            return {
+                desserts: [
+                    {
+                        name: 'Frozen',
+                        calories: 159,
+                    },
+                    {
+                        name: 'Ice cream',
+                        calories: 237,
+                    },
+                ],
+            };
+        },
+    });
+
+    app2.use(Vuetify.default);
+
+    app2.mount('#app2');
+</script>

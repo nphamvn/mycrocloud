@@ -7,16 +7,16 @@ using MockServer.Web.Models.WebApplications.Authentications.JwtBearer;
 
 namespace MockServer.Web.Services;
 
-public class WebApplicationAuthenticationWebService : BaseWebService, IWebApplicationAuthenticationWebService
+public class WebApplicationAuthenticationWebService : BaseService, IWebApplicationAuthenticationWebService
 {
     private readonly IWebApplicationAuthenticationSchemeRepository _webApplicationAuthenticationSchemeRepository;
-    private readonly IWebApplicationWebService _webApplicationWebService;
+    private readonly IWebApplicationService _webApplicationWebService;
     private readonly IMapper _mapper;
 
     public WebApplicationAuthenticationWebService(IHttpContextAccessor contextAccessor,
             IWebApplicationAuthenticationSchemeRepository webApplicationAuthenticationSchemeRepository,
-            IWebApplicationWebService webApplicationRepository,
-            IWebApplicationWebService webApplicationWebService,
+            IWebApplicationService webApplicationRepository,
+            IWebApplicationService webApplicationWebService,
             IMapper mapper)
             : base(contextAccessor)
     {

@@ -1,6 +1,6 @@
 namespace MockServer.Web.Models.WebApplications.Routes.Integrations.MockIntegrations;
 
-public class MockIntegration
+public class MockResponse
 {
     public string Code { get; set; }
     public IList<MockIntegrationResponseHeader> ResponseHeaders { get; set; }

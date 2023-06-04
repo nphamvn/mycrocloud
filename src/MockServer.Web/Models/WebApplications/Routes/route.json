@@ -1,72 +1,64 @@
 {
     "id": 1,
     "name": "name",
-    "request": {
-        "method": "method",
-        "path": "path",
-        "authorization": {
-            "type": "authorize",
-            "policyIds": [
-                1,
-                2,
-                3,
-                4,
-                5
-            ],
-            "claims": {
-                "Roles": ["Element 1", "Element 2"],
-                "Role": "Single" 
-            }
-        },
-        "validation": {
-            "query": [],
-            "header": [],
-            "body": []
-        },
-        "queryValidation": [
-            {
-                "page": [
-                    "required",
-                    "integer",
-                    "range(1,20)"
-                ]
-            },
-            {
-                "name": [
-                    "length(1,100)"
-                ]
-            }
-        ],
-        "headerValidation": [
-            {
-                "page": [
-                    "required",
-                    "integer",
-                    "range(1,20)"
-                ]
-            },
-            {
-                "name": [
-                    "length(1,100)"
-                ]
-            }
-        ],
-        "bodyValidation": [
-            {
-                ".": {
-                    "equalTo": "body"
+    "description": "description",
+    "order": 1,
+    "match": {
+        "methods": ["GET","POST"],
+        "path": "path"
+    },
+    "authorization": {
+        "type": "anonymous|authorized",
+        "policies": ["AdminOnly","CustomPolicy"],
+        "claims": {
+            "roles": "administrator",
+            "scopes": ["read","write"]
+        }
+    },
+    "validation": {
+        "queryParameters": {
+            "param1": {
+                "required": true,
+                "minlength": {
+                    "length": 3
                 }
             },
-            {
-                ".field1": {
-                    "equalTo": "field1"
+            "param2": {
+                "maxlength": {
+                    "length": 4
+                },
+                "rangelength": {
+                    "range": [2, 6]
                 }
             }
-        ]
+        },
+        "headers": {
+            "header1": {
+                "min": {
+                    "value": 13
+                }
+            },
+            "header2": {
+                "range": {
+                    "range": [13, 23]
+                }
+            }
+        },
+        "bodyMaxSize": 1000000,
+        "body": {
+            ".": {
+                "equalTo": {
+                    "value": "{\n    \"foo\":\"bar\"\n}"
+                }
+            },
+            ".field1": {
+                "digits": true
+            }
+        }
     },
     "response": {
-        "provider": "mock",
-        "mockProviderOptions": {
+        "provider": "mockResponse|transforms|function",
+        "mockResponse": {
             "status": 200,
             "delay": {
                 "delayed": true,
@@ -74,10 +66,49 @@
                 "time": 1000
             },
             "body": {
+                "template": "none|jsonstringify|handlebars",
+                "textFormat": "json|plain|html|xml",
                 "text": "foo"
-            }
+            },
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "type": "static"
+                },
+                {
+                    "name": "Content-Encoding",
+                    "value": "gzip",
+                    "type": "dynamic"
+                }   
+            ]
         },
-        "proxyProviderOptions" : null,
-        "functionProviderOptions": null
+        "transforms": {
+            "scheme": "http",
+            "host": "localhost",
+            "port": 8080,
+            "method": {
+                "original": true,
+                "method": "GET"
+            },
+            "path": {
+                "original": true,
+                "addPrefix": "/addPrefix",
+                "removePredix": "/removePrefix",
+                "path": "/newpath"
+            },
+            "headers": [
+                {
+                    "header": "header1",
+                    "set": "value1"
+                },
+                {
+                    "remove": "header2"
+                }
+            ]
+        },
+        "function": {
+            "id": 1
+        }
     }
 }

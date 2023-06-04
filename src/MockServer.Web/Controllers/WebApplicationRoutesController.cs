@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MockServer.Core.WebApplications;
 using MockServer.Web.Attributes;
 using MockServer.Web.Filters;
+using MockServer.Web.Models.Common;
 using MockServer.Web.Models.WebApplications.Routes;
 using MockServer.Web.Services;
 using RouteName = MockServer.Web.Common.Constants.RouteName;
@@ -13,58 +13,84 @@ namespace MockServer.Web.Controllers;
 [GetAuthUserWebApplicationId(RouteName.WebApplicationName, RouteName.WebApplicationId)]
 public class WebApplicationRoutesController : Controller
 {
-    private readonly string IndexRender = "vue";
-    private readonly IWebApplicationRouteWebService _webApplicationRouteWebService;
-    private readonly IConfiguration _configuration;
+    private readonly IWebApplicationRouteService _webApplicationRouteWebService;
 
-    public WebApplicationRoutesController(
-        IWebApplicationRouteWebService webApplicationRouteWebService,
-        IConfiguration configuration)
+    public WebApplicationRoutesController(IWebApplicationRouteService webApplicationRouteWebService)
     {
         _webApplicationRouteWebService = webApplicationRouteWebService;
-        _configuration = configuration;
     }
-
-    #region Regular MVC
-
+    
     [HttpGet]
     public async Task<IActionResult> Index(int WebApplicationId, string SearchTerm, string Sort)
     {
-        if (IndexRender == "SSR")
-        {
-            var vm = await _webApplicationRouteWebService.GetIndexModel(WebApplicationId, SearchTerm, Sort);
-            return View("/Views/WebApplications/Routes/Index.cshtml", vm);
-        }
-        else
-        {
-            var pm = await _webApplicationRouteWebService.GetPageModel(WebApplicationId, SearchTerm, Sort);
-            return View("/Views/WebApplications/Routes/IndexWithVue.cshtml", pm);
-        }
+        var pm = await _webApplicationRouteWebService.GetIndexViewModel(WebApplicationId, SearchTerm, Sort);
+        return View("/Views/WebApplications/Routes/Index.cshtml", pm);
     }
 
     [AjaxOnly]
-    [HttpGet("create")]
-    public async Task<IActionResult> GetCreatePartial(int WebApplicationId)
+    [HttpGet]
+    public async Task<IActionResult> List(int WebApplicationId, string SearchTerm, string Sort)
     {
-        var model = await _webApplicationRouteWebService.GetCreateRouteModel(WebApplicationId);
-        return PartialView("/Views/WebApplications/WebApplications.Create.cshtml", model);
+        var routes = await _webApplicationRouteWebService.GetList(WebApplicationId, SearchTerm, Sort);
+        return Ok(routes.Select(r => new
+        {
+            r.RouteId,
+            r.Name,
+            r.Method,
+            r.Path,
+            IntegrationType = (int)r.IntegrationType,
+            r.Description
+        }));
     }
-
-    [HttpGet("edit/{RouteId:int}")]
-    [ValidateRouteWebApplication(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> Edit(int RouteId, string tab = "overview")
+    
+    [AjaxOnly]
+    [HttpGet("{RouteId:int}")]
+    public async Task<IActionResult> Get(int RouteId)
     {
-        var vm = await _webApplicationRouteWebService.GetViewModel(RouteId);
-        ViewData["Tab"] = tab;
-        return View("/Views/WebApplications/Routes/Edit.cshtml", vm);
+        var route = await _webApplicationRouteWebService.GetDetails(RouteId);
+        return Ok(new
+        {
+            route.RouteId,
+            route.Name,
+            route.Method,
+            route.Path,
+            route.Description
+        });
     }
-
+    
+    [AjaxOnly]
+    [HttpPost("create")]
+    public async Task<IActionResult> Create(int WebApplicationId, [FromBody] RouteSaveModel route)
+    {
+        if (!await _webApplicationRouteWebService.ValidateCreate(WebApplicationId, route, ModelState))
+        {
+            return Ok(new AjaxResult<RouteSaveModel>
+            {
+                Errors = new List<Error> { new("something went wrong") }
+            });
+        }
+        int id = await _webApplicationRouteWebService.Create(WebApplicationId, route);
+        return Ok(id);
+    }
+    
+    [AjaxOnly]
     [HttpPost("edit/{RouteId:int}")]
-    [ValidateRouteWebApplication(RouteName.WebApplicationId, RouteName.RouteId)]
-    public async Task<IActionResult> Edit(int WebApplicationId, int RouteId, RouteViewModel vm)
+    public async Task<IActionResult> Edit(int RouteId, [FromBody] RouteSaveModel route)
     {
-        return Ok(vm);
+        if (!await _webApplicationRouteWebService.ValidateEdit(RouteId, route, ModelState))
+        {
+            var allErrors = ModelState.Values.SelectMany(v => v.Errors);
+            return BadRequest(allErrors);
+        }
+        await _webApplicationRouteWebService.Edit(RouteId, route);
+        return NoContent();
     }
-
-    #endregion
+    
+    [AjaxOnly]
+    [HttpPost("delete/{RouteId:int}")]
+    public async Task<IActionResult> Delete(int RouteId)
+    {
+        await _webApplicationRouteWebService.Delete(RouteId);
+        return Ok();
+    }
 }

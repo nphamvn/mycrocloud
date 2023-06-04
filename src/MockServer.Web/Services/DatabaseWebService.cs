@@ -8,7 +8,7 @@ using MockServer.Web.Services.Interfaces;
 
 namespace MockServer.Web.Services;
 
-public class DatabaseWebService : BaseWebService, IDatabaseWebService
+public class DatabaseWebService : BaseService, IDatabaseWebService
 {
     private readonly IDatabaseRepository _databaseRepository;
     private readonly IServiceRepository _serviceRepository;

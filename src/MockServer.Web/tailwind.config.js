@@ -1,10 +1,9 @@
 module.exports = {
   content: [
     './Pages/**/*.cshtml',
-    './Views/**/*.chstml'
+    './Views/**/*.cshtml',
   ],
-  purge: [],
-  darkMode: false, // or 'media' or 'class'
+  darkMode: 'media', // or 'media' or 'class'
   theme: {
     extend: {},
   },

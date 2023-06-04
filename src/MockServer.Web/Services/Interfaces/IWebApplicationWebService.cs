@@ -2,7 +2,7 @@ using MockServer.Web.Models.WebApplications;
 using WebApplication = MockServer.Web.Models.WebApplications.WebApplication;
 namespace MockServer.Web.Services;
 
-public interface IWebApplicationWebService
+public interface IWebApplicationService
 {
     Task<WebApplication> Get(int appId);
     Task<WebApplicationIndexViewModel> GetIndexViewModel(WebApplicationSearchModel searchModel);

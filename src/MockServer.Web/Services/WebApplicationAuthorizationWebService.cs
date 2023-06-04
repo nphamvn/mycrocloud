@@ -4,15 +4,15 @@ using MockServer.Web.Models.WebApplications.Authorizations;
 using CorePolicy = MockServer.Core.WebApplications.Security.Policy;
 namespace MockServer.Web.Services;
 
-public class WebApplicationAuthorizationWebService : BaseWebService, IWebApplicationAuthorizationWebService
+public class WebApplicationAuthorizationWebService : BaseService, IWebApplicationAuthorizationWebService
 {
     private readonly IWebApplicationAuthorizationPolicyRepository _webApplicationAuthorizationPolicyRepository;
-    private readonly IWebApplicationWebService _webApplicationWebService;
+    private readonly IWebApplicationService _webApplicationWebService;
     private readonly IMapper _mapper;
 
     public WebApplicationAuthorizationWebService(
         IWebApplicationAuthorizationPolicyRepository webApplicationAuthorizationPolicyRepository,
-        IWebApplicationWebService webApplicationWebService,
+        IWebApplicationService webApplicationWebService,
         IMapper mapper,
         IHttpContextAccessor contextAccessor) : base(contextAccessor)
     {

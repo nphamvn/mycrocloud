@@ -3,7 +3,7 @@ using MockServer.Web.Shared;
 
 namespace MockServer.Web.Models.WebApplications.Routes;
 
-public class RoutePageModel
+public class RouteIndexViewModel
 {
     public WebApplication WebApplication { get; set; }
     public IEnumerable<RouteIndexItem> Routes { get; set; }

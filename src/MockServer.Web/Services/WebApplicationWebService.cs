@@ -1,18 +1,19 @@
 using AutoMapper;
 using MockServer.Core.Repositories;
+using MockServer.Web.Repositories;
 using MockServer.Web.Models.WebApplications;
 using CoreWebApplication = MockServer.Core.WebApplications.WebApplication;
 using WebApplication = MockServer.Web.Models.WebApplications.WebApplication;
 namespace MockServer.Web.Services;
 
-public class WebApplicationWebService : BaseWebService, IWebApplicationWebService
+public class WebApplicationService : BaseService, IWebApplicationService
 {
-    private readonly IWebApplicationRepository _webApplicationRepository;
+    private readonly IWebApplicationWebRepository _webApplicationRepository;
     private readonly IMapper _mapper;
     private readonly IWebApplicationRouteRepository _requestRepository;
 
-    public WebApplicationWebService(IHttpContextAccessor contextAccessor,
-        IWebApplicationRepository projectRepository,
+    public WebApplicationService(IHttpContextAccessor contextAccessor,
+        IWebApplicationWebRepository projectRepository,
         IWebApplicationRouteRepository requestRepository,
         IMapper mapper) : base(contextAccessor)
     {

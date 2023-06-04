@@ -37,7 +37,7 @@ public class WebApplicationProfile : Profile
         CreateMap<CoreMockIntegrationResponseHeader, MockIntegrationResponseHeaderSaveModel>().ReverseMap();
         CreateMap<CoreMockIntegrationResponseHeader, MockIntegrationResponseHeaderViewModel>();
 
-        CreateMap<CoreMockIntegration, MockIntegration>();
+        CreateMap<CoreMockIntegration, MockResponse>();
         CreateMap<CoreMockIntegration, MockIntegrationSaveModel>().ReverseMap();
         CreateMap<CoreMockIntegration, MockIntegrationViewModel>();
 
@@ -45,7 +45,7 @@ public class WebApplicationProfile : Profile
         CreateMap<CoreAuthorizationPolicy, PolicyIndexItem>();
         CreateMap<CoreAuthorizationPolicy, PolicySaveModel>().ReverseMap();
 
-        CreateMap<CoreAuthorization, Authorization>();
+        //CreateMap<CoreAuthorization, Authorization>();
         CreateMap<CoreAuthorization, AuthorizationSaveModel>().ReverseMap();
         CreateMap<CoreAuthorization, AuthorizationViewModel>();
 
@@ -54,7 +54,7 @@ public class WebApplicationProfile : Profile
         CreateMap<CoreAuthenticationScheme, AuthenticationSchemeSaveModel>().ReverseMap();
         CreateMap<CoreAuthenticationScheme, AuthenticationSchemeViewModel>();
 
-        CreateMap<CoreAuthorization, Authorization>();
+        //CreateMap<CoreAuthorization, Authorization>();
         CreateMap<CoreAuthorization, AuthorizationSaveModel>().ReverseMap();
         CreateMap<CoreAuthorization, AuthorizationViewModel>();
 

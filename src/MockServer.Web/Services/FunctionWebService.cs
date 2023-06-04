@@ -9,7 +9,7 @@ using MockServer.Web.Services.Interfaces;
 
 namespace MockServer.Web.Services;
 
-public class FunctionWebService : BaseWebService, IFunctionWebService
+public class FunctionWebService : BaseService, IFunctionWebService
 {
     private readonly IFunctionRepository _functionRepository;
     private readonly IMapper _mapper;

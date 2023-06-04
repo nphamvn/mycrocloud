@@ -5,79 +5,35 @@ using MockServer.Core.Helpers;
 using MockServer.Core.Repositories;
 using MockServer.Core.WebApplications;
 using MockServer.Web.Models.WebApplications.Routes;
-using MockServer.Web.Models.WebApplications.Routes.Authorizations;
-using MockServer.Web.Models.WebApplications.Routes.Integrations.MockIntegrations;
 using CoreRoute = MockServer.Core.WebApplications.Route;
-using CoreAuthorization = MockServer.Core.WebApplications.Security.Authorization;
-using CoreMockIntegration = MockServer.Core.WebApplications.MockResponse;
 using MockServer.Core.WebApplications.Security;
 using MockServer.Web.Shared;
 
 namespace MockServer.Web.Services;
 
-public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRouteWebService
+public class WebApplicationRouteService : BaseService, IWebApplicationRouteService
 {
     private readonly IWebApplicationRouteRepository _webApplicationRouteRepository;
-    private readonly IWebApplicationRepository _webApplicationRepository;
-    private readonly IWebApplicationAuthenticationSchemeRepository _authRepository;
+    //private readonly IWebApplicationRepository _webApplicationRepository;
+    //private readonly IWebApplicationAuthenticationSchemeRepository _authRepository;
     private readonly IWebApplicationAuthorizationPolicyRepository _webApplicationAuthorizationPolicyRepository;
-    private readonly IWebApplicationWebService _webApplicationWebService;
+    private readonly IWebApplicationService _webApplicationWebService;
     private readonly IMapper _mapper;
-    public WebApplicationRouteWebService(
+    public WebApplicationRouteService(
         IHttpContextAccessor contextAccessor,
         IWebApplicationRouteRepository requestRepository,
-        IWebApplicationRepository projectRepository,
-        IWebApplicationAuthenticationSchemeRepository authRepository,
+        //IWebApplicationRepository projectRepository,
+        //IWebApplicationAuthenticationSchemeRepository authRepository,
         IWebApplicationAuthorizationPolicyRepository webApplicationAuthorizationPolicyRepository,
-        IWebApplicationWebService webApplicationWebService,
+        IWebApplicationService webApplicationWebService,
         IMapper mapper) : base(contextAccessor)
     {
         _webApplicationRouteRepository = requestRepository;
-        _webApplicationRepository = projectRepository;
-        _authRepository = authRepository;
+        //_webApplicationRepository = projectRepository;
+        //_authRepository = authRepository;
         _webApplicationAuthorizationPolicyRepository = webApplicationAuthorizationPolicyRepository;
         _webApplicationWebService = webApplicationWebService;
         _mapper = mapper;
-    }
-    public async Task<RouteViewModel> GetViewModel(int routeId)
-    {
-        var route = await _webApplicationRouteRepository.GetById(routeId);
-        var vm = _mapper.Map<RouteViewModel>(route);
-        vm.WebApplication = await _webApplicationWebService.Get(route.WebApplicationId);
-        //vm.WebApplication.User = AuthUser;
-        if (route.ResponseProvider == ResponseProvider.MockResponse)
-        {
-            vm.Integration = _mapper.Map<MockIntegrationViewModel>(await _webApplicationRouteRepository.GetMockResponse(routeId));
-        }
-        else if (route.ResponseProvider == ResponseProvider.RequestForward)
-        {
-
-        }
-        else if (route.ResponseProvider == ResponseProvider.Function)
-        {
-
-        }
-        vm.MethodSelectListItem = HttpProtocolExtensions.CommonHttpMethods
-                                    .Select(m => new SelectListItem(m, m));
-        if (vm.Authorization == null)
-        {
-            vm.Authorization = new();
-        }
-        vm.Authorization.AuthorizationTypeSelectListItem = new List<SelectListItem>
-        {
-            new("None", nameof(AuthorizationType.None)),
-            new("Allow Anonymous", nameof(AuthorizationType.AllowAnonymous)),
-            new("Authorize", nameof(AuthorizationType.Authorize))
-        };
-        var policies = await _webApplicationAuthorizationPolicyRepository.GetAll(vm.WebApplication.WebApplicationId);
-        vm.Authorization.PolicySelectListItem = policies
-                        .Select(p => new SelectListItem
-                        {
-                            Value = p.PolicyId.ToString(),
-                            Text = p.Name,
-                            //Selected = vm.Authorization.PolicyIds.Contains(p.PolicyId)
-                        });
-        return vm;
     }
 
     public async Task<int> Create(int appId, RouteSaveModel route)
@@ -99,13 +55,6 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         await _webApplicationRouteRepository.Delete(id);
     }
 
-    public async Task<RouteSaveModel> GetEditRouteModel(int requestId)
-    {
-        var route = await _webApplicationRouteRepository.GetById(requestId);
-        var vm = _mapper.Map<RouteSaveModel>(route);
-        return vm;
-    }
-
     public async Task<bool> ValidateEdit(int id, RouteSaveModel request, ModelStateDictionary modelState)
     {
         return modelState.IsValid;
@@ -121,67 +70,14 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
         }
     }
 
-    public async Task<AuthorizationViewModel> GetAuthorizationViewModel(int appId, int routeId)
-    {
-        var authorization = await _webApplicationRouteRepository.GetAuthorization(routeId);
-        var vm = authorization != null ? _mapper.Map<AuthorizationViewModel>(authorization)
-                                        : new AuthorizationViewModel();
-        return vm;
-    }
-
-    public async Task AttachAuthorization(int routeId, AuthorizationSaveModel auth)
-    {
-        var authorization = _mapper.Map<CoreAuthorization>(auth);
-        await _webApplicationRouteRepository.AttachAuthorization(routeId, authorization);
-    }
-
-    public async Task<RouteIndexModel> GetIndexModel(int appId, string searchTerm = "", string sort = "")
-    {
-        var vm = new RouteIndexModel
-        {
-            WebApplication = await _webApplicationWebService.Get(appId),
-            Routes = _mapper.Map<IEnumerable<RouteIndexItem>>(await _webApplicationRouteRepository.GetByApplicationId(appId, searchTerm, sort)),
-            HttpMethodSelectListItem = HttpProtocolExtensions.CommonHttpMethods
-                                    .Select(m => new SelectListItem(m, m))
-        };
-        return vm;
-    }
-
     public Task<bool> ValidateCreate(int appId, RouteSaveModel request, ModelStateDictionary modelState)
     {
         return Task.FromResult(modelState.IsValid);
     }
 
-    public async Task<RouteSaveModel> GetCreateRouteModel(int appId)
+    public async Task<RouteIndexViewModel> GetIndexViewModel(int appId, string searchTerm, string sort)
     {
-        var vm = new RouteSaveModel();
-        vm.WebApplication = await _webApplicationWebService.Get(appId);
-        //vm.WebApplication.User = AuthUser;
-        vm.HttpMethodSelectListItems = HttpProtocolExtensions.CommonHttpMethods
-                                        .Select(m => new SelectListItem(m, m));
-        return vm;
-    }
-
-    public async Task<MockIntegrationViewModel> GetMockIntegration(int routeId)
-    {
-        var integration = await _webApplicationRouteRepository.GetMockResponse(routeId);
-        return _mapper.Map<MockIntegrationViewModel>(integration);
-    }
-
-    public async Task SaveMockIntegration(int requestId, MockIntegrationSaveModel integration)
-    {
-        var mapped = _mapper.Map<CoreMockIntegration>(integration);
-        await _webApplicationRouteRepository.UpdateMockIntegration(requestId, mapped);
-    }
-
-    public Task ChangeIntegrationType(int routeId, ResponseProvider type)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<RoutePageModel> GetPageModel(int appId, string searchTerm, string sort)
-    {
-        var vm = new RoutePageModel
+        var vm = new RouteIndexViewModel
         {
             WebApplication = await _webApplicationWebService.Get(appId),
             Routes = _mapper.Map<IEnumerable<RouteIndexItem>>(await _webApplicationRouteRepository.GetByApplicationId(appId, searchTerm, sort)),
@@ -189,14 +85,14 @@ public class WebApplicationRouteWebService : BaseWebService, IWebApplicationRout
                                     .Select(m => new SelectListItem(m, m)),
             ResponseProviderSelectListItem = new List<SelectListItem>{
                 new("Mock Response", ((int)ResponseProvider.MockResponse).ToString()),
-                new("Direct Forwarding", ((int)ResponseProvider.RequestForward).ToString()),
+                new("Forward Proxy", ((int)ResponseProvider.RequestForward).ToString()),
                 new("Function Trigger", ((int)ResponseProvider.Function).ToString())
             },
             AuthorizationTypeSelectListItem = new List<SelectListItem>
             {
-                new("None", ((int)AuthorizationType.None).ToString()),
-                //new("Allow Anonymous", ((int)AuthorizationType.AllowAnonymous).ToString()),
-                new("Authorize", ((int)AuthorizationType.Authorize).ToString())
+                //new("None", ((int)AuthorizationType.None).ToString()),
+                new("Allow Anonymous", ((int)AuthorizationType.AllowAnonymous).ToString()),
+                new("Authorize", ((int)AuthorizationType.Authorized).ToString())
             },
         };
         var policies = await _webApplicationAuthorizationPolicyRepository.GetAll(appId);

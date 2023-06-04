@@ -14,7 +14,7 @@ public class Authorization
     public IList<Policy> Policies { get; set; }
     public static Authorization Authorize()
     {
-        return new Authorization { Type = AuthorizationType.Authorize };
+        return new Authorization { Type = AuthorizationType.Authorized };
     }
     public static Authorization AllowAnonymous()
     {
