@@ -59,136 +59,76 @@
                             <v-text-field v-model="route.name" clearable label="Name" variant="solo"></v-text-field>
                             <v-textarea v-model="route.description" clearable label="Description" variant="solo"
                                 rows="2"></v-textarea>
-                            <v-card-actions>
-                                <v-btn>MORE</v-btn>
-                                <v-spacer></v-spacer>
-                                <v-btn :icon="true ? 'mdi-chevron-up' : 'mdi-chevron-down'" @@click="show = !show">
-                                </v-btn>
-                            </v-card-actions>
-                            <v-expand-transition>
-                                <div v-show="true">
-                                    <v-row no-gutters>
-                                        <v-col cols="3">
-                                            <v-text-field v-model="route.order" label="Order" type="number"
-                                                variant="solo"></v-text-field>
-                                        </v-col>
-                                    </v-row>
-                                </div>
-                            </v-expand-transition>
+                            <v-row no-gutters>
+                                <v-col cols="3">
+                                    <v-text-field v-model="route.order" label="Order" type="number"
+                                        variant="solo"></v-text-field>
+                                </v-col>
+                            </v-row>
                         </section>
                         <v-divider></v-divider>
-                        <section class="mt-3">
+                        <section>
                             <h5>MATCH</h5>
-                            <v-select v-model="route.match.methods" :items="httpMethods" label="METHOD(S)" clearable
-                                chips multiple variant="solo">
+                            <v-select v-model="route.match.methods" :items="httpMethods" item-title="title"
+                                item-value="value" label="METHOD(S)" clearable chips multiple variant="solo">
                             </v-select>
                             <v-text-field v-model="route.match.path" label="Path" variant="solo"></v-text-field>
-                            <div class="mt-2">
-                                <v-card-actions>
-                                    <v-btn variant="tonal">Authorization</v-btn>
-                                    <v-spacer></v-spacer>
-                                    <v-btn :icon="show ? 'mdi-chevron-up' : 'mdi-chevron-down'" @@click="show = !show">
-                                    </v-btn>
-                                </v-card-actions>
-                                <v-expand-transition>
-                                    <div v-show="true">
-                                        <v-radio-group v-model="route.authorization.type" inline label="Type"
-                                            @@change="onRouteAuthorizationTypeChanged">
-                                            <v-radio label="AllowAnonymous"
-                                                value="@((int)AuthorizationType.AllowAnonymous)"></v-radio>
-                                            <v-radio label="Authorized"
-                                                value="@((int)AuthorizationType.Authorized)"></v-radio>
-                                        </v-radio-group>
-                                        <v-expand-transition>
-                                            <div
-                                                v-show="route.authorization.type == @((int)AuthorizationType.Authorized)">
-                                                <v-select v-model="route.authorization.policies" clearable
-                                                    label="Policy" :items="policies" item-title="title"
-                                                    item-value="value" multiple variant="solo"></v-select>
-                                                <div>Claims</div>
-                                                <v-row v-for="(claim, index) in route.authorization.claims">
-                                                    <v-col cols="3">
-                                                        <v-text-field v-model="claim.type" variant="solo"></v-text-field>
-                                                    </v-col>
-                                                    <v-col>
-                                                        <v-combobox v-model="claim.allowedValues" variant="solo"
-                                                            multiple chips></v-combobox>
-                                                    </v-col>
-                                                    <v-col cols="1">
-                                                        <v-btn>DEL</v-btn>
-                                                    </v-col>
-                                                </v-row>
-                                            </div>
-                                        </v-expand-transition>
-                                    </div>
-                                </v-expand-transition>
-                                <div class="collapse mt-2" id="requestAuthorization">
-                                    <div class="card card-body">
-                                        @* <div>
-                                            <label class="form-label">Authorization Type</label>
-                                            <div class="mt-1">
-                                            @foreach (var type in Model.AuthorizationTypeSelectListItem)
-                                            {
-                                            <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" value="@type.Value"
-                                            v-model="route.authorization.type"
-                                            @@change="onRouteAuthorizationTypeChanged">
-                                            <label class="form-check-label">@type.Text</label>
-                                            </div>
-                                            }
-                                            </div>
-                                            </div> *@
-                                        <div v-show="route.authorization.type == @((int)AuthorizationType.Authorized)"
-                                            class="mt-1">
-                                            @* <div class="mt-2">
-                                                <label class="form-label">Claims</label>
-                                                <ol class="list-group list-group-numbered">
-                                                <li v-for="(claim, index) in route.request.authorization.claims"
-                                                class="list-group-item">
-                                                <div class="d-flex">
-                                                <input type="text" v-model="claim.type"
-                                                class="form-control me-2" placeholder="Claim type">
-                                                <input type="text" v-model="claim.allowedValues"
-                                                class="form-control me-2" placeholder="Allowed values">
-                                                <button type="button" class="btn btn-sm btn-danger"
-                                                @@click="deleteAuthorizationClaim(index)">
-                                                <i class="bi bi-trash"></i>
-                                                </button>
-                                                </div>
-                                                </li>
-                                                </ol>
-                                                <button type="button" class="btn btn-sm btn-secondary"
-                                                @@click="addAuthorizationClaim">Add Claim</button>
-                                                </div> *@
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-2">
+                            <div v-show="false" class="mt-2">
                                 <button type="button" class="btn btn-primary" data-bs-toggle="collapse"
                                     data-bs-target="#requestValidation">
                                     Validation
                                 </button>
-                                <div class="collapse mt-2" id="requestValidation">
-                                    <div class="card card-body">
-                                        <ul class="nav nav-tabs" role="tablist">
-                                            <li class="nav-item" role="presentation">
-                                                <button type="button" class="nav-link active py-1" data-bs-toggle="tab"
-                                                    data-bs-target="#request-param-tab">Query</button>
-                                            </li>
-                                            <li class="nav-item">
-                                                <button type="button" class="nav-link py-1" data-bs-toggle="tab"
-                                                    data-bs-target="#request-header-tab">Header</button>
-                                            </li>
-                                            <li class="nav-item">
-                                                <button type="button" class="nav-link py-1" data-bs-toggle="tab"
-                                                    data-bs-target="#request-body-tab">Body</button>
-                                            </li>
-                                        </ul>
-                                        <div class="tab-content" style="min-height: 200px;">
-                                            <div id="request-param-tab" class="tab-pane show active p-2"
-                                                role="tabpanel">
-                                                <table class="table table-sm p-0 m-0">
+                            </div>
+                            <validation-attributes-modal v-if="validationAttributesModalVisible"
+                                :attributes="validationAttributesModalAttributes"
+                                @@save="onValidationAttributesModalSaved"
+                                @@close="closeValidationAttributesModal"></validation-attributes-modal>
+                        </section>
+                        <v-divider></v-divider>
+                        <section>
+                            <h5>AUTHORIZATION</h5>
+                            <div>
+                                <v-radio-group v-model="route.authorization.type" inline label="Type"
+                                    @@change="onRouteAuthorizationTypeChanged">
+                                    <v-radio label="AllowAnonymous"
+                                        value="@((int)AuthorizationType.AllowAnonymous)"></v-radio>
+                                    <v-radio label="Authorized" value="@((int)AuthorizationType.Authorized)"></v-radio>
+                                </v-radio-group>
+                                <v-expand-transition>
+                                    <div v-show="route.authorization.type == @((int)AuthorizationType.Authorized)">
+                                        <v-select v-model="route.authorization.policies" clearable label="Policy"
+                                            :items="policies" item-title="title" item-value="value" multiple
+                                            variant="solo"></v-select>
+                                        <div>Claims</div>
+                                        <v-row v-for="(claim, index) in route.authorization.claims">
+                                            <v-col cols="3">
+                                                <v-text-field v-model="claim.type" variant="solo"></v-text-field>
+                                            </v-col>
+                                            <v-col>
+                                                <v-combobox v-model="claim.allowedValues" variant="solo" multiple
+                                                    chips></v-combobox>
+                                            </v-col>
+                                            <v-col cols="1">
+                                                <v-btn>DEL</v-btn>
+                                            </v-col>
+                                        </v-row>
+                                    </div>
+                                </v-expand-transition>
+                            </div>
+                        </section>
+                        <section>
+                            <h5>VALIDATION</h5>
+                            <v-card>
+                                <v-tabs v-model="requestValidationTab" bg-color="primary">
+                                    <v-tab value="queryParameters">QUERRY PARAMETERS</v-tab>
+                                    <v-tab value="headers">HEADERS</v-tab>
+                                    <v-tab value="body">BODY</v-tab>
+                                </v-tabs>
+                                <v-card-text>
+                                    <v-window v-model="requestValidationTab">
+                                        <v-window-item value="queryParameters">
+                                            <v-card>
+                                                <table>
                                                     <thead>
                                                         <tr>
                                                             <th style="width: 20%" scope="col">Key</th>
@@ -227,12 +167,13 @@
                                                         </tr>
                                                     </tbody>
                                                 </table>
-                                                <div class="mt-1">
-                                                    <button type="button" class="btn btn-secondary btn-sm"
-                                                        v-on:click="addRow('requestQueries')">Add</button>
+                                                <div>
+                                                    <v-btn v-on:click="addRow('requestQueries')" variant="tonal">ADD</v-btn>
                                                 </div>
-                                            </div>
-                                            <div id="request-header-tab" class="tab-pane p-2" role="tabpanel">
+                                            </v-card>
+                                        </v-window-item>
+                                        <v-window-item value="headers">
+                                            <v-card>
                                                 <table id="request-header-table" class="table table-sm p-0 m-0">
                                                     <thead>
                                                         <tr>
@@ -277,8 +218,11 @@
                                                     <button type="button" class="btn btn-secondary btn-sm"
                                                         v-on:click="addRow('requestHeaders')">Add</button>
                                                 </div>
-                                            </div>
-                                            <div id="request-body-tab" class="tab-pane p-2" role="tabpanel">
+
+                                            </v-card>
+                                        </v-window-item>
+                                        <v-window-item value="body">
+                                            <v-card>
                                                 <table class="table table-sm">
                                                     <thead>
                                                         <tr>
@@ -325,18 +269,15 @@
                                                     <button type="button" class="btn btn-secondary btn-sm"
                                                         v-on:click="addRequesBodyField">Add</button>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <validation-attributes-modal v-if="validationAttributesModalVisible"
-                                :attributes="validationAttributesModalAttributes"
-                                @@save="onValidationAttributesModalSaved"
-                                @@close="closeValidationAttributesModal"></validation-attributes-modal>
+                                            </v-card>
+                                        </v-window-item>
+                                    </v-window>
+                                </v-card-text>
+                            </v-card>
                         </section>
-                        <section class="mt-3">
-                            <h5>Response</h5>
+                        <v-divider></v-divider>
+                        <section>
+                            <h5>RESPONSE</h5>
                             <div class="card-body">
                                 <label>Response Provider</label>
                                 <div class="mt-1">
@@ -632,12 +573,25 @@
                     },
                     method: 'GET',
                     path: '',
-                    integrationType: 1,
                     request: {
                         authorization: {
                             type: 0,
                             policies: [],
                             claims: []
+                        },
+                        validation: {
+                            queryParams: [
+                                {
+                                    name: 'id',
+                                    rules: {
+                                        required: true,
+                                        type: 'string',
+                                        format: 'regex',
+                                        pattern: '^[0-9]+$'
+                                    }
+                                }],
+                            headers: [],
+                            body: []
                         }
                     },
                     response: {
@@ -760,8 +714,9 @@
                 route.value.request.authorization.claims = route.value.request.authorization.claims || [];
                 route.value.request.authorization.claims.push({ type: '', allowedValues: '' })
             }
-            const httpMethods = JSON.parse('@Json.Serialize(Model.HttpMethodSelectListItem.Select(m => m.Value.ToUpper()).Prepend("ALL"))');
+            const httpMethods = JSON.parse('@Json.Serialize(Model.HttpMethodSelectListItem.Select(m => new {Title = m.Text.ToUpper(), Value = m.Value.ToUpper()}).Prepend(new { Title = "ALL", Value = "*" }))');
             const policies = JSON.parse('@Json.Serialize(Model.AuthorizationPolicySelectListItem.Select(p => new {p.Value, Title = p.Text}))');
+            const requestValidationTab = ref('queryParameters');
             return {
                 routes,
                 RouteBaseUrl,
@@ -787,7 +742,8 @@
                 deleteAuthorizationClaim,
                 addAuthorizationClaim,
                 httpMethods,
-                policies
+                policies,
+                requestValidationTab
             }
         }
     });
