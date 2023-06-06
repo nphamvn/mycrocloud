@@ -30,10 +30,14 @@
     {
       "library": "vuetify@3.3.2",
       "destination": "wwwroot/lib/vuetify",
-      "files":[
+      "files": [
         "vuetify.min.css",
         "vuetify.min.js"
       ]
+    },
+    {
+      "library": "vee-validate@4.9.6",
+      "destination": "wwwroot/lib/vee-validate"
     }
   ]
 }
