@@ -34,6 +34,7 @@
         width: 60px;
     }
 </style>
+<div id="app2"></div>
 <div class="row">
     <div class="col-2">
         <partial name="/Views/WebApplications/_SideBar.cshtml" model="Model.WebApplication"></partial>
@@ -71,39 +72,33 @@
                         <v-divider></v-divider>
                         <section>
                             <h5>MATCH</h5>
-                            <v-select v-model="route.match.methods" :items="httpMethods" item-title="title"
+                            <v-select v-model="route.methods" :items="httpMethods" item-title="title"
                                 item-value="value" label="METHOD(S)" clearable chips multiple variant="solo">
                             </v-select>
-                            <v-text-field v-model="route.match.path" label="Path" variant="solo"></v-text-field>
-                            <div v-show="false" class="mt-2">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="collapse"
-                                    data-bs-target="#requestValidation">
-                                    Validation
-                                </button>
-                            </div>
-                            <validation-attributes-modal v-if="validationAttributesModalVisible"
-                                :attributes="validationAttributesModalAttributes"
-                                @@save="onValidationAttributesModalSaved"
-                                @@close="closeValidationAttributesModal"></validation-attributes-modal>
+                            <v-text-field v-model="route.path" label="Path" variant="solo"></v-text-field>
                         </section>
                         <v-divider></v-divider>
                         <section>
                             <h5>AUTHORIZATION</h5>
                             <div>
-                                <v-radio-group v-model="route.request.authorization.type" inline label="Type"
-                                    @@change="onRouteAuthorizationTypeChanged">
+                                <v-radio-group v-model="route.request.authorization.type" 
+                                    inline label="Type">
                                     <v-radio label="AllowAnonymous"
-                                        :value="@((int)AuthorizationType.AllowAnonymous)"></v-radio>
-                                    <v-radio label="Authorized" :value="@((int)AuthorizationType.Authorized)"></v-radio>
+                                        :value="@((int)AuthorizationType.AllowAnonymous)">
+                                    </v-radio>
+                                    <v-radio label="Authorized" 
+                                        :value="@((int)AuthorizationType.Authorized)">
+                                    </v-radio>
                                 </v-radio-group>
                                 <v-expand-transition>
-                                    <div
-                                        v-show="route.request.authorization.type == @((int)AuthorizationType.Authorized)">
-                                        <v-select v-model="route.authorization.policies" clearable label="Policy"
+                                    <div v-show="route.request.authorization.type == @((int)AuthorizationType.Authorized)">
+                                        <v-select v-model="route.request.authorization.policies" 
+                                            clearable label="Policy"
                                             :items="policies" item-title="title" item-value="value" multiple
-                                            variant="solo"></v-select>
-                                        <div>Claims</div>
-                                        <v-row v-for="(claim, index) in route.authorization.claims">
+                                            variant="solo">
+                                        </v-select>
+                                        <div>CLAIMS</div>
+                                        <v-row v-for="(claim, index) in route.request.authorization.claims">
                                             <v-col cols="3">
                                                 <v-text-field v-model="claim.type" variant="solo"></v-text-field>
                                             </v-col>
@@ -123,13 +118,13 @@
                             <h5>VALIDATION</h5>
                             <v-card>
                                 <v-tabs v-model="requestValidationTab" bg-color="primary">
-                                    <v-tab value="queryParameters">QUERRY PARAMETERS</v-tab>
+                                    <v-tab value="queryParams">QUERRY PARAMETERS</v-tab>
                                     <v-tab value="headers">HEADERS</v-tab>
                                     <v-tab value="body">BODY</v-tab>
                                 </v-tabs>
                                 <v-card-text>
                                     <v-window v-model="requestValidationTab">
-                                        <v-window-item value="queryParameters">
+                                        <v-window-item value="queryParams">
                                             <v-card>
                                                 <table>
                                                     <thead>
@@ -280,6 +275,11 @@
                                     </v-window>
                                 </v-card-text>
                             </v-card>
+                            <validation-attributes-modal v-if="validationAttributesModalVisible"
+                                :attributes="validationAttributesModalAttributes"
+                                @@save="onValidationAttributesModalSaved"
+                                @@close="closeValidationAttributesModal">
+                            </validation-attributes-modal>
                         </section>
                         <v-divider></v-divider>
                         <section>
@@ -316,7 +316,7 @@
                             </div>
                         </section>
                         <div class="mt-1 d-flex">
-                            <button type="button" @@click="discardChange"
+                            <button type="button" @@click="cancel"
                                 class="btn btn-secondary ms-auto">Cancle</button>
                             <button type="submit" class="btn btn-primary ms-2">Save</button>
                         </div>
@@ -433,20 +433,21 @@
                 this.$emit('close')
             },
             save() {
-                this.$emit('save', this.attrs)
+                this.$emit('save', this.rules)
             },
             add() {
-                this.attrs.push({ name: null, parameters: '' });
+                this.rules.push({ name: null, parameters: '' });
             },
             remove(index) {
-                this.attrs.splice(index, 1)
+                this.rules.splice(index, 1)
             }
         },
         data: function () {
-            const rules = JSON.parse(JSON.stringify(this.rules || []));
+            const rules = [];// JSON.parse(JSON.stringify(this.rules || []));
+            const availableRules = JSON.parse('@Html.Raw(Json.Serialize(Model.BuiltInValdationAttributes))')
             return {
-                rules: rules,
-                availableRules: JSON.parse('@Html.Raw(Json.Serialize(Model.BuiltInValdationAttributes))')
+                rules,
+                availableRules
             }
         },
         computed: {
@@ -534,25 +535,19 @@
     })
     const app = createApp({
         setup() {
-            const webapp = ref(null);
+            const webapp = ref(JSON.parse('@Html.Raw(Json.Serialize(Model.WebApplication))'));
             const routes = ref([]);
             const route = ref(null);
             let openingRouteOriginalValue = null;
-            const mode = ref();
-            const openingRouteId = ref(0);
             const searchTerm = ref('');
             const RouteBaseUrl = '@string.Format("https://wa-{0}.mockserver.com", Model.WebApplication.WebApplicationId)';
             const openRoute = async id => {
-                if (mode.value !== 'EDIT') {
-                    mode.value = 'EDIT';
-                }
                 let tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.Get),"WebApplicationRoutesApi", new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
                 axios.get(tempUrl.replace('-9999', id))
                     .then(res => {
                         route.value = res.data
                         route.value.requestBody = route.value.requestBody || {}
                         this.openingRouteOriginalValue = JSON.parse(JSON.stringify(route.value));
-                        openingRouteId.value = id
                     })
             }
             const delayedSearch = () => {
@@ -573,198 +568,158 @@
             }
 
             const newRoute = () => {
-                mode.value = 'CREATE';
                 route.value = {
                     id: 0,
                     name: '',
                     description: '',
+                    methods: [],
+                    path: '',
                     order: 1,
-                    match: {
-                        methods: ['GET', 'POST'],
-                        path: '/foo'
-                    },
-    @* method: 'GET',
-        path: '', *@
                     request: {
-                    authorization: {
-                        type: 0,
+                        authorization: {
+                            type: 0,
                             policies: [],
-                                claims: []
-                    },
-                    validation: {
-                        queryParams: [
-                            {
-                                name: 'id',
-                                rules: {
-                                    required: true,
-                                    type: 'string',
-                                    format: 'regex',
-                                    pattern: '^[0-9]+$'
-                                }
-                            }],
+                            claims: []
+                        },
+                        validation: {
+                            queryParams: [],
                             headers: [],
-                                body: []
-                    }
-                },
-                response: {
-                    provider: 1,
-                        mockResponseOptions: {
-                        statusCode: 200
+                            body: []
+                        }
                     },
-                    forwardProxyOptions: {
+                    response: {
+                        provider: 1,
+                        mockResponse: {
+                            statusCode: 200
+                        },
+                        transforms: {
 
+                        },
+                        function: {
+
+                        }
                     }
-                },
-                authorization: {
-                    type: 0,
-                        policies: [],
-                            claims: [{
-                                type: 'roles',
-                                allowedValues: ['admin']
-                            }]
-                },
-                requestBody: { }
+                }
             }
-            routes.value.unshift(route.value)
-            openingRouteId.value = 0
-        }
             const onSubmit = () => {
-            alert(JSON.stringify(route.value));
-            return;
-            let url = ''
-            if (mode.value === 'CREATE') {
-                url = '@Url.Action(nameof(WebApplicationRoutesController.Create), "WebApplicationRoutesApi", new { WebApplicationName = Model.WebApplication.Name})'
-            } else {
-                let tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.Edit), "WebApplicationRoutesApi", new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})'
-                url = tempUrl.replace('-9999', route.value.id);
+                alert(JSON.stringify(route.value));
+                return;
+                let url = ''
+                if (route.value.id === 0) {
+                    //Create
+                    url = '@Url.Action(nameof(WebApplicationRoutesController.Create), "WebApplicationRoutesApi", new { WebApplicationName = Model.WebApplication.Name})'
+                } else {
+                    let tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.Edit), "WebApplicationRoutesApi", new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})'
+                    url = tempUrl.replace('-9999', route.value.id);
+                }
+                axios.post(url, route.value)
+                    .then(res => {
+                        if (route.value.id === 0) {
+                            route.value.id = res.data
+                        }
+                    })
+                    .catch(err => console.log(err));
             }
-            axios.post(url, route.value)
-                .then(res => {
-                    if (mode.value === 'CREATE') {
-                        route.value.id = res.data
-                        openingRouteId.value = res.data
-                    }
-                })
-                .catch(err => console.log(err));
-        }
-            const discardChange = () => {
-            if (mode.value === 'EDIT') {
-                route.value = this.openingRouteOriginalValue
-                this.openingRouteOriginalValue = JSON.parse(JSON.stringify(route.value))
-            } else {
-                //CREATE
-                routes.value.splice(0, 1)
+            const cancel = () => {
                 route.value = null
-                openingRouteId.value = null
             }
-        }
             const addRow = (prop) => {
-            route.value[prop] = route.value[prop] || [];
-            route.value[prop].push({
-                name: null,
-                attributes: []
-            });
-        }
+                route.value[prop] = route.value[prop] || [];
+                route.value[prop].push({
+                    name: null,
+                    attributes: []
+                });
+            }
             const addRequesBodyField = () => {
-            route.value.requestBody.fieldValidationAttributes = route.value.requestBody.fieldValidationAttributes || []
-            route.value.requestBody.fieldValidationAttributes.push({ name: null, attributes: [] })
-        }
+                route.value.requestBody.fieldValidationAttributes = route.value.requestBody.fieldValidationAttributes || []
+                route.value.requestBody.fieldValidationAttributes.push({ name: null, attributes: [] })
+            }
 
             let validationAttributesModalObj = null;
-        const validationAttributesModalVisible = ref(false)
+            const validationAttributesModalVisible = ref(false)
             const validationAttributesModalAttributes = ref(null)
             let onValidationAttributesModalSavedHandler
             const showValidationAttributesModal = async (attributes, onValidationAttributesModalSavedHandler) => {
-            validationAttributesModalAttributes.value = attributes
-            this.onValidationAttributesModalSavedHandler = onValidationAttributesModalSavedHandler
-            validationAttributesModalVisible.value = true
-            await nextTick()
-            this.validationAttributesModalObj = new bootstrap.Modal(document.getElementById("validationAttributesModal"), {})
-            this.validationAttributesModalObj.show()
-        }
-            const closeValidationAttributesModal = () => {
-            this.validationAttributesModalObj.hide()
-            this.validationAttributesModalObj = null
-            validationAttributesModalVisible.value = false
-            this.onValidationAttributesModalSavedHandler = null
-        }
-            const onValidationAttributesModalSaved = (attributes) => {
-            this.onValidationAttributesModalSavedHandler(attributes)
-
-            this.validationAttributesModalObj.hide()
-            this.validationAttributesModalObj = null
-            validationAttributesModalVisible.value = false
-            this.onValidationAttributesModalSavedHandler = null
-        }
-            const onRouteDeleted = (id) => {
-            const index = routes.value.findIndex(r => r.id === id);
-            if (index > -1) {
-                if (openingRouteId === id) {
-                    openRoute.value = null
-                }
-                routes.value.splice(index, 1)
+                validationAttributesModalAttributes.value = attributes
+                this.onValidationAttributesModalSavedHandler = onValidationAttributesModalSavedHandler
+                validationAttributesModalVisible.value = true
+                await nextTick()
+                this.validationAttributesModalObj = new bootstrap.Modal(document.getElementById("validationAttributesModal"), {})
+                this.validationAttributesModalObj.show()
             }
-        }
+            const closeValidationAttributesModal = () => {
+                this.validationAttributesModalObj.hide()
+                this.validationAttributesModalObj = null
+                validationAttributesModalVisible.value = false
+                this.onValidationAttributesModalSavedHandler = null
+            }
+            const onValidationAttributesModalSaved = (attributes) => {
+                this.onValidationAttributesModalSavedHandler(attributes)
+
+                this.validationAttributesModalObj.hide()
+                this.validationAttributesModalObj = null
+                validationAttributesModalVisible.value = false
+                this.onValidationAttributesModalSavedHandler = null
+            }
+            const onRouteDeleted = (id) => {
+                const index = routes.value.findIndex(r => r.id === id);
+                if (index > -1) {
+                    routes.value.splice(index, 1)
+                }
+            }
             onMounted(() => {
-        webapp.value = JSON.parse('@Html.Raw(Json.Serialize(Model.WebApplication))')
-        routes.value = JSON.parse('@Html.Raw(Json.Serialize(Model.Routes.Select(r => new {
+                routes.value = JSON.parse('@Html.Raw(Json.Serialize(Model.Routes.Select(r => new {
                     Id = r.RouteId,
-            r.Name,
-            r.Method,
-            r.Path
-            })))')
+                    r.Name,
+                    r.Method,
+                    r.Path
+                    })))')
             })
 
-    const onRouteAuthorizationTypeChanged = () => {
-        if (route.value.authorization.type === 0 || route.value.authorization.type) {
-        }
-    }
-    const deleteAuthorizationClaim = (index) => {
-        route.value.request.authorization.claims.splice(index, 1)
-    }
-    const addAuthorizationClaim = () => {
-        route.value.request.authorization.claims = route.value.request.authorization.claims || [];
-        route.value.request.authorization.claims.push({ type: '', allowedValues: '' })
-    }
-    const httpMethods = JSON.parse('@Json.Serialize(Model.HttpMethodSelectListItem.Select(m => new {Title = m.Text.ToUpper(), Value = m.Value.ToUpper()}).Prepend(new { Title = "ALL", Value = "*" }))');
-    const policies = JSON.parse('@Json.Serialize(Model.AuthorizationPolicySelectListItem.Select(p => new {p.Value, Title = p.Text}))');
-    const requestValidationTab = ref('queryParameters');
-    return {
-        routes,
-        RouteBaseUrl,
-        route,
-        openingRouteId,
-        openRoute,
-        newRoute,
-        delayedSearch,
-        searchTerm,
-        webapp,
-        onSubmit,
-        discardChange,
-        mode,
-        onRouteDeleted,
-        addRow,
-        addRequesBodyField,
-        validationAttributesModalVisible,
-        validationAttributesModalAttributes,
-        showValidationAttributesModal,
-        onValidationAttributesModalSaved,
-        closeValidationAttributesModal,
-        onRouteAuthorizationTypeChanged,
-        deleteAuthorizationClaim,
-        addAuthorizationClaim,
-        httpMethods,
-        policies,
-        requestValidationTab,
-        dialog: false,
-        notifications: false,
-        sound: true,
-        widgets: false,
-    }
+            const deleteAuthorizationClaim = (index) => {
+                route.value.request.authorization.claims.splice(index, 1)
+            }
+            const addAuthorizationClaim = () => {
+                route.value.request.authorization.claims = route.value.request.authorization.claims || [];
+                route.value.request.authorization.claims.push({ type: '', allowedValues: '' })
+            }
+            const httpMethods = JSON.parse('@Json.Serialize(Model.HttpMethodSelectListItem.Select(m => new {Title = m.Text.ToUpper(), Value = m.Value.ToUpper()}).Prepend(new { Title = "ALL", Value = "*" }))');
+            const policies = JSON.parse('@Json.Serialize(Model.AuthorizationPolicySelectListItem.Select(p => new {p.Value, Title = p.Text}))');
+            const requestValidationTab = ref('queryParams');
+            return {
+                routes,
+                RouteBaseUrl,
+                route,
+                openRoute,
+                newRoute,
+                delayedSearch,
+                searchTerm,
+                webapp,
+                onSubmit,
+                cancel,
+                onRouteDeleted,
+                addRow,
+                addRequesBodyField,
+                validationAttributesModalVisible,
+                validationAttributesModalAttributes,
+                showValidationAttributesModal,
+                onValidationAttributesModalSaved,
+                closeValidationAttributesModal,
+                deleteAuthorizationClaim,
+                addAuthorizationClaim,
+                httpMethods,
+                policies,
+                requestValidationTab,
+                dialog: false,
+                notifications: false,
+                sound: true,
+                widgets: false,
+            }
         }
     });
     app.component('route-list', RouteList)
     app.component('validation-attributes-modal', ValidationAttributesModal)
     app.use(vuetify)
     app.mount('#app')
+
 </script>
