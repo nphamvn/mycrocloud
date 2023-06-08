@@ -5,28 +5,28 @@
     ViewData["Title"] = Model.WebApplication.Name;
 }
 @section Scripts {
-<environment include="Development">
-    <!-- Development Environment -->
-    <link href="lib/vuetify/vuetify.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css" />
-    <script src="lib/vue/vue.global.min.js"></script>
-    <script src="lib/axios/axios.min.js"></script>
-    <script src="lib/vuetify/vuetify.min.js"></script>
-    <script src="lib/vee-validate/vee-validate.min.js"></script>
-</environment>
-<environment exclude="Development">
-    <!-- Not Development Environment -->
-    <link href="https://cdn.jsdelivr.net/npm/vuetify@3.3.2/dist/vuetify.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"
-        integrity="sha512-39BSQXI5q1XlvVhLfFRidKG8KM6Tr6VS/XSnNo6N/A0ZXexHCeoUI/s+ulujQy3UREjoLNrMnFat8VI0mMugWA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
-        integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vuetify@3.3.2/dist/vuetify.min.js"></script>
-    <script src="https://unpkg.com/vee-validate"></script>
-</environment>
+    <environment include="Development">
+        <!-- Development Environment -->
+        <link href="lib/vuetify/vuetify.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css" />
+        <script src="lib/vue/vue.global.min.js"></script>
+        <script src="lib/axios/axios.min.js"></script>
+        <script src="lib/vuetify/vuetify.min.js"></script>
+        <script src="lib/vee-validate/vee-validate.min.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <!-- Not Development Environment -->
+        <link href="https://cdn.jsdelivr.net/npm/vuetify@3.3.2/dist/vuetify.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"
+            integrity="sha512-39BSQXI5q1XlvVhLfFRidKG8KM6Tr6VS/XSnNo6N/A0ZXexHCeoUI/s+ulujQy3UREjoLNrMnFat8VI0mMugWA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+            integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vuetify@3.3.2/dist/vuetify.min.js"></script>
+        <script src="https://unpkg.com/vee-validate"></script>
+    </environment>
 }
 <style>
     .context-menu {
@@ -72,8 +72,8 @@
                         <v-divider></v-divider>
                         <section>
                             <h5>MATCH</h5>
-                            <v-select v-model="route.methods" :items="httpMethods" item-title="title"
-                                item-value="value" label="METHOD(S)" clearable chips multiple variant="solo">
+                            <v-select v-model="route.methods" :items="httpMethods" item-title="title" item-value="value"
+                                label="METHOD(S)" clearable chips multiple variant="solo">
                             </v-select>
                             <v-text-field v-model="route.path" label="Path" variant="solo"></v-text-field>
                         </section>
@@ -81,24 +81,20 @@
                         <section>
                             <h5>AUTHORIZATION</h5>
                             <div>
-                                <v-radio-group v-model="route.request.authorization.type" 
-                                    inline label="Type">
-                                    <v-radio label="AllowAnonymous"
-                                        :value="@((int)AuthorizationType.AllowAnonymous)">
+                                <v-radio-group v-model="route.authorizationType" inline label="Type">
+                                    <v-radio label="AllowAnonymous" :value="@((int)AuthorizationType.AllowAnonymous)">
                                     </v-radio>
-                                    <v-radio label="Authorized" 
-                                        :value="@((int)AuthorizationType.Authorized)">
+                                    <v-radio label="Authorized" :value="@((int)AuthorizationType.Authorized)">
                                     </v-radio>
                                 </v-radio-group>
                                 <v-expand-transition>
-                                    <div v-show="route.request.authorization.type == @((int)AuthorizationType.Authorized)">
-                                        <v-select v-model="route.request.authorization.policies" 
-                                            clearable label="Policy"
+                                    <div v-show="route.authorizationType == @((int)AuthorizationType.Authorized)">
+                                        <v-select v-model="route.authorizationPolicies" clearable label="Policy"
                                             :items="policies" item-title="title" item-value="value" multiple
                                             variant="solo">
                                         </v-select>
                                         <div>CLAIMS</div>
-                                        <v-row v-for="(claim, index) in route.request.authorization.claims">
+                                        <v-row v-for="(claim, index) in route.authorizationClaims">
                                             <v-col cols="3">
                                                 <v-text-field v-model="claim.type" variant="solo"></v-text-field>
                                             </v-col>
@@ -114,6 +110,7 @@
                                 </v-expand-transition>
                             </div>
                         </section>
+                        <v-divider></v-divider>
                         <section>
                             <h5>VALIDATION</h5>
                             <v-card>
@@ -137,11 +134,8 @@
                                                     <tbody>
                                                         <tr v-for="(query, index) in route.requestQueries">
                                                             <td class="align-middle">
-                                                                @* <input type="text" v-model="query.key"
-                                                                    class="form-control form-control-sm"
-                                                                    placeholder="key" autocomplete="off"> *@
                                                                 <v-text-field v-model="query.key"
-                                                                    variant="solo"></v-text-field>
+                                                                    variant="dense"></v-text-field>
                                                             </td>
                                                             <td class="align-middle">
                                                                 <div class="d-flex">
@@ -277,8 +271,7 @@
                             </v-card>
                             <validation-attributes-modal v-if="validationAttributesModalVisible"
                                 :attributes="validationAttributesModalAttributes"
-                                @@save="onValidationAttributesModalSaved"
-                                @@close="closeValidationAttributesModal">
+                                @@save="onValidationAttributesModalSaved" @@close="closeValidationAttributesModal">
                             </validation-attributes-modal>
                         </section>
                         <v-divider></v-divider>
@@ -290,34 +283,31 @@
                                     @foreach (var type in Model.ResponseProviderSelectListItem)
                                     {
                                         <div class="form-check form-check-inline">
-                                            <input v-model="route.response.provider" class="form-check-input" type="radio"
-                                            value="@type.Value" @@change="onResponseProviderChanged">
+                                            <input v-model="route.responseType" class="form-check-input" type="radio"
+                                                value="@type.Value" @@change="onResponseProviderChanged">
                                             <label class="form-check-label">@type.Text</label>
                                         </div>
                                     }
                                 </div>
-                                <div v-show="route.response.provider == 1" class="card card-body">
+                                <div v-show="route.responseType == 1" class="card card-body">
                                     <div>
                                         <label class="form-label">Status Code</label>
-                                        <input v-model="route.response.mockResponseOptions.statusCode"
-                                            list="statusCodeOptions" class="form-control">
+                                        <input v-model="route.mockResponse.statusCode" list="statusCodeOptions"
+                                            class="form-control">
                                         <datalist id="statusCodeOptions">
-                                            @* <option value="200" title="OK">
-                                                <option value="400" title="Bad Request"> *@
                                         </datalist>
                                     </div>
                                 </div>
-                                <div v-show="route.response.provider == 2">
+                                <div v-show="route.responseType == 2">
                                     Forward Proxy
                                 </div>
-                                <div v-show="route.response.provider == 3">
+                                <div v-show="route.responseType == 3">
                                     Function Trigger
                                 </div>
                             </div>
                         </section>
                         <div class="mt-1 d-flex">
-                            <button type="button" @@click="cancel"
-                                class="btn btn-secondary ms-auto">Cancle</button>
+                            <button type="button" @@click="cancel" class="btn btn-secondary ms-auto">Cancle</button>
                             <button type="submit" class="btn btn-primary ms-2">Save</button>
                         </div>
                     </v-form>
@@ -538,16 +528,13 @@
             const webapp = ref(JSON.parse('@Html.Raw(Json.Serialize(Model.WebApplication))'));
             const routes = ref([]);
             const route = ref(null);
-            let openingRouteOriginalValue = null;
             const searchTerm = ref('');
-            const RouteBaseUrl = '@string.Format("https://wa-{0}.mockserver.com", Model.WebApplication.WebApplicationId)';
+            const TempRouteDetailUrl = '@Url.Action(nameof(WebApplicationRoutesController.Get),"WebApplicationRoutesApi", new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
             const openRoute = async id => {
-                let tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.Get),"WebApplicationRoutesApi", new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
-                axios.get(tempUrl.replace('-9999', id))
+                axios.get(TempRouteDetailUrl.replace('-9999', id))
                     .then(res => {
                         route.value = res.data
                         route.value.requestBody = route.value.requestBody || {}
-                        this.openingRouteOriginalValue = JSON.parse(JSON.stringify(route.value));
                     })
             }
             const delayedSearch = () => {
@@ -575,29 +562,21 @@
                     methods: [],
                     path: '',
                     order: 1,
-                    request: {
-                        authorization: {
-                            type: 0,
-                            policies: [],
-                            claims: []
-                        },
-                        validation: {
-                            queryParams: [],
-                            headers: [],
-                            body: []
-                        }
+                    authorizationType: 0,
+                    authorizationPolicies: [],
+                    authorizationClaims: [],
+                    queryValidationRules: [],
+                    headersValidationRules: [],
+                    bodyValidationRules:[],
+                    responseType: 1,
+                    mockResponse: {
+                        statusCode: 200
                     },
-                    response: {
-                        provider: 1,
-                        mockResponse: {
-                            statusCode: 200
-                        },
-                        transforms: {
+                    transforms: {
 
-                        },
-                        function: {
+                    },
+                    function: {
 
-                        }
                     }
                 }
             }
@@ -677,18 +656,17 @@
             })
 
             const deleteAuthorizationClaim = (index) => {
-                route.value.request.authorization.claims.splice(index, 1)
+                route.value.authorizationClaims.splice(index, 1)
             }
             const addAuthorizationClaim = () => {
-                route.value.request.authorization.claims = route.value.request.authorization.claims || [];
-                route.value.request.authorization.claims.push({ type: '', allowedValues: '' })
+                route.value.authorizationClaims = route.value.authorizationClaims || [];
+                route.value.authorizationClaims.push({ type: '', allowedValues: '' })
             }
             const httpMethods = JSON.parse('@Json.Serialize(Model.HttpMethodSelectListItem.Select(m => new {Title = m.Text.ToUpper(), Value = m.Value.ToUpper()}).Prepend(new { Title = "ALL", Value = "*" }))');
             const policies = JSON.parse('@Json.Serialize(Model.AuthorizationPolicySelectListItem.Select(p => new {p.Value, Title = p.Text}))');
             const requestValidationTab = ref('queryParams');
             return {
                 routes,
-                RouteBaseUrl,
                 route,
                 openRoute,
                 newRoute,
