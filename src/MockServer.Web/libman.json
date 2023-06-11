@@ -38,6 +38,10 @@
     {
       "library": "vee-validate@4.9.6",
       "destination": "wwwroot/lib/vee-validate"
+    },
+    {
+      "library": "monaco-editor@0.39.0",
+      "destination": "wwwroot/lib/monaco-editor"
     }
   ]
 }

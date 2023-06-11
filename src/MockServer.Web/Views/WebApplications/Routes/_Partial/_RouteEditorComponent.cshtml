@@ -1,0 +1,437 @@
+@using MockServer.Web.Controllers
+@using MockServer.Core.WebApplications.Security
+@model MockServer.Web.Models.WebApplications.Routes.RouteIndexViewModel
+
+<partial name="/Views/WebApplications/Routes/_Partial/_ValidationRulesConfigComponent.cshtml" />
+<template id="routeEditorTemplate">
+    <v-form v-on:submit.prevent="onSubmit">
+        <v-container>
+            <section>
+                <h5>BASIC INFORMATION</h5>
+                <v-text-field v-model="route.name" clearable label="Name" variant="solo"></v-text-field>
+                <v-textarea v-model="route.description" clearable label="Description" variant="solo"
+                    rows="2"></v-textarea>
+                <v-row no-gutters>
+                    <v-col cols="3">
+                        <v-text-field v-model="route.order" label="Order" type="number" variant="solo"></v-text-field>
+                    </v-col>
+                </v-row>
+            </section>
+            <v-divider></v-divider>
+            <section>
+                <h5>MATCH</h5>
+                <v-select v-model="route.methods" :items="httpMethods" item-title="title" item-value="value"
+                    label="METHOD(S)" clearable chips multiple variant="solo">
+                </v-select>
+                <v-text-field v-model="route.path" label="Path" variant="solo"></v-text-field>
+            </section>
+            <v-divider></v-divider>
+            <section>
+                <h5>AUTHORIZATION</h5>
+                <div>
+                    <v-radio-group v-model="route.authorization.type" inline label="Type">
+                        <v-radio label="AllowAnonymous" :value="@((int)AuthorizationType.AllowAnonymous)">
+                        </v-radio>
+                        <v-radio label="Authorized" :value="@((int)AuthorizationType.Authorized)">
+                        </v-radio>
+                    </v-radio-group>
+                    <v-expand-transition>
+                        <div v-show="route.authorization.type == @((int)AuthorizationType.Authorized)">
+                            <v-select v-model="route.authorization.policies" clearable label="Policy" :items="policies"
+                                item-title="title" item-value="value" multiple variant="solo">
+                            </v-select>
+                            <div>CLAIMS</div>
+                            <v-row>
+                                <v-col cols="3">
+                                    <div>CLAIM TYPE</div>
+                                </v-col>
+                                <v-col>
+                                    <div>AlLOWED VALUES</div>
+                                </v-col>
+                                <v-col cols="1"></v-col>
+                            </v-row>
+                            <v-row v-for="(claim, index) in route.authorization.claims">
+                                <v-col cols="3">
+                                    <v-text-field v-model="claim.type" variant="solo"></v-text-field>
+                                </v-col>
+                                <v-col>
+                                    <v-combobox v-model="claim.allowedValues" variant="solo" multiple
+                                        chips></v-combobox>
+                                </v-col>
+                                <v-col cols="1">
+                                    <v-btn icon="mdi-delete" class="mt-2"
+                                        v-on:click="route.authorization.claims.splice(index)">
+                                    </v-btn>
+                                </v-col>
+                            </v-row>
+                            <v-btn prepend-icon="mdi-plus"
+                                v-on:click="route.authorization.claims.push({})">ADD</v-btn>
+                        </div>
+                    </v-expand-transition>
+                </div>
+            </section>
+            <v-divider></v-divider>
+            <section>
+                <h5>VALIDATION</h5>
+                <v-card>
+                    <v-tabs v-model="requestValidationTab" bg-color="primary">
+                        <v-tab value="queryParams">QUERY PARAMETERS</v-tab>
+                        <v-tab value="headers">HEADERS</v-tab>
+                        <v-tab value="body">BODY</v-tab>
+                    </v-tabs>
+                    <v-card-text>
+                        <v-window v-model="requestValidationTab">
+                            <v-window-item value="queryParams">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 20%" scope="col">PARAMETER</th>
+                                            <th style="width: 75%" scope="col">RULES</th>
+                                            <th style="width: 5%" scope="col">ACTIONS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(param, index) in route.queryParamsValidation">
+                                            <td>
+                                                <v-text-field v-model="param.name" placeholder="name" variant="solo">
+                                                </v-text-field>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-row pa-2 mb-6">
+                                                    <template v-if="param.rules.length === 0">
+                                                        <span class="pa-2 ma-2">No rules configured yet.</span>
+                                                    </template>
+                                                    <template v-else>
+                                                        <v-chip-group>
+                                                            <v-chip v-for="(rule, index) of param.rules.slice(0, 3)">
+                                                                {{rule.name}}
+                                                            </v-chip>
+                                                            <v-chip v-if="param.rules.length > 3">
+                                                                (+{{param.rules.length - 3 }} others)
+                                                            </v-chip>
+                                                        </v-chip-group>
+                                                    </template>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-row mb-6">
+                                                    <v-btn icon="mdi-cog" class="ma-2 pa-2"
+                                                        v-on:click="showValidationRulesConfigDialog('queryParams', index, param.rules)">
+                                                    </v-btn>
+                                                    <v-btn icon="mdi-delete" class="ma-2 pa-2"
+                                                        v-on:click="route.queryParamsValidation.splice(index, 1)">
+                                                    </v-btn>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="d-flex flex-row">
+                                    <v-btn prepend-icon="mdi-plus"
+                                        v-on:click="addValidationRow('queryParams')">ADD</v-btn>
+                                </div>
+                            </v-window-item>
+                            <v-window-item value="headers">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 20%" scope="col">HEADER</th>
+                                            <th style="width: 75%" scope="col">RULES</th>
+                                            <th style="width: 5%" scope="col">ACTIONS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(header, index) in route.headersValidation">
+                                            <td>
+                                                <v-text-field v-model="header.name" placeholder="name" variant="solo">
+                                                </v-text-field>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-row pa-2 mb-6">
+                                                    <template v-if="header.rules.length === 0">
+                                                        <span class="pa-2 ma-2">
+                                                            No rules configured yet.
+                                                        </span>
+                                                    </template>
+                                                    <template v-else>
+                                                        <v-chip-group>
+                                                            <v-chip v-for="(rule, index) of header.rules.slice(0, 3)">
+                                                                {{rule.name}}
+                                                            </v-chip>
+                                                            <v-chip v-if="header.rules.length > 3">
+                                                                (+{{header.rules.length - 3 }} others)
+                                                            </v-chip>
+                                                        </v-chip-group>
+                                                    </template>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-row mb-6">
+                                                    <v-btn icon="mdi-cog" class="ma-2 pa-2"
+                                                        v-on:click="showValidationRulesConfigDialog('headers', index, header.rules)">
+                                                    </v-btn>
+                                                    <v-btn icon="mdi-delete" class="ma-2 pa-2"
+                                                        v-on:click="route.headersValidation.splice(index, 1)">
+                                                    </v-btn>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="d-flex flex-row">
+                                    <v-btn prepend-icon="mdi-plus" v-on:click="addValidationRow('headers')">ADD</v-btn>
+                                </div>
+                            </v-window-item>
+                            <v-window-item value="body">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 20%" scope="col">FIELD</th>
+                                            <th style="width: 75%" scope="col">RULES</th>
+                                            <th style="width: 5%" scope="col">ACTIONS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(field, index) in route.bodyValidation">
+                                            <td>
+                                                <v-text-field v-model="field.name" placeholder="field" variant="solo">
+                                                </v-text-field>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-row pa-2 mb-6">
+                                                    <template v-if="field.rules.length === 0">
+                                                        <span class="pa-2 ma-2">
+                                                            No rules configured yet.
+                                                        </span>
+                                                    </template>
+                                                    <template v-else>
+                                                        <v-chip-group>
+                                                            <v-chip v-for="(rule, index) of field.rules.slice(0, 3)">
+                                                                {{rule.name}}
+                                                            </v-chip>
+                                                            <v-chip v-if="field.rules.length > 3">
+                                                                (+{{field.rules.length - 3 }} others)
+                                                            </v-chip>
+                                                        </v-chip-group>
+                                                    </template>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-row mb-6">
+                                                    <v-btn icon="mdi-cog" class="ma-2 pa-2"
+                                                        v-on:click="showValidationRulesConfigDialog('body', index, field.rules)">
+                                                    </v-btn>
+                                                    <v-btn icon="mdi-delete" class="ma-2 pa-2"
+                                                        v-on:click="route.bodyValidation.splice(index, 1)">
+                                                    </v-btn>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="d-flex flex-row">
+                                    <v-btn prepend-icon="mdi-plus" v-on:click="addValidationRow('body')">ADD</v-btn>
+                                </div>
+                            </v-window-item>
+                        </v-window>
+                    </v-card-text>
+                </v-card>
+                <validation-rules-config-dialog v-if="validationRules" :rules="validationRules"
+                    @@save="saveValidationRules" @@close="closeValidationRulesConfigDialog">
+                </validation-rules-config-dialog>
+            </section>
+            <v-divider></v-divider>
+            <section>
+                <h5>RESPONSE</h5>
+                <v-select v-model="route.responseType" 
+                    label="RESPONSE TYPE" 
+                    :items="responseTypes"
+                    variant="solo">
+                </v-select>
+                <div v-show="route.responseType==1">
+                    <div>MOCK RESPONSE OPTIONS</div>
+                    <v-text-field v-model="route.mockResponse.statusCode" type="number" label="STATUS CODE" variant="solo"></v-text-field>
+                    <v-container class="px-0">
+                        <div>HEADERS</div>
+                        <v-row v-for="(header, index) of route.mockResponse.headers" class="py-0">
+                            <v-col cols="2">
+                                <v-text-field v-model="header.name" variant="solo"></v-text-field>
+                            </v-col>
+                            <v-col cols="2">
+                                <v-select v-model="header.template"
+                                    :items="['static', 'dynamic']"
+                                    variant="solo">
+                                </v-select>
+                            </v-col>
+                            <v-col>
+                                <v-text-field v-model="header.value" variant="solo"></v-text-field>
+                            </v-col>
+                            <v-col cols="1">
+                                <v-btn icon="mdi-delete"
+                                    v-on:click="route.mockResponse.headers.splice(index)"></v-btn>
+                            </v-col>
+                        </v-row>
+                        <v-btn prepend-icon="mdi-plus"
+                            v-on:click="route.mockResponse.headers.push({template: 'static'})">ADD</v-btn>
+                    </v-container>
+                    <v-container class="px-0">
+                        <div>BODY</div>
+                        <div>
+                            <v-select 
+                                v-model="route.mockResponse.body.textFormat"
+                                :items="['json', 'plain text']"
+                                label="TEXT FORMAT"
+                                variant="solo">
+                            </v-select>
+                        </div>
+                        <div id="bodyEditor" style="width: 100%; height: 300px; border: 1px solid grey;"></div>
+                    </v-container>
+                </div>
+                <div v-show="route.responseType==2">
+                    <v-container>2</v-container>
+                </div>
+                <div v-show="route.responseType==3">
+                    <v-container>3</v-container>
+                </div>
+            </section>
+            <div>
+                <v-btn type="button" @@click="cancel">CANCEL</v-btn>
+                <v-btn type="submit">SAVE</v-btn>
+            </div>
+        </v-container>
+    </v-form>
+</template>
+<script>
+    const RouteEditorComponent = {
+        template: '#routeEditorTemplate',
+        components: {
+            'validation-rules-config-dialog': ValidationRulesConfigComponent
+        },
+        props: {
+            route: {
+                type: Object,
+                required: true
+            }
+        },
+        setup(props) {
+            const { route } = props
+            //
+            const httpMethods = JSON.parse('@Json.Serialize(Model.HttpMethodSelectListItem.Select(m => new {Title = m.Text.ToUpper(), Value = m.Value.ToUpper()}).Prepend(new { Title = "ALL", Value = "*" }))');
+            //
+
+            //
+            const policies = JSON.parse('@Json.Serialize(Model.AuthorizationPolicySelectListItem.Select(p => new {p.Value, Title = p.Text}))');
+            const deleteAuthorizationClaim = (index) => {
+                route.authorization.claims.splice(index, 1)
+            }
+            const addAuthorizationClaim = () => {
+                route.authorization.claims = route.authorization.claims || [];
+                route.authorization.claims.push({ type: '', allowedValues: '' })
+            }
+            //
+            // Request Validation: START
+            const requestValidationTab = ref();
+            const addValidationRow = (prop) => {
+                let emptyRule = { name: null, rules: [] };
+                if (prop === 'queryParams') {
+                    route.queryParamsValidation ??= [];
+                    route.queryParamsValidation.push(emptyRule);
+                } else if (prop === 'headers') {
+                    route.headersValidation ??= [];
+                    route.headersValidation.push(emptyRule);
+                } else if (prop === 'body') {
+                    route.bodyValidation ??= [];
+                    route.bodyValidation.push(emptyRule);
+                }
+            }
+            const validationRules = ref(null)
+            let validationRulesFor = null;
+            let validationRulesForIndex = null;
+            const showValidationRulesConfigDialog = (prop, index, rules) => {
+                validationRulesFor = prop;
+                validationRulesForIndex = index;
+                validationRules.value = [...rules];
+            }
+            const closeValidationRulesConfigDialog = () => {
+                validationRules.value = null
+                validationRulesFor = null
+                validationRulesForIndex = null
+            }
+            const saveValidationRules = (rules) => {
+                if (validationRulesFor === 'queryParams') {
+                    route.queryParamsValidation[validationRulesForIndex].rules = rules;
+                } else if (validationRulesFor === 'headers') {
+                    route.headersValidation[validationRulesForIndex].rules = rules;
+                } else if (validationRulesFor === 'body') {
+                    route.bodyValidation[validationRulesForIndex].rules = rules;
+                }
+                validationRules.value = null
+                validationRulesFor = null
+                validationRulesForIndex = null
+            }
+            // Request Validation: END
+
+            //
+            const responseTypes = [{ title: 'MOCK', value: 1 }, { title: 'HTTP PROXY', value: 2 }, { title: 'FUNCTION TRIGGER', value: 3 }]
+            //
+
+            //
+            const onSubmit = async () => {
+                //route.response.mockResponse.body.text = bodyEditor.getModel().getValue();
+                console.log(JSON.stringify(route));
+                if (!await validate()) {
+                    return;
+                }
+                let url
+                if (route.id === 0) {
+                    url = '@Url.Action(nameof(WebApplicationRoutesController.Create), "WebApplicationRoutes", new { WebApplicationName = Model.WebApplication.Name})'
+                } else {
+                    let tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.Edit), "WebApplicationRoutes", new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})'
+                    url = tempUrl.replace('-9999', route.id);
+                }
+                const res = await axios.post(url, route)
+                if (route.id === 0) {
+                    route.id = res.data
+                }
+            }
+            async function validate() {
+                return true;
+            }
+            //
+
+            //
+            onMounted(() => {
+                // Initialize the Monaco editor
+                require.config({ paths: { vs: "lib/monaco-editor/min/vs" } });
+                require(["vs/editor/editor.main"], function () {
+                    const bodyEditor = monaco.editor.create(document.getElementById("bodyEditor"));
+                    if(route.mockResponse.body.text) {
+                        bodyEditor.getModel().setValue(route.mockResponse.body.text)
+                    }
+                    // Bind the editor value to route.mockResponse.body.text
+                    bodyEditor.getModel().onDidChangeContent(() => {
+                        const newValue = bodyEditor.getValue();
+                        if (newValue !== route.mockResponse.body.text) {
+                            route.mockResponse.body.text = newValue;
+                        }
+                        console.log(route.mockResponse.body.text)
+                    });
+                });
+            });
+            return {
+                httpMethods,
+                policies,
+                addAuthorizationClaim,
+                deleteAuthorizationClaim,
+                requestValidationTab,
+                addValidationRow,
+                validationRules,
+                showValidationRulesConfigDialog,
+                closeValidationRulesConfigDialog,
+                saveValidationRules,
+                responseTypes,
+                onSubmit
+            }
+        }
+    }
+</script>

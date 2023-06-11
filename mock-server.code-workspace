@@ -7,5 +7,8 @@
 	"launch": {
 		"version": "0.2.0",
 		"configurations": []
+	},
+	"settings": {
+		"dotnet.defaultSolution": "src/MockServer.sln"
 	}
 }

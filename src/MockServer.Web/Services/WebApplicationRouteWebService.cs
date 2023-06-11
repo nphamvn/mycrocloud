@@ -7,6 +7,7 @@ using MockServer.Core.WebApplications;
 using MockServer.Web.Models.WebApplications.Routes;
 using CoreRoute = MockServer.Core.WebApplications.Route;
 using MockServer.Core.WebApplications.Security;
+using MockServer.Web.Models.WebApplications.Routes.Authorizations;
 using MockServer.Web.Shared;
 
 namespace MockServer.Web.Services;
@@ -38,11 +39,21 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
 
     public async Task<int> Create(int appId, RouteSaveModel route)
     {
-        var existing = await _webApplicationRouteRepository.Find(appId, route.Method, route.Path);
+        var existing = await _webApplicationRouteRepository.Find(appId, route.Methods[0], route.Path);
         if (existing == null)
         {
-            var mapped = _mapper.Map<CoreRoute>(route);
-            return await _webApplicationRouteRepository.Create(appId, mapped);
+            return await _webApplicationRouteRepository.Create(appId, new()
+            {
+                Name = route.Name,
+                Description = route.Description,
+                Path = route.Path,
+                Method = route.Methods[0],
+                Authorization = new ()
+                {
+                    Type = route.Authorization.Type,
+                    PolicyIds = route.Authorization.Policies,
+                }
+            });
         }
         else
         {
@@ -119,7 +130,21 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
     public async Task<RouteViewModel> GetDetails(int routeId)
     {
         var route = await _webApplicationRouteRepository.GetById(routeId);
-        var vm = _mapper.Map<RouteViewModel>(route);
-        return vm;
+        return new RouteViewModel()
+        {
+            RouteId = routeId,
+            Name = route.Name,
+            Description = route.Description,
+            Order = route.Order,
+            Path = route.Path,
+            Methods = route.Methods,
+            Authorization = new AuthorizationViewModel()
+            {
+                Type = route.Authorization.Type,
+                PolicyIds = route.Authorization.PolicyIds,
+                Claims = route.Authorization.Claims
+            },
+            
+        };
     }
 }

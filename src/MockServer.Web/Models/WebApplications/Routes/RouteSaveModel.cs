@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using MockServer.Core.WebApplications;
+using MockServer.Core.WebApplications.Security;
 
 namespace MockServer.Web.Models.WebApplications.Routes
 {
@@ -9,18 +8,21 @@ namespace MockServer.Web.Models.WebApplications.Routes
         [Required]
         [StringLength(100, ErrorMessage = "Name length can't be more than 100.")]
         public string Name { get; set; }
+        public string Description { get; set; }
         [Required]
         [StringLength(50, ErrorMessage = "Name length can't be more than 8.")]
         public string Path { get; set; }
-        [Required]
-        public string Method { get; set; }
-        public string Description { get; set; }
-        public IList<RequestQueryValidationItemSaveModel> RequestQueryValidationItems { get; set; } = new List<RequestQueryValidationItemSaveModel>();
-        public IList<RequestHeaderValidationItemSaveModel> RequestHeaderValidationItems { get; set; } = new List<RequestHeaderValidationItemSaveModel>();
-        public IList<RequestBodyValidationItemSaveModel> RequestBodyValidationItems { get; set; } = new List<RequestBodyValidationItemSaveModel>();
-        public WebApplication? WebApplication { get; set; }
-        public IEnumerable<SelectListItem>? HttpMethodSelectListItems { get; set; }
-        [Required]
-        public ResponseProvider ResponseProvider { get; set; }
+        public List<string> Methods { get; set; }
+        public int Order { get; set; }
+        public Authorization Authorization { get; set; }
+        public IList<ValidationItem> QueryParamsValidation { get; set; }
+        public IList<ValidationItem> HeadersValidation { get; set; }
+        public IList<ValidationItem> BodyValidation { get; set; }
+    }
+    public class Authorization
+    {
+        public AuthorizationType Type { get; set; }
+        public List<int> Policies { get; set; }
+        //public List<string> claims { get; set; }
     }
 }

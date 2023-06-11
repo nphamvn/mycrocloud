@@ -9,4 +9,5 @@ public class AuthorizationViewModel
     public IEnumerable<SelectListItem>? AuthorizationTypeSelectListItem { get; set; }
     public IList<int> PolicyIds { get; set; }
     public IEnumerable<SelectListItem>? PolicySelectListItem { get; set; }
+    public Dictionary<string, object> Claims { get; set; }
 }

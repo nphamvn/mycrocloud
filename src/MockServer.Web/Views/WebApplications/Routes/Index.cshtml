@@ -8,537 +8,113 @@
     <environment include="Development">
         <!-- Development Environment -->
         <link href="lib/vuetify/vuetify.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css"/>
         <script src="lib/vue/vue.global.min.js"></script>
         <script src="lib/axios/axios.min.js"></script>
         <script src="lib/vuetify/vuetify.min.js"></script>
         <script src="lib/vee-validate/vee-validate.min.js"></script>
+        <script src="lib/monaco-editor/min/vs/loader.min.js"></script>
     </environment>
     <environment exclude="Development">
         <!-- Not Development Environment -->
         <link href="https://cdn.jsdelivr.net/npm/vuetify@3.3.2/dist/vuetify.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css"/>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"
-            integrity="sha512-39BSQXI5q1XlvVhLfFRidKG8KM6Tr6VS/XSnNo6N/A0ZXexHCeoUI/s+ulujQy3UREjoLNrMnFat8VI0mMugWA=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                integrity="sha512-39BSQXI5q1XlvVhLfFRidKG8KM6Tr6VS/XSnNo6N/A0ZXexHCeoUI/s+ulujQy3UREjoLNrMnFat8VI0mMugWA=="
+                crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
-            integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+                crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdn.jsdelivr.net/npm/vuetify@3.3.2/dist/vuetify.min.js"></script>
         <script src="https://unpkg.com/vee-validate"></script>
     </environment>
+    <script>
+        const { createApp, onMounted, ref, nextTick, computed, watch } = Vue
+        const { createVuetify } = Vuetify
+        const vuetify = createVuetify({
+            ssr: true
+        })
+        window.axios = axios;
+        axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    </script>
 }
-<style>
-    .context-menu {
-        position: absolute;
-        width: 60px;
-    }
-</style>
 <div id="app2"></div>
 <div class="row">
     <div class="col-2">
         <partial name="/Views/WebApplications/_SideBar.cshtml" model="Model.WebApplication"></partial>
     </div>
     <div id="app" class="col-10">
-        <div class="row">
-            <div class="col-3">
-                <div class="d-flex mt-1">
-                    <input v-model="searchTerm" @@keyup="delayedSearch" class="form-control form-control-sm me-1"
-                        type="text" placeholder="Search">
-                    <button @@click="newRoute" class="btn btn-sm text-white !tw-bg-violet-500">
-                        <i class="bi bi-plus"></i>
-                    </button>
-                </div>
-                <div class="route-list-container">
-                    <route-list :routes="routes" @@click-route="openRoute"
-                        @@route-deleted="onRouteDeleted"></route-list>
-                </div>
-            </div>
-            <div class="col-9">
+        <v-row>
+            <v-col cols="3">
+                <v-btn class="bg-primary" prepend-icon="mdi-plus" block @@click="newRoute">
+                    NEW ROUTE
+                </v-btn>
+                <v-text-field class="mt-2" v-model="searchTerm" @@keyup="fetchRoutes" variant="solo" placeholder="Search">
+                </v-text-field>
+                <template v-if="routes.length > 0">
+                    <route-list :routes="routes" @@click-route="openRoute">
+                    </route-list>
+                </template>
+                <template v-else>
+                    <p>No routes available.Create some routes.</p>
+                </template>
+            </v-col>
+            <v-col>
                 <div v-if="route" style="overflow-y: scroll">
-                    <v-form class="px-3" v-on:submit.prevent="onSubmit">
-                        <h5>BASIC INFORMATION</h5>
-                        <section>
-                            <v-text-field v-model="route.name" clearable label="Name" variant="solo"></v-text-field>
-                            <v-textarea v-model="route.description" clearable label="Description" variant="solo"
-                                rows="2"></v-textarea>
-                            <v-row no-gutters>
-                                <v-col cols="3">
-                                    <v-text-field v-model="route.order" label="Order" type="number"
-                                        variant="solo"></v-text-field>
-                                </v-col>
-                            </v-row>
-                        </section>
-                        <v-divider></v-divider>
-                        <section>
-                            <h5>MATCH</h5>
-                            <v-select v-model="route.methods" :items="httpMethods" item-title="title" item-value="value"
-                                label="METHOD(S)" clearable chips multiple variant="solo">
-                            </v-select>
-                            <v-text-field v-model="route.path" label="Path" variant="solo"></v-text-field>
-                        </section>
-                        <v-divider></v-divider>
-                        <section>
-                            <h5>AUTHORIZATION</h5>
-                            <div>
-                                <v-radio-group v-model="route.authorizationType" inline label="Type">
-                                    <v-radio label="AllowAnonymous" :value="@((int)AuthorizationType.AllowAnonymous)">
-                                    </v-radio>
-                                    <v-radio label="Authorized" :value="@((int)AuthorizationType.Authorized)">
-                                    </v-radio>
-                                </v-radio-group>
-                                <v-expand-transition>
-                                    <div v-show="route.authorizationType == @((int)AuthorizationType.Authorized)">
-                                        <v-select v-model="route.authorizationPolicies" clearable label="Policy"
-                                            :items="policies" item-title="title" item-value="value" multiple
-                                            variant="solo">
-                                        </v-select>
-                                        <div>CLAIMS</div>
-                                        <v-row v-for="(claim, index) in route.authorizationClaims">
-                                            <v-col cols="3">
-                                                <v-text-field v-model="claim.type" variant="solo"></v-text-field>
-                                            </v-col>
-                                            <v-col>
-                                                <v-combobox v-model="claim.allowedValues" variant="solo" multiple
-                                                    chips></v-combobox>
-                                            </v-col>
-                                            <v-col cols="1">
-                                                <v-btn>DEL</v-btn>
-                                            </v-col>
-                                        </v-row>
-                                    </div>
-                                </v-expand-transition>
-                            </div>
-                        </section>
-                        <v-divider></v-divider>
-                        <section>
-                            <h5>VALIDATION</h5>
-                            <v-card>
-                                <v-tabs v-model="requestValidationTab" bg-color="primary">
-                                    <v-tab value="queryParams">QUERRY PARAMETERS</v-tab>
-                                    <v-tab value="headers">HEADERS</v-tab>
-                                    <v-tab value="body">BODY</v-tab>
-                                </v-tabs>
-                                <v-card-text>
-                                    <v-window v-model="requestValidationTab">
-                                        <v-window-item value="queryParams">
-                                            <v-card>
-                                                <table>
-                                                    <thead>
-                                                        <tr>
-                                                            <th style="width: 20%" scope="col">PARAMETER NAME</th>
-                                                            <th style="width: 75%" scope="col">RULES</th>
-                                                            <th style="width: 5%" scope="col">Actions</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr v-for="(query, index) in route.requestQueries">
-                                                            <td class="align-middle">
-                                                                <v-text-field v-model="query.key"
-                                                                    variant="dense"></v-text-field>
-                                                            </td>
-                                                            <td class="align-middle">
-                                                                <div class="d-flex">
-                                                                    <select style="display: none;"
-                                                                        v-model="query.attributes" multiple></select>
-                                                                    <div class="d-flex">
-                                                                        <span v-for="attr in query.attributes"
-                                                                            class="me-1 bg-gray py-1 px-2 rounded">{{attr.name}}</span>
-                                                                    </div>
-                                                                    <button type="button" class="ms-auto"
-                                                                        v-on:click="showValidationAttributesModal(query.attributes, attrs => query.attributes = attrs)">
-                                                                        <i class="bi bi-box-arrow-in-up-right"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </td>
-                                                            <td class="align-middle">
-                                                                <button type="button"
-                                                                    class="btn text-gray btn-show-on-hover"
-                                                                    v-on:click="route.requestQueries.splice(index, 1)">
-                                                                    <i class="bi bi-trash"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                                <div>
-                                                    <v-btn v-on:click="addRow('requestQueries')"
-                                                        variant="tonal">ADD</v-btn>
-                                                </div>
-                                            </v-card>
-                                        </v-window-item>
-                                        <v-window-item value="headers">
-                                            <v-card>
-                                                <table id="request-header-table" class="table table-sm p-0 m-0">
-                                                    <thead>
-                                                        <tr>
-                                                            <th style="width: 20%" scope="col">Header</th>
-                                                            <th style="width: 75%" scope="col">Attributes</th>
-                                                            <th style="width: 5%" scope="col">Actions</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr v-for="(header, index) in route.requestHeaders">
-                                                            <td class="align-middle">
-                                                                <input type="text" v-model="header.name"
-                                                                    class="form-control form-control-sm"
-                                                                    placeholder="name" autocomplete="off"
-                                                                    aria-autocomplete="none">
-                                                            </td>
-                                                            <td class="align-middle">
-                                                                <div class="d-flex">
-                                                                    <select style="display: none;"
-                                                                        v-model="header.attributes" multiple></select>
-                                                                    <div class="d-flex">
-                                                                        <span v-for="attr in header.attributes"
-                                                                            class="me-1 bg-gray py-1 px-2 rounded">{{attr.name}}</span>
-                                                                    </div>
-                                                                    <button type="button" class="ms-auto"
-                                                                        v-on:click="showValidationAttributesModal(header.attributes, attrs => header.attributes = attrs)">
-                                                                        <i class="bi bi-box-arrow-in-up-right"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </td>
-                                                            <td class="align-middle">
-                                                                <button type="button"
-                                                                    class="btn text-gray btn-show-on-hover"
-                                                                    v-on:click="route.requestHeaders.splice(index, 1)">
-                                                                    <i class="bi bi-trash"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                                <div class="mt-1">
-                                                    <button type="button" class="btn btn-secondary btn-sm"
-                                                        v-on:click="addRow('requestHeaders')">Add</button>
-                                                </div>
-
-                                            </v-card>
-                                        </v-window-item>
-                                        <v-window-item value="body">
-                                            <v-card>
-                                                <table class="table table-sm">
-                                                    <thead>
-                                                        <tr>
-                                                            <th style="width: 20%" scope="col">Field</th>
-                                                            <th style="width: 75%" scope="col">Attributes
-                                                            </th>
-                                                            <th style="width: 5%" scope="col">Actions</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr
-                                                            v-for="(field, index) in route.requestBody.fieldValidationAttributes">
-                                                            <td class="align-middle">
-                                                                <input type="text" v-model="field.name"
-                                                                    class="form-control form-control-sm"
-                                                                    placeholder="name" autocomplete="off"
-                                                                    aria-autocomplete="none">
-                                                            </td>
-                                                            <td class="align-middle">
-                                                                <div class="d-flex">
-                                                                    <select style="display: none;"
-                                                                        v-model="field.attributes" multiple></select>
-                                                                    <div class="d-flex">
-                                                                        <span v-for="attr in field.attributes"
-                                                                            class="me-1 bg-gray py-1 px-2 rounded">{{attr.name}}</span>
-                                                                    </div>
-                                                                    <button type="button" class="ms-auto"
-                                                                        v-on:click="showValidationAttributesModal(field.attributes, attrs => field.attributes = attrs)">
-                                                                        <i class="bi bi-box-arrow-in-up-right"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </td>
-                                                            <td class="align-middle">
-                                                                <button type="button"
-                                                                    class="btn text-gray btn-show-on-hover"
-                                                                    v-on:click="route.requestBody.fieldValidationAttributes.splice(index, 1)">
-                                                                    <i class="bi bi-trash"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                                <div class="mt-1">
-                                                    <button type="button" class="btn btn-secondary btn-sm"
-                                                        v-on:click="addRequesBodyField">Add</button>
-                                                </div>
-                                            </v-card>
-                                        </v-window-item>
-                                    </v-window>
-                                </v-card-text>
-                            </v-card>
-                            <validation-attributes-modal v-if="validationAttributesModalVisible"
-                                :attributes="validationAttributesModalAttributes"
-                                @@save="onValidationAttributesModalSaved" @@close="closeValidationAttributesModal">
-                            </validation-attributes-modal>
-                        </section>
-                        <v-divider></v-divider>
-                        <section>
-                            <h5>RESPONSE</h5>
-                            <div class="card-body">
-                                <label>Response Provider</label>
-                                <div class="mt-1">
-                                    @foreach (var type in Model.ResponseProviderSelectListItem)
-                                    {
-                                        <div class="form-check form-check-inline">
-                                            <input v-model="route.responseType" class="form-check-input" type="radio"
-                                                value="@type.Value" @@change="onResponseProviderChanged">
-                                            <label class="form-check-label">@type.Text</label>
-                                        </div>
-                                    }
-                                </div>
-                                <div v-show="route.responseType == 1" class="card card-body">
-                                    <div>
-                                        <label class="form-label">Status Code</label>
-                                        <input v-model="route.mockResponse.statusCode" list="statusCodeOptions"
-                                            class="form-control">
-                                        <datalist id="statusCodeOptions">
-                                        </datalist>
-                                    </div>
-                                </div>
-                                <div v-show="route.responseType == 2">
-                                    Forward Proxy
-                                </div>
-                                <div v-show="route.responseType == 3">
-                                    Function Trigger
-                                </div>
-                            </div>
-                        </section>
-                        <div class="mt-1 d-flex">
-                            <button type="button" @@click="cancel" class="btn btn-secondary ms-auto">Cancle</button>
-                            <button type="submit" class="btn btn-primary ms-2">Save</button>
-                        </div>
-                    </v-form>
+                    <route-editor :route="route" @@save="saveRoute"></route-editor>
                 </div>
-                <div v-else>
-                    Click to show details
-                </div>
-            </div>
-        </div>
+            </v-col>
+        </v-row>
     </div>
 </div>
-<template id="route-list-template">
-    <ul v-if="routes.length > 0" class="list-group list-group-flush mt-2">
-        <li v-for="route in routes" :key="route.id" class="list-group-item px-2 py-1"
-            :class="{'!tw-bg-violet-200': route.id === selected_id}">
-            <div class="row">
-                <div v-on:click="click(route.id)" class="col" style="position: relative;">
-                    <a onclick="event.preventDefault()" href="#"
-                        class="text-decoration-none stretched-link">{{route.name}}</a>
-                    <div>
-                        <small class="badge rounded-pill me-1" style="width: 60px;"
-                            :class="getMethodClass(route.method)">{{route.method}}</small>
-                        <small class="text-muted">/{{route.path}}</small>
-                    </div>
-                </div>
-                <div class="p-0 my-auto" style="width: 40px;">
-                    <button v-on:click="showActionsMenu(route.id, $event)" class="btn btn-sm" type="button">
-                        <i class="bi bi-three-dots"></i>
-                    </button>
-                </div>
-            </div>
-        </li>
-    </ul>
-    <div v-if="itemActionsMenuVisible" class="btn-group-vertical dropdown-menu context-menu" role="group">
-        <button type="button" v-on:click="showDeleteConfirmModal"
-            class="dropdown-item btn btn-default text-danger">Delete</button>
-    </div>
-    <div v-if="routeDeleteConfirmModalVisible" class="modal" :id="routeDeleteConfirmModalId" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Delete confirm</h5>
-                    <button type="button" class="btn-close" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are your sure want to delete route?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger"
-                        v-on:click="deleteRoute(itemActionsMenuClickedRouteId)">Delete</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
-<template id="validation-rules-modal-template">
-    <div id="validationAttributesModal" class="modal">
-        <div class="modal-dialog dialog-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h6 class="modal-title">VALIDATION RULES</h6>
-                    <button type="button" class="btn-close" v-on:click="close"></button>
-                </div>
-                <div class="modal-body">
-                    <ul class="list-group list-group-flush">
-                        <li v-for="(rule, index) in rules" class="list-group-item">
-                            <v-row>
-                                <v-col cols="4">
-                                    <v-select v-model="rule.name" :items="availableRules" item-title="name"
-                                        item-value="name">
-                                    </v-select>
-                                </v-col>
-                                <div v-if="rule.name=='Range'">
-                                    <v-col cols="4">
-                                        <v-text-field v-model="rule.min" type="number" label="MIN"
-                                            variant="solo"></v-text-field>
-                                    </v-col>
-                                    <v-col cols="4">
-                                        <v-text-field v-model="rule.max" type="number" label="MAX"
-                                            variant="solo"></v-text-field>
-                                    </v-col>
-                                </div>
-                                <button type="button" class="btn text-gray btn-show-on-hover" @@click="remove(index)">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </v-row>
-                        </li>
-                    </ul>
-                    <div class="mt-2">
-                        <button type="button" class="btn btn-secondary btn-sm" @@click="add">Add</button>
-                    </div>
-                </div>
-                <div class="modal-footer p-2">
-                    <button type="button" class="btn btn-secondary" v-on:click="close">Cancel</button>
-                    <button type="button" class="btn btn-primary" v-on:click="save">Save</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
+<partial name="/Views/WebApplications/Routes/_Partial/_RouteListComponent.cshtml" />
+<partial name="/Views/WebApplications/Routes/_Partial/_RouteEditorComponent.cshtml" />
 <script>
-    const ValidationAttributesModal = {
-        template: '#validation-rules-modal-template',
-        props: {
-            rules: {
-                type: Object,
-                default: () => ({})
-            }
-        },
-        methods: {
-            close() {
-                this.$emit('close')
-            },
-            save() {
-                this.$emit('save', this.rules)
-            },
-            add() {
-                this.rules.push({ name: null, parameters: '' });
-            },
-            remove(index) {
-                this.rules.splice(index, 1)
-            }
-        },
-        data: function () {
-            const rules = [];// JSON.parse(JSON.stringify(this.rules || []));
-            const availableRules = JSON.parse('@Html.Raw(Json.Serialize(Model.BuiltInValdationAttributes))')
-            return {
-                rules,
-                availableRules
-            }
-        },
-        computed: {
-            computeParametersPlaceholder() {
-                return (rule) => {
-                    const selectedOption = this.availableRules.find(item => item.name === rule.name)
-                    return selectedOption ? selectedOption.parameterDescription : 'Attribute parameters'
-                }
-            }
-        }
-    }
-</script>
-<script>
-    const RouteList = {
-        props: {
-            routes: {
-                type: Array,
-                required: true
-            }
-        },
-        template: '#route-list-template',
-        methods: {
-            click(id) {
-                this.selected_id = id
-                this.$emit('click-route', id);
-            },
-            editRoute(route) {
-                this.$emit('edit-route', route);
-            },
-            createRoute() {
-                this.$emit('create-route');
-            },
-            getMethodClass(method) {
-                switch (method) {
-                    case 'DELETE': return 'tw-bg-red-500';
-                    case 'POST': return 'tw-bg-orange-500';
-                    case 'PUT': return 'tw-bg-yellow-500';
-                    case 'GET': return 'tw-bg-blue-500';
-                    default: return 'text-blue';
-                }
-            },
-            showActionsMenu(id, event) {
-                this.itemActionsMenuClickedRouteId = id
-                this.itemActionsMenuVisible = true
-            },
-            async showDeleteConfirmModal(id) {
-                this.routeDeleteConfirmModalVisible = true
-                await nextTick()
-                const modalEl = document.getElementById(this.routeDeleteConfirmModalId)
-                let modal = new bootstrap.Modal(modalEl, {})
-                modalEl.addEventListener('hidden.bs.modal', function (event) {
-                    modal.dispose()
-                    this.routeDeleteConfirmModalVisible = false
-                })
-                modal.show()
-            },
-            deleteRoute(id) {
-                const DeleteUrl = '@Url.Action(nameof(WebApplicationRoutesController.Delete), "WebApplicationRoutesApi", new {WebApplicationName = Model.WebApplication.Name, RouteId = -9999})'
-                axios.post(DeleteUrl.replace('-9999', id))
-                    .then(res => this.$emit('route-deleted', id))
-                    .then(async () => {
-                        let modal = bootstrap.Modal.getInstance(document.getElementById(this.routeDeleteConfirmModalId), {})
-                        modal.dispose()
-                        this.routeDeleteConfirmModalVisible = false
-                    });
-            }
-        },
-        data: function () {
-            return {
-                selected_id: null,
-                itemActionsMenuVisible: false,
-                itemActionsMenuClickedRouteId: null,
-                routeDeleteConfirmModalVisible: false,
-                routeDeleteConfirmModalId: 'routeDeleteConfirmModal'
-            }
-        }
-    }
-</script>
-<script>
-    let timeout = null;
-    const { createApp, onMounted, ref, nextTick } = Vue
-    const { createVuetify } = Vuetify
-    const vuetify = createVuetify({
-        ssr: true
-    })
-    const app = createApp({
+    const RootComponent = {
         setup() {
-            const webapp = ref(JSON.parse('@Html.Raw(Json.Serialize(Model.WebApplication))'));
             const routes = ref([]);
             const route = ref(null);
             const searchTerm = ref('');
-            const TempRouteDetailUrl = '@Url.Action(nameof(WebApplicationRoutesController.Get),"WebApplicationRoutesApi", new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
-            const openRoute = async id => {
-                axios.get(TempRouteDetailUrl.replace('-9999', id))
-                    .then(res => {
-                        route.value = res.data
-                        route.value.requestBody = route.value.requestBody || {}
-                    })
+            const newRoute = () => {
+                route.value = {
+                    id: 0,
+                    name: '',
+                    description: '',
+                    methods: [],
+                    path: '',
+                    order: 1,
+                    authorization: {
+                        type: 0,
+                        policies: [],
+                        claims: []
+                    },
+                    queryParamsValidation: [],
+                    headersValidation: [],
+                    bodyValidation: [],
+                    responseType: 1,
+                    mockResponse: {
+                        statusCode: 200,
+                        headers: [
+                            {
+                                name: "foo",
+                                template: "static",
+                                value: "bar"
+                            }
+                        ],
+                        body: {
+                            text: 'hi'
+                        }
+                    }
+                }
             }
-            const delayedSearch = () => {
-                const IndexUrl = '@Url.Action(nameof(WebApplicationRoutesController.List), "WebApplicationRoutesApi", new {WebApplicationName = Model.WebApplication.Name})'
+            const TempRouteDetailUrl = '@Url.Action(nameof(WebApplicationRoutesController.Get),"WebApplicationRoutes", new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
+            const openRoute = async id => {
+                const res = await axios.get(TempRouteDetailUrl.replace('-9999', id));
+                route.value = res.data;
+            }
+            let timeout = null;
+            const fetchRoutes = () => {
+                const IndexUrl = '@Url.Action(nameof(WebApplicationRoutesController.List), "WebApplicationRoutes", new {WebApplicationName = Model.WebApplication.Name})'
                 clearTimeout(timeout);
                 timeout = setTimeout(async () => {
                     const params = {
@@ -554,92 +130,13 @@
                 }, 800);
             }
 
-            const newRoute = () => {
-                route.value = {
-                    id: 0,
-                    name: '',
-                    description: '',
-                    methods: [],
-                    path: '',
-                    order: 1,
-                    authorizationType: 0,
-                    authorizationPolicies: [],
-                    authorizationClaims: [],
-                    queryValidationRules: [],
-                    headersValidationRules: [],
-                    bodyValidationRules:[],
-                    responseType: 1,
-                    mockResponse: {
-                        statusCode: 200
-                    },
-                    transforms: {
+            const saveRoute = (route) => {
 
-                    },
-                    function: {
-
-                    }
-                }
-            }
-            const onSubmit = () => {
-                alert(JSON.stringify(route.value));
-                return;
-                let url = ''
-                if (route.value.id === 0) {
-                    //Create
-                    url = '@Url.Action(nameof(WebApplicationRoutesController.Create), "WebApplicationRoutesApi", new { WebApplicationName = Model.WebApplication.Name})'
-                } else {
-                    let tempUrl = '@Url.Action(nameof(WebApplicationRoutesController.Edit), "WebApplicationRoutesApi", new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})'
-                    url = tempUrl.replace('-9999', route.value.id);
-                }
-                axios.post(url, route.value)
-                    .then(res => {
-                        if (route.value.id === 0) {
-                            route.value.id = res.data
-                        }
-                    })
-                    .catch(err => console.log(err));
             }
             const cancel = () => {
                 route.value = null
             }
-            const addRow = (prop) => {
-                route.value[prop] = route.value[prop] || [];
-                route.value[prop].push({
-                    name: null,
-                    attributes: []
-                });
-            }
-            const addRequesBodyField = () => {
-                route.value.requestBody.fieldValidationAttributes = route.value.requestBody.fieldValidationAttributes || []
-                route.value.requestBody.fieldValidationAttributes.push({ name: null, attributes: [] })
-            }
 
-            let validationAttributesModalObj = null;
-            const validationAttributesModalVisible = ref(false)
-            const validationAttributesModalAttributes = ref(null)
-            let onValidationAttributesModalSavedHandler
-            const showValidationAttributesModal = async (attributes, onValidationAttributesModalSavedHandler) => {
-                validationAttributesModalAttributes.value = attributes
-                this.onValidationAttributesModalSavedHandler = onValidationAttributesModalSavedHandler
-                validationAttributesModalVisible.value = true
-                await nextTick()
-                this.validationAttributesModalObj = new bootstrap.Modal(document.getElementById("validationAttributesModal"), {})
-                this.validationAttributesModalObj.show()
-            }
-            const closeValidationAttributesModal = () => {
-                this.validationAttributesModalObj.hide()
-                this.validationAttributesModalObj = null
-                validationAttributesModalVisible.value = false
-                this.onValidationAttributesModalSavedHandler = null
-            }
-            const onValidationAttributesModalSaved = (attributes) => {
-                this.onValidationAttributesModalSavedHandler(attributes)
-
-                this.validationAttributesModalObj.hide()
-                this.validationAttributesModalObj = null
-                validationAttributesModalVisible.value = false
-                this.onValidationAttributesModalSavedHandler = null
-            }
             const onRouteDeleted = (id) => {
                 const index = routes.value.findIndex(r => r.id === id);
                 if (index > -1) {
@@ -648,56 +145,28 @@
             }
             onMounted(() => {
                 routes.value = JSON.parse('@Html.Raw(Json.Serialize(Model.Routes.Select(r => new {
-                    Id = r.RouteId,
-                    r.Name,
-                    r.Method,
-                    r.Path
-                    })))')
+                                               Id = r.RouteId,
+                                               r.Name,
+                                               r.Method,
+                                               r.Path
+                                           })))')
             })
 
-            const deleteAuthorizationClaim = (index) => {
-                route.value.authorizationClaims.splice(index, 1)
-            }
-            const addAuthorizationClaim = () => {
-                route.value.authorizationClaims = route.value.authorizationClaims || [];
-                route.value.authorizationClaims.push({ type: '', allowedValues: '' })
-            }
-            const httpMethods = JSON.parse('@Json.Serialize(Model.HttpMethodSelectListItem.Select(m => new {Title = m.Text.ToUpper(), Value = m.Value.ToUpper()}).Prepend(new { Title = "ALL", Value = "*" }))');
-            const policies = JSON.parse('@Json.Serialize(Model.AuthorizationPolicySelectListItem.Select(p => new {p.Value, Title = p.Text}))');
-            const requestValidationTab = ref('queryParams');
             return {
+                newRoute,
                 routes,
                 route,
                 openRoute,
-                newRoute,
-                delayedSearch,
+                fetchRoutes,
                 searchTerm,
-                webapp,
-                onSubmit,
                 cancel,
                 onRouteDeleted,
-                addRow,
-                addRequesBodyField,
-                validationAttributesModalVisible,
-                validationAttributesModalAttributes,
-                showValidationAttributesModal,
-                onValidationAttributesModalSaved,
-                closeValidationAttributesModal,
-                deleteAuthorizationClaim,
-                addAuthorizationClaim,
-                httpMethods,
-                policies,
-                requestValidationTab,
-                dialog: false,
-                notifications: false,
-                sound: true,
-                widgets: false,
             }
         }
-    });
+    }
+    const app = createApp(RootComponent);
     app.component('route-list', RouteList)
-    app.component('validation-attributes-modal', ValidationAttributesModal)
+    app.component('route-editor', RouteEditorComponent)
     app.use(vuetify)
     app.mount('#app')
-
 </script>
