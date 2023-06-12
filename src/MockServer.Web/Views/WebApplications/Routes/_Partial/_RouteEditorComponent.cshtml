@@ -37,6 +37,12 @@
                     </v-radio-group>
                     <v-expand-transition>
                         <div v-show="route.authorization.type == @((int)AuthorizationType.Authorized)">
+                            <v-select 
+                                v-model="route.authorization.method"
+                                label="METHOD"
+                                :items="[{title: 'JWT BEARER', value: 'jwtbearer'}]"
+                                variant="solo">
+                            </v-select>
                             <v-select v-model="route.authorization.policies" clearable label="Policy" :items="policies"
                                 item-title="title" item-value="value" multiple variant="solo">
                             </v-select>
