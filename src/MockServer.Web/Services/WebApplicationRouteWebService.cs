@@ -16,7 +16,7 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
 {
     private readonly IWebApplicationRouteRepository _webApplicationRouteRepository;
     //private readonly IWebApplicationRepository _webApplicationRepository;
-    //private readonly IWebApplicationAuthenticationSchemeRepository _authRepository;
+    private readonly IWebApplicationAuthenticationSchemeRepository _webApplicationAuthenticationSchemeRepository;
     private readonly IWebApplicationAuthorizationPolicyRepository _webApplicationAuthorizationPolicyRepository;
     private readonly IWebApplicationService _webApplicationWebService;
     private readonly IMapper _mapper;
@@ -24,14 +24,14 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
         IHttpContextAccessor contextAccessor,
         IWebApplicationRouteRepository requestRepository,
         //IWebApplicationRepository projectRepository,
-        //IWebApplicationAuthenticationSchemeRepository authRepository,
+        IWebApplicationAuthenticationSchemeRepository webApplicationAuthenticationSchemeRepository,
         IWebApplicationAuthorizationPolicyRepository webApplicationAuthorizationPolicyRepository,
         IWebApplicationService webApplicationWebService,
         IMapper mapper) : base(contextAccessor)
     {
         _webApplicationRouteRepository = requestRepository;
         //_webApplicationRepository = projectRepository;
-        //_authRepository = authRepository;
+        _webApplicationAuthenticationSchemeRepository = webApplicationAuthenticationSchemeRepository;
         _webApplicationAuthorizationPolicyRepository = webApplicationAuthorizationPolicyRepository;
         _webApplicationWebService = webApplicationWebService;
         _mapper = mapper;
@@ -106,6 +106,8 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
                 new("Authorize", ((int)AuthorizationType.Authorized).ToString())
             },
         };
+        vm.AuthorizationAuthenticationSchemeSelectListItem = 
+            (await _webApplicationAuthenticationSchemeRepository.GetAll(appId)).Select(s => new SelectListItem(s.Name, s.SchemeId.ToString()));
         var policies = await _webApplicationAuthorizationPolicyRepository.GetAll(appId);
         vm.AuthorizationPolicySelectListItem = policies.Select(p => new SelectListItem(p.Name, p.PolicyId.ToString()));
         vm.BuiltInValdationAttributes = new List<BuiltInValdationAttributeDescription>

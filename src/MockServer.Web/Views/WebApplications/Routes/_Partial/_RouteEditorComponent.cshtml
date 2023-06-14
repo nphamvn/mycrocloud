@@ -38,40 +38,20 @@
                     <v-expand-transition>
                         <div v-show="route.authorization.type == @((int)AuthorizationType.Authorized)">
                             <v-select 
-                                v-model="route.authorization.method"
-                                label="METHOD"
-                                :items="[{title: 'JWT BEARER', value: 'jwtbearer'}]"
+                                v-model="route.authorization.authenticationSchemeIds"
+                                label="AUTHENTICATION SCHEMES"
+                                :items="authorizationAuthenticationSchemes"
+                                multiple
                                 variant="solo">
                             </v-select>
-                            <v-select v-model="route.authorization.policies" clearable label="Policy" :items="policies"
-                                item-title="title" item-value="value" multiple variant="solo">
+                            <v-select v-model="route.authorization.policies" 
+                                clearable label="POLICIES" 
+                                :items="policies"
+                                item-title="title" 
+                                item-value="value" 
+                                multiple
+                                variant="solo">
                             </v-select>
-                            <div>CLAIMS</div>
-                            <v-row>
-                                <v-col cols="3">
-                                    <div>CLAIM TYPE</div>
-                                </v-col>
-                                <v-col>
-                                    <div>AlLOWED VALUES</div>
-                                </v-col>
-                                <v-col cols="1"></v-col>
-                            </v-row>
-                            <v-row v-for="(claim, index) in route.authorization.claims">
-                                <v-col cols="3">
-                                    <v-text-field v-model="claim.type" variant="solo"></v-text-field>
-                                </v-col>
-                                <v-col>
-                                    <v-combobox v-model="claim.allowedValues" variant="solo" multiple
-                                        chips></v-combobox>
-                                </v-col>
-                                <v-col cols="1">
-                                    <v-btn icon="mdi-delete" class="mt-2"
-                                        v-on:click="route.authorization.claims.splice(index)">
-                                    </v-btn>
-                                </v-col>
-                            </v-row>
-                            <v-btn prepend-icon="mdi-plus"
-                                v-on:click="route.authorization.claims.push({})">ADD</v-btn>
                         </div>
                     </v-expand-transition>
                 </div>
@@ -326,6 +306,7 @@
             //
 
             //
+            const authorizationAuthenticationSchemes = JSON.parse('@Json.Serialize(Model.AuthorizationAuthenticationSchemeSelectListItem.Select(p => new {p.Value, Title = p.Text}))');
             const policies = JSON.parse('@Json.Serialize(Model.AuthorizationPolicySelectListItem.Select(p => new {p.Value, Title = p.Text}))');
             const deleteAuthorizationClaim = (index) => {
                 route.authorization.claims.splice(index, 1)
@@ -426,6 +407,7 @@
             });
             return {
                 httpMethods,
+                authorizationAuthenticationSchemes,
                 policies,
                 addAuthorizationClaim,
                 deleteAuthorizationClaim,

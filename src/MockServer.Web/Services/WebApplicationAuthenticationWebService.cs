@@ -25,9 +25,19 @@ public class WebApplicationAuthenticationWebService : BaseService, IWebApplicati
         _mapper = mapper;
     }
 
-    public Task AddJwtBearerScheme(int appId, JwtBearerSchemeSaveModel scheme)
+    public async Task AddJwtBearerScheme(int appId, JwtBearerSchemeSaveModel scheme)
     {
-        throw new NotImplementedException();
+        await _webApplicationAuthenticationSchemeRepository.Add(appId, new() {
+            WebApplicationId = appId,
+            Type = Core.WebApplications.Security.AuthenticationSchemeType.JwtBearer,
+            Name = scheme.Name,
+            DisplayName = scheme.DisplayName,
+            Description = scheme.Description,
+            Options = new JwtBearerAuthenticationOptions() {
+                Authority = scheme.Options.Authority,
+                Audience = scheme.Options.Audience
+            }
+        });
     }
 
     public Task EditJwtBearerScheme(int schemeId, JwtBearerSchemeSaveModel scheme)

@@ -85,9 +85,8 @@
                     order: 1,
                     authorization: {
                         type: 0,
-                        method: 'jwtbearer',
+                        authenticationSchemeIds: [],
                         policies: [],
-                        claims: []
                     },
                     queryParamsValidation: [],
                     headersValidation: [],
@@ -95,16 +94,8 @@
                     responseType: 1,
                     mockResponse: {
                         statusCode: 200,
-                        headers: [
-                            {
-                                name: "foo",
-                                template: "static",
-                                value: "bar"
-                            }
-                        ],
-                        body: {
-                            text: 'hi'
-                        }
+                        headers: [],
+                        body: { }
                     }
                 }
             }

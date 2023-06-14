@@ -49,10 +49,10 @@ public class WebApplicationAuthenticationsController: BaseController
     }
 
     [HttpPost("schemes/jwtbearer/new")]
-    public async Task<IActionResult> NewJwtBearerScheme(int WebApplicationId, JwtBearerSchemeSaveModel model)
+    public async Task<IActionResult> NewJwtBearerScheme(int WebApplicationId, string WebApplicationName, JwtBearerSchemeSaveModel model)
     {
         await _webApplicationAuthenticationWebService.AddJwtBearerScheme(WebApplicationId, model);
-        return RedirectToAction(nameof(Schemes), Request.RouteValues);
+        return RedirectToAction(nameof(Schemes), new { WebApplicationName });
     }
 
     [HttpGet("schemes/jwtbearer/edit/{SchemeId:int}")]
@@ -63,10 +63,10 @@ public class WebApplicationAuthenticationsController: BaseController
     }
 
     [HttpPost("schemes/jwtbearer/edit/{SchemeId:int}")]
-    public async Task<IActionResult> EditJwtBearerScheme(int WebApplicationId, JwtBearerSchemeSaveModel model)
+    public async Task<IActionResult> EditJwtBearerScheme(string WebApplicationName, int SchemeId, JwtBearerSchemeSaveModel model)
     {
-        await _webApplicationAuthenticationWebService.AddJwtBearerScheme(WebApplicationId, model);
-        return RedirectToAction(nameof(Schemes), Request.RouteValues);
+        await _webApplicationAuthenticationWebService.EditJwtBearerScheme(SchemeId, model);
+        return RedirectToAction(nameof(Schemes), new { WebApplicationName });
     }
 
     [HttpGet("schemes/apikey/new")]

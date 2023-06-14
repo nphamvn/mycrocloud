@@ -10,6 +10,7 @@ public class RouteIndexViewModel
     public IEnumerable<SelectListItem> HttpMethodSelectListItem { get; set; }
     public IEnumerable<SelectListItem> AuthorizationTypeSelectListItem { get; set; }
     public IEnumerable<SelectListItem> AuthorizationPolicySelectListItem { get; set; }
+    public IEnumerable<SelectListItem> AuthorizationAuthenticationSchemeSelectListItem { get; set; }
     public IEnumerable<SelectListItem> ResponseProviderSelectListItem { get; set; }
     public IEnumerable<BuiltInValdationAttributeDescription> BuiltInValdationAttributes { get; set; }
 }

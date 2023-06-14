@@ -17,57 +17,59 @@ public class WebApplicationAuthenticationSchemeRepository : BaseRepository, IWeb
     {
     }
 
-    public Task Add(int appId, AuthenticationScheme auth)
+    public async Task Add(int appId, AuthenticationScheme auth)
     {
         var query =
-                """
-                INSERT INTO 
-                    WebApplicationAuthenticationScheme (
-                        WebApplicationId,
-                        Type,
-                        Name,
-                        Options,
-                        Description
-                    )
-                    VALUES (
-                        @WebApplicationId,
-                        @Type,
-                        @Name,
-                        @Options,
-                        @Description
-                    );
-                """;
+"""
+INSERT INTO 
+    web_application_authentication_scheme(
+        web_application_id
+        ,type
+        ,name
+        ,display_name
+        ,options
+        ,description)
+    VALUES (
+        @web_application_id
+        ,@type
+        ,@name
+        ,@display_name
+        ,@options
+        ,@description
+    );
+""";
         using var connection = new NpgsqlConnection(ConnectionString);
-        SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(auth.Type));
-        return connection.ExecuteAsync(query, new
+        SqlMapper.AddTypeHandler(new AuthenticationSchemeOptionsJsonTypeHandler(auth.Type));
+        await connection.ExecuteAsync(query, new
         {
-            WebApplicationId = appId,
-            Type = (int)auth.Type,
-            Name = auth.Name,
-            Options = auth.Options,
-            Description = auth.Description,
+            web_application_id = appId,
+            type = (int)auth.Type,
+            name = auth.Name,
+            display_name = auth.DisplayName,
+            options = auth.Options,
+            description = auth.Description,
         });
     }
 
-    public Task<IEnumerable<AuthenticationScheme>> GetAll(int appId)
+    public async Task<IEnumerable<AuthenticationScheme>> GetAll(int appId)
     {
         var query =
-                """
-                SELECT
-                    Id,
-                    Name,
-                    Type,
-                    [Order],
-                    Description
-                FROM
-                    WebApplicationAuthenticationScheme
-                WHERE
-                    WebApplicationId = @WebApplicationId
-                """;
+"""
+SELECT
+    scheme_id SchemeId
+    ,web_application_id WebApplicationId
+    ,type Type
+    ,name Name
+    ,description Description
+FROM
+    web_application_authentication_scheme
+WHERE
+    web_application_id = @web_application_id
+""";
         using var connection = new NpgsqlConnection(ConnectionString);
-        return connection.QueryAsync<AuthenticationScheme>(query, new
+        return await connection.QueryAsync<AuthenticationScheme>(query, new
         {
-            WebApplicationId = appId
+            web_application_id = appId
         });
     }
 
@@ -88,7 +90,7 @@ public class WebApplicationAuthenticationSchemeRepository : BaseRepository, IWeb
                     Id = @Id
                 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(type));
+        SqlMapper.AddTypeHandler(new AuthenticationSchemeOptionsJsonTypeHandler(type));
         return connection.QuerySingleOrDefaultAsync<AuthenticationScheme>(query, new
         {
             Id = schemeId
@@ -109,7 +111,7 @@ public class WebApplicationAuthenticationSchemeRepository : BaseRepository, IWeb
                     Id = @Id
                 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(scheme.Type));
+        SqlMapper.AddTypeHandler(new AuthenticationSchemeOptionsJsonTypeHandler(scheme.Type));
         int type = (int)scheme.Type;
         await connection.ExecuteAsync(query, new
         {
@@ -177,11 +179,11 @@ public class WebApplicationAuthenticationSchemeRepository : BaseRepository, IWeb
         Type type = typeof(TAuthOptions);
         if (typeof(JwtBearerAuthenticationOptions).IsEquivalentTo(type))
         {
-            SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(AuthenticationSchemeType.JwtBearer));
+            SqlMapper.AddTypeHandler(new AuthenticationSchemeOptionsJsonTypeHandler(AuthenticationSchemeType.JwtBearer));
         }
         else if (typeof(ApiKeyAuthenticationOptions).IsEquivalentTo(type))
         {
-            SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(AuthenticationSchemeType.ApiKey));
+            SqlMapper.AddTypeHandler(new AuthenticationSchemeOptionsJsonTypeHandler(AuthenticationSchemeType.ApiKey));
         }
         var query =
                 """
@@ -219,7 +221,7 @@ public class WebApplicationAuthenticationSchemeRepository : BaseRepository, IWeb
                 WHERE
                     Id = @Id
                 """;
-        SqlMapper.AddTypeHandler(new AuthenticationOptionsJsonTypeHandler(type));
+        SqlMapper.AddTypeHandler(new AuthenticationSchemeOptionsJsonTypeHandler(type));
         return await connection.QuerySingleOrDefaultAsync<AuthenticationScheme>(query, new
         {
             Id = id
@@ -227,11 +229,11 @@ public class WebApplicationAuthenticationSchemeRepository : BaseRepository, IWeb
     }
 }
 
-public class AuthenticationOptionsJsonTypeHandler : SqlMapper.TypeHandler<AuthenticationSchemeOptions>
+public class AuthenticationSchemeOptionsJsonTypeHandler : SqlMapper.TypeHandler<AuthenticationSchemeOptions>
 {
     private readonly AuthenticationSchemeType _type;
     
-    public AuthenticationOptionsJsonTypeHandler(AuthenticationSchemeType type)
+    public AuthenticationSchemeOptionsJsonTypeHandler(AuthenticationSchemeType type)
     {
         _type = type;
     }
