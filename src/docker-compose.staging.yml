@@ -20,6 +20,8 @@ services:
     environment:
       - PGADMIN_DEFAULT_EMAIL=pvnam95@hotmail.com
       - PGADMIN_DEFAULT_PASSWORD=9xs3wVYkwSSSiG
+    volumes:
+      - mockserver-pgadmin4-volume:/var/lib/pgadmin
     networks:
       - mockserver-network
   seq:
@@ -51,6 +53,7 @@ services:
       - mockserver-network
 volumes:
   mockserver-postgres-volume:
+  mockserver-pgadmin4-volume:
   mockserver-seq-data:
 networks:
   mockserver-network:
