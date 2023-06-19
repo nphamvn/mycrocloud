@@ -7,14 +7,14 @@
 </style>
 <template id="route-list-template">
     <v-list>
-        <v-list-item class="pa-0" v-for="route in routes" :key="route.id" :class="{'!tw-bg-violet-200': route.id === selected_id}">
-            <v-card v-on:click="clickRoute(route.id)">
+        <v-list-item class="pa-0" v-for="route in routes" :key="route.id">
+            <v-card v-on:click="clickRoute(route.id)" :class="{'bg-primary': route.id === clickRouteId}">
                 <v-card-title>{{route.name}}</v-card-title>
                 <v-card-text>
                     <v-badge
-                        :color="getMethodBadgeColor(route.method)"
+                        :color="getMethodBadgeColor(route)"
                         text-color="white"
-                        :content="route.method"
+                        :content="getMethodBadgeContent(route)"
                         inline
                     ></v-badge>
                     <small>{{route.path}}</small>
@@ -46,7 +46,7 @@
     </div>
 </template>
 <script>
-    const RouteList = {
+    const RouteListComponent = {
         template: '#route-list-template',
         props: {
             routes: {
@@ -54,65 +54,32 @@
                 required: true
             }
         },
-        emits: ['click-route', 'delete'],
+        emits: ['click-route'],
         setup(props, { emit }) {
             const clickRouteId = ref(null)
             const clickRoute = (id) => {
                 clickRouteId.value = id;
                 emit('click-route', id);
             }
-            return {
-                clickRoute,
-                clickRouteId
-            }
-        },
-        methods: {
-            click(id) {
-                this.selected_id = id
-                this.$emit('click-route', id);
-            },
-            getMethodBadgeColor(method) {
-                switch (method) {
+            const getMethodBadgeColor = (route) => {
+                //TODO: use methods prop
+                switch (route.method) {
                     case 'DELETE': return 'red';
                     case 'POST': return 'orange';
                     case 'PUT': return 'yellow';
                     case 'GET': return 'light-blue';
                     default: return 'light-blue';
                 }
-            },
-            showActionsMenu(id, event) {
-                this.itemActionsMenuClickedRouteId = id
-                this.itemActionsMenuVisible = true
-            },
-            async showDeleteConfirmModal(id) {
-                this.routeDeleteConfirmModalVisible = true
-                await nextTick()
-                const modalEl = document.getElementById(this.routeDeleteConfirmModalId)
-                let modal = new bootstrap.Modal(modalEl, {})
-                modalEl.addEventListener('hidden.bs.modal', function (event) {
-                    modal.dispose()
-                    this.routeDeleteConfirmModalVisible = false
-                })
-                modal.show()
-            },
-            deleteRoute(id) {
-                const DeleteUrl = '@Url.Action(nameof(WebApplicationRoutesController.Delete), "WebApplicationRoutes", new {WebApplicationName = Model.WebApplication.Name, RouteId = -9999})'
-                axios.post(DeleteUrl.replace('-9999', id))
-                    .then(res => this.$emit('route-deleted', id))
-                    .then(async () => {
-                        let modal = bootstrap.Modal.getInstance(document.getElementById(this.routeDeleteConfirmModalId), {})
-                        modal.dispose()
-                        this.routeDeleteConfirmModalVisible = false
-                    });
             }
-        },
-        data: function () {
+            const getMethodBadgeContent = (route) => {
+                //TODO: use methods prop
+                return route.method
+            }
             return {
-                selected_id: null,
-                itemActionsMenuVisible: false,
-                itemActionsMenuClickedRouteId: null,
-                routeDeleteConfirmModalVisible: false,
-                routeDeleteConfirmModalId: 'routeDeleteConfirmModal'
+                clickRoute,
+                clickRouteId,
+                getMethodBadgeColor,
+                getMethodBadgeContent
             }
         }
     }

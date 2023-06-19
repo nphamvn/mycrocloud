@@ -9,6 +9,7 @@ using CoreRoute = MockServer.Core.WebApplications.Route;
 using MockServer.Core.WebApplications.Security;
 using MockServer.Web.Models.WebApplications.Routes.Authorizations;
 using MockServer.Web.Shared;
+using MongoDB.Driver;
 
 namespace MockServer.Web.Services;
 
@@ -42,6 +43,21 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
         var existing = await _webApplicationRouteRepository.Find(appId, route.Methods[0], route.Path);
         if (existing == null)
         {
+            var connectionString = Environment.GetEnvironmentVariable("MONGODB_URI");
+            var client = new MongoClient(connectionString);
+            var routesCollection = client.GetDatabase("mock_server").GetCollection<CoreRoute>("routes");
+            await routesCollection.InsertOneAsync(new()
+            {
+                Name = route.Name,
+                Description = route.Description,
+                Path = route.Path,
+                Method = route.Methods[0],
+                Authorization = new ()
+                {
+                    Type = route.Authorization.Type,
+                    PolicyIds = route.Authorization.Policies,
+                }
+            });
             return await _webApplicationRouteRepository.Create(appId, new()
             {
                 Name = route.Name,

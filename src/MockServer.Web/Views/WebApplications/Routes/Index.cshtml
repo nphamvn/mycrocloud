@@ -28,15 +28,6 @@
         <script src="https://cdn.jsdelivr.net/npm/vuetify@3.3.2/dist/vuetify.min.js"></script>
         <script src="https://unpkg.com/vee-validate"></script>
     </environment>
-    <script>
-        const { createApp, onMounted, ref, nextTick, computed, watch } = Vue
-        const { createVuetify } = Vuetify
-        const vuetify = createVuetify({
-            ssr: true
-        })
-        window.axios = axios;
-        axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    </script>
 }
 <div id="app2"></div>
 <div class="row">
@@ -60,7 +51,7 @@
                 </template>
             </v-col>
             <v-col>
-                <div v-if="route" style="overflow-y: scroll">
+                <div v-if="route" class="overflow-y-auto" style="height: 80vh;">
                     <route-editor :route="route" @@save="saveRoute"></route-editor>
                 </div>
             </v-col>
@@ -93,9 +84,20 @@
                     bodyValidation: [],
                     responseType: 1,
                     mockResponse: {
-                        statusCode: 200,
-                        headers: [],
-                        body: { }
+                        statusCode: {
+                            type: 'static',
+                            value: 200
+                        },
+                        headers: [{
+                            name: 'content-type',
+                            engine: 'static',
+                            value: 'application/json'
+                        }],
+                        body: {
+                            engine: 'static',
+                            textFormat: 'json',
+                            value: ''
+                        }
                     }
                 }
             }
@@ -123,7 +125,7 @@
             }
 
             const saveRoute = (route) => {
-
+                routes.value.push(route)
             }
             const cancel = () => {
                 route.value = null
@@ -156,9 +158,18 @@
             }
         }
     }
+</script>
+<script>
+    const { createApp, onMounted, ref, nextTick, computed, watch } = Vue
+    const { createVuetify } = Vuetify
+    const vuetify = createVuetify({
+        ssr: true
+    })
     const app = createApp(RootComponent);
-    app.component('route-list', RouteList)
+    app.component('route-list', RouteListComponent)
     app.component('route-editor', RouteEditorComponent)
     app.use(vuetify)
     app.mount('#app')
+    window.axios = axios;
+    axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 </script>

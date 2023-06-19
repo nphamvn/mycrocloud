@@ -1,5 +1,5 @@
 <template id="validation-rules-config-template">
-    <v-dialog v-model="dialogVisible" persistent width="1024">
+    <v-dialog v-model="dialogVisible" fullscreen scrollable>
         <v-card>
             <v-card-title>
                 <span class="text-h5">VALIDATION RULES</span>
@@ -115,23 +115,26 @@
                             </v-row>
                         </v-col>
                         <v-col cols="1">
-                            <v-btn class="mt-3" density="compact" icon="mdi-delete" @@click="removeRule(index)"></v-btn>
-                        </v-col>
-                    </v-row>
-                </v-container>
-                <v-divider></v-divider>
-                <v-container>
-                    <v-row justify="start" align="start">
-                        <v-col cols="auto">
-                            <v-btn density="compact" prepend-icon="mdi-plus"
-                                v-on:click="addRule(availableRules[0])">ADD</v-btn>
-                        </v-col>
-                        <v-col v-for="rule of availableRules" cols="auto">
-                            <v-btn v-on:click="addRule(rule)" density="compact">{{rule}}</v-btn>
+                            <v-btn class="mt-3" density="compact" icon="mdi-delete" @@click="rules.splice(index)"></v-btn>
                         </v-col>
                     </v-row>
                 </v-container>
             </v-card-text>
+            <v-divider></v-divider>
+            <v-card-actions>
+                <v-container>
+                    <v-row justify="start" align="start">
+                    <v-col cols="auto">
+                        <v-btn density="compact" prepend-icon="mdi-plus"
+                            v-on:click="addRule(availableRules[0])">ADD</v-btn>
+                    </v-col>
+                    <v-col v-for="rule of availableRules" cols="auto">
+                        <v-btn v-on:click="addRule(rule)" density="compact">{{rule}}</v-btn>
+                    </v-col>
+                </v-row>
+                </v-container>
+            </v-card-actions>
+            <v-divider></v-divider>
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn v-on:click="close">Cancel</v-btn>
@@ -157,16 +160,22 @@
                     emit('close');
                 }
             });
+            const rules = ref(props.rules);
             const close = () => dialogVisible.value = false;
-            const save = () => emit('save', rules.value);
+            const save = () => {
+                if(validate(rules.value)) {
+                    emit('save', rules.value);
+                }
+                function validate(rules) {
+                    return true;
+                }
+            }
 
             const availableRules = ['alpha', 'alpha_dash', 'alpha_spaces', 'between', 'credit_card', 'date_between',
                 'date_format', 'digits', 'ip', 'ip_or_fqdn',
                 'email', 'not_one_of', 'integer', 'is', 'is_not', 'length', 'max', 'max_value',
                 'min', 'min_value', 'numeric', 'one_of', 'regex', 'required', 'url'];
-            const rules = ref(props.rules);
             const addRule = (ruleName) => rules.value.push({ name: ruleName });
-            const removeRule = (index) => rules.value.splice(index, 1);
             return {
                 dialogVisible,
                 rules,
@@ -174,7 +183,6 @@
                 close,
                 save,
                 addRule,
-                removeRule,
             };
         }
     }
