@@ -4,25 +4,37 @@
     "description": "foo",
     "order": 1,
     "path": "/foo",
-    "methods": ["ALL", "GET", "POST"],
+    "methods": [
+        "ALL",
+        "GET",
+        "POST"
+    ],
     "authorization": {
         "type": "authorized",
-        "authenticationSchemeIds": [1, 2],
-        "policyIds": [1, 2]
+        "authenticationSchemeIds": [
+            1,
+            2
+        ],
+        "policyIds": [
+            1,
+            2
+        ]
     },
     "validations": {
-        "queryParams": [{
-            "name": "xxx",
-            "rules": [
-                {
-                    "name": "required"
-                },
-                {
-                    "name": "min_length",
-                    "length": 100
-                }
-            ]
-        }],
+        "queryParams": [
+            {
+                "name": "xxx",
+                "rules": [
+                    {
+                        "name": "required"
+                    },
+                    {
+                        "name": "min_length",
+                        "length": 100
+                    }
+                ]
+            }
+        ],
         "headers": [],
         "body": []
     },

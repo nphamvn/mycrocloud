@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build_web",
-            "program": "${workspaceFolder}/src/MockServer.Web/bin/Debug/net6.0/MockServer.Web.dll",
+            "program": "${workspaceFolder}/src/MockServer.Web/bin/Debug/net7.0/MockServer.Web.dll",
             "args": [],
             "cwd": "${workspaceFolder}/src/MockServer.Web",
             "stopAtEntry": false,

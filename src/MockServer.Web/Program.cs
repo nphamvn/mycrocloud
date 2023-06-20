@@ -1,6 +1,10 @@
+using System.Data;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using MockServer.Web.Extentions;
+using MockServer.Web.Models.WebApplications.Routes;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +17,13 @@ builder.Logging.AddSerilog(logger);
 builder.Services.ConfigureServices(builder.Configuration);
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(
+    options =>
+    {
+        var readerFactory = builder.Services.BuildServiceProvider().GetRequiredService<IHttpRequestStreamReaderFactory>();
+        options.ModelBinderProviders.Insert(0, new RouteModelBinderProvider(options.InputFormatters, readerFactory));
+    }
+);
 builder.Services.AddRazorPages();
 //builder.Services.AddServerSideBlazor();
 builder.Services
@@ -27,7 +37,8 @@ builder.Services
     {
 
     })
-    .AddCookie(IdentityConstants.ExternalScheme, options => {
+    .AddCookie(IdentityConstants.ExternalScheme, options =>
+    {
         options.LoginPath = "/identity/account/login";
     })
     .AddCookie(IdentityConstants.TwoFactorUserIdScheme)
@@ -58,14 +69,18 @@ builder.Services
         options.Scope.Add("email");
     })
     ;
-builder.Services.AddAuthorization(options => {
-    options.AddPolicy("ReadWebApplication", policy => {
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ReadWebApplication", policy =>
+    {
         policy.RequireClaim("scopes", "webapp:read");
     });
-    options.AddPolicy("WriteWebApplication", policy => {
+    options.AddPolicy("WriteWebApplication", policy =>
+    {
         policy.RequireClaim("scopes", "webapp:write");
     });
-    options.AddPolicy("DeleteWebApplication", policy => {
+    options.AddPolicy("DeleteWebApplication", policy =>
+    {
         policy.RequireClaim("scopes", "webapp:delete");
     });
 });

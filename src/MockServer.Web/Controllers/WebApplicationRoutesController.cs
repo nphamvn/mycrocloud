@@ -60,7 +60,7 @@ public class WebApplicationRoutesController : Controller
     
     [AjaxOnly]
     [HttpPost("create")]
-    public async Task<IActionResult> Create(int WebApplicationId, [FromBody] RouteSaveModel route)
+    public async Task<IActionResult> Create(int WebApplicationId, RouteSaveModel route)
     {
         if (!await _webApplicationRouteWebService.ValidateCreate(WebApplicationId, route, ModelState))
         {
