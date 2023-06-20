@@ -1,4 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -8,7 +11,6 @@ using MockServer.Core.WebApplications.Security;
 
 namespace MockServer.Web.Models.WebApplications.Routes
 {
-    [ModelBinder(BinderType = typeof(RouteModelBinder))]
     public class RouteSaveModel
     {
         [Required]
@@ -42,7 +44,6 @@ namespace MockServer.Web.Models.WebApplications.Routes
     {
         private readonly IList<IInputFormatter> _formatters;
         private readonly IHttpRequestStreamReaderFactory _readerFactory;
-
         public RouteModelBinderProvider(IList<IInputFormatter> formatters, IHttpRequestStreamReaderFactory readerFactory)
         {
             _formatters = formatters;
@@ -63,9 +64,8 @@ namespace MockServer.Web.Models.WebApplications.Routes
     }
     public class RouteModelBinder: IModelBinder
     {
-        private BodyModelBinder defaultBinder;
+        private readonly BodyModelBinder defaultBinder;
         public RouteModelBinder(IList<IInputFormatter> formatters, IHttpRequestStreamReaderFactory readerFactory)
-            //: base(formatters, readerFactory)
         {
             defaultBinder = new BodyModelBinder(formatters, readerFactory);
         }
@@ -73,8 +73,19 @@ namespace MockServer.Web.Models.WebApplications.Routes
         public async Task BindModelAsync(ModelBindingContext bindingContext)
         {
             await defaultBinder.BindModelAsync(bindingContext);
-            var xxx = (RouteSaveModel)bindingContext.Model;
-            bindingContext.Result = ModelBindingResult.Success(xxx);
+            //bindingContext.ValueProvider.GetValue()
+            var model = (RouteSaveModel)bindingContext.Result.Model;
+            if (model.Validations != null)
+            {
+                if (model.Validations.QueryParams != null)
+                {
+                    foreach (var queryParam in model.Validations.QueryParams)
+                    {
+                        
+                    }
+                }
+            }
+            bindingContext.Result = ModelBindingResult.Success(model);
         }
     }
 
@@ -95,6 +106,19 @@ namespace MockServer.Web.Models.WebApplications.Routes
     public abstract class Rule
     {
         public abstract string Name { get; set; }
+    }
+    public class RuleJsonConverter : JsonConverter<Rule>
+    {
+        public override Rule Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            var stringValue = reader.GetString();
+            return new RequiredRule();
+        }
+
+        public override void Write(Utf8JsonWriter writer, Rule value, JsonSerializerOptions options)
+        {
+            throw new NotImplementedException();
+        }
     }
     public class RequiredRule : Rule
     {
