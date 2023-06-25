@@ -9,16 +9,16 @@ public static class HttpContextExtentions
         {
             context.Response.Headers.Add(header.Key, header.Value.ToArray());
         }
+        var contentStream = await message.Content.ReadAsStreamAsync();
+        await contentStream.CopyToAsync(context.Response.Body);
+    }
 
-        if (message.Content != null)
+    public static async Task<object> ToJsonObject(this HttpContext context)
+    {
+        var obj = new
         {
-            foreach (var header in message.Content.Headers)
-            {
-                context.Response.Headers.Add(header.Key, header.Value.ToArray());
-            }
-
-            var contentStream = await message.Content.ReadAsStreamAsync();
-            await contentStream.CopyToAsync(context.Response.Body);
-        }
+            
+        };
+        return obj;
     }
 }

@@ -1,49 +1,17 @@
 @using MockServer.Web.Controllers
-<style>
-    .context-menu {
-        position: absolute;
-        width: 60px;
-    }
-</style>
 <template id="route-list-template">
     <v-list>
         <v-list-item class="pa-0" v-for="route in routes" :key="route.id">
             <v-card v-on:click="clickRoute(route.id)" :class="{'bg-primary': route.id === clickRouteId}">
                 <v-card-title>{{route.name}}</v-card-title>
                 <v-card-text>
-                    <v-badge
-                        :color="getMethodBadgeColor(route)"
-                        text-color="white"
-                        :content="getMethodBadgeContent(route)"
-                        inline
-                    ></v-badge>
-                    <small>{{route.path}}</small>
+                    <v-badge :color="getMethodBadgeColor(route)" text-color="white"
+                        :content="getMethodBadgeContent(route)" inline></v-badge>
+                    <small>{{route.match.path}}</small>
                 </v-card-text>
             </v-card>
         </v-list-item>
     </v-list>
-    <div v-if="itemActionsMenuVisible" class="btn-group-vertical dropdown-menu context-menu" role="group">
-        <button type="button" v-on:click="showDeleteConfirmModal"
-                class="dropdown-item btn btn-default text-danger">Delete</button>
-    </div>
-    <div v-if="routeDeleteConfirmModalVisible" class="modal" :id="routeDeleteConfirmModalId" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Delete confirm</h5>
-                    <button type="button" class="btn-close" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are your sure want to delete route?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger"
-                            v-on:click="deleteRoute(itemActionsMenuClickedRouteId)">Delete</button>
-                </div>
-            </div>
-        </div>
-    </div>
 </template>
 <script>
     const RouteListComponent = {
@@ -62,18 +30,27 @@
                 emit('click-route', id);
             }
             const getMethodBadgeColor = (route) => {
-                //TODO: use methods prop
-                switch (route.method) {
-                    case 'DELETE': return 'red';
-                    case 'POST': return 'orange';
-                    case 'PUT': return 'yellow';
-                    case 'GET': return 'light-blue';
-                    default: return 'light-blue';
+                if (route.match.methods.length === 1) {
+                    switch (route.match.methods[0]) {
+                        case 'DELETE': return 'red';
+                        case 'POST': return 'orange';
+                        case 'PUT': return 'yellow';
+                        case 'GET': return 'light-blue';
+                        default: return 'light-blue';
+                    }
+                } else {
+                    return 'purple'
                 }
             }
             const getMethodBadgeContent = (route) => {
                 //TODO: use methods prop
-                return route.method
+                if(route.match.methods.length === 1) {
+                    return route.match.methods[0]
+                }
+                else 
+                {
+                    return 'MULTI'
+                }
             }
             return {
                 clickRoute,

@@ -9,7 +9,6 @@ using CoreRoute = MockServer.Core.WebApplications.Route;
 using MockServer.Core.WebApplications.Security;
 using MockServer.Web.Models.WebApplications.Routes.Authorizations;
 using MockServer.Web.Shared;
-using MongoDB.Driver;
 
 namespace MockServer.Web.Services;
 
@@ -43,31 +42,16 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
         var existing = await _webApplicationRouteRepository.Find(appId, route.Methods[0], route.Path);
         if (existing == null)
         {
-            var connectionString = Environment.GetEnvironmentVariable("MONGODB_URI");
-            var client = new MongoClient(connectionString);
-            var routesCollection = client.GetDatabase("mock_server").GetCollection<CoreRoute>("routes");
-            await routesCollection.InsertOneAsync(new()
-            {
-                Name = route.Name,
-                Description = route.Description,
-                Path = route.Path,
-                Method = route.Methods[0],
-                Authorization = new ()
-                {
-                    Type = route.Authorization.Type,
-                    PolicyIds = route.Authorization.Policies,
-                }
-            });
             return await _webApplicationRouteRepository.Create(appId, new()
             {
                 Name = route.Name,
                 Description = route.Description,
-                Path = route.Path,
-                Method = route.Methods[0],
+                //Path = route.Path,
+                //Method = route.Methods[0],
                 Authorization = new ()
                 {
                     Type = route.Authorization.Type,
-                    PolicyIds = route.Authorization.Policies,
+                    PolicyIds = route.Authorization.PolicyIds,
                 }
             });
         }
@@ -107,17 +91,15 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
         var vm = new RouteIndexViewModel
         {
             WebApplication = await _webApplicationWebService.Get(appId),
-            Routes = _mapper.Map<IEnumerable<RouteIndexItem>>(await _webApplicationRouteRepository.GetByApplicationId(appId, searchTerm, sort)),
             HttpMethodSelectListItem = HttpProtocolExtensions.CommonHttpMethods
                                     .Select(m => new SelectListItem(m, m)),
             ResponseProviderSelectListItem = new List<SelectListItem>{
-                new("Mock Response", ((int)ResponseProvider.MockResponse).ToString()),
-                new("Forward Proxy", ((int)ResponseProvider.RequestForward).ToString()),
-                new("Function Trigger", ((int)ResponseProvider.Function).ToString())
+                new("Mock", ((int)ResponseProvider.Mock).ToString()),
+                new("Proxied Server", ((int)ResponseProvider.ProxiedServer).ToString()),
+                new("Function", ((int)ResponseProvider.Function).ToString())
             },
             AuthorizationTypeSelectListItem = new List<SelectListItem>
             {
-                //new("None", ((int)AuthorizationType.None).ToString()),
                 new("Allow Anonymous", ((int)AuthorizationType.AllowAnonymous).ToString()),
                 new("Authorize", ((int)AuthorizationType.Authorized).ToString())
             },
@@ -126,16 +108,17 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
             (await _webApplicationAuthenticationSchemeRepository.GetAll(appId)).Select(s => new SelectListItem(s.Name, s.SchemeId.ToString()));
         var policies = await _webApplicationAuthorizationPolicyRepository.GetAll(appId);
         vm.AuthorizationPolicySelectListItem = policies.Select(p => new SelectListItem(p.Name, p.PolicyId.ToString()));
-        vm.BuiltInValdationAttributes = new List<BuiltInValdationAttributeDescription>
+
+        var routes = await _webApplicationRouteRepository.GetByApplicationId(appId, searchTerm, sort);
+        vm.Routes = routes.Select(r => new RouteIndexItem()
         {
-            new () {
-                Name = "Required"
-            },
-            new () {
-                Name = "Range",
-                ParameterDescription = "Type, Min, Max"
-            }
-        };
+            RouteId = r.RouteId,
+            Name = r.Name,
+            Description = r.Description,
+            //Methods = r.Methods,
+            //Path = r.Path,
+            //ResponseProvider = r.ResponseProvider
+        });
         return vm;
     }
 
@@ -153,9 +136,10 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
             RouteId = routeId,
             Name = route.Name,
             Description = route.Description,
-            Order = route.Order,
-            Path = route.Path,
-            Methods = route.Methods,
+            //Order = route.Order,
+            //Path = route.Path,
+            //Methods = route.Methods,
+            
             Authorization = new AuthorizationViewModel()
             {
                 Type = route.Authorization.Type,

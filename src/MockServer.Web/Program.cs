@@ -1,11 +1,14 @@
 using System.Data;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using MockServer.Core.WebApplications;
 using MockServer.Web.Extentions;
 using MockServer.Web.Models.WebApplications.Routes;
 using Serilog;
+using WebApplication = Microsoft.AspNetCore.Builder.WebApplication;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -23,7 +26,11 @@ builder.Services.AddControllersWithViews(
         var readerFactory = builder.Services.BuildServiceProvider().GetRequiredService<IHttpRequestStreamReaderFactory>();
         options.ModelBinderProviders.Insert(0, new RouteModelBinderProvider(options.InputFormatters, readerFactory));
     }
-);
+).AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new RuleJsonConverter());
+    //options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+});
 builder.Services.AddRazorPages();
 //builder.Services.AddServerSideBlazor();
 builder.Services

@@ -1,11 +1,12 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MockServer.Web.Attributes;
 using MockServer.Web.Filters;
-using MockServer.Web.Models.Common;
 using MockServer.Web.Models.WebApplications.Routes;
 using MockServer.Web.Services;
 using RouteName = MockServer.Web.Common.Constants.RouteName;
+
 namespace MockServer.Web.Controllers;
 
 [Authorize]
@@ -38,51 +39,45 @@ public class WebApplicationRoutesController : Controller
             r.Name,
             r.Method,
             r.Path,
-            IntegrationType = (int)r.IntegrationType,
+            IntegrationType = (int)r.ResponseProvider,
             r.Description
         }));
     }
-    
+
+    [AjaxOnly]
+    [HttpGet("sample")]
+    public IActionResult Sample()
+    {
+        var json = System.IO.File.ReadAllText("Views/WebApplications/Routes/_Partial/sample.json");
+        var sampleRoute = JsonSerializer.Deserialize<dynamic>(json);
+        return Ok(sampleRoute);
+    }
+
     [AjaxOnly]
     [HttpGet("{RouteId:int}")]
     public async Task<IActionResult> Get(int RouteId)
     {
         var route = await _webApplicationRouteWebService.GetDetails(RouteId);
-        return Ok(new
-        {
-            route.RouteId,
-            route.Name,
-            route.Method,
-            route.Path,
-            route.Description
-        });
+        return Ok(route);
     }
-    
+
     [AjaxOnly]
     [HttpPost("create")]
-    public async Task<IActionResult> Create(int WebApplicationId, [ModelBinder(BinderType = typeof(RouteModelBinder))] RouteSaveModel route)
+    public async Task<IActionResult> Create(int WebApplicationId, [FromBody] MockServer.Core.WebApplications.Route route)
     {
-        if (!await _webApplicationRouteWebService.ValidateCreate(WebApplicationId, route, ModelState))
-        {
-            return Ok(new AjaxResult<RouteSaveModel>
-            {
-                Errors = new List<Error> { new("something went wrong") }
-            });
-        }
-        int id = await _webApplicationRouteWebService.Create(WebApplicationId, route);
-        return Ok(id);
+        return Ok(route);
     }
     
     [AjaxOnly]
     [HttpPost("edit/{RouteId:int}")]
-    public async Task<IActionResult> Edit(int RouteId, [FromBody] RouteSaveModel route)
+    public async Task<IActionResult> Edit(int RouteId, [FromBody] MockServer.Core.WebApplications.Route route)
     {
-        if (!await _webApplicationRouteWebService.ValidateEdit(RouteId, route, ModelState))
-        {
-            var allErrors = ModelState.Values.SelectMany(v => v.Errors);
-            return BadRequest(allErrors);
-        }
-        await _webApplicationRouteWebService.Edit(RouteId, route);
+        // if (!await _webApplicationRouteWebService.ValidateEdit(RouteId, route, ModelState))
+        // {
+        //     var allErrors = ModelState.Values.SelectMany(v => v.Errors);
+        //     return BadRequest(allErrors);
+        // }
+        // await _webApplicationRouteWebService.Edit(RouteId, route);
         return NoContent();
     }
     

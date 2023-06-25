@@ -78,9 +78,9 @@ namespace Ocelot.Configuration.Creator
                 var builder = new RouteBuilder();
                 return builder
                     .WithId(r.RouteId)
-                    .WithUpstreamHttpMethod(new() { r.Method })
-                    .WithUpstreamPathTemplate(new UpstreamPathTemplate(r.Path, 1, false, r.Path))
-                    .WithResponseProvider(r.ResponseProvider)
+                    //.WithUpstreamHttpMethod(new() { r.Method })
+                    //.WithUpstreamPathTemplate(new UpstreamPathTemplate(r.Path, 1, false, r.Path))
+                    //.WithResponseProvider(r.ResponseProvider)
                     .Build();
             })
             .ToList();

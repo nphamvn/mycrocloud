@@ -1,14 +1,26 @@
 @using MockServer.Core.WebApplications.Security
 @using MockServer.Web.Controllers
 @model MockServer.Web.Models.WebApplications.Routes.RouteIndexViewModel
+@using System.Text.Json
+@using System.IO
 @{
     ViewData["Title"] = Model.WebApplication.Name;
+    var routes = Model.Routes.Select(r => new
+    {
+        Id = r.RouteId,
+        Name = r.Name,
+        Match = new
+        {
+            Methods = new List<string> { "GET" },
+            Path = "/foo"
+        }
+    });
 }
 @section Scripts {
     <environment include="Development">
         <!-- Development Environment -->
         <link href="lib/vuetify/vuetify.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css"/>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css" />
         <script src="lib/vue/vue.global.min.js"></script>
         <script src="lib/axios/axios.min.js"></script>
         <script src="lib/vuetify/vuetify.min.js"></script>
@@ -18,13 +30,13 @@
     <environment exclude="Development">
         <!-- Not Development Environment -->
         <link href="https://cdn.jsdelivr.net/npm/vuetify@3.3.2/dist/vuetify.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css"/>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"
-                integrity="sha512-39BSQXI5q1XlvVhLfFRidKG8KM6Tr6VS/XSnNo6N/A0ZXexHCeoUI/s+ulujQy3UREjoLNrMnFat8VI0mMugWA=="
-                crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            integrity="sha512-39BSQXI5q1XlvVhLfFRidKG8KM6Tr6VS/XSnNo6N/A0ZXexHCeoUI/s+ulujQy3UREjoLNrMnFat8VI0mMugWA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
-                integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
-                crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdn.jsdelivr.net/npm/vuetify@3.3.2/dist/vuetify.min.js"></script>
         <script src="https://unpkg.com/vee-validate"></script>
     </environment>
@@ -40,7 +52,8 @@
                 <v-btn class="bg-primary" prepend-icon="mdi-plus" block @@click="newRoute">
                     NEW ROUTE
                 </v-btn>
-                <v-text-field class="mt-2" v-model="searchTerm" @@keyup="fetchRoutes" variant="solo" placeholder="Search">
+                <v-text-field class="mt-2" v-model="searchTerm" @@keyup="fetchRoutes" variant="solo"
+                    placeholder="Search">
                 </v-text-field>
                 <template v-if="routes.length > 0">
                     <route-list :routes="routes" @@click-route="openRoute">
@@ -65,43 +78,10 @@
         setup() {
             const routes = ref([]);
             const route = ref(null);
+            let sampleRoute = null;
             const searchTerm = ref('');
-            const newRoute = () => {
-                route.value = {
-                    id: 0,
-                    name: '',
-                    description: '',
-                    methods: [],
-                    path: '',
-                    order: 1,
-                    authorization: {
-                        type: 0,
-                        authenticationSchemeIds: [],
-                        policies: [],
-                    },
-                    validations: {
-                        queryParams: [],
-                        headers: [],
-                        body: []
-                    },
-                    responseType: 1,
-                    mockResponse: {
-                        statusCode: {
-                            type: 'static',
-                            value: 200
-                        },
-                        headers: [{
-                            name: 'content-type',
-                            engine: 'static',
-                            value: 'application/json'
-                        }],
-                        body: {
-                            engine: 'static',
-                            textFormat: 'json',
-                            value: ''
-                        }
-                    }
-                }
+            const newRoute = async () => {
+                route.value = sampleRoute;
             }
             const TempRouteDetailUrl = '@Url.Action(nameof(WebApplicationRoutesController.Get),"WebApplicationRoutes", new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
             const openRoute = async id => {
@@ -139,13 +119,10 @@
                     routes.value.splice(index, 1)
                 }
             }
-            onMounted(() => {
-                routes.value = JSON.parse('@Html.Raw(Json.Serialize(Model.Routes.Select(r => new {
-                                               Id = r.RouteId,
-                                               r.Name,
-                                               r.Method,
-                                               r.Path
-                                           })))')
+            onMounted(async () => {
+                routes.value = JSON.parse('@Html.Raw(Json.Serialize(routes))');
+                var res = await axios.get('@Url.Action(nameof(WebApplicationRoutesController.Sample), "WebApplicationRoutes", new {WebApplicationName = Model.WebApplication.Name})')
+                sampleRoute = res.data;
             })
 
             return {
@@ -162,6 +139,8 @@
     }
 </script>
 <script>
+    window.axios = axios;
+    axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     const { createApp, onMounted, ref, nextTick, computed, watch } = Vue
     const { createVuetify } = Vuetify
     const vuetify = createVuetify({
@@ -172,6 +151,4 @@
     app.component('route-editor', RouteEditorComponent)
     app.use(vuetify)
     app.mount('#app')
-    window.axios = axios;
-    axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 </script>

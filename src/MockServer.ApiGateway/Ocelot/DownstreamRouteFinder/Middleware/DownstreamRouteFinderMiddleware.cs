@@ -85,7 +85,7 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
             var builder = new DownstreamRouteBuilder();
             switch (route.ResponseProvider)
             {
-                case ResponseProvider.MockResponse:
+                case ResponseProvider.Mock:
                     builder.WithAddHeadersToUpstream(new() {
                                                 new AddHeader(_mockResponderOptions.RouteIdHeader, route.Id.ToString())
                                             })
@@ -100,7 +100,7 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
                         new (_mockResponderOptions.Host, _mockResponderOptions.Port)
                     });
                     break;
-                case ResponseProvider.RequestForward:
+                case ResponseProvider.ProxiedServer:
                     var options = new
                     {
                         Path = "Path",

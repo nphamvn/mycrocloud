@@ -24,8 +24,8 @@ app.Use( async (context, next) =>
 });
 app.Run(async context => {
     int routeId = (int)context.Items[routeIdKey];
-    var retriever = context.RequestServices.GetService<IHttpResponseRetriever>();
-    var responseMessage = await retriever.GetResponseMessage(routeId);
+    var retriever = context.RequestServices.GetService<IHttpResponseRetriever>(); 
+    var responseMessage = await retriever.GetResponseMessage(routeId, context);
     await context.WriteResponseMessage(responseMessage);
 });
 app.Run();

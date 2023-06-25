@@ -1,0 +1,85 @@
+{
+    "id": null,
+    "name": "foo",
+    "description": "foo",
+    "match": {
+        "order": 1,
+        "path": "/foo",
+        "methods": [
+            "GET",
+            "POST"
+        ]
+    },
+    "authorization": {
+        "type": "Authorized",
+        "authenticationSchemeIds": [
+            1
+        ],
+        "policyIds": [
+            1,
+            2
+        ]
+    },
+    "validation": {
+        "queryParameters": [
+            {
+                "name": "foo",
+                "rules": [
+                    {
+                        "name": "required"
+                    }
+                ]
+            }
+        ],
+        "headers": [
+            {
+                "name": "bar",
+                "rules": [
+                    {
+                        "name": "minlength",
+                        "length": 100
+                    }
+                ]
+            }
+        ],
+        "body": [
+            {
+                "field": ".",
+                "rules": [
+                    {
+                        "name": "required"
+                    }
+                ]
+            }
+        ]
+    },
+    "response": {
+        "provider": "Mock",
+        "mock": {
+            "statusCode": {
+                "renderedValue": {
+                    "engine": "None",
+                    "template": "200"
+                }
+            },
+            "headers": [
+                {
+                    "name": "foo",
+                    "value": {
+                        "renderedValue": {
+                            "engine": "None",
+                            "template": "bar"
+                        }
+                    }
+                }
+            ],
+            "body": {
+                "renderedValue": {
+                    "engine": "None",
+                    "template": "{\n  \"foo\": \"bar\"\n}",
+                    "format": "json"
+                }
+            }
+        }
+    }
+}

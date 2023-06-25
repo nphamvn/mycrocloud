@@ -38,8 +38,8 @@ public class WebApplicationRouteRepository : BaseRepository, IWebApplicationRout
         {
             web_application_id = appId,
             name = route.Name,
-            method = route.Method,
-            path = route.Path,
+            //method = route.Method,
+            //path = route.Path,
             description = route.Description
         });
     }
@@ -173,45 +173,28 @@ WHERE
 
     public async Task Update(int id, Route route)
     {
-        var query =
-                    """
-                    UPDATE
-                        WebApplicationRoute
-                    SET
-                        Name = @Name,
-                        Method = @Method,
-                        Path = @Path,
-                        Description = @Description
-                    WHERE
-                        Id = @Id
-                    """;
+        var sql =
+"""
+UPDATE
+    WebApplicationRoute
+SET
+    Name = @Name,
+    Method = @Method,
+    Path = @Path,
+    Description = @Description,
+    Order = @Order
+WHERE
+    Id = @Id
+""";
         using var connection = new NpgsqlConnection(ConnectionString);
-        await connection.ExecuteAsync(query, new
+        await connection.ExecuteAsync(sql, new
         {
             Id = id,
             Name = route.Name,
-            Method = route.Method,
-            Path = route.Path,
-            Description = route.Description
-        });
-    }
-
-    public Task AttachAuthorization(int id, Authorization authorization)
-    {
-        var query =
-                """
-                UPDATE 
-                    WebApplicationRoute
-                SET
-                    Authorization = @Authorization
-                WHERE
-                    Id = @Id
-                """;
-        using var connection = new NpgsqlConnection(ConnectionString);
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<int>>());
-        return connection.ExecuteAsync(query, new
-        {
-            Id = id
+            //Method = route.Method,
+            //Path = route.Path,
+            Description = route.Description,
+            //Order = route.Order,
         });
     }
 
@@ -244,71 +227,5 @@ WHERE
         {
             route_id = routeId
         });
-    }
-
-    public Task UpdateMockIntegration(int id, MockResponse integration)
-    {
-        var query =
-                """
-                UPDATE
-                    WebApplicationRouteMockIntegration
-                SET
-                    Code = @Code,
-                    ResponseHeaders = @ResponseHeaders,
-                    ResponseBodyText = @ResponseBodyText,
-                    ResponseBodyTextFormat = @ResponseBodyTextFormat,
-                    ResponseBodyTextRenderEngine = @ResponseBodyTextRenderEngine,
-                    ResponseStatusCode = @ResponseStatusCode,
-                    ResponseDelay = @ResponseDelay,
-                    ResponseDelayTime = @ResponseDelayTime
-                WHERE
-                    RouteId = @RouteId
-                """;
-        using var connection = new NpgsqlConnection(ConnectionString);
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<IList<MockIntegrationResponseHeader>>());
-        return connection.QuerySingleOrDefaultAsync<MockResponse>(query, new
-        {
-            RouteId = id,
-            ResponseHeaders = integration.Headers,
-            ResponseBodyText = integration.BodyText,
-            ResponseBodyTextFormat = integration.BodyTextFormat,
-            ResponseBodyTextRenderEngine = integration.BodyTextRenderEngine,
-            ResponseStatusCode = integration.StatusCode,
-            ResponseDelay = integration.DelayType,
-            ResponseDelayTime = integration.DelayFixedTime
-        });
-    }
-
-    public Task<DirectForwardingIntegration> GetDirectForwardingIntegration(int routeId)
-    {
-        var query =
-                """
-                SELECT
-                    mi.ExternalServerHost
-                FROM
-                    WebApplicationRouteDirectForwardingIntegration mi
-                WHERE
-                    RouteId = @RouteId
-                """;
-        using var connection = new NpgsqlConnection(ConnectionString);
-        return connection.QuerySingleOrDefaultAsync<DirectForwardingIntegration>(query, new
-        {
-            RouteId = routeId
-        });
-    }
-
-    public Task UpdateDirectForwardingIntegration(int id, DirectForwardingIntegration integration)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<FunctionTriggerIntegration> GetFunctionTriggerIntegration(int id)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task UpdateFunctionTriggerIntegration(int id, FunctionTriggerIntegration integration)
-    {
-        throw new NotImplementedException();
     }
 }

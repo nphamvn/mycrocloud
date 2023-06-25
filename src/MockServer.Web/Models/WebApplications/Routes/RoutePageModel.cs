@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
-using MockServer.Web.Shared;
 
 namespace MockServer.Web.Models.WebApplications.Routes;
 
@@ -12,5 +11,4 @@ public class RouteIndexViewModel
     public IEnumerable<SelectListItem> AuthorizationPolicySelectListItem { get; set; }
     public IEnumerable<SelectListItem> AuthorizationAuthenticationSchemeSelectListItem { get; set; }
     public IEnumerable<SelectListItem> ResponseProviderSelectListItem { get; set; }
-    public IEnumerable<BuiltInValdationAttributeDescription> BuiltInValdationAttributes { get; set; }
 }

@@ -1,20 +1,44 @@
-﻿namespace MockServer.Core.WebApplications
+﻿using System.Text.Json.Serialization;
+
+namespace MockServer.Core.WebApplications
 {
-    public class MockResponse : RouteIntegration
+    public class MockResponse
     {
         public int ResponseId { get; set; }
         public int RouteId { get; set; }
-        public int StatusCode { get; set; }
-        public Dictionary<string, string> Headers { get; set; }
-        public string BodyText { get; set; }
-        public string BodyTextFormat { get; set; }
-        public int BodyTextRenderEngine { get; set; }
-        public ResponseDelayType DelayType { get; set; }
-        public int? DelayFixedTime { get; set; }
+        public Value StatusCode { get; set; }
+        public ICollection<HeaderItem> Headers { get; set; }
+        public Value Body { get; set; }
     }
-    public enum ResponseDelayType
+    public class HeaderItem
     {
-        NoDelay = 0,
-        Fixed
+        public string Name { get; set; }
+        public Value Value { get; set; }
+    }
+
+    public class Value
+    {
+        public TemplateRenderedValue RenderedValue { get; set; }
+    }
+
+    public class TemplateRenderedValue {
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public TemplateEngine Engine { get; set; }
+        public string Template { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public TextFormat? Format { get; set; }
+    }
+    public enum TemplateEngine {
+        None,
+        JavaScript, 
+        Handlebars,
+        Mustache,
+        Ejs
+    }
+    public enum TextFormat {
+        Plain,
+        Json,
+        Xml,
+        Html
     }
 }

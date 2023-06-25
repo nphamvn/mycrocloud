@@ -1,22 +1,14 @@
 using MockServer.Core.WebApplications;
-using MockServer.Core.WebApplications.Security;
 
 namespace MockServer.Core.Repositories;
 
 public interface IWebApplicationRouteRepository
 {
-    Task<int> Create(int appId, Route request);
+    Task<int> Create(int appId, Route route);
     Task<Route> Find(int appId, string method, string path);
     Task<Route> GetById(int id);
     Task<IEnumerable<Route>> GetByApplicationId(int appId, string searchTerm, string sort);
     Task Update(int id, Route route);
     Task Delete(int id);
-    Task AttachAuthorization(int id, Authorization authorization);
-    Task<Authorization> GetAuthorization(int id);
     Task<MockResponse> GetMockResponse(int id);
-    Task UpdateMockIntegration(int id, MockResponse integration);
-    Task<DirectForwardingIntegration> GetDirectForwardingIntegration(int id);
-    Task UpdateDirectForwardingIntegration(int id, DirectForwardingIntegration integration);
-    Task<FunctionTriggerIntegration> GetFunctionTriggerIntegration(int id);
-    Task UpdateFunctionTriggerIntegration(int id, FunctionTriggerIntegration integration);
 }

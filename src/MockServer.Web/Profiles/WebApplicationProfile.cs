@@ -1,4 +1,5 @@
 using AutoMapper;
+using MockServer.Core.WebApplications;
 using MockServer.Web.Models.WebApplications;
 using CoreWebApplication = MockServer.Core.WebApplications.WebApplication;
 using CoreRoute = MockServer.Core.WebApplications.Route;
@@ -7,7 +8,6 @@ using WebApplication = MockServer.Web.Models.WebApplications.WebApplication;
 //using Route = MockServer.Web.Models.WebApplications.Routes.Route;
 using MockServer.Web.Models.WebApplications.Routes;
 using MockServer.Web.Models.WebApplications.Routes.Integrations.MockIntegrations;
-using CoreMockIntegration = MockServer.Core.WebApplications.MockResponse;
 using CoreAuthorizationPolicy = MockServer.Core.WebApplications.Security.Policy;
 using MockServer.Web.Models.WebApplications.Routes.Authorizations;
 using CoreAuthorization = MockServer.Core.WebApplications.Security.Authorization;
@@ -16,6 +16,8 @@ using MockServer.Web.Models.WebApplications.Authentications;
 using CoreJwtBearerSchemeOptions = MockServer.Core.WebApplications.Security.JwtBearer.JwtBearerAuthenticationOptions;
 using MockServer.Web.Models.WebApplications.Authentications.JwtBearer;
 using MockServer.Web.Models.WebApplications.Authorizations;
+using MockIntegrationResponseHeader = MockServer.Web.Models.WebApplications.Routes.Integrations.MockIntegrations.MockIntegrationResponseHeader;
+using MockResponse = MockServer.Core.WebApplications.MockResponse;
 
 namespace MockServer.Web.Profiles;
 
@@ -27,19 +29,14 @@ public class WebApplicationProfile : Profile
         CreateMap<CoreWebApplication, WebApplicationIndexItem>();
         CreateMap<CoreWebApplication, WebApplicationCreateModel>().ReverseMap();
         CreateMap<CoreWebApplication, WebApplicationViewModel>();
-        
-        //CreateMap<CoreRoute, Route>();
-        CreateMap<CoreRoute, RouteIndexItem>();
-        CreateMap<CoreRoute,RouteSaveModel >().ReverseMap();
-        CreateMap<CoreRoute, RouteViewModel>();
 
         CreateMap<CoreMockIntegrationResponseHeader, MockIntegrationResponseHeader>();
         CreateMap<CoreMockIntegrationResponseHeader, MockIntegrationResponseHeaderSaveModel>().ReverseMap();
         CreateMap<CoreMockIntegrationResponseHeader, MockIntegrationResponseHeaderViewModel>();
 
-        CreateMap<CoreMockIntegration, MockResponse>();
-        CreateMap<CoreMockIntegration, MockIntegrationSaveModel>().ReverseMap();
-        CreateMap<CoreMockIntegration, MockIntegrationViewModel>();
+        CreateMap<MockResponse, Models.WebApplications.Routes.Integrations.MockIntegrations.MockResponse>();
+        CreateMap<MockResponse, MockIntegrationSaveModel>().ReverseMap();
+        CreateMap<MockResponse, MockIntegrationViewModel>();
 
         CreateMap<CoreAuthorizationPolicy, Policy>();
         CreateMap<CoreAuthorizationPolicy, PolicyIndexItem>();
