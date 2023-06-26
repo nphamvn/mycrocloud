@@ -26,7 +26,7 @@ namespace MockServer.Core.WebApplications
         public TemplateEngine Engine { get; set; }
         public string Template { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public TextFormat? Format { get; set; }
+        public string Format { get; set; }
     }
     public enum TemplateEngine {
         None,
@@ -34,11 +34,5 @@ namespace MockServer.Core.WebApplications
         Handlebars,
         Mustache,
         Ejs
-    }
-    public enum TextFormat {
-        Plain,
-        Json,
-        Xml,
-        Html
     }
 }
