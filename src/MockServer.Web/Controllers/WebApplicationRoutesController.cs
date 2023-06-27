@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -47,6 +48,15 @@ public class WebApplicationRoutesController : Controller
         var json = System.IO.File.ReadAllText("Views/WebApplications/Routes/_Partial/sample.json");
         var sampleRoute = JsonSerializer.Deserialize<dynamic>(json);
         return Ok(sampleRoute);
+    }
+
+    //[AjaxOnly]
+    [HttpGet("downloadJson")]
+    public IActionResult DownloadJson()
+    {
+        var json = System.IO.File.ReadAllText("Views/WebApplications/Routes/_Partial/sample.json");
+        var byteArray = Encoding.ASCII.GetBytes(json);
+        return File(byteArray, "application/json", "sample.json");
     }
 
     [AjaxOnly]

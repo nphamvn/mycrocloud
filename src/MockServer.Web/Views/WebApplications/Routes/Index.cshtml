@@ -56,7 +56,7 @@
                     placeholder="Search">
                 </v-text-field>
                 <template v-if="routes.length > 0">
-                    <route-list :routes="routes" @@click-route="openRoute">
+                    <route-list :routes="routes" :route="route" @@click-route="openRoute">
                     </route-list>
                 </template>
                 <template v-else>
@@ -65,7 +65,7 @@
             </v-col>
             <v-col>
                 <div v-if="route" class="overflow-y-auto" style="height: 80vh;">
-                    <route-editor :route="route" @@save="saveRoute"></route-editor>
+                    <route-editor :route="route" @@route-save="routeSave"></route-editor>
                 </div>
             </v-col>
         </v-row>
@@ -105,10 +105,18 @@
                     routes.value = response.data
                 }, 800);
             }
-
-            const saveRoute = (route) => {
-                routes.value.push(route)
+            const routeSave = (route) => {
+                // Check if route already exists in routes array by its id
+                const index = routes.value.findIndex(r => r.id === route.id);
+                if (index === -1) {
+                    // If route doesn't exist in routes array, add it to the beginning
+                    routes.value.unshift(route);
+                } else {
+                    // If route already exists in routes array, replace it with updated route
+                    routes.value.splice(index, 1, route);
+                }
             }
+        
             const cancel = () => {
                 route.value = null
             }
@@ -121,8 +129,8 @@
             }
             onMounted(async () => {
                 routes.value = JSON.parse('@Html.Raw(Json.Serialize(routes))');
-                var res = await axios.get('@Url.Action(nameof(WebApplicationRoutesController.Sample), "WebApplicationRoutes", new {WebApplicationName = Model.WebApplication.Name})')
-                sampleRoute = res.data;
+                const response = await axios.get('@Url.Action(nameof(WebApplicationRoutesController.Sample), "WebApplicationRoutes", new {WebApplicationName = Model.WebApplication.Name})')
+                sampleRoute = response.data;
             })
 
             return {
@@ -130,6 +138,7 @@
                 routes,
                 route,
                 openRoute,
+                routeSave,
                 fetchRoutes,
                 searchTerm,
                 cancel,

@@ -35,7 +35,11 @@
 }
 <partial name="/Views/WebApplications/Routes/_Partial/_ValidationRulesConfigComponent.cshtml" />
 <template id="routeEditorTemplate">
-    <v-form v-on:submit.prevent="onSubmit">
+    <v-btn @@click="importJson">Import</v-btn>
+    <v-btn @@click="exportJson">Export</v-btn>
+    <v-btn @@click="duplicate">Duplicate</v-btn>
+    <v-btn @@click="deleteRoute">Delete</v-btn>
+    <v-form v-on:submit.prevent="save">
         <v-card>
             <v-card-text>
                 <section>
@@ -312,13 +316,9 @@
                                 :items="[{value: 'None', title: 'STATIC'}, {value: 'JavaScript', title: 'EVALUATED'},
                                             {value: 'Handlebars', title: 'Handlebars'}]" variant="solo">
                             </v-select>
-                            <div class="d-flex">
-                                <v-select class="col-3" v-model="route.response.mock.body.renderedValue.format"
-                                    :items="mockResponseBodyEditorLanguages" label="FORMAT" variant="solo">
-                                </v-select>
-                                <v-spacer></v-spacer>
-                                <v-btn>BEAUTIFY</v-btn>
-                            </div>
+                            <v-select class="col-3" v-model="route.response.mock.body.renderedValue.format"
+                                :items="mockResponseBodyEditorLanguages" label="FORMAT" variant="solo">
+                            </v-select>
                             <div>
                                 <div>{{route.response.mock.body.renderedValue.engine === 'None'? 'VALUE':
                                     route.response.mock.body.renderedValue.engine === 'JavaScript'? 'EXPRESSION':
@@ -356,7 +356,8 @@
                 required: true
             }
         },
-        setup(props) {
+        emits: ['route-save'],
+        setup(props, { emit }) {
             const { route } = props
             // Match:START
             const matchHttpMethodItems = JSON.parse('@Json.Serialize(matchHttpMethodItems)');
@@ -445,7 +446,7 @@
             }
             //Mock Response: END
             //
-            const onSubmit = async () => {
+            const save = async () => {
                 if (route.response.provider === 'Mock') {
                     route.response.mock.body.renderedValue.template = mockResponseBodyEditor.getValue();
                 }
@@ -465,12 +466,35 @@
                 if (isCreate) {
                     //route.id = res.data.rou
                 }
+                route.id = 1;
+                emit('route-save', route);
             }
             async function validate() {
                 return true;
             }
-            //
+            const importJson = () => {
+                // Open json file select dialog
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.onchange = (event) => {
+                    // Read selected json file
+                    const fileReader = new FileReader();
+                    fileReader.readAsText(event.target.files[0], "UTF-8");
+                    fileReader.onload = (e) => {
+                        const { id } = route;
+                        Object.assign(route, JSON.parse(e.target.result));
+                        route.id = id; // Set id back to original value
+                    }
+                }
+                input.click();
+            }
+            const exportJson = () => {
+            }
+            const duplicate = () => {
+            }
+            const deleteRoute = () => {
 
+            }
             //
             onMounted(() => {
                 // Initialize the Monaco editor
@@ -491,7 +515,11 @@
                 responseProviders,
                 mockResponseStatusCodeValueType,
                 mockResponseBodyEditorLanguages,
-                onSubmit
+                save,
+                importJson,
+                exportJson,
+                duplicate,
+                deleteRoute
             }
         }
     }
