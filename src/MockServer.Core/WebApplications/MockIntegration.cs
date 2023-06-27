@@ -25,7 +25,6 @@ namespace MockServer.Core.WebApplications
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public TemplateEngine Engine { get; set; }
         public string Template { get; set; }
-        [JsonConverter(typeof(JsonStringEnumConverter))]
         public string Format { get; set; }
     }
     public enum TemplateEngine {
