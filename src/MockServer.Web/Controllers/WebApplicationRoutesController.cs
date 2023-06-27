@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MockServer.Web.Attributes;
 using MockServer.Web.Filters;
-using MockServer.Web.Models.WebApplications.Routes;
 using MockServer.Web.Services;
 using RouteName = MockServer.Web.Common.Constants.RouteName;
 
@@ -37,9 +36,6 @@ public class WebApplicationRoutesController : Controller
         {
             r.RouteId,
             r.Name,
-            r.Method,
-            r.Path,
-            IntegrationType = (int)r.ResponseProvider,
             r.Description
         }));
     }

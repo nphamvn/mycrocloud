@@ -133,15 +133,9 @@ WHERE
 SELECT 
     route_id RouteId,
     web_application_id WebApplicationId,
-    integration_type ResponseProvider,
     "name",
-    "method",
-    "path",
     description,
-    "authorization",
-    request_query,
-    request_header,
-    request_body
+    "authorization"
 FROM
     web_application_route
 WHERE
