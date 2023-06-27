@@ -164,3 +164,13 @@ public class MinLengthRule : Rule
         return strValue != null && strValue.Length < Length ? RuleValidateResult.Fail($"The value must have a minimum length of {Length}.") : RuleValidateResult.Success();
     }
 }
+public class BetweenRule: Rule {
+    public override string Name => "between";
+    public int Min { get; set; }
+    public int Max { get; set; }
+
+    public override RuleValidateResult Validate(object value)
+    {
+        throw new NotImplementedException();
+    }
+}

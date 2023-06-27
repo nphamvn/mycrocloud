@@ -36,8 +36,9 @@
                 "name": "bar",
                 "rules": [
                     {
-                        "name": "minlength",
-                        "length": 100
+                        "name": "between",
+                        "min": 1,
+                        "max": 100
                     }
                 ]
             }
