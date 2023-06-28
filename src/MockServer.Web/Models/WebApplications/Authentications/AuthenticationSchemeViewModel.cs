@@ -4,7 +4,7 @@ namespace MockServer.Web.Models.WebApplications.Authentications;
 
 public abstract class AuthenticationSchemeViewModel
 {
-    public int Id { get; set; }
+    public int SchemeId { get; set; }
     public AuthenticationSchemeType Type { get; set; }
     public string Name { get; set; }
     public string DisplayName { get; set; }
