@@ -8,6 +8,7 @@ public class RouteIndexItem
     public Match Match { get; set; }
 }
 public class Match {
-    public List<string> Methods { get; set; }
+    public int Order { get; set; }
+    public ICollection<string> Methods { get; set; }
     public string Path { get; set; }
 }

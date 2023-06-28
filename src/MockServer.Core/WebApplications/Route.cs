@@ -62,35 +62,9 @@ public class QueryParameterValidationItem
     public string Name { get; set; }
     public ICollection<Rule> Rules { get; set; }
 }
-public class RuleValidateResult {
-    public RuleValidateResult(bool isValid)
-    {
-        IsValid = isValid;
-    }
-    public RuleValidateResult(bool isValid, string theValueIsRequired)
-    {
-        IsValid = isValid;
-        Message = theValueIsRequired;
-    }
-    public static RuleValidateResult Success()
-    {
-        return new RuleValidateResult(true);
-    }
-    
-    public static RuleValidateResult Fail(string message)
-    {
-        return new RuleValidateResult(false, message);
-    }
-    public bool IsValid { get; private set; }
-    public string Message { get; private set; }
-}
-public interface IRule {
-    RuleValidateResult Validate(object value);
-}
-public abstract class Rule: IRule
+public abstract class Rule
 {
     public abstract string Name { get; }
-    public abstract RuleValidateResult Validate(object value);
 }
 
 public class RuleJsonConverter : JsonConverter<Rule>
@@ -118,6 +92,7 @@ public class RuleJsonConverter : JsonConverter<Rule>
         {
             "required" => JsonSerializer.Deserialize<RequiredRule>(ref reader, options),
             "minlength" => JsonSerializer.Deserialize<MinLengthRule>(ref reader, options),
+            "between" => JsonSerializer.Deserialize<BetweenRule>(ref reader, options),
             _ => throw new JsonException()
         };
     }
@@ -139,38 +114,15 @@ public class RuleJsonConverter : JsonConverter<Rule>
 public class RequiredRule : Rule
 {
     public override string Name => "required";
-    public override RuleValidateResult Validate(object value)
-    {
-        if (value == null || string.IsNullOrWhiteSpace(value.ToString()))
-        {
-            return RuleValidateResult.Fail("The value is required.");
-        }
-        return RuleValidateResult.Success();
-    }
 }
 
 public class MinLengthRule : Rule
 {
     public override string Name => "minlength";
     public int Length { get; set; }
-    public override RuleValidateResult Validate(object value)
-    {
-        if (value == null || string.IsNullOrWhiteSpace(value.ToString()))
-        {
-            return RuleValidateResult.Fail("The value is required.");
-        }
-
-        var strValue = value.ToString();
-        return strValue != null && strValue.Length < Length ? RuleValidateResult.Fail($"The value must have a minimum length of {Length}.") : RuleValidateResult.Success();
-    }
 }
 public class BetweenRule: Rule {
     public override string Name => "between";
     public int Min { get; set; }
     public int Max { get; set; }
-
-    public override RuleValidateResult Validate(object value)
-    {
-        throw new NotImplementedException();
-    }
 }

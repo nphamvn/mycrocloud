@@ -149,4 +149,30 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
             
         };
     }
+
+    private RouteViewModel Map(CoreRoute route) {
+        var vm = new RouteViewModel();
+        vm.RouteId = route.RouteId;
+        vm.Name = route.Name;
+        vm.Description = route.Description;
+        if (route.Match != null)
+        {
+            vm.Match = new()
+            {
+                Order = route.Match.Order,
+                Methods = route.Match.Methods,
+                Path = route.Match.Path
+            };
+        }
+        if (route.Authorization != null)
+        {
+            vm.Authorization = new()
+            {
+                Type = route.Authorization.Type,
+                AuthenticationSchemeIds = 
+            };
+        }
+
+        return vm;
+    }
 }

@@ -21,6 +21,7 @@ public class RouteViewModel
     public IList<ValidationItem> QueryParamsValidation { get; set; }
     public IList<ValidationItem> HeadersValidation { get; set; }
     public IList<ValidationItem> BodyValidation { get; set; }
+    public Match Match { get; set; }
 }
 
 public class ValidationItem

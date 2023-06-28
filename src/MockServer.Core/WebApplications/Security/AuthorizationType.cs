@@ -1,4 +1,4 @@
-namespace MockServer.Core.WebApplications.Security;
+namespace MockServer.Core.WebApplication.Authorization;
 
 public enum AuthorizationType
 {

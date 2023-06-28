@@ -37,8 +37,8 @@
 <template id="routeEditorTemplate">
     <v-btn @@click="importJson">Import</v-btn>
     <v-btn @@click="exportJson">Export</v-btn>
-    <v-btn @@click="duplicate">Duplicate</v-btn>
-    <v-btn @@click="deleteRoute">Delete</v-btn>
+    <v-btn @@click="duplicate" :disabled="!route.id">Duplicate</v-btn>
+    <v-btn @@click="deleteRoute" :disabled="!route.id">Delete</v-btn>
     <v-form v-on:submit.prevent="save">
         <v-card>
             <v-card-text>

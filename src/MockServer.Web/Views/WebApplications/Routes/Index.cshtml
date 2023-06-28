@@ -81,12 +81,13 @@
             let sampleRoute = null;
             const searchTerm = ref('');
             const newRoute = () => {
-                route.value = sampleRoute;
+                route.value = { ...sampleRoute, id: undefined };;
             }
             const openRoute = async id => {
                 const TempRouteDetailUrl = '@Url.Action(nameof(WebApplicationRoutesController.Get),"WebApplicationRoutes", new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
                 const res = await axios.get(TempRouteDetailUrl.replace('-9999', id));
                 route.value = res.data;
+                route.value.id = route.value.id || id;
             }
             let timeout = null;
             const fetchRoutes = () => {

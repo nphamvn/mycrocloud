@@ -63,8 +63,10 @@ public class WebApplicationRoutesController : Controller
     [HttpGet("{RouteId:int}")]
     public async Task<IActionResult> Get(int RouteId)
     {
-        var route = await _webApplicationRouteWebService.GetDetails(RouteId);
-        return Ok(route);
+        var json = System.IO.File.ReadAllText("Views/WebApplications/Routes/_Partial/sample.json");
+        var sampleRoute = JsonSerializer.Deserialize<dynamic>(json);
+        return Ok(sampleRoute);
+        //return ok(route);
     }
 
     [AjaxOnly]
