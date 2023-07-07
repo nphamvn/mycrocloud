@@ -1,7 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using MockServer.Core.Repositories;
-using MockServer.Core.WebApplications.Security.JwtBearer;
+using MockServer.Domain.Repositories;
+using MockServer.Domain.WebApplication.Entities;
 using MockServer.Web.Models.WebApplications.Authentications;
 using MockServer.Web.Models.WebApplications.Authentications.JwtBearer;
 
@@ -29,7 +29,7 @@ public class WebApplicationAuthenticationWebService : BaseService, IWebApplicati
     {
         await _webApplicationAuthenticationSchemeRepository.Add(appId, new() {
             WebApplicationId = appId,
-            Type = Core.WebApplications.Security.AuthenticationSchemeType.JwtBearer,
+            Type = Domain.WebApplication.Shared.AuthenticationSchemeType.JwtBearer,
             Name = scheme.Name,
             DisplayName = scheme.DisplayName,
             Description = scheme.Description,

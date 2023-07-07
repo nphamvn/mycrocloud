@@ -1,6 +1,6 @@
 ﻿namespace Ocelot.Configuration
 {
-    using MockServer.Core.WebApplications;
+    using MockServer.Domain.WebApplications;
     using Ocelot.Configuration.File;
     using Ocelot.Values;
     using System.Collections.Generic;
@@ -9,7 +9,7 @@
     public class Route
     {
         public Route(int id,
-            ResponseProvider responseProvider,
+            RouteResponseProvider responseProvider,
             List<DownstreamRoute> downstreamRoute,
             List<AggregateRouteConfig> downstreamRouteConfig,
             List<HttpMethod> upstreamHttpMethod,
@@ -27,7 +27,7 @@
             Aggregator = aggregator;
         }
         public int Id { get; set; }
-        public ResponseProvider ResponseProvider { get; set; }
+        public RouteResponseProvider ResponseProvider { get; set; }
         public UpstreamPathTemplate UpstreamTemplatePattern { get; set; }
         public List<HttpMethod> UpstreamHttpMethod { get; private set; }
         public string UpstreamHost { get; private set; }

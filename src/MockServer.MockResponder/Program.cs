@@ -1,5 +1,5 @@
-using MockServer.Core.Repositories;
-using MockServer.Core.Settings;
+using MockServer.Domain.Repositories;
+using MockServer.Domain.Settings;
 using MockServer.Infrastructure.Repositories.PostgreSql;
 using MockServer.MockResponder.Extensions;
 using MockServer.MockResponder.Services;

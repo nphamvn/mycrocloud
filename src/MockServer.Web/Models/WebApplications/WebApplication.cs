@@ -1,7 +1,7 @@
-using MockServer.Core.WebApplications;
-using MockServer.Core.Identity;
+using MockServer.Domain.WebApplications;
+using MockServer.Domain.Identity;
 using MockServer.Web.Models.WebApplications.Authentications;
-using Route = MockServer.Core.WebApplications.Route;
+
 namespace MockServer.Web.Models.WebApplications;
 
 public class WebApplication
@@ -13,6 +13,6 @@ public class WebApplication
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public User User { get; set; }
-    public IEnumerable<AuthenticationScheme> AuthenticationSchemes { get; set; }
+    public IEnumerable<AuthenticationSchemeViewModel> AuthenticationSchemes { get; set; }
     public IEnumerable<Route> Routes { get; set; }
 }

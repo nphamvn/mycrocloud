@@ -1,4 +1,4 @@
-using MockServer.Core.Services;
+using MockServer.Domain.Services;
 namespace MockServer.Web.Models.Home;
 
 public class ServiceItem

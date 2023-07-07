@@ -1,6 +1,6 @@
 namespace MockServer.Web.Models.WebApplications.Authentications.ApiKey;
 
-public class ApiKeySchemeSaveModel : AuthenticationSchemeSaveModel
+public class ApiKeySchemeSaveModel : AuthenticationSchemeViewModel
 {
     public ApiKeySchemeOptionsSaveModel Options { get; set; }
 }

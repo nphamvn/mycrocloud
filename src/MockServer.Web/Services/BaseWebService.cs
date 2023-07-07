@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Identity;
-using MockServer.Core.Identity;
+using MockServer.Domain.Identity;
 using MockServer.Web.Extentions;
 
 namespace MockServer.Web.Services;

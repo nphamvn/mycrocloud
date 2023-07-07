@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Core", "MockServer.Core\MockServer.Core.csproj", "{883671FE-3C30-4ECA-9882-ACCF237138E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Domain", "MockServer.Domain\MockServer.Domain.csproj", "{883671FE-3C30-4ECA-9882-ACCF237138E7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockServer.Infrastructure", "MockServer.Infrastructure\MockServer.Infrastructure.csproj", "{6F834257-C6F3-47BA-BD5D-0F512D552136}"
 EndProject

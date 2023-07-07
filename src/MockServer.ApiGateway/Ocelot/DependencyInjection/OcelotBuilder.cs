@@ -43,9 +43,9 @@ namespace Ocelot.DependencyInjection
     using System.Linq;
     using System.Net.Http;
     using System.Reflection;
-    using MockServer.Core.Repositories;
+    using MockServer.Domain.Repositories;
     using MockServer.Infrastructure.Repositories.PostgreSql;
-    using MockServer.Core.Settings;
+    using MockServer.Domain.Settings;
 
     public class OcelotBuilder : IOcelotBuilder
     {

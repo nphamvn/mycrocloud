@@ -1,4 +1,4 @@
-using MockServer.Core.WebApplications;
+using MockServer.Domain.WebApplications;
 
 namespace MockServer.Web.Models.WebApplications;
 

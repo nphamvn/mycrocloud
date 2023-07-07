@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
-using MockServer.Core.WebApplications;
+using MockServer.Domain.WebApplications;
 using MockServer.Web.Extentions;
 using MockServer.Web.Models.WebApplications.Routes;
 using Serilog;
@@ -23,12 +23,11 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddControllersWithViews(
     options =>
     {
-        var readerFactory = builder.Services.BuildServiceProvider().GetRequiredService<IHttpRequestStreamReaderFactory>();
-        options.ModelBinderProviders.Insert(0, new RouteModelBinderProvider(options.InputFormatters, readerFactory));
+        
     }
 ).AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.Converters.Add(new RuleJsonConverter());
+    //options.JsonSerializerOptions.Converters.Add(new RuleJsonConverter());
     //options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 });
 builder.Services.AddRazorPages();

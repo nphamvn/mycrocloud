@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using MockServer.Core.Repositories;
+using MockServer.Domain.Repositories;
 using Ocelot.DownstreamWebApplicationFinder.Finder;
 using Ocelot.Logging;
 using Ocelot.Middleware;

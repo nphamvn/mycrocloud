@@ -1,6 +1,6 @@
 ﻿namespace Ocelot.Middleware
 {
-    using MockServer.Core.WebApplications;
+    using MockServer.Domain.WebApplications;
     using Ocelot.Configuration;
     using Ocelot.DownstreamRouteFinder;
     using Ocelot.DownstreamRouteFinder.UrlMatcher;

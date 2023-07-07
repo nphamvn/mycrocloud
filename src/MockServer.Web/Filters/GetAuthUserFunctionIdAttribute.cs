@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Filters;
-using MockServer.Core.Identity;
-using MockServer.Core.Repositories;
+using MockServer.Domain.Identity;
+using MockServer.Domain.Repositories;
 using MockServer.Web.Extentions;
 
 namespace MockServer.Web.Filters;

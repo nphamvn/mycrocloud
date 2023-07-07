@@ -1,61 +1,54 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
-using MockServer.Core.WebApplications;
-using MockServer.Core.WebApplications.Security;
 
 namespace MockServer.Web.Models.WebApplications.Routes
 {
     public class RouteSaveModel
     {
+        public int RouteId { get; set; }
         [Required]
         [StringLength(100, ErrorMessage = "Name length can't be more than 100.")]
         public string Name { get; set; }
         public string Description { get; set; }
+        public RouteMatchViewModel Match { get; set; }
+        public AuthorizationViewModel Authorization { get; set; }
+        public RouteValidationViewModel Validation { get; set; }
+        public RouteResponseViewModel Response { get; set; }
+    }
+
+    public class RouteResponseViewModel
+    {
+    }
+
+    public class RouteMatchViewModel
+    {
+        public int Order { get; set; }
+        public ICollection<string> Methods { get; set; }
         [Required]
         [StringLength(50, ErrorMessage = "Name length can't be more than 8.")]
         public string Path { get; set; }
-        public List<string> Methods { get; set; }
-        public int Order { get; set; }
-        public Authorization Authorization { get; set; }
-        public Validation Validations { get; set; }
     }
-    //ref: http://www.prasannapattam.com/2016/12/aspnet-core-custom-frombody-model.html
-    public class RouteModelBinderProvider : IModelBinderProvider
-    {
-        private readonly IList<IInputFormatter> _formatters;
-        private readonly IHttpRequestStreamReaderFactory _readerFactory;
-        public RouteModelBinderProvider(IList<IInputFormatter> formatters, IHttpRequestStreamReaderFactory readerFactory)
-        {
-            _formatters = formatters;
-            _readerFactory = readerFactory;
-        }
-        public IModelBinder GetBinder(ModelBinderProviderContext context)
-        {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-            if (context.Metadata.ModelType == typeof(RouteSaveModel))
-            {
-                return new RouteModelBinder(_formatters, _readerFactory);
-            }
-            return null;
-        }
+    public class RouteValidationViewModel {
+        public IList<QueryParamerterValidationRuleViewModel> QueryParamerters { get; set; }
+        public IList<HeaderValidationRuleViewModel> Headers { get; set; }
+        public IList<BodyFieldValidationRuleViewModel> Body { get; set; }
     }
-    public class RouteModelBinder: IModelBinder
-    {
-        private readonly BodyModelBinder defaultBinder;
-        public RouteModelBinder(IList<IInputFormatter> formatters, IHttpRequestStreamReaderFactory readerFactory)
-        {
-            defaultBinder = new BodyModelBinder(formatters, readerFactory);
-        }
 
-        public async Task BindModelAsync(ModelBindingContext bindingContext)
-        {
-            await defaultBinder.BindModelAsync(bindingContext);
-        }
+    public class BodyFieldValidationRuleViewModel
+    {
+    }
+
+    public class HeaderValidationRuleViewModel
+    {
+    }
+
+    public class QueryParamerterValidationRuleViewModel
+    {
+    }
+
+    public class ClaimViewModel {
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public string Value { get; set; }
     }
 }

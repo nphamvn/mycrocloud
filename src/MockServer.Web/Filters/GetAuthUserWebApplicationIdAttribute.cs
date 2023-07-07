@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Filters;
-using MockServer.Core.Repositories;
+using MockServer.Domain.Repositories;
 using MockServer.Web.Extentions;
 
 namespace MockServer.Web.Filters;
@@ -18,13 +18,13 @@ public class GetAuthUserWebApplicationIdAttribute : ActionFilterAttribute
         var user = context.HttpContext.User.ToIdentityUser();
         var webApplicationRepository = context.HttpContext.RequestServices.GetService<IWebApplicationRepository>();
         string appName = null;
-        if (context.ActionArguments.ContainsKey(_appNameKey))
+        if (context.ActionArguments.TryGetValue(_appNameKey, out var argument))
         {
-            appName = (string)context.ActionArguments[_appNameKey];
+            appName = (string)argument;
         }
-        else if (context.RouteData.Values.ContainsKey(_appNameKey))
+        else if (context.RouteData.Values.TryGetValue(_appNameKey, out var value))
         {
-            appName = (string)context.RouteData.Values[_appNameKey];
+            appName = (string)value;
         }
         if (!string.IsNullOrEmpty(appName))
         {

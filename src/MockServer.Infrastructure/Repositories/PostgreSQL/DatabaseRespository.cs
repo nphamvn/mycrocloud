@@ -1,11 +1,12 @@
 using System.Text.Json;
 using Dapper;
 using Npgsql;
-using MockServer.Core.Databases;
-using MockServer.Core.Repositories;
-using MockServer.Core.Services;
-using MockServer.Core.Settings;
+using MockServer.Domain.Databases;
+using MockServer.Domain.Repositories;
+using MockServer.Domain.Services;
+using MockServer.Domain.Settings;
 using Microsoft.Extensions.Options;
+using MockServer.Domain.Services.Entities;
 
 namespace MockServer.Infrastructure.Repositories.PostgreSql;
 

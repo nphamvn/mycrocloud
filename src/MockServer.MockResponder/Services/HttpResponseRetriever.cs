@@ -1,7 +1,7 @@
 using System.Net;
 using System.Text.Json;
-using MockServer.Core.Repositories;
-using MockServer.Core.WebApplications;
+using MockServer.Domain.Repositories;
+using MockServer.Domain.WebApplications;
 using MockServer.MockResponder.Extensions;
 
 namespace MockServer.MockResponder.Services {

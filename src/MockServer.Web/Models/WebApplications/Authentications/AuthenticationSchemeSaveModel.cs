@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MockServer.Web.Models.WebApplications.Authentications;
 
-public class AuthenticationSchemeSaveModel
+public class AuthenticationSchemeViewModel
 {
     [DisplayName("Name")]
     [Required]

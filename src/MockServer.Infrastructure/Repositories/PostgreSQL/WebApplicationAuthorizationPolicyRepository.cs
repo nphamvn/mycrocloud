@@ -1,8 +1,8 @@
 using Dapper;
 using Npgsql;
-using MockServer.Core.Repositories;
-using MockServer.Core.Settings;
-using MockServer.Core.WebApplications.Security;
+using MockServer.Domain.Repositories;
+using MockServer.Domain.Settings;
+using MockServer.Domain.WebApplication.Entities;
 using Microsoft.Extensions.Options;
 
 namespace MockServer.Infrastructure.Repositories.PostgreSql;
@@ -13,7 +13,7 @@ public class WebApplicationAuthorizationPolicyRepository : BaseRepository, IWebA
     {
     }
 
-    public async Task Add(int appId, Policy policy)
+    public async Task Add(int appId, PolicyEntity policyEntity)
     {
         var query =
                 """
@@ -36,9 +36,9 @@ public class WebApplicationAuthorizationPolicyRepository : BaseRepository, IWebA
         await connection.ExecuteAsync(query, new
         {
             web_application_id = appId,
-            name = policy.Name,
-            description = policy.Description,
-            claims = policy.Claims
+            name = policyEntity.Name,
+            description = policyEntity.Description,
+            claims = policyEntity.Claims
         });
     }
 
@@ -58,7 +58,7 @@ WHERE
         });
     }
 
-    public async Task<Policy> Get(int policyId)
+    public async Task<PolicyEntity> Get(int policyId)
     {
         var query =
 """
@@ -75,13 +75,13 @@ WHERE
 """;
         using var connection = new NpgsqlConnection(ConnectionString);
         SqlMapper.AddTypeHandler(new JsonTypeHandler<Claims>());
-        return await connection.QuerySingleOrDefaultAsync<Policy>(query, new
+        return await connection.QuerySingleOrDefaultAsync<PolicyEntity>(query, new
         {
             policy_id = policyId
         });
     }
 
-    public async Task<IEnumerable<Policy>> GetAll(int appId)
+    public async Task<IEnumerable<PolicyEntity>> GetAll(int appId)
     {
         var query =
 """
@@ -98,13 +98,13 @@ WHERE
 """;
         using var connection = new NpgsqlConnection(ConnectionString);
         SqlMapper.AddTypeHandler(new JsonTypeHandler<Claims>());
-        return await connection.QueryAsync<Policy>(query, new
+        return await connection.QueryAsync<PolicyEntity>(query, new
         {
             web_application_id = appId
         });
     }
 
-    public async Task Update(int id, Policy policy)
+    public async Task Update(int id, PolicyEntity policyEntity)
     {
         var query =
 """
@@ -122,9 +122,9 @@ WHERE
         await connection.ExecuteAsync(query, new
         {
             policy_id = id,
-            name = policy.Name,
-            description = policy.Description,
-            claims = policy.Claims
+            name = policyEntity.Name,
+            description = policyEntity.Description,
+            claims = policyEntity.Claims
         });
     }
 }

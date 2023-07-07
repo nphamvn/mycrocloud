@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MockServer.Core\MockServer.Core.csproj" />
+    <ProjectReference Include="..\MockServer.Domain\MockServer.Domain.csproj" />
     <ProjectReference Include="..\MockServer.Infrastructure\MockServer.Infrastructure.csproj" />
   </ItemGroup>
 

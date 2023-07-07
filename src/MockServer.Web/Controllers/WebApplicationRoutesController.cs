@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MockServer.Web.Attributes;
 using MockServer.Web.Filters;
+using MockServer.Web.Models.WebApplications.Routes;
 using MockServer.Web.Services;
 using RouteName = MockServer.Web.Common.Constants.RouteName;
 
@@ -71,14 +72,14 @@ public class WebApplicationRoutesController : Controller
 
     [AjaxOnly]
     [HttpPost("create")]
-    public async Task<IActionResult> Create(int WebApplicationId, [FromBody] MockServer.Core.WebApplications.Route route)
+    public async Task<IActionResult> Create(int WebApplicationId, [FromBody] RouteSaveModel route)
     {
         return Ok(route);
     }
     
     [AjaxOnly]
     [HttpPost("edit/{RouteId:int}")]
-    public async Task<IActionResult> Edit(int RouteId, [FromBody] MockServer.Core.WebApplications.Route route)
+    public async Task<IActionResult> Edit(int RouteId, [FromBody] RouteSaveModel route)
     {
         // if (!await _webApplicationRouteWebService.ValidateEdit(RouteId, route, ModelState))
         // {

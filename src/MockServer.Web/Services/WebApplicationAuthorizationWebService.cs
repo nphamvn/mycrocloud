@@ -1,7 +1,8 @@
 using AutoMapper;
-using MockServer.Core.Repositories;
+using MockServer.Domain.Repositories;
+using MockServer.Domain.WebApplication.Entities;
 using MockServer.Web.Models.WebApplications.Authorizations;
-using CorePolicy = MockServer.Core.WebApplications.Security.Policy;
+
 namespace MockServer.Web.Services;
 
 public class WebApplicationAuthorizationWebService : BaseService, IWebApplicationAuthorizationWebService
@@ -23,10 +24,10 @@ public class WebApplicationAuthorizationWebService : BaseService, IWebApplicatio
 
     public async Task CreatePolicy(int appId, PolicySaveModel model)
     {
-        var policy = new CorePolicy {
+        var policy = new PolicyEntity {
             Name = model.Name,
             Description = model.Description,
-            Claims = (Core.WebApplications.Security.Claims)model.Claims.ToDictionary(k => k.Key, v => v.Value)
+            Claims = (Domain.WebApplication.Entities.Claims)model.Claims.ToDictionary(k => k.Key, v => v.Value)
         };
         await _webApplicationAuthorizationPolicyRepository.Add(appId, policy);
     }
@@ -38,9 +39,9 @@ public class WebApplicationAuthorizationWebService : BaseService, IWebApplicatio
 
     public async Task EditPolicy(int policyId, PolicySaveModel model)
     {
-        var claims = new Core.WebApplications.Security.Claims();
+        var claims = new Domain.WebApplication.Entities.Claims();
         model.Claims.ForEach(c => claims.Add(c.Key, c.Value));
-        var policy = new CorePolicy {
+        var policy = new PolicyEntity {
             Name = model.Name,
             Description = model.Description,
             Claims = claims

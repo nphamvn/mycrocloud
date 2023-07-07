@@ -2,8 +2,8 @@ using System.CodeDom.Compiler;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CSharp;
-using MockServer.Core.Functions;
-using MockServer.Core.Repositories;
+using MockServer.Domain.Functions;
+using MockServer.Domain.Repositories;
 using MockServer.Web.Models.Function;
 using MockServer.Web.Services.Interfaces;
 
@@ -26,7 +26,7 @@ public class FunctionWebService : BaseService, IFunctionWebService
 
     public Task Create(FunctionSaveModel function)
     {
-        var coreFunction = _mapper.Map<Core.Functions.Function>(function);
+        var coreFunction = _mapper.Map<Domain.Functions.Function>(function);
         return _functionRepository.Add(AuthUser.Id, coreFunction);
     }
 
@@ -37,7 +37,7 @@ public class FunctionWebService : BaseService, IFunctionWebService
 
     public Task Edit(int functionId, FunctionSaveModel function)
     {
-        var coreFunction = _mapper.Map<Core.Functions.Function>(function);
+        var coreFunction = _mapper.Map<Domain.Functions.Function>(function);
         return _functionRepository.Update(functionId, coreFunction);
     }
 
@@ -103,8 +103,8 @@ public class FunctionWebService : BaseService, IFunctionWebService
     {
         public MapperProfile()
         {
-            CreateMap<Core.Functions.Function, FunctionSaveModel>().ReverseMap();
-            CreateMap<Core.Functions.Function, FunctionIndexItem>();
+            CreateMap<Domain.Functions.Function, FunctionSaveModel>().ReverseMap();
+            CreateMap<Domain.Functions.Function, FunctionIndexItem>();
         }
     }
 }

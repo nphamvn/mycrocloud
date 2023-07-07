@@ -1,8 +1,5 @@
-@using MockServer.Core.WebApplications.Security
 @using MockServer.Web.Controllers
 @model MockServer.Web.Models.WebApplications.Routes.RouteIndexViewModel
-@using System.Text.Json
-@using System.IO
 @{
     ViewData["Title"] = Model.WebApplication.Name;
     var routes = Model.Routes.Select(r => new
@@ -41,7 +38,6 @@
         <script src="https://unpkg.com/vee-validate"></script>
     </environment>
 }
-<div id="app2"></div>
 <div class="row">
     <div class="col-2">
         <partial name="/Views/WebApplications/_SideBar.cshtml" model="Model.WebApplication"></partial>
@@ -81,7 +77,7 @@
             let sampleRoute = null;
             const searchTerm = ref('');
             const newRoute = () => {
-                route.value = { ...sampleRoute, id: undefined };;
+                route.value = { ...sampleRoute, id: undefined };
             }
             const openRoute = async id => {
                 const TempRouteDetailUrl = '@Url.Action(nameof(WebApplicationRoutesController.Get),"WebApplicationRoutes", new { WebApplicationName = Model.WebApplication.Name, RouteId = -9999})';
@@ -117,11 +113,9 @@
                     routes.value.splice(index, 1, route);
                 }
             }
-        
             const cancel = () => {
                 route.value = null
             }
-
             const onRouteDeleted = (id) => {
                 const index = routes.value.findIndex(r => r.id === id);
                 if (index > -1) {
@@ -133,7 +127,6 @@
                 const response = await axios.get('@Url.Action(nameof(WebApplicationRoutesController.Sample), "WebApplicationRoutes", new {WebApplicationName = Model.WebApplication.Name})')
                 sampleRoute = response.data;
             })
-
             return {
                 newRoute,
                 routes,

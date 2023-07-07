@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MockServer.Core.WebApplications.Security;
+using MockServer.Domain.WebApplication.Shared;
 using MockServer.Web.Filters;
 using MockServer.Web.Models.WebApplications.Authentications;
 using MockServer.Web.Models.WebApplications.Authentications.JwtBearer;

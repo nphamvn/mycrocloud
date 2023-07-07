@@ -2,8 +2,8 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
 {
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Options;
-    using MockServer.Core.Repositories;
-    using MockServer.Core.WebApplications;
+    using MockServer.Domain.Repositories;
+    using MockServer.Domain.WebApplications;
     using Ocelot.Configuration;
     using Ocelot.Configuration.Builder;
     using Ocelot.Configuration.Creator;
@@ -85,7 +85,7 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
             var builder = new DownstreamRouteBuilder();
             switch (route.ResponseProvider)
             {
-                case ResponseProvider.Mock:
+                case RouteResponseProvider.Mock:
                     builder.WithAddHeadersToUpstream(new() {
                                                 new AddHeader(_mockResponderOptions.RouteIdHeader, route.Id.ToString())
                                             })
@@ -100,7 +100,7 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
                         new (_mockResponderOptions.Host, _mockResponderOptions.Port)
                     });
                     break;
-                case ResponseProvider.ProxiedServer:
+                case RouteResponseProvider.ProxiedServer:
                     var options = new
                     {
                         Path = "Path",

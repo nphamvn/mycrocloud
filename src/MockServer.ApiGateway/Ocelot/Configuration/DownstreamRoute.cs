@@ -4,7 +4,7 @@ namespace Ocelot.Configuration
     using System;
     using System.Collections.Generic;
     using Ocelot.Values;
-    using MockServer.Core.WebApplications.Security;
+    using MockServer.Domain.WebApplications.Security;
 
     public class DownstreamRoute
     {

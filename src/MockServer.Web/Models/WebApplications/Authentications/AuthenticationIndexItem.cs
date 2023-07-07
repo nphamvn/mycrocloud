@@ -1,4 +1,4 @@
-using MockServer.Core.WebApplications.Security;
+using MockServer.Domain.WebApplication.Shared;
 
 namespace MockServer.Web.Models.WebApplications.Authentications;
 

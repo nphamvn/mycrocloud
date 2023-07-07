@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using MockServer.Core.Repositories;
+using MockServer.Domain.Repositories;
 
 namespace MockServer.Web.Filters;
 
@@ -32,7 +32,7 @@ public class ValidateRouteWebApplicationAttribute : BaseActionFilterAttribute
         if (appId is > 0 && routeId is > 0)
         {
             var webApplicationRouteRepository = context.HttpContext.RequestServices.GetService<IWebApplicationRouteRepository>();
-            var route = await webApplicationRouteRepository.GetById(routeId);
+            var route = await webApplicationRouteRepository.Get(routeId);
             if (route == null || route.WebApplicationId != appId)
             {
                 context.Result = new BadRequestObjectResult(context.ModelState);

@@ -1,8 +1,8 @@
 using Dapper;
 using Npgsql;
-using MockServer.Core.Functions;
-using MockServer.Core.Repositories;
-using MockServer.Core.Settings;
+using MockServer.Domain.Functions;
+using MockServer.Domain.Repositories;
+using MockServer.Domain.Settings;
 using Microsoft.Extensions.Options;
 
 namespace MockServer.Infrastructure.Repositories.PostgreSql;

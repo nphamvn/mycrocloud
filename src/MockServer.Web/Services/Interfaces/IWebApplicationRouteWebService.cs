@@ -12,5 +12,5 @@ public interface IWebApplicationRouteService
     Task<bool> ValidateEdit(int routeId, RouteSaveModel route, ModelStateDictionary modelState);
     Task Edit(int routeId, RouteSaveModel route);
     Task Delete(int routeId);
-    Task<RouteViewModel> GetDetails(int routeId);
+    Task<RouteSaveModel> GetDetails(int routeId);
 }

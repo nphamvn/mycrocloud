@@ -1,14 +1,13 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using MockServer.Core.Helpers;
-using MockServer.Core.Repositories;
-using MockServer.Core.WebApplications;
+using MockServer.Domain.Helpers;
+using MockServer.Domain.Repositories;
+using MockServer.Domain.WebApplication.Entities;
+using MockServer.Domain.WebApplication.Route;
+using MockServer.Domain.WebApplication.Shared;
 using MockServer.Web.Models.WebApplications.Routes;
-using CoreRoute = MockServer.Core.WebApplications.Route;
-using MockServer.Core.WebApplications.Security;
-using MockServer.Web.Models.WebApplications.Routes.Authorizations;
-using MockServer.Web.Shared;
+using Route = MockServer.Domain.WebApplication.Entities.Route;
 
 namespace MockServer.Web.Services;
 
@@ -39,26 +38,11 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
 
     public async Task<int> Create(int appId, RouteSaveModel route)
     {
-        var existing = await _webApplicationRouteRepository.Find(appId, route.Methods[0], route.Path);
-        if (existing == null)
+        return await _webApplicationRouteRepository.Create(appId, new Route()
         {
-            return await _webApplicationRouteRepository.Create(appId, new()
-            {
-                Name = route.Name,
-                Description = route.Description,
-                //Path = route.Path,
-                //Method = route.Methods[0],
-                Authorization = new ()
-                {
-                    Type = route.Authorization.Type,
-                    PolicyIds = route.Authorization.PolicyIds,
-                }
-            });
-        }
-        else
-        {
-            return 0;
-        }
+            Name = route.Name,
+            Description = route.Description,
+        });
     }
 
     public async Task Delete(int id)
@@ -73,11 +57,12 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
 
     public async Task Edit(int id, RouteSaveModel route)
     {
-        var existing = await _webApplicationRouteRepository.GetById(id);
+        var existing = await _webApplicationRouteRepository.Get(id);
         if (existing != null)
         {
-            var mapped = _mapper.Map<CoreRoute>(route);
-            await _webApplicationRouteRepository.Update(id, mapped);
+            await _webApplicationRouteRepository.Update(id, new Route() {
+                
+            });
         }
     }
 
@@ -94,9 +79,9 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
             HttpMethodSelectListItem = HttpProtocolExtensions.CommonHttpMethods
                                     .Select(m => new SelectListItem(m, m)),
             ResponseProviderSelectListItem = new List<SelectListItem>{
-                new("Mock", ((int)ResponseProvider.Mock).ToString()),
-                new("Proxied Server", ((int)ResponseProvider.ProxiedServer).ToString()),
-                new("Function", ((int)ResponseProvider.Function).ToString())
+                new("Mock", ((int)RouteResponseProvider.Mock).ToString()),
+                new("Proxied Server", ((int)RouteResponseProvider.ProxiedServer).ToString()),
+                new("Function", ((int)RouteResponseProvider.Function).ToString())
             },
             AuthorizationTypeSelectListItem = new List<SelectListItem>
             {
@@ -114,10 +99,7 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
         {
             RouteId = r.RouteId,
             Name = r.Name,
-            Description = r.Description,
-            //Methods = r.Methods,
-            //Path = r.Path,
-            //ResponseProvider = r.ResponseProvider
+            Description = r.Description
         });
         return vm;
     }
@@ -125,33 +107,28 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
     public async Task<IEnumerable<RouteIndexItem>> GetList(int appId, string searchTerm, string sort)
     {
         var routes = await _webApplicationRouteRepository.GetByApplicationId(appId, searchTerm, sort);
-        return _mapper.Map<IEnumerable<RouteIndexItem>>(routes);
+        
+        return routes.Select(r => new RouteIndexItem()
+        {
+            RouteId = r.RouteId,
+            Name = r.Name,
+            Description = r.Description
+        });
     }
 
-    public async Task<RouteViewModel> GetDetails(int routeId)
+    public async Task<RouteSaveModel> GetDetails(int routeId)
     {
-        var route = await _webApplicationRouteRepository.GetById(routeId);
-        return new RouteViewModel()
+        var route = await _webApplicationRouteRepository.Get(routeId);
+        return new RouteSaveModel()
         {
             RouteId = routeId,
             Name = route.Name,
-            Description = route.Description,
-            //Order = route.Order,
-            //Path = route.Path,
-            //Methods = route.Methods,
-            
-            Authorization = new AuthorizationViewModel()
-            {
-                Type = route.Authorization.Type,
-                PolicyIds = route.Authorization.PolicyIds,
-                Claims = route.Authorization.Claims
-            },
-            
+            Description = route.Description,            
         };
     }
 
-    private RouteViewModel Map(CoreRoute route) {
-        var vm = new RouteViewModel();
+    private RouteSaveModel Map(Route route) {
+        var vm = new RouteSaveModel();
         vm.RouteId = route.RouteId;
         vm.Name = route.Name;
         vm.Description = route.Description;
@@ -169,7 +146,6 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
             vm.Authorization = new()
             {
                 Type = route.Authorization.Type,
-                AuthenticationSchemeIds = 
             };
         }
 

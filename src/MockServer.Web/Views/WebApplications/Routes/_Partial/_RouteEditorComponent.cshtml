@@ -1,6 +1,7 @@
 @using MockServer.Web.Controllers
-@using MockServer.Core.WebApplications.Security
-@using MockServer.Core.WebApplications
+@using MockServer.Domain.WebApplication.Shared
+@using MockServer.Domain.WebApplication.Entities
+@using MockServer.Domain.WebApplications
 @model MockServer.Web.Models.WebApplications.Routes.RouteIndexViewModel
 @{
     var matchHttpMethodItems = Model.HttpMethodSelectListItem.Select(m => new
@@ -26,10 +27,10 @@
         Value = int.Parse(p.Value),
         Title = p.Text
     });
-    var responseProviders = Html.GetEnumSelectList<ResponseProvider>()
+    var responseProviders = Html.GetEnumSelectList<RouteResponseProvider>()
     .Select(p => new
     {
-        Value = ((ResponseProvider)int.Parse(p.Value)).ToString(),
+        Value = ((RouteResponseProvider)int.Parse(p.Value)).ToString(),
         Title = p.Text.ToUpper()
     });
 }
@@ -269,7 +270,7 @@
                     <v-select class="col-3" v-model="route.response.provider" label="PROVIDER"
                         :items="responseProviders" variant="solo">
                     </v-select>
-                    <div v-show="route.response.provider=='@nameof(ResponseProvider.Mock)'">
+                    <div v-show="route.response.provider=='@nameof(RouteResponseProvider.Mock)'">
                         <div class="text-subtitle-2">STATUS CODE</div>
                         <v-row>
                             <v-col cols="3">
@@ -329,10 +330,10 @@
                             </div>
                         </v-container>
                     </div>
-                    <div v-show="route.response.provider=='@nameof(ResponseProvider.ProxiedServer)'">
+                    <div v-show="route.response.provider=='@nameof(RouteResponseProvider.ProxiedServer)'">
                         <v-container>Proxied Server</v-container>
                     </div>
-                    <div v-show="route.response.provider=='@nameof(ResponseProvider.Function)'">
+                    <div v-show="route.response.provider=='@nameof(RouteResponseProvider.Function)'">
                         <v-container>Function</v-container>
                     </div>
                 </section>
@@ -418,7 +419,7 @@
             const mockResponseStatusCodeValueType = ref('number');
             let mockResponseBodyEditor;
             watch(() => route.response.provider, (newValue) => {
-                if (newValue === '@nameof(ResponseProvider.Mock)' && mockResponseBodyEditor === undefined) {
+                if (newValue === '@nameof(RouteResponseProvider.Mock)' && mockResponseBodyEditor === undefined) {
                     initializeMockResponseBodyEditor();
                 }
             });
@@ -498,7 +499,7 @@
             //
             onMounted(() => {
                 // Initialize the Monaco editor
-                if (route.response.provider === '@nameof(ResponseProvider.Mock)') {
+                if (route.response.provider === '@nameof(RouteResponseProvider.Mock)') {
                     initializeMockResponseBodyEditor();
                 }
             });

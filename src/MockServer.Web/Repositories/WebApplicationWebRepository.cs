@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Options;
-using MockServer.Core.Settings;
+using MockServer.Domain.Settings;
 using BaseWebApplicationRepository = MockServer.Infrastructure.Repositories.PostgreSql.WebApplicationRepository;
 using MockServer.Web.Models.WebApplications;
 

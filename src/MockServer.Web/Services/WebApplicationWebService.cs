@@ -1,8 +1,8 @@
 using AutoMapper;
-using MockServer.Core.Repositories;
+using MockServer.Domain.Repositories;
 using MockServer.Web.Repositories;
 using MockServer.Web.Models.WebApplications;
-using CoreWebApplication = MockServer.Core.WebApplications.WebApplication;
+using CoreWebApplication = MockServer.Domain.WebApplication.Entities.WebApplication;
 using WebApplication = MockServer.Web.Models.WebApplications.WebApplication;
 namespace MockServer.Web.Services;
 

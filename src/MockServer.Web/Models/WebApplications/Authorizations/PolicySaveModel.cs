@@ -4,11 +4,6 @@ namespace MockServer.Web.Models.WebApplications.Authorizations;
 
 public class PolicySaveModel : IValidatableObject
 {
-    public PolicySaveModel()
-    {
-        Claims = new();
-    }
-
     [Required]
     public string Name { get; set; }
     public string Description { get; set; }

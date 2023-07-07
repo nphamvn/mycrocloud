@@ -71,7 +71,7 @@ namespace Ocelot.Configuration.Creator
                 })
                 .ToList();
         }
-        public List<Route> Create(IEnumerable<MockServer.Core.WebApplications.Route> routes)
+        public List<Route> Create(IEnumerable<MockServer.Domain.WebApplications.Route> routes)
         {
             return routes.Select(r =>
             {

@@ -2,12 +2,11 @@ using System.Data;
 using System.Text.Json;
 using Dapper;
 using Npgsql;
-using MockServer.Core.Repositories;
-using MockServer.Core.Settings;
-using MockServer.Core.WebApplications.Security;
-using MockServer.Core.WebApplications.Security.ApiKey;
-using MockServer.Core.WebApplications.Security.JwtBearer;
+using MockServer.Domain.Repositories;
+using MockServer.Domain.Settings;
+using MockServer.Domain.WebApplication.Entities;
 using Microsoft.Extensions.Options;
+using MockServer.Domain.WebApplication.Shared;
 
 namespace MockServer.Infrastructure.Repositories.PostgreSql;
 
@@ -17,7 +16,7 @@ public class WebApplicationAuthenticationSchemeRepository : BaseRepository, IWeb
     {
     }
 
-    public async Task Add(int appId, AuthenticationScheme auth)
+    public async Task Add(int appId, AuthenticationSchemeEntity auth)
     {
         var query =
 """
@@ -51,7 +50,7 @@ INSERT INTO
         });
     }
 
-    public async Task<IEnumerable<AuthenticationScheme>> GetAll(int appId)
+    public async Task<IEnumerable<AuthenticationSchemeEntity>> GetAll(int appId)
     {
         var query =
 """
@@ -67,13 +66,13 @@ WHERE
     web_application_id = @web_application_id
 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        return await connection.QueryAsync<AuthenticationScheme>(query, new
+        return await connection.QueryAsync<AuthenticationSchemeEntity>(query, new
         {
             web_application_id = appId
         });
     }
 
-    public Task<AuthenticationScheme> Get(int schemeId, AuthenticationSchemeType type)
+    public Task<AuthenticationSchemeEntity> Get(int schemeId, AuthenticationSchemeType type)
     {
         var query =
                 """
@@ -91,13 +90,13 @@ WHERE
                 """;
         using var connection = new NpgsqlConnection(ConnectionString);
         SqlMapper.AddTypeHandler(new AuthenticationSchemeOptionsJsonTypeHandler(type));
-        return connection.QuerySingleOrDefaultAsync<AuthenticationScheme>(query, new
+        return connection.QuerySingleOrDefaultAsync<AuthenticationSchemeEntity>(query, new
         {
             Id = schemeId
         });
     }
 
-    public async Task Update(int schemeId, AuthenticationScheme scheme)
+    public async Task Update(int schemeId, AuthenticationSchemeEntity schemeEntity)
     {
         var query =
                 """
@@ -111,14 +110,14 @@ WHERE
                     Id = @Id
                 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        SqlMapper.AddTypeHandler(new AuthenticationSchemeOptionsJsonTypeHandler(scheme.Type));
-        int type = (int)scheme.Type;
+        SqlMapper.AddTypeHandler(new AuthenticationSchemeOptionsJsonTypeHandler(schemeEntity.Type));
+        int type = (int)schemeEntity.Type;
         await connection.ExecuteAsync(query, new
         {
             Id = schemeId,
-            Name = scheme.Name,
-            Options = scheme.Options,
-            Description = scheme.Description,
+            Name = schemeEntity.Name,
+            Options = schemeEntity.Options,
+            Description = schemeEntity.Description,
         });
     }
 
@@ -174,7 +173,7 @@ WHERE
         }
     }
 
-    public Task<AuthenticationScheme> Get<TAuthOptions>(int id) where TAuthOptions : AuthenticationSchemeOptions
+    public Task<AuthenticationSchemeEntity> Get<TAuthOptions>(int id) where TAuthOptions : AuthenticationSchemeOptions
     {
         Type type = typeof(TAuthOptions);
         if (typeof(JwtBearerAuthenticationOptions).IsEquivalentTo(type))
@@ -199,13 +198,13 @@ WHERE
                     Id = @Id
                 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        return connection.QuerySingleOrDefaultAsync<AuthenticationScheme>(query, new
+        return connection.QuerySingleOrDefaultAsync<AuthenticationSchemeEntity>(query, new
         {
             Id = id
         });
     }
 
-    public async Task<AuthenticationScheme> Get(int id)
+    public async Task<AuthenticationSchemeEntity> Get(int id)
     {
         using var connection = new NpgsqlConnection(ConnectionString);
         var type = await connection.QuerySingleOrDefaultAsync<AuthenticationSchemeType>("SELECT Type FROM WebApplicationAuthenticationScheme WHERE Id = @Id", new { Id = id });
@@ -222,7 +221,7 @@ WHERE
                     Id = @Id
                 """;
         SqlMapper.AddTypeHandler(new AuthenticationSchemeOptionsJsonTypeHandler(type));
-        return await connection.QuerySingleOrDefaultAsync<AuthenticationScheme>(query, new
+        return await connection.QuerySingleOrDefaultAsync<AuthenticationSchemeEntity>(query, new
         {
             Id = id
         });
