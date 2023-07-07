@@ -1,5 +1,5 @@
 /**
-  * vee-validate v4.9.6
+  * vee-validate v4.10.5
   * (c) 2023 Abdelrahman Awad
   * @license MIT
   */
@@ -243,11 +243,6 @@
                 return a.toString() === b.toString();
             keys = Object.keys(a);
             length = keys.length;
-            if (length !== Object.keys(b).length)
-                return false;
-            for (i = length; i-- !== 0;)
-                if (!Object.prototype.hasOwnProperty.call(b, keys[i]))
-                    return false;
             for (i = length; i-- !== 0;) {
                 // eslint-disable-next-line no-var
                 var key = keys[i];
@@ -445,9 +440,10 @@
         return function (...args) {
             // Run the function after a certain amount of time
             if (timer) {
-                window.clearTimeout(timer);
+                clearTimeout(timer);
             }
-            timer = window.setTimeout(() => {
+            // @ts-expect-error timer is a number
+            timer = setTimeout(() => {
                 // Get the result of the inner function, then apply it to the resolve function of
                 // each promise that has been created since the last time the inner function was run
                 const result = inner(...args);
@@ -500,14 +496,8 @@
         });
         return baseRef;
     }
-    function unravel(value) {
-        if (isCallable(value)) {
-            return value();
-        }
-        return vue.unref(value);
-    }
     function lazyToRef(value) {
-        return vue.computed(() => unravel(value));
+        return vue.computed(() => vue.toValue(value));
     }
     function normalizeErrorItem(message) {
         return Array.isArray(message) ? message : message ? [message] : [];
@@ -561,6 +551,12 @@
         return '_value' in el;
     }
 
+    function parseInputValue(el) {
+        if (el.type === 'number') {
+            return Number.isNaN(el.valueAsNumber) ? el.value : el.valueAsNumber;
+        }
+        return el.value;
+    }
     function normalizeEventValue(value) {
         if (!isEvent(value)) {
             return value;
@@ -586,7 +582,7 @@
             const selectedOption = Array.from(input.options).find(opt => opt.selected);
             return selectedOption ? getBoundValue(selectedOption) : input.value;
         }
-        return input.value;
+        return parseInputValue(input);
     }
 
     /**
@@ -749,12 +745,17 @@
             for (let i = 0; i < length; i++) {
                 const rule = pipeline[i];
                 const result = await rule(value, ctx);
-                const isValid = typeof result !== 'string' && result;
+                const isValid = typeof result !== 'string' && !Array.isArray(result) && result;
                 if (isValid) {
                     continue;
                 }
-                const message = typeof result === 'string' ? result : _generateFieldError(ctx);
-                errors.push(message);
+                if (Array.isArray(result)) {
+                    errors.push(...result);
+                }
+                else {
+                    const message = typeof result === 'string' ? result : _generateFieldError(ctx);
+                    errors.push(message);
+                }
                 if (field.bails) {
                     return {
                         errors,
@@ -1057,7 +1058,7 @@
                 return getFromPath(form.values, vue.unref(path));
             },
             set(newVal) {
-                form.setFieldValue(vue.unref(path), newVal);
+                form.setFieldValue(vue.unref(path), newVal, false);
             },
         });
         return {
@@ -1126,7 +1127,7 @@
         return _useField(path, rules, opts);
     }
     function _useField(path, rules, opts) {
-        const { initialValue: modelValue, validateOnMount, bails, type, checkedValue, label, validateOnValueUpdate, uncheckedValue, controlled, keepValueOnUnmount, modelPropName, syncVModel, form: controlForm, } = normalizeOptions(opts);
+        const { initialValue: modelValue, validateOnMount, bails, type, checkedValue, label, validateOnValueUpdate, uncheckedValue, controlled, keepValueOnUnmount, syncVModel, form: controlForm, } = normalizeOptions(opts);
         const injectedForm = controlled ? injectWithSelf(FormContextKey) : undefined;
         const form = controlForm || injectedForm;
         const name = lazyToRef(path);
@@ -1154,13 +1155,16 @@
         });
         const errorMessage = vue.computed(() => errors.value[0]);
         if (syncVModel) {
-            useVModel({ value, prop: modelPropName, handleChange });
+            useVModel({ value, prop: syncVModel, handleChange });
         }
         /**
          * Handles common onBlur meta update
          */
-        const handleBlur = () => {
+        const handleBlur = (evt, shouldValidate = false) => {
             meta.touched = true;
+            if (shouldValidate) {
+                validateWithStateMutation();
+            }
         };
         async function validateCurrentValue(mode) {
             var _a, _b;
@@ -1234,12 +1238,9 @@
             meta.validated = false;
             validateValidStateOnly();
         }
+        const vm = vue.getCurrentInstance();
         function setValue(newValue, shouldValidate = true) {
-            value.value = newValue;
-            if (!shouldValidate) {
-                validateValidStateOnly();
-                return;
-            }
+            value.value = vm && syncVModel ? applyModelModifiers(newValue, vm.props.modelModifiers) : newValue;
             const validateFn = shouldValidate ? validateWithStateMutation : validateValidStateOnly;
             validateFn();
         }
@@ -1332,7 +1333,7 @@
         vue.onBeforeUnmount(() => {
             var _a;
             const shouldKeepValue = (_a = vue.unref(field.keepValueOnUnmount)) !== null && _a !== void 0 ? _a : vue.unref(form.keepValuesOnUnmount);
-            const path = unravel(name);
+            const path = vue.toValue(name);
             if (shouldKeepValue || !form || flags.pendingUnmount[field.id]) {
                 form === null || form === void 0 ? void 0 : form.removePathState(path, id);
                 return;
@@ -1357,7 +1358,7 @@
                 }
             }
             else {
-                form.unsetPathValue(unravel(name));
+                form.unsetPathValue(vue.toValue(name));
             }
             form.removePathState(path, id);
         });
@@ -1367,7 +1368,6 @@
      * Normalizes partial field options to include the full options
      */
     function normalizeOptions(opts) {
-        var _a;
         const defaults = () => ({
             initialValue: undefined,
             validateOnMount: false,
@@ -1375,13 +1375,13 @@
             label: undefined,
             validateOnValueUpdate: true,
             keepValueOnUnmount: undefined,
-            modelPropName: 'modelValue',
-            syncVModel: true,
+            syncVModel: false,
             controlled: true,
         });
-        const isVModelSynced = (_a = opts === null || opts === void 0 ? void 0 : opts.syncVModel) !== null && _a !== void 0 ? _a : true;
+        const isVModelSynced = !!(opts === null || opts === void 0 ? void 0 : opts.syncVModel);
+        const modelPropName = typeof (opts === null || opts === void 0 ? void 0 : opts.syncVModel) === 'string' ? opts.syncVModel : (opts === null || opts === void 0 ? void 0 : opts.modelPropName) || 'modelValue';
         const initialValue = isVModelSynced && !('initialValue' in (opts || {}))
-            ? getCurrentModelValue(vue.getCurrentInstance(), (opts === null || opts === void 0 ? void 0 : opts.modelPropName) || 'modelValue')
+            ? getCurrentModelValue(vue.getCurrentInstance(), modelPropName)
             : opts === null || opts === void 0 ? void 0 : opts.initialValue;
         if (!opts) {
             return Object.assign(Object.assign({}, defaults()), { initialValue });
@@ -1389,7 +1389,9 @@
         // TODO: Deprecate this in next major release
         const checkedValue = 'valueProp' in opts ? opts.valueProp : opts.checkedValue;
         const controlled = 'standalone' in opts ? !opts.standalone : opts.controlled;
-        return Object.assign(Object.assign(Object.assign({}, defaults()), (opts || {})), { initialValue, controlled: controlled !== null && controlled !== void 0 ? controlled : true, checkedValue });
+        const syncVModel = (opts === null || opts === void 0 ? void 0 : opts.modelPropName) || (opts === null || opts === void 0 ? void 0 : opts.syncVModel) || false;
+        return Object.assign(Object.assign(Object.assign({}, defaults()), (opts || {})), { initialValue, controlled: controlled !== null && controlled !== void 0 ? controlled : true, checkedValue,
+            syncVModel });
     }
     function useFieldWithChecked(name, rules, opts) {
         const form = !(opts === null || opts === void 0 ? void 0 : opts.standalone) ? injectWithSelf(FormContextKey) : undefined;
@@ -1405,23 +1407,22 @@
                     : isEqual(checkedVal, currentValue);
             });
             function handleCheckboxChange(e, shouldValidate = true) {
-                var _a;
+                var _a, _b;
                 if (checked.value === ((_a = e === null || e === void 0 ? void 0 : e.target) === null || _a === void 0 ? void 0 : _a.checked)) {
                     if (shouldValidate) {
                         field.validate();
                     }
                     return;
                 }
-                const path = unravel(name);
+                const path = vue.toValue(name);
                 const pathState = form === null || form === void 0 ? void 0 : form.getPathState(path);
                 const value = normalizeEventValue(e);
-                let newValue;
+                let newValue = (_b = vue.unref(checkedValue)) !== null && _b !== void 0 ? _b : value;
                 if (form && (pathState === null || pathState === void 0 ? void 0 : pathState.multiple) && pathState.type === 'checkbox') {
-                    newValue = resolveNextCheckboxValue(getFromPath(form.values, path) || [], value, undefined);
+                    newValue = resolveNextCheckboxValue(getFromPath(form.values, path) || [], newValue, undefined);
                 }
-                else {
-                    // Single checkbox field without a form to toggle it's value
-                    newValue = resolveNextCheckboxValue(vue.unref(field.value), vue.unref(checkedValue), vue.unref(uncheckedValue));
+                else if ((opts === null || opts === void 0 ? void 0 : opts.type) === 'checkbox') {
+                    newValue = resolveNextCheckboxValue(vue.unref(field.value), newValue, vue.unref(uncheckedValue));
                 }
                 handleChange(newValue, shouldValidate);
             }
@@ -1434,10 +1435,10 @@
     function useVModel({ prop, value, handleChange }) {
         const vm = vue.getCurrentInstance();
         /* istanbul ignore next */
-        if (!vm) {
+        if (!vm || !prop) {
             return;
         }
-        const propName = prop || 'modelValue';
+        const propName = typeof prop === 'string' ? prop : 'modelValue';
         const emitName = `update:${propName}`;
         // Component doesn't have a model prop setup (must be defined on the props)
         if (!(propName in vm.props)) {
@@ -1454,7 +1455,7 @@
                 return;
             }
             const newValue = propValue === IS_ABSENT ? undefined : propValue;
-            if (isEqual(newValue, applyModelModifiers(value.value, vm.props.modelModifiers))) {
+            if (isEqual(newValue, value.value)) {
                 return;
             }
             handleChange(newValue);
@@ -1554,6 +1555,7 @@
                 label,
                 validateOnValueUpdate: false,
                 keepValueOnUnmount: keepValue,
+                syncVModel: true,
             });
             // If there is a v-model applied on the component we need to emit the `update:modelValue` whenever the value binding changes
             const onChangeHandler = function handleChangeWithModel(e, shouldValidate = true) {
@@ -1563,12 +1565,9 @@
             const sharedProps = vue.computed(() => {
                 const { validateOnInput, validateOnChange, validateOnBlur, validateOnModelUpdate } = resolveValidationTriggers(props);
                 function baseOnBlur(e) {
-                    handleBlur(e);
+                    handleBlur(e, validateOnBlur);
                     if (isCallable(ctx.attrs.onBlur)) {
                         ctx.attrs.onBlur(e);
-                    }
-                    if (validateOnBlur) {
-                        validateField();
                     }
                 }
                 function baseOnInput(e) {
@@ -1773,7 +1772,7 @@
         const schema = opts === null || opts === void 0 ? void 0 : opts.validationSchema;
         function createPathState(path, config) {
             var _a, _b;
-            const initialValue = vue.computed(() => getFromPath(initialValues.value, unravel(path)));
+            const initialValue = vue.computed(() => getFromPath(initialValues.value, vue.toValue(path)));
             const pathStateExists = pathStates.value.find(state => state.path === vue.unref(path));
             if (pathStateExists) {
                 if ((config === null || config === void 0 ? void 0 : config.type) === 'checkbox' || (config === null || config === void 0 ? void 0 : config.type) === 'radio') {
@@ -1790,8 +1789,8 @@
                 pathStateExists.__flags.pendingUnmount[id] = false;
                 return pathStateExists;
             }
-            const currentValue = vue.computed(() => getFromPath(formValues, unravel(path)));
-            const pathValue = unravel(path);
+            const currentValue = vue.computed(() => getFromPath(formValues, vue.toValue(path)));
+            const pathValue = vue.toValue(path);
             const id = FIELD_ID_COUNTER++;
             const state = vue.reactive({
                 id,
@@ -2043,7 +2042,7 @@
         /**
          * Sets a single field value
          */
-        function setFieldValue(field, value) {
+        function setFieldValue(field, value, shouldValidate = true) {
             const clonedValue = klona(value);
             const path = typeof field === 'string' ? field : field.path;
             const pathState = findPathState(path);
@@ -2051,6 +2050,9 @@
                 createPathState(path);
             }
             setInPath(formValues, path, clonedValue);
+            if (shouldValidate) {
+                validateField(path);
+            }
         }
         /**
          * Sets multiple fields values
@@ -2068,7 +2070,7 @@
                 },
                 set(value) {
                     const pathValue = vue.unref(path);
-                    setFieldValue(pathValue, value);
+                    setFieldValue(pathValue, value, false);
                     pathState.validated = true;
                     pathState.pending = true;
                     validateField(pathValue).then(() => {
@@ -2104,7 +2106,7 @@
             var _a;
             const newValue = state && 'value' in state ? state.value : getFromPath(initialValues.value, field);
             setFieldInitialValue(field, klona(newValue));
-            setFieldValue(field, newValue);
+            setFieldValue(field, newValue, false);
             setFieldTouched(field, (_a = state === null || state === void 0 ? void 0 : state.touched) !== null && _a !== void 0 ? _a : false);
             setFieldError(field, (state === null || state === void 0 ? void 0 : state.errors) || []);
         }
@@ -2114,14 +2116,14 @@
         function resetForm(resetState) {
             const newValues = (resetState === null || resetState === void 0 ? void 0 : resetState.values) ? resetState.values : originalInitialValues.value;
             setInitialValues(newValues);
-            setValues(newValues);
             mutateAllPathState(state => {
                 var _a;
                 state.validated = false;
                 state.touched = ((_a = resetState === null || resetState === void 0 ? void 0 : resetState.touched) === null || _a === void 0 ? void 0 : _a[state.path]) || false;
-                setFieldValue(state.path, getFromPath(newValues, state.path));
+                setFieldValue(state.path, getFromPath(newValues, state.path), false);
                 setFieldError(state.path, undefined);
             });
+            setValues(newValues);
             setErrors((resetState === null || resetState === void 0 ? void 0 : resetState.errors) || {});
             submitCount.value = (resetState === null || resetState === void 0 ? void 0 : resetState.submitCount) || 0;
             vue.nextTick(() => {
@@ -2253,7 +2255,7 @@
         // Provide injections
         vue.provide(FormContextKey, formCtx);
         function defineComponentBinds(path, config) {
-            const pathState = findPathState(unravel(path)) || createPathState(path);
+            const pathState = findPathState(vue.toValue(path)) || createPathState(path);
             const evalConfig = () => (isCallable(config) ? config(omit(pathState, PRIVATE_PATH_STATE_KEYS)) : config || {});
             function onBlur() {
                 var _a;
@@ -2265,21 +2267,21 @@
             }
             function onUpdateModelValue(value) {
                 var _a;
-                setFieldValue(pathState.path, value);
                 const validateOnModelUpdate = (_a = evalConfig().validateOnModelUpdate) !== null && _a !== void 0 ? _a : getConfig().validateOnModelUpdate;
-                if (validateOnModelUpdate) {
-                    validateField(pathState.path);
-                }
+                setFieldValue(pathState.path, value, validateOnModelUpdate);
             }
             const props = vue.computed(() => {
-                const base = {
-                    modelValue: pathState.value,
-                    'onUpdate:modelValue': onUpdateModelValue,
-                    onBlur,
-                };
                 if (isCallable(config)) {
-                    return Object.assign(Object.assign({}, base), (config(pathState).props || {}));
+                    const configVal = config(pathState);
+                    const model = configVal.model || 'modelValue';
+                    return Object.assign({ onBlur, [model]: pathState.value, [`onUpdate:${model}`]: onUpdateModelValue }, (configVal.props || {}));
                 }
+                const model = (config === null || config === void 0 ? void 0 : config.model) || 'modelValue';
+                const base = {
+                    onBlur,
+                    [model]: pathState.value,
+                    [`onUpdate:${model}`]: onUpdateModelValue,
+                };
                 if (config === null || config === void 0 ? void 0 : config.mapProps) {
                     return Object.assign(Object.assign({}, base), config.mapProps(omit(pathState, PRIVATE_PATH_STATE_KEYS)));
                 }
@@ -2288,7 +2290,7 @@
             return props;
         }
         function defineInputBinds(path, config) {
-            const pathState = (findPathState(unravel(path)) || createPathState(path));
+            const pathState = (findPathState(vue.toValue(path)) || createPathState(path));
             const evalConfig = () => (isCallable(config) ? config(omit(pathState, PRIVATE_PATH_STATE_KEYS)) : config || {});
             function onBlur() {
                 var _a;
@@ -2301,20 +2303,14 @@
             function onInput(e) {
                 var _a;
                 const value = normalizeEventValue(e);
-                setFieldValue(pathState.path, value);
                 const validateOnInput = (_a = evalConfig().validateOnInput) !== null && _a !== void 0 ? _a : getConfig().validateOnInput;
-                if (validateOnInput) {
-                    validateField(pathState.path);
-                }
+                setFieldValue(pathState.path, value, validateOnInput);
             }
             function onChange(e) {
                 var _a;
                 const value = normalizeEventValue(e);
-                setFieldValue(pathState.path, value);
                 const validateOnChange = (_a = evalConfig().validateOnChange) !== null && _a !== void 0 ? _a : getConfig().validateOnChange;
-                if (validateOnChange) {
-                    validateField(pathState.path);
-                }
+                setFieldValue(pathState.path, value, validateOnChange);
             }
             const props = vue.computed(() => {
                 const base = {
@@ -2333,7 +2329,7 @@
             });
             return props;
         }
-        return Object.assign(Object.assign({}, formCtx), { handleReset: () => resetForm(), submitForm,
+        return Object.assign(Object.assign({}, formCtx), { values: vue.readonly(formValues), handleReset: () => resetForm(), submitForm,
             defineComponentBinds,
             defineInputBinds });
     }
@@ -2383,8 +2379,8 @@
         // these only change when the user explicitly changes the initial values or when the user resets them with new values.
         const originalInitialValues = vue.ref(klona(values));
         function setInitialValues(values, updateFields = false) {
-            initialValues.value = klona(values);
-            originalInitialValues.value = klona(values);
+            initialValues.value = merge(klona(initialValues.value) || {}, klona(values));
+            originalInitialValues.value = merge(klona(originalInitialValues.value) || {}, klona(values));
             if (!updateFields) {
                 return;
             }
