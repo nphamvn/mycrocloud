@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'MockServer.Web' " />
+  <ItemGroup>
+    <PackageReference Include="Ardalis.GuardClauses" Version="4.0.1" />
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="MongoDB.Driver" Version="2.19.2" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
+    <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
+    <PackageReference Include="Serilog.Sinks.Seq" Version="5.2.2" />
+    <PackageReference Include="System.CodeDom" Version="8.0.0-preview.1.23110.8" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.30.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WebApplication.Infrastructure\WebApplication.Infrastructure.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\WebApplication.Domain\WebApplication.Domain.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Areas\WebApplication\Models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="Areas\WebApplication\Views\Authentication\SaveJwtBearerScheme.cshtml" />
+    <AdditionalFiles Include="Areas\WebApplication\Views\Authentication\SchemeList.cshtml" />
+    <AdditionalFiles Include="Areas\WebApplication\Views\Authentication\Settings.cshtml" />
+    <AdditionalFiles Include="Areas\WebApplication\Views\Authentication\_NavBar.cshtml" />
+    <AdditionalFiles Include="Areas\WebApplication\Views\Authorization\Policy\Index.cshtml" />
+    <AdditionalFiles Include="Areas\WebApplication\Views\Authorization\Policy\Save.cshtml" />
+    <AdditionalFiles Include="Areas\WebApplication\Views\Authorization\_NavBar.cshtml" />
+    <AdditionalFiles Include="Areas\WebApplication\Views\Routes\Index.cshtml" />
+    <AdditionalFiles Include="Areas\WebApplication\Views\Routes\_Partial\_RouteEditorComponent.cshtml" />
+    <AdditionalFiles Include="Areas\WebApplication\Views\Routes\_Partial\_RouteListComponent.cshtml" />
+    <AdditionalFiles Include="Areas\WebApplication\Views\Routes\_Partial\_ValidationRulesConfigComponent.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\WebApplication\Authorization\Policy\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\WebApplication\Authorization\Policy\Save.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\WebApplication\Authorization\_NavBar.cshtml" />
+  </ItemGroup>
+</Project>

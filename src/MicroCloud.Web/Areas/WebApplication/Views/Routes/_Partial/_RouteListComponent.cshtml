@@ -1,0 +1,63 @@
+@using MicroCloud.Web.Controllers
+<template id="route-list-template">
+    <v-list>
+        <v-list-item class="pa-0" v-for="route in routes" :key="route.id">
+            <v-card v-on:click="clickRoute(route.id)" :class="{'bg-primary': route.id === clickRouteId}">
+                <v-card-title>{{route.name}}</v-card-title>
+                <v-card-text>
+                    <v-badge :color="getMethodBadgeColor(route)" text-color="white"
+                        :content="getMethodBadgeContent(route)" inline></v-badge>
+                    <small>{{route.match.path}}</small>
+                </v-card-text>
+            </v-card>
+        </v-list-item>
+    </v-list>
+</template>
+<script>
+    const RouteListComponent = {
+        template: '#route-list-template',
+        props: {
+            routes: {
+                type: Array,
+                required: true
+            }
+        },
+        emits: ['click-route'],
+        setup(props, { emit }) {
+            const clickRouteId = ref(null)
+            const clickRoute = (id) => {
+                clickRouteId.value = id;
+                emit('click-route', id);
+            }
+            const getMethodBadgeColor = (route) => {
+                if (route.match.methods.length === 1) {
+                    switch (route.match.methods[0]) {
+                        case 'DELETE': return 'red';
+                        case 'POST': return 'orange';
+                        case 'PUT': return 'yellow';
+                        case 'GET': return 'light-blue';
+                        default: return 'light-blue';
+                    }
+                } else {
+                    return 'purple'
+                }
+            }
+            const getMethodBadgeContent = (route) => {
+                //TODO: use methods prop
+                if(route.match.methods.length === 1) {
+                    return route.match.methods[0]
+                }
+                else 
+                {
+                    return 'MULTI'
+                }
+            }
+            return {
+                clickRoute,
+                clickRouteId,
+                getMethodBadgeColor,
+                getMethodBadgeContent
+            }
+        }
+    }
+</script>

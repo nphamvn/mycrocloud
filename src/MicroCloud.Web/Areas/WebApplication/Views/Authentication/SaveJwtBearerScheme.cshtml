@@ -1,0 +1,42 @@
+@model MicroCloud.Web.Models.WebApplications.Authentications.JwtBearer.JwtBearerSchemeSaveModel
+@{
+    var project = Model.WebApplication;
+}
+<div class="row">
+    <div class="col-2">
+        <partial name="/Views/WebApplications/_SideBar.cshtml" model="Model.WebApplication" />
+    </div>
+    <div class="col-10">
+        <partial name="/Views/WebApplications/Authentications/_NavBar.cshtml" model="Model.WebApplication" />
+        <div class="mt-2">
+            <h5>Create new JwtBearer Scheme</h5>
+            <form method="post">
+                <div>
+                    <label asp-for="Name" class="form-label"></label>
+                    <input type="text" class="form-control" asp-for="Name" autocomplete="off" aria-autocomplete="none">
+                </div>
+                <div class="mt-2">
+                    <label asp-for="DisplayName" class="form-label"></label>
+                    <input type="text" class="form-control" asp-for="DisplayName" autocomplete="off" aria-autocomplete="none">
+                </div>
+                <div class="mt-2">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea type="text" class="form-control" asp-for="Description" rows="2"></textarea>
+                </div>
+                <div class="mt-2">
+                    <label asp-for="Options.Authority" class="form-label">Authority</label>
+                    <input type="text" class="form-control" asp-for="Options.Authority">
+                </div>
+                <div class="mt-2">
+                    <label asp-for="Options.Audience" class="form-label">Audience</label>
+                    <input type="text" class="form-control" asp-for="Options.Audience">
+                </div>
+                <div class="mt-2">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary ms-2"
+                        onclick="location.href='@Context.Request.Headers["Referer"].ToString()'">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

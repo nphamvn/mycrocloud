@@ -1,0 +1,12 @@
+@using MicroCloud.Web.Controllers
+@model MicroCloud.Web.Models.WebApplications.WebApplication
+@{
+    var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
+    var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
+    var tab = ViewData["Tab"] as string;
+}
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link @(tab.Equals("Policies", StringComparison.OrdinalIgnoreCase) ?"active":"")" href="@Url.Action(nameof(WebApplicationAuthorizationsController.PolicyIndex), new { WebApplicationName = Model.Name })">Policies</a>
+    </li>
+</ul>

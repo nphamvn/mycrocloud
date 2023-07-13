@@ -1,0 +1,166 @@
+@using MicroCloud.Web.Controllers
+@model MicroCloud.Web.Models.WebApplications.WebApplicationIndexViewModel;
+@{
+    ViewData["Title"] = "Your Applications";
+}
+<div class="row justify-content-center">
+    <div class="col-8">
+        <h3>@ViewData["Title"]</h3>
+        <div class="mt-2">
+            <div class="d-flex">
+                <form id="search" class="flex-grow-1 row" action="@Url.Action(nameof(WebApplicationsController.Index))"
+                    method="get">
+                    <div class="d-flex">
+                        <div class="me-auto w-100">
+                            <input id="query" asp-for="Search.Query" class="form-control" type="text" autocomplete="off"
+                                placeholder="Find an application...">
+                        </div>
+                        <div class="dropdown me-2">
+                            <input id="sort" type="hidden" name="Search.Sort" value="">
+                            <button class="btn border dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Sort
+                            </button>
+                            <ul id="sort_dropdown" class="dropdown-menu">
+                                <li data-sort="name"><button type="button" class="dropdown-item">A to Z</button></li>
+                                <li data-sort="createdAt"><button type="button" class="dropdown-item">Recently created</button></li>
+                                <li data-sort="updatedAt"><button type="button" class="dropdown-item">Recently updated</button></li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+                <div>
+                    <a class="btn btn-outline-primary text-decoration-none px-5" asp-action="Create">New</a>
+                </div>
+            </div>
+            <div id="projectList" class="my-3">
+                <ul class="list-group list-group-flush project-list">
+                    @foreach (var app in Model.Applications)
+                    {
+                        <li class="list-group-item">
+                            <div>
+                                <h3 class="text-xl">
+                                    <a class="text-decoration-none me-2"
+                                    href="@Url.Action(nameof(WebApplicationsController.Overview), "WebApplications" ,new {WebApplicationName=app.Name})">@app.Name</a>
+                                </h3>
+                                <p>@app.Description</p>
+                                <div class="d-flex">
+                                    @if (app.UpdatedAt > default(DateTime))
+                                    {
+                                        <div class="text-sm text-gray">
+                                        Updated <span name="updated-at" data-updated-at="@app.UpdatedAt.ToString("yyyy-MM-ddTHH:mm:ss")"></span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        $('#search #query').keyup(delay(function (e) {
+            $(this).closest('form').submit();
+        }, 500));
+
+        $('#search #sort_dropdown li').click(function () {
+            var sort = $(this).data('sort');
+            $('#search #sort').val(sort);
+            $(this).closest('form').submit();
+        });
+    });
+    function delay(fn, ms) {
+        let timer = 0
+        return function (...args) {
+            clearTimeout(timer)
+            timer = setTimeout(fn.bind(this, ...args), ms || 0)
+        }
+    }
+</script>
+<script src="https://unpkg.com/javascript-time-ago@2.5.9/bundle/javascript-time-ago.js"></script>
+<script>
+    TimeAgo.addDefaultLocale({
+        locale: 'en',
+        now: {
+            now: {
+                current: "now",
+                future: "in a moment",
+                past: "just now"
+            }
+        },
+        long: {
+            year: {
+                past: {
+                    one: "{0} year ago",
+                    other: "{0} years ago"
+                },
+                future: {
+                    one: "in {0} year",
+                    other: "in {0} years"
+                }
+            },
+            month: {
+                past: {
+                    one: "{0} month ago",
+                    other: "{0} months ago"
+                },
+                future: {
+                    one: "in {0} month",
+                    other: "in {0} months"
+                }
+            },
+            day: {
+                past: {
+                    one: "{0} day ago",
+                    other: "{0} days ago"
+                },
+                future: {
+                    one: "in {0} day",
+                    other: "in {0} days"
+                }
+            },
+            hour: {
+                past: {
+                    one: "{0} hour ago",
+                    other: "{0} hours ago"
+                },
+                future: {
+                    one: "in {0} hour",
+                    other: "in {0} hours"
+                }
+            },
+            minute: {
+                past: {
+                    one: "{0} minute ago",
+                    other: "{0} minutes ago"
+                },
+                future: {
+                    one: "in {0} minute",
+                    other: "in {0} minutes"
+                }
+            },
+            second: {
+                past: {
+                    one: "{0} second ago",
+                    other: "{0} seconds ago"
+                },
+                future: {
+                    one: "in {0} minute",
+                    other: "in {0} minutes"
+                }
+            }
+        }
+    });
+    $(function () {
+        const timeago = new TimeAgo('en-US');
+        $('.project-list span[name=updated-at]').each(function () {
+            const updatedAt = $(this).data('updated-at');
+            if (updatedAt !== '') {
+                $(this).text(timeago.format(new Date(updatedAt)));
+            }
+        });
+    });
+</script>

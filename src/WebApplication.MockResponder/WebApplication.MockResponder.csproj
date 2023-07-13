@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>preview</LangVersion>
+    <RootNamespace>MockServer.MockResponder</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WebApplication.Domain\WebApplication.Domain.csproj" />
+    <ProjectReference Include="..\WebApplication.Infrastructure\WebApplication.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
