@@ -9,6 +9,6 @@
 		"configurations": []
 	},
 	"settings": {
-		"dotnet.defaultSolution": "src/MockServer.sln"
+		"dotnet.defaultSolution": "src/MycroCloud.sln"
 	}
 }
