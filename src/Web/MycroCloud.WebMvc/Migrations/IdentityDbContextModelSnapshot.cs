@@ -24,7 +24,7 @@ namespace MicroCloud.Web.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("WebAppId")
                         .HasColumnType("text");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -39,7 +39,7 @@ namespace MicroCloud.Web.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
-                    b.HasKey("Id");
+                    b.HasKey("WebAppId");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
@@ -50,11 +50,11 @@ namespace MicroCloud.Web.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("WebAppId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WebAppId"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("text");
@@ -66,7 +66,7 @@ namespace MicroCloud.Web.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("WebAppId");
 
                     b.HasIndex("RoleId");
 
@@ -75,7 +75,7 @@ namespace MicroCloud.Web.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("WebAppId")
                         .HasColumnType("text");
 
                     b.Property<int>("AccessFailedCount")
@@ -125,7 +125,7 @@ namespace MicroCloud.Web.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
-                    b.HasKey("Id");
+                    b.HasKey("WebAppId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -139,11 +139,11 @@ namespace MicroCloud.Web.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("WebAppId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WebAppId"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("text");
@@ -155,7 +155,7 @@ namespace MicroCloud.Web.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("WebAppId");
 
                     b.HasIndex("UserId");
 

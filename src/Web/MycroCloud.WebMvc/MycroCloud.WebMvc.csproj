@@ -1,10 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>preview</LangVersion>
-    <RootNamespace>MicroCloud.Web</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'MockServer.Web' " />
@@ -26,6 +25,7 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.30.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Shared\MycroCloud.Shared.csproj" />
     <ProjectReference Include="..\WebApplication.Infrastructure\WebApplication.Infrastructure.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
@@ -34,24 +34,19 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Areas\WebApplication\Models\" />
-  </ItemGroup>
-  <ItemGroup>
-    <AdditionalFiles Include="Areas\WebApplication\Views\Authentication\SaveJwtBearerScheme.cshtml" />
-    <AdditionalFiles Include="Areas\WebApplication\Views\Authentication\SchemeList.cshtml" />
-    <AdditionalFiles Include="Areas\WebApplication\Views\Authentication\Settings.cshtml" />
-    <AdditionalFiles Include="Areas\WebApplication\Views\Authentication\_NavBar.cshtml" />
-    <AdditionalFiles Include="Areas\WebApplication\Views\Authorization\Policy\Index.cshtml" />
-    <AdditionalFiles Include="Areas\WebApplication\Views\Authorization\Policy\Save.cshtml" />
-    <AdditionalFiles Include="Areas\WebApplication\Views\Authorization\_NavBar.cshtml" />
-    <AdditionalFiles Include="Areas\WebApplication\Views\Routes\Index.cshtml" />
-    <AdditionalFiles Include="Areas\WebApplication\Views\Routes\_Partial\_RouteEditorComponent.cshtml" />
-    <AdditionalFiles Include="Areas\WebApplication\Views\Routes\_Partial\_RouteListComponent.cshtml" />
-    <AdditionalFiles Include="Areas\WebApplication\Views\Routes\_Partial\_ValidationRulesConfigComponent.cshtml" />
+    <Folder Include="Areas\Services\Models\" />
   </ItemGroup>
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Views\WebApplication\Authorization\Policy\Index.cshtml" />
     <_ContentIncludedByDefault Remove="Views\WebApplication\Authorization\Policy\Save.cshtml" />
     <_ContentIncludedByDefault Remove="Views\WebApplication\Authorization\_NavBar.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Services\Views\Routes\_Partial\sample.json" />
+    <_ContentIncludedByDefault Remove="Areas\Services\Views\Routes\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Services\Views\Routes\_Partial\_RouteEditorComponent.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Services\Views\Routes\_Partial\_RouteListComponent.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Services\Views\Routes\_Partial\_ValidationRulesConfigComponent.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Services\Views\Authorization\Policy\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Services\Views\Authorization\Policy\Save.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Services\Views\Authorization\_NavBar.cshtml" />
   </ItemGroup>
 </Project>

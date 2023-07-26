@@ -67,7 +67,7 @@ public class WebApplicationAuthorizationWebService : BaseService, IWebApplicatio
     public async Task<PolicyIndexViewModel> GetPolicyIndexViewModel(int appId)
     {
         var vm = new PolicyIndexViewModel();
-        vm.WebApplication = await _webApplicationWebService.Get(appId);
+        vm.WebAppModel = await _webApplicationWebService.Get(appId);
         var policies = await _webApplicationAuthorizationPolicyRepository.GetAll(appId);
         vm.Policies = _mapper.Map<IEnumerable<PolicyIndexItem>>(policies);
         return vm;

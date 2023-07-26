@@ -5,8 +5,8 @@ namespace MicroCloud.Web.Services;
 
 public interface IWebApplicationRouteService
 {
-    Task<RouteIndexViewModel> GetIndexViewModel(int appId, string searchTerm, string sort);
-    Task<IEnumerable<RouteIndexItem>> GetList(int appId, string searchTerm, string sort);
+    Task<RoutePageModel> GetIndexViewModel(int appId, string searchTerm, string sort);
+    Task<IEnumerable<RouteItem>> GetList(int appId, string searchTerm, string sort);
     Task<bool> ValidateCreate(int appId, RouteSaveModel route, ModelStateDictionary modelState);
     Task<int> Create(int appId, RouteSaveModel route);
     Task<bool> ValidateEdit(int routeId, RouteSaveModel route, ModelStateDictionary modelState);

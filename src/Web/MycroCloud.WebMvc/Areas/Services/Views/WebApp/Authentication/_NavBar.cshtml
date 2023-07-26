@@ -1,0 +1,19 @@
+@using MicroCloud.Web.Controllers
+@model MicroCloud.Web.Models.WebApplications.WebAppModel
+@{
+    var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
+    var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
+}
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link @(action.Equals("Settings", StringComparison.OrdinalIgnoreCase) ?"active":"")" href="@Url.Action(nameof(WebAppAuthenticationsController.Settings), new { WebApplicationName = Model.Name })">Settings</a>
+    </li>
+    <li class="nav-item">
+        @{
+            var schemeAction = action.Equals("Schemes", StringComparison.OrdinalIgnoreCase) ||
+                               action.Equals("newjwtbearerscheme", StringComparison.OrdinalIgnoreCase) ||
+                               action.Equals("newapikeyscheme", StringComparison.OrdinalIgnoreCase);
+        }
+        <a class="nav-link @(schemeAction ?"active":"")" href="@Url.Action(nameof(WebAppAuthenticationsController.Schemes), new { WebApplicationName = Model.Name })">Schemes</a>
+    </li>
+</ul>

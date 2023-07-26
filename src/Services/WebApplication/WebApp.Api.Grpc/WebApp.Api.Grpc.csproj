@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,6 +25,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\WebApp.Domain\WebApp.Domain.csproj" />
+      <ProjectReference Include="..\WebApp.Infrastructure\WebApp.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

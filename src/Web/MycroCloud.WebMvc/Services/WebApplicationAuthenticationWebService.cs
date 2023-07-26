@@ -51,14 +51,14 @@ public class WebApplicationAuthenticationWebService : BaseService, IWebApplicati
         var vm = new AuthenticationIndexModel();
         vm.AuthenticationSchemes = _mapper.Map<IEnumerable<AuthenticationSchemeIndexItem>>(schemes);
         vm.SelectedAuthenticationSchemeIds = vm.AuthenticationSchemes.Where(s => s.Order > 0).Select(s => s.Id).ToList();
-        vm.WebApplication = await _webApplicationWebService.Get(appId);
+        vm.WebAppModel = await _webApplicationWebService.Get(appId);
         return vm;
     }
 
     public async Task<JwtBearerSchemeSaveModel> GetCreateJwtBearerSchemeModel(int appId)
     {
         var vm = new JwtBearerSchemeSaveModel();
-        vm.WebApplication = await _webApplicationWebService.Get(appId);
+        vm.WebAppModel = await _webApplicationWebService.Get(appId);
         return vm;
     }
 
@@ -71,7 +71,7 @@ public class WebApplicationAuthenticationWebService : BaseService, IWebApplicati
     {
         var scheme = await _webApplicationAuthenticationSchemeRepository.Get<JwtBearerAuthenticationOptions>(schemeId);
         var mapped = _mapper.Map<JwtBearerSchemeSaveModel>(scheme);
-        mapped.WebApplication = await _webApplicationWebService.Get(appId);
+        mapped.WebAppModel = await _webApplicationWebService.Get(appId);
         return mapped;
     }
 
@@ -87,7 +87,7 @@ public class WebApplicationAuthenticationWebService : BaseService, IWebApplicati
             Value = s.Id.ToString(),
             Selected = model.SelectedAuthenticationSchemeIds.Contains(s.Id)
         });
-        model.WebApplication = await _webApplicationWebService.Get(appId);
+        model.WebAppModel = await _webApplicationWebService.Get(appId);
         return model;
     }
 }

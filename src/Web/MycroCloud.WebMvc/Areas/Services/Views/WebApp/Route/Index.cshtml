@@ -1,0 +1,157 @@
+@using MicroCloud.Web.Controllers
+@model MicroCloud.Web.Models.WebApplications.Routes.RoutePageModel
+@{
+    ViewData["Title"] = Model.WebAppModel.Name;
+    var routes = Model.Routes.Select(r => new
+    {
+        Id = r.RouteId,
+        Name = r.Name,
+        Match = new
+        {
+            Methods = new List<string> { "GET" },
+            Path = "/foo"
+        }
+    });
+}
+@section Scripts {
+    <environment include="Development">
+        <!-- Development Environment -->
+        <link href="lib/vuetify/vuetify.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css" />
+        <script src="lib/vue/vue.global.min.js"></script>
+        <script src="lib/axios/axios.min.js"></script>
+        <script src="lib/vuetify/vuetify.min.js"></script>
+        <script src="lib/vee-validate/vee-validate.min.js"></script>
+        <script src="lib/monaco-editor/min/vs/loader.min.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <!-- Not Development Environment -->
+        <link href="https://cdn.jsdelivr.net/npm/vuetify@3.3.2/dist/vuetify.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@mdi/font@latest/css/materialdesignicons.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"
+            integrity="sha512-39BSQXI5q1XlvVhLfFRidKG8KM6Tr6VS/XSnNo6N/A0ZXexHCeoUI/s+ulujQy3UREjoLNrMnFat8VI0mMugWA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+            integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vuetify@3.3.2/dist/vuetify.min.js"></script>
+        <script src="https://unpkg.com/vee-validate"></script>
+    </environment>
+}
+<div class="row">
+    <div class="col-2">
+        <partial name="/Views/WebApplications/_SideBar.cshtml" model="Model.WebApplication"></partial>
+    </div>
+    <div id="app" class="col-10">
+        <v-row>
+            <v-col cols="3">
+                <v-btn class="bg-primary" prepend-icon="mdi-plus" block @@click="newRoute">
+                    NEW ROUTE
+                </v-btn>
+                <v-text-field class="mt-2" v-model="searchTerm" @@keyup="fetchRoutes" variant="solo"
+                    placeholder="Search">
+                </v-text-field>
+                <template v-if="routes.length > 0">
+                    <route-list :routes="routes" :route="route" @@click-route="openRoute">
+                    </route-list>
+                </template>
+                <template v-else>
+                    <p>No routes available.Create some routes.</p>
+                </template>
+            </v-col>
+            <v-col>
+                <div v-if="route" class="overflow-y-auto" style="height: 80vh;">
+                    <route-editor :route="route" @@route-save="routeSave"></route-editor>
+                </div>
+            </v-col>
+        </v-row>
+    </div>
+</div>
+<partial name="/Views/WebApplications/Routes/_Partial/_RouteListComponent.cshtml" />
+<partial name="/Views/WebApplications/Routes/_Partial/_RouteEditorComponent.cshtml" />
+<script>
+    const RootComponent = {
+        setup() {
+            const routes = ref([]);
+            const route = ref(null);
+            let sampleRoute = null;
+            const searchTerm = ref('');
+            const newRoute = () => {
+                route.value = { ...sampleRoute, id: undefined };
+            }
+            const openRoute = async id => {
+                const TempRouteDetailUrl = '@Url.Action(nameof(WebAppRoutesController.Get),"WebAppRoutes", new { WebApplicationName = Model.WebAppModel.Name, RouteId = -9999})';
+                const res = await axios.get(TempRouteDetailUrl.replace('-9999', id));
+                route.value = res.data;
+                route.value.id = route.value.id || id;
+            }
+            let timeout = null;
+            const fetchRoutes = () => {
+                const IndexUrl = '@Url.Action(nameof(WebAppRoutesController.List), "WebAppRoutes", new {WebApplicationName = Model.WebAppModel.Name})'
+                clearTimeout(timeout);
+                timeout = setTimeout(async () => {
+                    const params = {
+                        SearchTerm: searchTerm.value
+                    }
+                    const query_params = new URLSearchParams(params);
+                    let reqOptions = {
+                        method: "GET",
+                        url: IndexUrl.trimEnd('?') + '?' + query_params.toString()
+                    }
+                    let response = await axios.request(reqOptions);
+                    routes.value = response.data
+                }, 800);
+            }
+            const routeSave = (route) => {
+                // Check if route already exists in routes array by its id
+                const index = routes.value.findIndex(r => r.id === route.id);
+                if (index === -1) {
+                    // If route doesn't exist in routes array, add it to the beginning
+                    routes.value.unshift(route);
+                } else {
+                    // If route already exists in routes array, replace it with updated route
+                    routes.value.splice(index, 1, route);
+                }
+            }
+            const cancel = () => {
+                route.value = null
+            }
+            const onRouteDeleted = (id) => {
+                const index = routes.value.findIndex(r => r.id === id);
+                if (index > -1) {
+                    routes.value.splice(index, 1)
+                }
+            }
+            onMounted(async () => {
+                routes.value = JSON.parse('@Html.Raw(Json.Serialize(routes))');
+                const response = await axios.get('@Url.Action(nameof(WebAppRoutesController.Sample), "WebAppRoutes", new {WebApplicationName = Model.WebAppModel.Name})')
+                sampleRoute = response.data;
+            })
+            return {
+                newRoute,
+                routes,
+                route,
+                openRoute,
+                routeSave,
+                fetchRoutes,
+                searchTerm,
+                cancel,
+                onRouteDeleted,
+            }
+        }
+    }
+</script>
+<script>
+    window.axios = axios;
+    axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    const { createApp, onMounted, ref, nextTick, computed, watch } = Vue
+    const { createVuetify } = Vuetify
+    const vuetify = createVuetify({
+        ssr: true
+    })
+    const app = createApp(RootComponent);
+    app.component('route-list', RouteListComponent)
+    app.component('route-editor', RouteEditorComponent)
+    app.use(vuetify)
+    app.mount('#app')
+</script>

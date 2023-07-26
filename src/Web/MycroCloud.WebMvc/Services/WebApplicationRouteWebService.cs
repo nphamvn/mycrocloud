@@ -71,11 +71,11 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
         return Task.FromResult(modelState.IsValid);
     }
 
-    public async Task<RouteIndexViewModel> GetIndexViewModel(int appId, string searchTerm, string sort)
+    public async Task<RoutePageModel> GetIndexViewModel(int appId, string searchTerm, string sort)
     {
-        var vm = new RouteIndexViewModel
+        var vm = new RoutePageModel
         {
-            WebApplication = await _webApplicationWebService.Get(appId),
+            WebAppModel = await _webApplicationWebService.Get(appId),
             HttpMethodSelectListItem = HttpProtocolExtensions.CommonHttpMethods
                                     .Select(m => new SelectListItem(m, m)),
             ResponseProviderSelectListItem = new List<SelectListItem>{
@@ -95,7 +95,7 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
         vm.AuthorizationPolicySelectListItem = policies.Select(p => new SelectListItem(p.Name, p.PolicyId.ToString()));
 
         var routes = await _webApplicationRouteRepository.GetByApplicationId(appId, searchTerm, sort);
-        vm.Routes = routes.Select(r => new RouteIndexItem()
+        vm.Routes = routes.Select(r => new RouteItem()
         {
             RouteId = r.RouteId,
             Name = r.Name,
@@ -104,11 +104,11 @@ public class WebApplicationRouteService : BaseService, IWebApplicationRouteServi
         return vm;
     }
 
-    public async Task<IEnumerable<RouteIndexItem>> GetList(int appId, string searchTerm, string sort)
+    public async Task<IEnumerable<RouteItem>> GetList(int appId, string searchTerm, string sort)
     {
         var routes = await _webApplicationRouteRepository.GetByApplicationId(appId, searchTerm, sort);
         
-        return routes.Select(r => new RouteIndexItem()
+        return routes.Select(r => new RouteItem()
         {
             RouteId = r.RouteId,
             Name = r.Name,
