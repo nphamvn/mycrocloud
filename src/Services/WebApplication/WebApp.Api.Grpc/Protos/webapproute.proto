@@ -1,0 +1,16 @@
+
+syntax = "proto3";
+
+option csharp_namespace = "WebApp.Api.Grpc";
+
+package webapp;
+
+service WebAppRoute {
+  rpc Create(CreateRouteRequest) returns (CreateRouteReply);
+}
+message CreateRouteRequest {
+  string name = 1;
+}
+message CreateRouteReply {
+
+}
