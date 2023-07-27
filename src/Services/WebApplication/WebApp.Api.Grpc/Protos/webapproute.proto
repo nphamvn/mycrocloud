@@ -6,11 +6,18 @@ option csharp_namespace = "WebApp.Api.Grpc";
 package webapp;
 
 service WebAppRoute {
-  rpc Create(CreateRouteRequest) returns (CreateRouteReply);
+  rpc CreateRoute(CreateRouteRequest) returns (CreateRouteResponse);
+  rpc EdiRoute(EditRouteRequest) returns (EditRouteResponse);
 }
 message CreateRouteRequest {
   string name = 1;
 }
-message CreateRouteReply {
+message CreateRouteResponse {
+
+}
+message EditRouteRequest {
+  string name = 1;
+}
+message EditRouteResponse {
 
 }

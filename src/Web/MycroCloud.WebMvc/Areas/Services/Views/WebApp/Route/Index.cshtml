@@ -1,5 +1,5 @@
 @using MicroCloud.Web.Controllers
-@model MicroCloud.Web.Models.WebApplications.Routes.RoutePageModel
+@model MycroCloud.WebMvc.Areas.Services.Models.WebApp.RouteIndexViewModel
 @{
     ViewData["Title"] = Model.WebAppModel.Name;
     var routes = Model.Routes.Select(r => new
@@ -40,7 +40,7 @@
 }
 <div class="row">
     <div class="col-2">
-        <partial name="/Views/WebApplications/_SideBar.cshtml" model="Model.WebApplication"></partial>
+        <partial name="/Views/WebApplications/_SideBar.cshtml" model="Model.WebApplication" />
     </div>
     <div id="app" class="col-10">
         <v-row>

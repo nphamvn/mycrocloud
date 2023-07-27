@@ -1,10 +1,9 @@
-namespace WebApp.Domain.Shared
+namespace WebApp.Domain.Shared;
+public enum TemplateEngine
 {
-    public enum TemplateEngine {
-        None,
-        JavaScript, 
-        Handlebars,
-        Mustache,
-        Ejs
-    }
+    None,
+    JavaScript,
+    Handlebars,
+    Mustache,
+    Ejs
 }

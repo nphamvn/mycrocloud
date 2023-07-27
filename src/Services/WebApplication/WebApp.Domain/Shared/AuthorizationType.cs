@@ -1,9 +1,11 @@
+using MycroCloud.Shared;
+
 namespace WebApp.Domain.Shared;
-public class AuthorizationType : Enumeration
+public class RouteAuthorizationType : Enumeration
 {
-    public static AuthorizationType AllowAnonymous = new AuthorizationType(0, "AllowAnonymous");
-    public static AuthorizationType Authorized = new AuthorizationType(1, "Authorized");
-    protected AuthorizationType(int id, string name) : base(id, name)
+    public static RouteAuthorizationType AllowAnonymous = new (0, "AllowAnonymous");
+    public static RouteAuthorizationType Authorized = new (1, "Authorized");
+    protected RouteAuthorizationType(int id, string name) : base(id, name)
     {
     }
 }

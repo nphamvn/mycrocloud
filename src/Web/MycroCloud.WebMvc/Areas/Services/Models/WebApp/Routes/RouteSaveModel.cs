@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using MycroCloud.WebMvc.Areas.Services.Models.WebApp.Routes.Shared;
 
 namespace MycroCloud.WebMvc.Areas.Services.Models.WebApp
 {
@@ -9,43 +10,53 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApp
         [StringLength(100, ErrorMessage = "Name length can't be more than 100.")]
         public string Name { get; set; }
         public string Description { get; set; }
-        public RouteMatchViewModel Match { get; set; }
-        public AuthorizationViewModel Authorization { get; set; }
-        public RouteValidationViewModel Validation { get; set; }
-        public RouteResponseViewModel Response { get; set; }
+        public RouteMatchSaveModel Match { get; set; }
+        public RouteAuthorizationSaveModel Authorization { get; set; }
+        public RouteValidationSaveModel Validation { get; set; }
+        public RouteResponseSaveModel Response { get; set; }
     }
 
-    public class RouteResponseViewModel
+    public class RouteMatchSaveModel
     {
-    }
+        public int? Order { get; set; }
 
-    public class RouteMatchViewModel
-    {
-        public int Order { get; set; }
-        public ICollection<string> Methods { get; set; }
+        public List<string> Methods { get; set; }
+
         [Required]
-        [StringLength(50, ErrorMessage = "Name length can't be more than 8.")]
+        [StringLength(50, ErrorMessage = "Name length can't be more than 50.")]
         public string Path { get; set; }
     }
-    public class RouteValidationViewModel {
-        public IList<QueryParamerterValidationRuleViewModel> QueryParamerters { get; set; }
-        public IList<HeaderValidationRuleViewModel> Headers { get; set; }
-        public IList<BodyFieldValidationRuleViewModel> Body { get; set; }
+    public class RouteAuthorizationSaveModel
+    {
+        [Required]
+        public RouteAuthorizationType Type { get; set; }
+        public IList<int> PolicyIds { get; set; }
+        public IList<RouteAuthorizationClaimSaveModel> Claims { get; set; }
     }
 
-    public class BodyFieldValidationRuleViewModel
+    public class RouteValidationSaveModel {
+        public List<RouteValidationQueryRuleSaveModel> QueryParamerters { get; set; }
+        public List<RouteValidationHeaderRuleSaveModel> Headers { get; set; }
+        public List<RouteValidationBodyFieldRuleSaveModel> Body { get; set; }
+    }
+
+    public class RouteResponseSaveModel
     {
     }
 
-    public class HeaderValidationRuleViewModel
+    public class RouteValidationBodyFieldRuleSaveModel
     {
     }
 
-    public class QueryParamerterValidationRuleViewModel
+    public class RouteValidationHeaderRuleSaveModel
     {
     }
 
-    public class ClaimViewModel {
+    public class RouteValidationQueryRuleSaveModel
+    {
+    }
+
+    public class RouteAuthorizationClaimSaveModel {
         [Required]
         public string Name { get; set; }
         [Required]

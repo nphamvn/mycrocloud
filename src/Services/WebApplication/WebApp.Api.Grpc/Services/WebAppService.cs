@@ -1,20 +1,39 @@
 using Grpc.Core;
+using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
 
 namespace WebApp.Api.Grpc.Services;
 
-public class WebAppService : WebApp.WebAppBase
+public class WebAppService(ILogger<WebAppService> logger
+        , IWebAppRepository webAppRepository) : WebApp.WebAppBase
 {
-    private readonly ILogger<WebAppService> _logger;
+    private readonly ILogger<WebAppService> _logger = logger;
+    private readonly IWebAppRepository _webAppRepository = webAppRepository;
 
-    public WebAppService(ILogger<WebAppService> logger
-        , IWebAppRepository webAppRepository)
+    public override async Task<CreateWebAppResponse> CreateWebApp(CreateWebAppRequest request, ServerCallContext context)
     {
-        _logger = logger;
+        //var userId = request.UserId;
+        var entity = new WebAppEntity() {
+            //request.
+        };
+        return await base.CreateWebApp(request, context);
     }
-
-    public override Task<CreateWebAppReply> CreateWebApp(CreateWebAppRequest request, ServerCallContext context)
+    public override async Task<RenameWebAppResponse> RenameWebApp(RenameWebAppRequest request, ServerCallContext context)
     {
-        return base.CreateWebApp(request, context);
+        return await base.RenameWebApp(request, context);
+    }
+    private WebAppEntity CreateWebAppRequestToWebAppEntity(CreateWebAppRequest request)
+    {
+        return new()
+        {
+
+        };
+    }
+    private WebAppEntity RenameWebAppRequestToWebAppEntity(RenameWebAppRequest request)
+    {
+        return new()
+        {
+
+        };
     }
 }

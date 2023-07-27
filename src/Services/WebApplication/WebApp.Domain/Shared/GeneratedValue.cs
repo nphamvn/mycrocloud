@@ -1,11 +1,10 @@
-namespace WebApp.Domain.Shared
+namespace WebApp.Domain.Shared;
+public class GeneratedValue
 {
-    public class GeneratedValue
-    {
-        public TemplateRenderedValue RenderedValue { get; set; }
-    }
-    public enum GenerationType {
-        None,
-        JavaScriptBasedTemplate
-    }
+    public TemplateRenderedValue RenderedValue { get; set; }
+}
+public enum GenerationType
+{
+    None,
+    JavaScriptBasedTemplate
 }

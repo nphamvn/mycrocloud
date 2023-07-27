@@ -1,11 +1,10 @@
 using System.Text.Json.Serialization;
 
-namespace WebApp.Domain.Shared
+namespace WebApp.Domain.Shared;
+public class TemplateRenderedValue
 {
-    public class TemplateRenderedValue {
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public TemplateEngine Engine { get; set; }
-        public string Template { get; set; }
-        public string Format { get; set; }
-    }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public TemplateEngine Engine { get; set; }
+    public string Template { get; set; }
+    public string Format { get; set; }
 }

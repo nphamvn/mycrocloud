@@ -1,9 +1,9 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace MicroCloud.Web.Models.WebApplications.Authentications;
+namespace MycroCloud.WebMvc.Areas.Services.Models.WebApp;
 
-public class AuthenticationSchemeViewModel
+public class AuthenticationSchemeSaveViewModel
 {
     [DisplayName("Name")]
     [Required]

@@ -1,5 +1,5 @@
 using WebApp.Domain.Entities;
-using WebApp.Domain.WebApplication.Shared;
+using WebApp.Domain.Shared;
 
 namespace WebApp.Domain.Repositories;
 

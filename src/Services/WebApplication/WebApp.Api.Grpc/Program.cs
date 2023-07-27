@@ -9,4 +9,5 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.MapGrpcService<WebAppService>();
+app.MapGrpcService<WebAppRouteService>();
 app.Run();
