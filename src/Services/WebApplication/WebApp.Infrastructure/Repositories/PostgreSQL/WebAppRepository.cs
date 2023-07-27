@@ -1,19 +1,13 @@
 using Dapper;
 using Microsoft.Extensions.Options;
+using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
-using WebApp.Domain.Settings;
-using WebApp.Domain.WebApplication.Entities;
-using WebApp.Domain.WebApplication.Repositories;
 using Npgsql;
 
 namespace WebApp.Infrastructure.Repositories.PostgreSql;
-public class WebAppRepository : BaseRepository, IWebAppRepository
+public class WebAppRepository(IOptions<PostgresDatabaseOptions> databaseOptions) : BaseRepository(databaseOptions), IWebAppRepository
 {
-    public WebAppRepository(IOptions<PostgresSettings> databaseOptions) : base(databaseOptions)
-    {
-    }
-
-    public async Task Add(string userId, WebApp.Domain.WebApplication.Entities.WebAppEntity app)
+    public async Task Add(int userId, WebAppEntity app)
     {
         var query =
         """
@@ -44,7 +38,7 @@ public class WebAppRepository : BaseRepository, IWebAppRepository
         });
     }
 
-    public async Task<WebApp.Domain.WebApplication.Entities.WebAppEntity> FindByUserId(string userId, string name)
+    public async Task<WebAppEntity> FindByUserId(int userId, string name)
     {
         var query =
                 """
@@ -63,14 +57,14 @@ public class WebAppRepository : BaseRepository, IWebAppRepository
                     ;             
                 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        return await connection.QuerySingleOrDefaultAsync<WebApp.Domain.WebApplication.Entities.WebAppEntity>(query, new
+        return await connection.QuerySingleOrDefaultAsync<WebAppEntity>(query, new
         {
             user_id = userId,
             name = name
         });
     }
 
-    public async Task<WebApp.Domain.WebApplication.Entities.WebAppEntity> Get(int id)
+    public async Task<WebAppEntity> Get(int id)
     {
         var query =
                 """
@@ -88,13 +82,13 @@ public class WebAppRepository : BaseRepository, IWebAppRepository
                     web_application_id = @web_application_id;
                 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        return await connection.QuerySingleOrDefaultAsync<WebApp.Domain.WebApplication.Entities.WebAppEntity>(query, new
+        return await connection.QuerySingleOrDefaultAsync<WebAppEntity>(query, new
         {
             web_application_id = id
         });
     }
 
-    public async Task<WebApp.Domain.WebApplication.Entities.WebAppEntity> FindByUsername(string username, string name)
+    public async Task<WebAppEntity> FindByUsername(string username, string name)
     {
         var query =
                 """
@@ -117,14 +111,14 @@ public class WebAppRepository : BaseRepository, IWebAppRepository
                 """;   
         using var connection = new NpgsqlConnection(ConnectionString);
         SqlMapper.AddTypeHandler(new JsonTypeHandler<List<string>>());
-        return await connection.QuerySingleOrDefaultAsync<WebApp.Domain.WebApplication.Entities.WebAppEntity>(query, new
+        return await connection.QuerySingleOrDefaultAsync<WebAppEntity>(query, new
         {
             Username = username,
             Name = name
         });
     }
 
-    public async Task<IEnumerable<WebApp.Domain.WebApplication.Entities.WebAppEntity>> Search(string userId, string query, string sort)
+    public async Task<IEnumerable<WebAppEntity>> Search(string userId, string query, string sort)
     {
         var sql =
                 """
@@ -159,13 +153,13 @@ public class WebAppRepository : BaseRepository, IWebAppRepository
         }
 
         using var connection = new NpgsqlConnection(ConnectionString);
-        return await connection.QueryAsync<WebApp.Domain.WebApplication.Entities.WebAppEntity>(sql, new
+        return await connection.QueryAsync<WebAppEntity>(sql, new
         {
             user_id = userId,
             query = "%" + query + "%"
         });
     }
-    public async Task Update(int id, WebApp.Domain.WebApplication.Entities.WebAppEntity app)
+    public async Task Update(int id, WebAppEntity app)
     {
         var query =
         """

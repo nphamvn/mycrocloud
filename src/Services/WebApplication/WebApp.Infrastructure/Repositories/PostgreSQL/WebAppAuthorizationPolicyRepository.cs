@@ -1,19 +1,14 @@
 using Dapper;
 using Npgsql;
 using WebApp.Domain.Repositories;
-using WebApp.Domain.Settings;
-using WebApp.Domain.WebApplication.Entities;
 using Microsoft.Extensions.Options;
+using WebApp.Domain.Entities;
 
 namespace WebApp.Infrastructure.Repositories.PostgreSql;
 
-public class WebAppAuthorizationPolicyRepository : BaseRepository, IWebAppAuthorizationPolicyRepository
+public class WebAppAuthorizationPolicyRepository(IOptions<PostgresDatabaseOptions> databaseOptions) : BaseRepository(databaseOptions), IWebAppAuthorizationPolicyRepository
 {
-    public WebAppAuthorizationPolicyRepository(IOptions<PostgresSettings> databaseOptions) : base(databaseOptions)
-    {
-    }
-
-    public async Task Add(int appId, PolicyEntity policyEntity)
+    public async Task Add(int appId, AuthorizationPolicyEntity AuthorizationPolicyEntity)
     {
         var query =
                 """
@@ -36,9 +31,9 @@ public class WebAppAuthorizationPolicyRepository : BaseRepository, IWebAppAuthor
         await connection.ExecuteAsync(query, new
         {
             web_application_id = appId,
-            name = policyEntity.Name,
-            description = policyEntity.Description,
-            claims = policyEntity.Claims
+            name = AuthorizationPolicyEntity.Name,
+            description = AuthorizationPolicyEntity.Description,
+            claims = AuthorizationPolicyEntity.Claims
         });
     }
 
@@ -58,7 +53,7 @@ WHERE
         });
     }
 
-    public async Task<PolicyEntity> Get(int policyId)
+    public async Task<AuthorizationPolicyEntity> Get(int policyId)
     {
         var query =
 """
@@ -75,13 +70,13 @@ WHERE
 """;
         using var connection = new NpgsqlConnection(ConnectionString);
         SqlMapper.AddTypeHandler(new JsonTypeHandler<Claims>());
-        return await connection.QuerySingleOrDefaultAsync<PolicyEntity>(query, new
+        return await connection.QuerySingleOrDefaultAsync<AuthorizationPolicyEntity>(query, new
         {
             policy_id = policyId
         });
     }
 
-    public async Task<IEnumerable<PolicyEntity>> GetAll(int appId)
+    public async Task<IEnumerable<AuthorizationPolicyEntity>> GetAll(int appId)
     {
         var query =
 """
@@ -98,13 +93,13 @@ WHERE
 """;
         using var connection = new NpgsqlConnection(ConnectionString);
         SqlMapper.AddTypeHandler(new JsonTypeHandler<Claims>());
-        return await connection.QueryAsync<PolicyEntity>(query, new
+        return await connection.QueryAsync<AuthorizationPolicyEntity>(query, new
         {
             web_application_id = appId
         });
     }
 
-    public async Task Update(int id, PolicyEntity policyEntity)
+    public async Task Update(int id, AuthorizationPolicyEntity AuthorizationPolicyEntity)
     {
         var query =
 """
@@ -122,9 +117,9 @@ WHERE
         await connection.ExecuteAsync(query, new
         {
             policy_id = id,
-            name = policyEntity.Name,
-            description = policyEntity.Description,
-            claims = policyEntity.Claims
+            name = AuthorizationPolicyEntity.Name,
+            description = AuthorizationPolicyEntity.Description,
+            claims = AuthorizationPolicyEntity.Claims
         });
     }
 }

@@ -3,20 +3,15 @@ using System.Text.Json;
 using Dapper;
 using Npgsql;
 using WebApp.Domain.Repositories;
-using WebApp.Domain.Settings;
-using WebApp.Domain.WebApplication.Entities;
 using Microsoft.Extensions.Options;
-using WebApp.Domain.WebApplication.Shared;
+using WebApp.Domain.Entities;
+using WebApp.Domain.Shared;
 
 namespace WebApp.Infrastructure.Repositories.PostgreSql;
 
-public class WebAppAuthenticationSchemeRepository : BaseRepository, IWebAppAuthenticationSchemeRepository
+public class WebAppAuthenticationSchemeRepository(IOptions<PostgresDatabaseOptions> databaseOptions) : BaseRepository(databaseOptions), IWebAppAuthenticationSchemeRepository
 {
-    public WebAppAuthenticationSchemeRepository(IOptions<PostgresSettings> databaseOptions) : base(databaseOptions)
-    {
-    }
-
-    public async Task Add(int appId, AuthenticationScheme auth)
+    public async Task Add(int appId, AuthenticationSchemeEntity auth)
     {
         var query =
 """
@@ -50,7 +45,7 @@ INSERT INTO
         });
     }
 
-    public async Task<IEnumerable<AuthenticationScheme>> GetAll(int appId)
+    public async Task<IEnumerable<AuthenticationSchemeEntity>> GetAll(int appId)
     {
         var query =
 """
@@ -66,13 +61,13 @@ WHERE
     web_application_id = @web_application_id
 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        return await connection.QueryAsync<AuthenticationScheme>(query, new
+        return await connection.QueryAsync<AuthenticationSchemeEntity>(query, new
         {
             web_application_id = appId
         });
     }
 
-    public Task<AuthenticationScheme> Get(int schemeId, AuthenticationSchemeType type)
+    public Task<AuthenticationSchemeEntity> Get(int schemeId, AuthenticationSchemeType type)
     {
         var query =
                 """
@@ -90,13 +85,13 @@ WHERE
                 """;
         using var connection = new NpgsqlConnection(ConnectionString);
         SqlMapper.AddTypeHandler(new AuthenticationSchemeOptionsJsonTypeHandler(type));
-        return connection.QuerySingleOrDefaultAsync<AuthenticationScheme>(query, new
+        return connection.QuerySingleOrDefaultAsync<AuthenticationSchemeEntity>(query, new
         {
             Id = schemeId
         });
     }
 
-    public async Task Update(int schemeId, AuthenticationScheme scheme)
+    public async Task Update(int schemeId, AuthenticationSchemeEntity scheme)
     {
         var query =
                 """
@@ -173,7 +168,7 @@ WHERE
         }
     }
 
-    public Task<AuthenticationScheme> Get<TAuthOptions>(int id) where TAuthOptions : AuthenticationSchemeOptions
+    public Task<AuthenticationSchemeEntity> Get<TAuthOptions>(int id) where TAuthOptions : AuthenticationSchemeOptions
     {
         Type type = typeof(TAuthOptions);
         if (typeof(JwtBearerAuthenticationOptions).IsEquivalentTo(type))
@@ -198,13 +193,13 @@ WHERE
                     Id = @Id
                 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        return connection.QuerySingleOrDefaultAsync<AuthenticationScheme>(query, new
+        return connection.QuerySingleOrDefaultAsync<AuthenticationSchemeEntity>(query, new
         {
             Id = id
         });
     }
 
-    public async Task<AuthenticationScheme> Get(int id)
+    public async Task<AuthenticationSchemeEntity> Get(int id)
     {
         using var connection = new NpgsqlConnection(ConnectionString);
         var type = await connection.QuerySingleOrDefaultAsync<AuthenticationSchemeType>("SELECT Type FROM WebApplicationAuthenticationScheme WHERE Id = @Id", new { Id = id });
@@ -221,21 +216,17 @@ WHERE
                     Id = @Id
                 """;
         SqlMapper.AddTypeHandler(new AuthenticationSchemeOptionsJsonTypeHandler(type));
-        return await connection.QuerySingleOrDefaultAsync<AuthenticationScheme>(query, new
+        return await connection.QuerySingleOrDefaultAsync<AuthenticationSchemeEntity>(query, new
         {
             Id = id
         });
     }
 }
 
-public class AuthenticationSchemeOptionsJsonTypeHandler : SqlMapper.TypeHandler<AuthenticationSchemeOptions>
+public class AuthenticationSchemeOptionsJsonTypeHandler(AuthenticationSchemeType type) : SqlMapper.TypeHandler<AuthenticationSchemeOptions>
 {
-    private readonly AuthenticationSchemeType _type;
-    
-    public AuthenticationSchemeOptionsJsonTypeHandler(AuthenticationSchemeType type)
-    {
-        _type = type;
-    }
+    private readonly AuthenticationSchemeType _type = type;
+
     public override AuthenticationSchemeOptions Parse(object value)
     {
         var stringValue = value.ToString();

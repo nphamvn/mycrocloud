@@ -12,28 +12,19 @@ public class WebAppService(ILogger<WebAppService> logger
 
     public override async Task<CreateWebAppResponse> CreateWebApp(CreateWebAppRequest request, ServerCallContext context)
     {
-        //var userId = request.UserId;
-        var entity = new WebAppEntity() {
-            //request.
-        };
-        return await base.CreateWebApp(request, context);
+        var existingApp = await _webAppRepository.FindByUserId(request.UserId, request.Name);
+        if (existingApp != null)
+        {
+            return new();
+        }
+        await _webAppRepository.Add(request.UserId, new()
+        {
+            Name = request.Name,
+        });
+        return new();
     }
     public override async Task<RenameWebAppResponse> RenameWebApp(RenameWebAppRequest request, ServerCallContext context)
     {
         return await base.RenameWebApp(request, context);
-    }
-    private WebAppEntity CreateWebAppRequestToWebAppEntity(CreateWebAppRequest request)
-    {
-        return new()
-        {
-
-        };
-    }
-    private WebAppEntity RenameWebAppRequestToWebAppEntity(RenameWebAppRequest request)
-    {
-        return new()
-        {
-
-        };
     }
 }

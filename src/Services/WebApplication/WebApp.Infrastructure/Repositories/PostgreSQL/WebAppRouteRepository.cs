@@ -1,18 +1,13 @@
 using Dapper;
 using Microsoft.Extensions.Options;
 using Npgsql;
+using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
-using WebApp.Domain.Settings;
-using WebApp.Domain.WebApplication.Entities;
 
 namespace WebApp.Infrastructure.Repositories.PostgreSql;
 
-public class WebAppRouteRepository : BaseRepository, IWebAppRouteRepository
+public class WebAppRouteRepository(IOptions<PostgresDatabaseOptions> databaseOptions) : BaseRepository(databaseOptions), IWebAppRouteRepository
 {
-    public WebAppRouteRepository(IOptions<PostgresSettings> databaseOptions) : base(databaseOptions)
-    {
-    }
-
     public async Task<int> Create(int appId, RouteEntity route)
     {
         const string query = """
@@ -90,7 +85,7 @@ WHERE
             path = path
         });
     }
-    
+
     public async Task<RouteEntity> Get(int id)
     {
         const string query = """
@@ -110,7 +105,7 @@ WHERE
 """;
         await using var connection = new NpgsqlConnection(ConnectionString);
         SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteMatch>());
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<Authorization>());
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteAuthorization>());
         SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteValidation>());
         SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteResponse>());
         return await connection.QuerySingleOrDefaultAsync<RouteEntity>(query, new
@@ -154,7 +149,7 @@ WHERE
         return await connection.QueryAsync<RouteEntity>(query, new
         {
             web_application_id = appId,
-            query =  "%" + searchTerm + "%"
+            query = "%" + searchTerm + "%"
         });
     }
 

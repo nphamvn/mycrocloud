@@ -1,6 +1,8 @@
+using WebApp.Infrastructure.Shared;
+
 namespace WebApp.Infrastructure.Repositories.PostgreSql;
 
-public class DatabaseOptions
+public class PostgresDatabaseOptions : DatabaseOptions
 {
-    public string ConnectionString { get; set; }
+
 }

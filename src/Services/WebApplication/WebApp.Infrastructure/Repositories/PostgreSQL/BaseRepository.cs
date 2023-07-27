@@ -1,12 +1,8 @@
 using Microsoft.Extensions.Options;
 
 namespace WebApp.Infrastructure.Repositories.PostgreSql;
-public class BaseRepository
+public class BaseRepository(IOptions<PostgresDatabaseOptions> databaseOptions)
 {
-    private readonly DatabaseOptions _options;
+    private readonly PostgresDatabaseOptions _options = databaseOptions.Value;
     public string ConnectionString => _options.ConnectionString;
-    public BaseRepository(IOptions<DatabaseOptions> databaseOptions)
-    {
-        _options = databaseOptions.Value;
-    }
 }
