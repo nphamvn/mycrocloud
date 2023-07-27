@@ -1,13 +1,10 @@
-@model MicroCloud.Web.Models.WebApplications.Authentications.JwtBearer.JwtBearerSchemeSaveModel
-@{
-    var project = Model.WebAppModel;
-}
+@model MycroCloud.WebMvc.Areas.Services.Models.WebApps.JwtBearerAuthenticationSchemeSaveViewModel
 <div class="row">
     <div class="col-2">
-        <partial name="/Views/WebApplications/_SideBar.cshtml" model="Model.WebApplication" />
+        <partial name="/Views/WebApplications/_SideBar.cshtml" viewModel="Model.WebApplication" />
     </div>
     <div class="col-10">
-        <partial name="/Views/WebApplications/Authentications/_NavBar.cshtml" model="Model.WebApplication" />
+        <partial name="/Views/WebApplications/Authentications/_NavBar.cshtml" viewModel="Model.WebApplication" />
         <div class="mt-2">
             <h5>Create new JwtBearer Scheme</h5>
             <form method="post">

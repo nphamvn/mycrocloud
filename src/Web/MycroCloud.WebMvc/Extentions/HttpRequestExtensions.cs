@@ -1,4 +1,4 @@
-namespace MicroCloud.Web.Extentions;
+namespace MycroCloud.WebMvc.Extentions;
 
 public static class HttpRequestExtensions
 {
@@ -7,10 +7,7 @@ public static class HttpRequestExtensions
 
     public static bool IsAjaxRequest(this HttpRequest request)
     {
-        if (request == null)
-        {
-            throw new ArgumentNullException("request");
-        }
+        ArgumentNullException.ThrowIfNull(request);
 
         if (request.Headers != null)
         {

@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace MicroCloud.Web.Common
+﻿namespace MycroCloud.WebMvc.Shared
 {
     /// <summary>
     /// Paged list
     /// </summary>
     /// <typeparam name="T">T</typeparam>
     [Serializable]
-    public partial class PagedList<T> : List<T>, IPagedList<T>
+    public class PagedList<T> : List<T>, IPagedList<T>
     {
         /// <summary>
         /// Ctor

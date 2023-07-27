@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
-namespace MicroCloud.Web.TagHelpers
+namespace MycroCloud.WebMvc.TagHelpers
 {
     [HtmlTargetElement("img", Attributes = "gravatar-email")]
     public class GravatarTagHelper : TagHelper

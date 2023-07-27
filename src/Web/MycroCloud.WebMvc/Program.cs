@@ -1,14 +1,8 @@
-using System.Data;
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
-using WebApplication.Domain.WebApplications;
-using MicroCloud.Web.Extentions;
-using MicroCloud.Web.Models.WebApplications.Routes;
+using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
+using MycroCloud.WebMvc.Extentions;
 using Serilog;
-using WebApplication = Microsoft.AspNetCore.Builder.WebApplication;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -75,21 +69,11 @@ builder.Services
         options.Scope.Add("email");
     })
     ;
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("ReadWebApplication", policy =>
-    {
-        policy.RequireClaim("scopes", "webapp:read");
-    });
-    options.AddPolicy("WriteWebApplication", policy =>
-    {
-        policy.RequireClaim("scopes", "webapp:write");
-    });
-    options.AddPolicy("DeleteWebApplication", policy =>
-    {
-        policy.RequireClaim("scopes", "webapp:delete");
-    });
-});
+
+// builder.Services.AddGrpcClient<WebApp.Grpc.>(o =>
+// {
+    
+// });
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -1,8 +1,6 @@
-﻿using System.Diagnostics;
-using MicroCloud.Web.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
-namespace MicroCloud.Web.Controllers;
+namespace MycroCloud.WebMvc.Controllers;
 
 public class HomeController : Controller
 {
@@ -22,17 +20,5 @@ public class HomeController : Controller
     {
         _logger.LogInformation(nameof(Privacy));
         return View();
-    }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
-
-    [HttpPost("logout")]
-    public async Task<IActionResult> Logout()
-    {
-        return SignOut("Cookies", "oidc");
     }
 }

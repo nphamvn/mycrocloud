@@ -1,21 +1,14 @@
-namespace MicroCloud.Web.Common;
+namespace MycroCloud.WeMvc;
 
 public class Constants
 {
     public const int TemporaryId = -9999;
     public class RouteName
     {
-        public const string WebApplicationId = "WebAppId";
-        public const string WebApplicationName = "WebApplicationName";
-        public const string RouteId = "RouteId";
-        public const string DatabaseId = "DatabaseId";
-        public const string DatabaseName = "DatabaseName";
-        public const string PolicyId = "PolicyId";
-    }
-    public class RouteTemplate
-    {
-        public const string ProjectsController = "[controller]";
-        public const string ProjectsController_View = "{ProjectName}";
-        public const string ProjectsController_Create = "create";
+        public const string WebAppId = "WebAppId";
+        public const string WebAppName = "WebAppName";
+        public const string WebAppRouteId = "RouteId";
+        public const string WebAppAuthenticationSchemeId = "SchemeId";
+        public const string WebAppAuthorizationPolicyId = "PolicyId";
     }
 }

@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace MycroCloud.Web.Controllers;
+namespace MycroCloud.WebMvc.Controllers;
 
 [Controller]
 [Route("[controller]")]
 public class BaseController : Controller
 {
-
 }

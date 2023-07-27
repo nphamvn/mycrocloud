@@ -1,7 +1,7 @@
-@using MicroCloud.Web.Controllers
-@model MycroCloud.WebMvc.Areas.Services.Models.WebApp.RouteIndexViewModel
+@using MycroCloud.WebMvc.Areas.Services.Controllers
+@model MycroCloud.WebMvc.Areas.Services.Models.WebApps.RouteIndexViewModel
 @{
-    ViewData["Title"] = Model.WebAppModel.Name;
+    ViewData["Title"] = Model.WebApp.Name;
     var routes = Model.Routes.Select(r => new
     {
         Id = r.RouteId,
@@ -40,7 +40,7 @@
 }
 <div class="row">
     <div class="col-2">
-        <partial name="/Views/WebApplications/_SideBar.cshtml" model="Model.WebApplication" />
+        <partial name="/Views/WebApplications/_SideBar.cshtml" viewModel="Model.WebApplication" />
     </div>
     <div id="app" class="col-10">
         <v-row>
@@ -48,7 +48,7 @@
                 <v-btn class="bg-primary" prepend-icon="mdi-plus" block @@click="newRoute">
                     NEW ROUTE
                 </v-btn>
-                <v-text-field class="mt-2" v-model="searchTerm" @@keyup="fetchRoutes" variant="solo"
+                <v-text-field class="mt-2" v-viewModel="searchTerm" @@keyup="fetchRoutes" variant="solo"
                     placeholder="Search">
                 </v-text-field>
                 <template v-if="routes.length > 0">
@@ -80,14 +80,14 @@
                 route.value = { ...sampleRoute, id: undefined };
             }
             const openRoute = async id => {
-                const TempRouteDetailUrl = '@Url.Action(nameof(WebAppRoutesController.Get),"WebAppRoutes", new { WebApplicationName = Model.WebAppModel.Name, RouteId = -9999})';
+                const TempRouteDetailUrl = '@Url.Action(nameof(WebAppRoutesController.Get),"WebAppRoutes", new { WebApplicationName = Model.WebApp.Name, RouteId = -9999})';
                 const res = await axios.get(TempRouteDetailUrl.replace('-9999', id));
                 route.value = res.data;
                 route.value.id = route.value.id || id;
             }
             let timeout = null;
             const fetchRoutes = () => {
-                const IndexUrl = '@Url.Action(nameof(WebAppRoutesController.List), "WebAppRoutes", new {WebApplicationName = Model.WebAppModel.Name})'
+                const IndexUrl = '@Url.Action(nameof(WebAppRoutesController.List), "WebAppRoutes", new {WebApplicationName = Model.WebApp.Name})'
                 clearTimeout(timeout);
                 timeout = setTimeout(async () => {
                     const params = {
@@ -124,7 +124,7 @@
             }
             onMounted(async () => {
                 routes.value = JSON.parse('@Html.Raw(Json.Serialize(routes))');
-                const response = await axios.get('@Url.Action(nameof(WebAppRoutesController.Sample), "WebAppRoutes", new {WebApplicationName = Model.WebAppModel.Name})')
+                const response = await axios.get('@Url.Action(nameof(WebAppRoutesController.Sample), "WebAppRoutes", new {WebApplicationName = Model.WebApp.Name})')
                 sampleRoute = response.data;
             })
             return {

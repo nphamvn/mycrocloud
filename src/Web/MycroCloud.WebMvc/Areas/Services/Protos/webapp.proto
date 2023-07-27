@@ -1,0 +1,24 @@
+
+syntax = "proto3";
+
+option csharp_namespace = "WebApp.Api.Grpc";
+
+package webapp;
+
+service WebApp {
+  rpc CreateWebApp(CreateWebAppRequest) returns (CreateWebAppResponse);
+  rpc RenameWebApp(RenameWebAppRequest) returns (RenameWebAppResponse);
+}
+message CreateWebAppRequest {
+  int32 user_id = 1;
+  string name = 2;
+}
+message CreateWebAppResponse {
+
+}
+message RenameWebAppRequest {
+  string name = 1;
+}
+message RenameWebAppResponse {
+
+}

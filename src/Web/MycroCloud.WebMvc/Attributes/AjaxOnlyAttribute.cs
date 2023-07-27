@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
-using MicroCloud.Web.Extentions;
+using MycroCloud.WebMvc.Extentions;
 
-namespace MicroCloud.Web.Attributes;
+namespace MycroCloud.WebMvc.Attributes;
 
 public class AjaxOnlyAttribute : ActionMethodSelectorAttribute
 {

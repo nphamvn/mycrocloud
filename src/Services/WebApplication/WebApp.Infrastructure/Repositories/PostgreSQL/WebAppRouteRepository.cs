@@ -104,7 +104,6 @@ WHERE
     route_id = @route_id
 """;
         await using var connection = new NpgsqlConnection(ConnectionString);
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteMatch>());
         SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteAuthorization>());
         SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteValidation>());
         SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteResponse>());

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace MicroCloud.Web.Attributes;
+namespace MycroCloud.WebMvc.Attributes;
 
 public class ViewLayoutAttribute: ResultFilterAttribute
 {

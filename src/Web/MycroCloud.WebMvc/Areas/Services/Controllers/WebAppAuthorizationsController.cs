@@ -1,81 +1,81 @@
-using MicroCloud.Web.Common;
-using MicroCloud.Web.Filters;
-using MicroCloud.Web.Models.WebApplications.Authorizations;
-using MicroCloud.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MycroCloud.Web.Controllers;
+using MycroCloud.WebMvc.Controllers;
+using MycroCloud.WebMvc.Filters;
+using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
+using MycroCloud.WebMvc.Areas.Services.Services;
+using MycroCloud.WeMvc;
 
 namespace MycroCloud.WebMvc.Areas.Services.Controllers;
 
 [Authorize]
-[Route("webapps/{WebApplicationName}/authorization")]
-[GetAuthUserWebApplicationId(Constants.RouteName.WebApplicationName, Constants.RouteName.WebApplicationId)]
+[Route("webapps/{WebApplicationName}/authorizations")]
+[GetAuthUserWebApplicationId(Constants.RouteName.WebAppName, Constants.RouteName.WebAppId)]
 public class WebAppAuthorizationsController : BaseController
 {
-    private readonly IWebApplicationAuthorizationWebService _webApplicationAuthorizationWebService;
+    private readonly IWebAppAuthorizationService _webAppAuthorizationService;
 
-    public WebAppAuthorizationsController(IWebApplicationAuthorizationWebService webApplicationAuthorizationWebService)
+    public WebAppAuthorizationsController(IWebAppAuthorizationService webAppAuthorizationService)
     {
-        _webApplicationAuthorizationWebService = webApplicationAuthorizationWebService;
+        _webAppAuthorizationService = webAppAuthorizationService;
     }
 
-    [HttpGet("policies")]
-    public async Task<IActionResult> PolicyIndex(int WebApplicationId)
+    [HttpGet("Policies")]
+    public async Task<IActionResult> PolicyList(int WebApplicationId)
     {
-        var model = await _webApplicationAuthorizationWebService.GetPolicyIndexViewModel(WebApplicationId);
-        return View("/Views/WebApplications/Authorization/Policy/Index.cshtml", model);
+        var vm = await _webAppAuthorizationService.GetPolicyListViewModel(WebApplicationId);
+        return View("/Areas/Services/Views/WebApp/Authorization/PolicyList.cshtml", vm);
     }
 
-    [HttpGet("policies/create")]
-    public async Task<IActionResult> PolicyCreate(int WebApplicationId)
+    [HttpGet("Policies/Create")]
+    public async Task<IActionResult> CreatePolicy(int WebApplicationId)
     {
-        var model = await _webApplicationAuthorizationWebService.GetPolicyCreateModel(WebApplicationId);
+        var model = await _webAppAuthorizationService.GetPolicyCreateModel(WebApplicationId);
         ViewData["HeadTitle"] = "Create new policy";
-        return View("/Views/WebApplications/Authorization/Policy/Save.cshtml", model);
+        return View("/Areas/Services/Views/WebApp/Authorization/SavePolicy.cshtml", model);
     }
 
-    [HttpPost("policies/create")]
-    public async Task<IActionResult> PolicyCreate(string WebApplicationName, int WebApplicationId, PolicySaveModel model)
+    [HttpPost("Policies/Create")]
+    public async Task<IActionResult> CreatePolicy(string WebApplicationName, int WebApplicationId, AuthorizationPolicySaveViewModel viewModel)
     {
         if (!ModelState.IsValid)
         {
-            var temp = await _webApplicationAuthorizationWebService.GetPolicyCreateModel(WebApplicationId);
-            model.WebApplication = temp.WebApplication;
-            return View("/Views/WebApplications/Authorization/Policy/Save.cshtml", model);
+            var temp = await _webAppAuthorizationService.GetPolicyCreateModel(WebApplicationId);
+            viewModel.WebApplication = temp.WebApplication;
+            return View("/Areas/Services/Views/WebApp/Authorization/SavePolicy.cshtml", viewModel);
         }
-        await _webApplicationAuthorizationWebService.CreatePolicy(WebApplicationId, model);
-        return RedirectToAction(nameof(PolicyIndex), new RouteValueDictionary
+        await _webAppAuthorizationService.CreatePolicy(WebApplicationId, viewModel);
+        return RedirectToAction(nameof(PolicyList), new RouteValueDictionary
         {
-            [Constants.RouteName.WebApplicationName] = WebApplicationName
+            [Constants.RouteName.WebAppName] = WebApplicationName
         });
     }
 
-    [HttpGet("policies/{PolicyId:int}/edit")]
-    public async Task<IActionResult> PolicyEdit(int PolicyId)
+    [HttpGet("Policies/{PolicyId:int}/Edit")]
+    public async Task<IActionResult> EditPolicy(int PolicyId)
     {
-        var model = await _webApplicationAuthorizationWebService.GetPolicyEditModel(PolicyId);
+        var model = await _webAppAuthorizationService.GetPolicyEditModel(PolicyId);
         ViewData["HeadTitle"] = "Edit policy";
-        return View("/Views/WebApplications/Authorization/Policy/Save.cshtml", model);
+        return View("/Areas/Services/Views/WebApp/Authorization/SavePolicy.cshtml", model);
     }
 
-    [HttpPost("policies/{PolicyId:int}/edit")]
-    public async Task<IActionResult> PolicyEdit(string WebApplicationName, int PolicyId, PolicySaveModel model)
+    [HttpPost("Policies/{PolicyId:int}/Edit")]
+    public async Task<IActionResult> EditPolicy(string WebApplicationName, int PolicyId, AuthorizationPolicySaveViewModel viewModel)
     {
-        await _webApplicationAuthorizationWebService.EditPolicy(PolicyId, model);
-        return RedirectToAction(nameof(PolicyIndex), new RouteValueDictionary
+        await _webAppAuthorizationService.EditPolicy(PolicyId, viewModel);
+        return RedirectToAction(nameof(PolicyList), new RouteValueDictionary
         {
-            [Constants.RouteName.WebApplicationName] = WebApplicationName
+            [Constants.RouteName.WebAppName] = WebApplicationName
         });
     }
 
-    [HttpPost("policies/{PolicyId:int}/delete")]
-    public async Task<IActionResult> PolictDelete(string WebApplicationName, int PolicyId)
+    [HttpPost("Policies/{PolicyId:int}/Edit")]
+    public async Task<IActionResult> DeletePolicy(string WebApplicationName, int PolicyId)
     {
-        await _webApplicationAuthorizationWebService.Delete(PolicyId);
-        return RedirectToAction(nameof(PolicyIndex), new RouteValueDictionary
+        await _webAppAuthorizationService.Delete(PolicyId);
+        return RedirectToAction(nameof(PolicyList), new RouteValueDictionary
         {
-            [Constants.RouteName.WebApplicationName] = WebApplicationName
+            [Constants.RouteName.WebAppName] = WebApplicationName
         });
     }
 }

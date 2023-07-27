@@ -9,16 +9,10 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'MockServer.Web' " />
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" Version="4.0.1" />
-    <PackageReference Include="AutoMapper" Version="12.0.1" />
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.55.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="MongoDB.Driver" Version="2.19.2" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0-preview.6.23329.11" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-preview.4" />
     <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="5.2.2" />
     <PackageReference Include="System.CodeDom" Version="8.0.0-preview.1.23110.8" />
@@ -26,27 +20,15 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\MycroCloud.Shared.csproj" />
-    <ProjectReference Include="..\WebApplication.Infrastructure\WebApplication.Infrastructure.csproj">
-      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
-    </ProjectReference>
-    <ProjectReference Include="..\WebApplication.Domain\WebApplication.Domain.csproj">
-      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Areas\Services\Models\" />
-  </ItemGroup>
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="Views\WebApplication\Authorization\Policy\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\WebApplication\Authorization\Policy\Save.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\WebApplication\Authorization\_NavBar.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Services\Views\Routes\_Partial\sample.json" />
-    <_ContentIncludedByDefault Remove="Areas\Services\Views\Routes\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Services\Views\Routes\_Partial\_RouteEditorComponent.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Services\Views\Routes\_Partial\_RouteListComponent.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Services\Views\Routes\_Partial\_ValidationRulesConfigComponent.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Services\Views\Authorization\Policy\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Services\Views\Authorization\Policy\Save.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Services\Views\Authorization\_NavBar.cshtml" />
+    <Protobuf Include="Areas\Services\Protos\webapp.proto">
+      <GrpcServices>Client</GrpcServices>
+      <Access>Public</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug/net8.0/</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
   </ItemGroup>
 </Project>

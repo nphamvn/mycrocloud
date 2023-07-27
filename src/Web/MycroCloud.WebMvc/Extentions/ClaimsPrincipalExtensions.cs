@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 
-namespace MicroCloud.Web.Extentions
+namespace MycroCloud.WebMvc.Extentions
 {
     public static class ClaimsPrincipalExtensions
     {

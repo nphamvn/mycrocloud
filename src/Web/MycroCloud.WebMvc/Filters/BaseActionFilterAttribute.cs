@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace MicroCloud.Web.Filters;
+namespace MycroCloud.WebMvc.Filters;
 public class BaseActionFilterAttribute : ActionFilterAttribute
 {
     public static bool TryGetActionArgumentValue<T>(ActionExecutingContext context, string key, out T value)

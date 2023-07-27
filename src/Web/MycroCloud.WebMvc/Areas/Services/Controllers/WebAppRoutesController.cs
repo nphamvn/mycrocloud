@@ -1,38 +1,39 @@
 using System.Text;
 using System.Text.Json;
-using MicroCloud.Web.Attributes;
-using MicroCloud.Web.Common;
-using MicroCloud.Web.Filters;
-using MicroCloud.Web.Services;
+using MycroCloud.WebMvc.Attributes;
+using MycroCloud.WebMvc.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
+using MycroCloud.WebMvc.Areas.Services.Services;
+using MycroCloud.WeMvc;
 
 namespace MycroCloud.WebMvc.Areas.Services.Controllers;
 
 [Authorize]
 [Route("webapps/{WebApplicationName}/routes")]
-[GetAuthUserWebApplicationId(Constants.RouteName.WebApplicationName, Constants.RouteName.WebApplicationId)]
+[GetAuthUserWebApplicationId(Constants.RouteName.WebAppName, Constants.RouteName.WebAppId)]
 public class WebAppRoutesController : Controller
 {
-    private readonly IWebApplicationRouteService _webApplicationRouteWebService;
+    private readonly IWebAppRouteService _webAppRouteService;
 
-    public WebAppRoutesController(IWebApplicationRouteService webApplicationRouteWebService)
+    public WebAppRoutesController(IWebAppRouteService webAppRouteService)
     {
-        _webApplicationRouteWebService = webApplicationRouteWebService;
+        _webAppRouteService = webAppRouteService;
     }
     
     [HttpGet]
     public async Task<IActionResult> Index(int WebApplicationId, string SearchTerm, string Sort)
     {
-        var pm = await _webApplicationRouteWebService.GetIndexViewModel(WebApplicationId, SearchTerm, Sort);
-        return View("/Views/WebApplications/Routes/Index.cshtml", pm);
+        var vm = await _webAppRouteService.GetIndexViewModel(WebApplicationId, SearchTerm, Sort);
+        return View("/Areas/Services/Views/WebApp/Route/Index.cshtml", vm);
     }
 
     [AjaxOnly]
     [HttpGet]
     public async Task<IActionResult> List(int WebApplicationId, string SearchTerm, string Sort)
     {
-        var routes = await _webApplicationRouteWebService.GetList(WebApplicationId, SearchTerm, Sort);
+        var routes = await _webAppRouteService.GetList(WebApplicationId, SearchTerm, Sort);
         return Ok(routes.Select(r => new
         {
             r.RouteId,
@@ -93,7 +94,7 @@ public class WebAppRoutesController : Controller
     [HttpPost("delete/{RouteId:int}")]
     public async Task<IActionResult> Delete(int RouteId)
     {
-        await _webApplicationRouteWebService.Delete(RouteId);
+        await _webAppRouteService.Delete(RouteId);
         return Ok();
     }
 }

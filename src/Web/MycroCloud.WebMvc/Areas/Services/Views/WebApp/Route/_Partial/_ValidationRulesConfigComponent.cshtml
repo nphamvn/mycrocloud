@@ -1,5 +1,5 @@
 <template id="validation-rules-config-template">
-    <v-dialog v-model="dialogVisible" fullscreen scrollable>
+    <v-dialog v-viewModel="dialogVisible" fullscreen scrollable>
         <v-card>
             <v-card-title>
                 <span class="text-h5">VALIDATION RULES</span>
@@ -8,39 +8,39 @@
                 <v-container>
                     <v-row v-for="(rule, index) in rules">
                         <v-col cols="3">
-                            <v-select v-model="rule.name" :items="availableRules" variant="solo"></v-select>
+                            <v-select v-viewModel="rule.name" :items="availableRules" variant="solo"></v-select>
                         </v-col>
                         <v-col>
                             <v-row v-if="rule.name=='between'">
                                 <v-col>
-                                    <v-text-field v-model="rule.min" type="number" label="min"
+                                    <v-text-field v-viewModel="rule.min" type="number" label="min"
                                         variant="solo"></v-text-field>
                                 </v-col>
                                 <v-col>
-                                    <v-text-field v-model="rule.max" type="number" label="max"
+                                    <v-text-field v-viewModel="rule.max" type="number" label="max"
                                         variant="solo"></v-text-field>
                                 </v-col>
                             </v-row>
                             <v-row v-if="rule.name=='date_between'">
                                 <v-col>
-                                    <v-text-field v-model="rule.min" type="date" label="min"
+                                    <v-text-field v-viewModel="rule.min" type="date" label="min"
                                         variant="solo"></v-text-field>
                                 </v-col>
                                 <v-col>
-                                    <v-text-field v-model="rule.max" type="date" label="max"
+                                    <v-text-field v-viewModel="rule.max" type="date" label="max"
                                         variant="solo"></v-text-field>
                                 </v-col>
                             </v-row>
                             <v-row v-if="rule.name=='date_format'">
                                 <v-col>
-                                    <v-text-field v-model="rule.format" label="format" variant="solo"></v-text-field>
+                                    <v-text-field v-viewModel="rule.format" label="format" variant="solo"></v-text-field>
                                 </v-col>
                                 <v-col>
                                 </v-col>
                             </v-row>
                             <v-row v-if="rule.name=='digits'">
                                 <v-col>
-                                    <v-text-field v-model="rule.length" type="number" label="length"
+                                    <v-text-field v-viewModel="rule.length" type="number" label="length"
                                         variant="solo"></v-text-field>
                                 </v-col>
                                 <v-col>
@@ -48,23 +48,23 @@
                             </v-row>
                             <v-row v-if="rule.name=='not_one_of'">
                                 <v-col>
-                                    <v-combobox v-model="rule.values" label="values" clearable multiple
+                                    <v-combobox v-viewModel="rule.values" label="values" clearable multiple
                                         variant="solo"></v-combobox>
                                 </v-col>
                             </v-row>
                             <v-row v-if="rule.name=='is'">
                                 <v-col>
-                                    <v-text-field v-model="rule.value" label="value" variant="solo"></v-text-field>
+                                    <v-text-field v-viewModel="rule.value" label="value" variant="solo"></v-text-field>
                                 </v-col>
                             </v-row>
                             <v-row v-if="rule.name=='is_not'">
                                 <v-col>
-                                    <v-text-field v-model="rule.value" label="value" variant="solo"></v-text-field>
+                                    <v-text-field v-viewModel="rule.value" label="value" variant="solo"></v-text-field>
                                 </v-col>
                             </v-row>
                             <v-row v-if="rule.name=='length'">
                                 <v-col>
-                                    <v-text-field v-model="rule.length" type="number" label="length"
+                                    <v-text-field v-viewModel="rule.length" type="number" label="length"
                                         variant="solo"></v-text-field>
                                 </v-col>
                                 <v-col>
@@ -72,7 +72,7 @@
                             </v-row>
                             <v-row v-if="rule.name=='max'">
                                 <v-col>
-                                    <v-text-field v-model="rule.length" type="number" label="length"
+                                    <v-text-field v-viewModel="rule.length" type="number" label="length"
                                         variant="solo"></v-text-field>
                                 </v-col>
                                 <v-col>
@@ -80,7 +80,7 @@
                             </v-row>
                             <v-row v-if="rule.name=='max_value'">
                                 <v-col>
-                                    <v-text-field v-model="rule.max" type="number" label="max"
+                                    <v-text-field v-viewModel="rule.max" type="number" label="max"
                                         variant="solo"></v-text-field>
                                 </v-col>
                                 <v-col>
@@ -88,7 +88,7 @@
                             </v-row>
                             <v-row v-if="rule.name=='min'">
                                 <v-col>
-                                    <v-text-field v-model="rule.length" type="number" label="length"
+                                    <v-text-field v-viewModel="rule.length" type="number" label="length"
                                         variant="solo"></v-text-field>
                                 </v-col>
                                 <v-col>
@@ -96,7 +96,7 @@
                             </v-row>
                             <v-row v-if="rule.name=='min_value'">
                                 <v-col>
-                                    <v-text-field v-model="rule.max" type="number" label="min"
+                                    <v-text-field v-viewModel="rule.max" type="number" label="min"
                                         variant="solo"></v-text-field>
                                 </v-col>
                                 <v-col>
@@ -104,13 +104,13 @@
                             </v-row>
                             <v-row v-if="rule.name=='one_of'">
                                 <v-col>
-                                    <v-combobox v-model="rule.values" label="values" clearable multiple
+                                    <v-combobox v-viewModel="rule.values" label="values" clearable multiple
                                         variant="solo"></v-combobox>
                                 </v-col>
                             </v-row>
                             <v-row v-if="rule.name=='regex'">
                                 <v-col>
-                                    <v-text-field v-model="rule.pattern" label="pattern" variant="solo"></v-text-field>
+                                    <v-text-field v-viewModel="rule.pattern" label="pattern" variant="solo"></v-text-field>
                                 </v-col>
                             </v-row>
                         </v-col>

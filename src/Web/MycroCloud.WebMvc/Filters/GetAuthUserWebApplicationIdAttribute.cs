@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc.Filters;
-using WebApplication.Domain.Repositories;
-using MicroCloud.Web.Extentions;
+using MycroCloud.WebMvc.Extentions;
+using MycroCloud.WebMvc.Areas.Services.Services;
 
-namespace MicroCloud.Web.Filters;
+namespace MycroCloud.WebMvc.Filters;
 
 public class GetAuthUserWebApplicationIdAttribute : ActionFilterAttribute
 {
@@ -16,7 +16,7 @@ public class GetAuthUserWebApplicationIdAttribute : ActionFilterAttribute
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var user = context.HttpContext.User.ToIdentityUser();
-        var webApplicationRepository = context.HttpContext.RequestServices.GetService<IWebApplicationRepository>();
+        var webAppService = context.HttpContext.RequestServices.GetService<IWebAppService>();
         string appName = null;
         if (context.ActionArguments.TryGetValue(_appNameKey, out var argument))
         {
@@ -28,10 +28,10 @@ public class GetAuthUserWebApplicationIdAttribute : ActionFilterAttribute
         }
         if (!string.IsNullOrEmpty(appName))
         {
-            var app = await webApplicationRepository.FindByUserId(user.Id, appName);
+            var app = await webAppService.Zzz(user.Id, appName);
             if (app != null)
             {
-                context.ActionArguments[_setKey] = app.WebApplicationId;
+                context.ActionArguments[_setKey] = app.WebAppId;
             }
         }
         await base.OnActionExecutionAsync(context, next);

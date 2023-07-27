@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MicroCloud.Web.Migrations
+namespace MycroCloud.WebMvc.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
     [Migration("20230507061321_InitIdentityDb")]

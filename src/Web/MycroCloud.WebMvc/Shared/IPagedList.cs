@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace MicroCloud.Web.Common
+﻿namespace MycroCloud.WebMvc.Shared
 {
     /// <summary>
     /// Paged list interface

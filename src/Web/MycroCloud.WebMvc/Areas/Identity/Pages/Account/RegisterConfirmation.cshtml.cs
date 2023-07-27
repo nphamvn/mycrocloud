@@ -2,14 +2,14 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Text;
-using MicroCloud.Web.Areas.Identity.Services;
+using MycroCloud.WebMvc.Areas.Identity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace MicroCloud.Web.Areas.Identity.Pages.Account
+namespace MycroCloud.WebMvc.Areas.Identity.Pages.Account
 
 {
     /// <summary>

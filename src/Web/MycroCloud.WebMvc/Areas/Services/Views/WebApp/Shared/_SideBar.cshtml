@@ -1,5 +1,5 @@
-@model MicroCloud.Web.Models.WebApplications.WebAppModel
-@using MicroCloud.Web.Controllers
+@model MycroCloud.WebMvc.Areas.Services.Models.WebApps.WebAppModel
+@using MycroCloud.WebMvc.Areas.Services.Controllers
 @{
     var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
     var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
@@ -7,7 +7,7 @@
 <div class="d-flex flex-column flex-shrink-0">
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a href="@Url.Action(nameof(WebApplicationsController.Overview), "WebApplications" ,new {WebApplicationName=Model.Name})"
+            <a href="@Url.Action(nameof(WebAppsController.View), "WebApps" ,new { WebApplicationName = Model.Name })"
                 class="nav-link @(controller.Equals("WebApplications", StringComparison.OrdinalIgnoreCase) && action.Equals("Overview",
                 StringComparison.OrdinalIgnoreCase) ?"active":"") py-1" role="tab">Overview</a>
         </li>
@@ -17,11 +17,11 @@
                 StringComparison.OrdinalIgnoreCase) ?"active":"") py-1" role="tab">Routes</a>
         </li>
         <li class="nav-item">
-            <a href="@Url.Action(nameof(WebAppAuthenticationsController.Settings), "WebAppAuthentications" ,new {WebApplicationName=Model.Name})"
+            <a href="@Url.Action(nameof(WebAppAuthenticationsController.SchemeList), "WebAppAuthentications" ,new {WebApplicationName=Model.Name})"
                 class="nav-link @(controller.Equals("WebApplicationAuthentications", StringComparison.OrdinalIgnoreCase)?"active":"") py-1" role="tab">Authentication</a>
         </li>
         <li class="nav-item">
-            <a href="@Url.Action(nameof(WebAppAuthorizationsController.PolicyIndex), "WebAppAuthorizations" ,new {WebApplicationName=Model.Name})"
+            <a href="@Url.Action(nameof(WebAppAuthorizationsController.PolicyList), "WebAppAuthorizations" ,new {WebApplicationName=Model.Name})"
                 class="nav-link @(controller.Equals("WebApplicationAuthorizations", StringComparison.OrdinalIgnoreCase)? "active":"") py-1"
                 role="tab">Authorization</a>
         </li>

@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MicroCloud.Web.Migrations
+namespace MycroCloud.WebMvc.Migrations
 {
     public partial class InitIdentityDb : Migration
     {

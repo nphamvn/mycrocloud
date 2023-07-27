@@ -1,13 +1,12 @@
-@using WebApplication.Domain.WebApplication.Entities
-@using WebApplication.Domain.WebApplication.Shared
-@using MicroCloud.Web.Controllers
-@model MicroCloud.Web.Models.WebApplications.Authentications.AuthenticationIndexModel
+@using MycroCloud.WebMvc.Areas.Services.Controllers
+@using MycroCloud.WebMvc.Areas.Services.Models.WebApps
+@model MycroCloud.WebMvc.Areas.Services.Models.WebApps.AuthenticationSchemeListViewModel
 <div class="row">
     <div class="col-2">
-        <partial name="/Views/WebApplications/_SideBar.cshtml" model="Model.WebApplication" />
+        <partial name="/Views/WebApplications/_SideBar.cshtml" viewModel="Model.WebApplication" />
     </div>
     <div class="col-10">
-        <partial name="/Views/WebApplications/Authentications/_NavBar.cshtml" model="Model.WebApplication" />
+        <partial name="/Views/WebApplications/Authentications/_NavBar.cshtml" viewModel="Model.WebApplication" />
         <div class="mt-2">
             <div class="btn-group">
                 <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"
@@ -16,11 +15,11 @@
                 <ul class="dropdown-menu">
                     <li>
                         <a class="dropdown-item"
-                            href="@Url.Action(nameof(WebAppAuthenticationsController.NewJwtBearerScheme), new { WebApplicationName = Model.WebAppModel.Name })">JWT Bearer</a>
+                            href="@Url.Action(nameof(WebAppAuthenticationsController.CreateJwtBearerScheme), "WebAppAuthentications", new { WebApplicationName = Model.WebApp.Name })">JWT Bearer</a>
                     </li>
                     <li>
                         <a class="dropdown-item"
-                            href="@Url.Action(nameof(WebAppAuthenticationsController.NewApiKeyScheme), new { WebApplicationName = Model.WebAppModel.Name })">API
+                            href="@Url.Action(nameof(WebAppAuthenticationsController.CreateApiKeyScheme),"WebAppAuthentications", new { WebApplicationName = Model.WebApp.Name })">API
                             Key</a>
                     </li>
                 </ul>
@@ -51,11 +50,11 @@
                                             var editAction = "";
                                             if (scheme.Type == AuthenticationSchemeType.JwtBearer)
                                             {
-                                                editAction = Url.Action(nameof(WebAppAuthenticationsController.EditJwtBearerScheme), new { WebApplicationName = Model.WebAppModel.Name, SchemeId = scheme.Id});
+                                                editAction = Url.Action(nameof(WebAppAuthenticationsController.EditJwtBearerScheme), "WebAppAuthentications",new { WebApplicationName = Model.WebApp.Name, SchemeId = scheme.Id});
                                             }
                                             else if (scheme.Type == AuthenticationSchemeType.ApiKey)
                                             {
-                                                editAction = Url.Action(nameof(WebAppAuthenticationsController.EditApiKeyScheme), new { WebApplicationName = Model.WebAppModel.Name, SchemeId = scheme.Id});
+                                                editAction = Url.Action(nameof(WebAppAuthenticationsController.EditApiKeyScheme), "WebAppAuthentications",new { WebApplicationName = Model.WebApp.Name, SchemeId = scheme.Id});
                                             }
                                         }
                                         <a class="btn btn-primary" href="@editAction">Edit</a>

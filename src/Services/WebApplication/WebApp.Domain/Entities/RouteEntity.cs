@@ -9,7 +9,9 @@ public class RouteEntity
     public int WebAppId { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
-    public RouteMatch Match { get; set; }
+    public int MatchOrder { get; set; }
+    public List<string> MatchMethods { get; set; }
+    public string MathPath { get; set; }
     public RouteAuthorization RouteAuthorization { get; set; }
     public RouteValidation Validation { get; set; }
     public RouteResponse Response { get; set; }
@@ -22,12 +24,6 @@ public class RouteAuthorization
     public IEnumerable<AuthenticationSchemeEntity> AuthenticationSchemes { get; set; }
     public List<int> AuthenticationSchemeIds { get; set; }
     public Dictionary<string, object> Claims { get; set; }
-}
-public class RouteMatch
-{
-    public int Order { get; set; }
-    public List<string> Methods { get; set; } = new();
-    public string Path { get; set; }
 }
 public class RouteValidation
 {

@@ -1,5 +1,5 @@
-@using MicroCloud.Web.Controllers
-@model MicroCloud.Web.Models.WebApplications.WebAppIndexViewModel;
+@using MycroCloud.WebMvc.Areas.Services.Controllers
+@model MycroCloud.WebMvc.Areas.Services.Models.WebApps.WebAppIndexViewModel
 @{
     ViewData["Title"] = "Your Applications";
 }
@@ -8,7 +8,7 @@
         <h3>@ViewData["Title"]</h3>
         <div class="mt-2">
             <div class="d-flex">
-                <form id="search" class="flex-grow-1 row" action="@Url.Action(nameof(WebApplicationsController.Index))"
+                <form id="search" class="flex-grow-1 row" action="@Url.Action(nameof(WebAppsController.Index), "WebApps")"
                     method="get">
                     <div class="d-flex">
                         <div class="me-auto w-100">
@@ -41,7 +41,7 @@
                             <div>
                                 <h3 class="text-xl">
                                     <a class="text-decoration-none me-2"
-                                    href="@Url.Action(nameof(WebApplicationsController.Overview), "WebApplications" ,new {WebApplicationName=app.Name})">@app.Name</a>
+                                    href="@Url.Action(nameof(WebAppsController.View), "WebApps" ,new {WebApplicationName=app.Name})">@app.Name</a>
                                 </h3>
                                 <p>@app.Description</p>
                                 <div class="d-flex">

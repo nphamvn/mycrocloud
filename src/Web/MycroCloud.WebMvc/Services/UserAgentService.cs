@@ -1,4 +1,4 @@
-﻿namespace MicroCloud.Web.Services;
+﻿namespace MycroCloud.WeMvc.Services;
 public interface IUserAgentService
 {
     Platform GetPlatform();

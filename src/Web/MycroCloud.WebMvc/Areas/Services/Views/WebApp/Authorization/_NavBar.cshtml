@@ -1,5 +1,5 @@
-@using MicroCloud.Web.Controllers
-@model MicroCloud.Web.Models.WebApplications.WebAppModel
+@using MycroCloud.WebMvc.Areas.Services.Controllers
+@model MycroCloud.WebMvc.Areas.Services.Models.WebApps.WebAppModel
 @{
     var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
     var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
@@ -7,6 +7,6 @@
 }
 <ul class="nav nav-tabs">
     <li class="nav-item">
-        <a class="nav-link @(tab.Equals("Policies", StringComparison.OrdinalIgnoreCase) ?"active":"")" href="@Url.Action(nameof(WebAppAuthorizationsController.PolicyIndex), new { WebApplicationName = Model.Name })">Policies</a>
+        <a class="nav-link @(tab.Equals("Policies", StringComparison.OrdinalIgnoreCase) ?"active":"")" href="@Url.Action(nameof(WebAppAuthorizationsController.PolicyList), "WebAppAuthorizations", new { WebApplicationName = Model.Name })">Policies</a>
     </li>
 </ul>
