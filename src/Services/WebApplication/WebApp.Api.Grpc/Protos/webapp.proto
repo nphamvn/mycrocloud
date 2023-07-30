@@ -5,12 +5,39 @@ option csharp_namespace = "WebApp.Api.Grpc";
 
 package webapp;
 
+import "google/protobuf/timestamp.proto";
+
 service WebApp {
-  rpc CreateWebApp(CreateWebAppRequest) returns (CreateWebAppResponse);
-  rpc RenameWebApp(RenameWebAppRequest) returns (RenameWebAppResponse);
+  rpc GetAll(GetAllWebAppRequest) returns (GetAllWebAppResponse);
+  rpc Get(GetWebAppRequest) returns (GetWebAppResponse);
+  rpc Create(CreateWebAppRequest) returns (CreateWebAppResponse);
+  rpc Rename(RenameWebAppRequest) returns (RenameWebAppResponse);
+  rpc Delete(DeleteWebAppRequest) returns (DeleteWebAppResponse);
+}
+message GetWebAppRequest {
+  string user_id = 1;
+  string name = 2;
+}
+message GetWebAppResponse {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  // google.protobuf.Timestamp created_time = 4;
+  // google.protobuf.Timestamp updated_time = 5;
+}
+message GetAllWebAppRequest {
+  string user_id = 1;
+  int32 page = 2;
+}
+message GetAllWebAppResponse {
+  message WebApp {
+    int32 id = 1;
+    string name = 2;
+  }
+  repeated WebApp web_apps = 1;
 }
 message CreateWebAppRequest {
-  int32 user_id = 1;
+  string user_id = 1;
   string name = 2;
 }
 message CreateWebAppResponse {
@@ -20,5 +47,12 @@ message RenameWebAppRequest {
   string name = 1;
 }
 message RenameWebAppResponse {
+
+}
+message DeleteWebAppRequest {
+  string user_id = 1;
+  string name = 2;
+}
+message DeleteWebAppResponse {
 
 }

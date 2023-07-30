@@ -2,7 +2,6 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps;
 
 public class AuthenticationSchemeListViewModel
 {
-    public WebAppModel WebApp { get; set; }
     public IEnumerable<AuthenticationSchemeIndexItem> AuthenticationSchemes { get; set; }
     public IEnumerable<int> SelectedAuthenticationSchemeIds { get; set; }
 }

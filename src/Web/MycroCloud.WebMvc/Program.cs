@@ -1,6 +1,11 @@
+using System.Security.Claims;
+using Grpc.Net.ClientFactory;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
+using MycroCloud.WebMvc.Authentications;
 using MycroCloud.WebMvc.Extentions;
 using Serilog;
 
@@ -17,7 +22,7 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddControllersWithViews(
     options =>
     {
-        
+
     }
 ).AddJsonOptions(options =>
 {
@@ -68,12 +73,34 @@ builder.Services
         options.SignInScheme = IdentityConstants.ExternalScheme;
         options.Scope.Add("email");
     })
+    .AddScheme<DevAuthenticationOptions, DevAuthenticationHandler>("DevAuthentication", o =>
+    {
+        o.Header = "X-Dev-Key";
+        o.KeyClaims = new() {
+            { "8D92604B-F47F-4C55-B9A4-D35EF8AE819F", new List<Claim> {
+                new ( ClaimTypes.NameIdentifier, "2c2602c5-49bd-4afc-84b7-ceaa47a45d9a"),
+                new ( ClaimTypes.Name, "Nam Pham"),
+                new ( ClaimTypes.Email, "nam@mycrocloud.com"),
+            } },
+        };
+    })
     ;
 
-// builder.Services.AddGrpcClient<WebApp.Grpc.>(o =>
-// {
-    
-// });
+builder.Services.AddAuthorization(options => {
+    options.DefaultPolicy = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .AddAuthenticationSchemes(IdentityConstants.ApplicationScheme, "DevAuthentication")
+            .Build();
+});
+
+Action<GrpcClientFactoryOptions> options = (o) =>
+{
+    o.Address = new Uri("https://localhost:5100");
+};
+builder.Services.AddGrpcClient<WebApp.Api.Grpc.WebApp.WebAppClient>(options);
+builder.Services.AddGrpcClient<WebApp.Api.Grpc.WebAppRoute.WebAppRouteClient>(options);
+builder.Services.AddGrpcClient<WebApp.Api.Grpc.WebAppAuthentication.WebAppAuthenticationClient>(options);
+
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

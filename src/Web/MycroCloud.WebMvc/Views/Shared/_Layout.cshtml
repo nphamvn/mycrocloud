@@ -31,6 +31,7 @@
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
         <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <partial name="_ValidationScriptsPartial" />
     </environment>
     <environment exclude="Development">
         <!-- Not Development Environment -->
@@ -79,13 +80,6 @@
             @RenderBody()
         </main>
     </div>
-
-    @* <footer class="border-top text-muted" style="position: absolute; bottom: 0; width: 100%; line-height: 40px;">
-        <div class="container text-center">
-            &copy; @DateTime.Now.Year - MockServer - <a class="text-decoration-none" asp-controller="Home"
-                asp-action="Privacy">Privacy</a>
-        </div>
-    </footer> *@
 </body>
 
 </html>

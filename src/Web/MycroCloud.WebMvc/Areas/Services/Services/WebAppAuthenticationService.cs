@@ -3,7 +3,7 @@ using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
 namespace MycroCloud.WebMvc.Areas.Services.Services;
 public interface IWebAppAuthenticationService
 {
-    Task<AuthenticationSchemeListViewModel> GetSchemeListViewModel(int appId);
+    Task<AuthenticationSchemeListViewModel> GetSchemeListViewModel(string appName);
     Task SaveSettings(int appId, AuthenticationConfigurationViewModel viewModel);
     Task AddJwtBearerScheme(int appId, JwtBearerAuthenticationSchemeSaveViewModel authenticationScheme);
     Task EditJwtBearerScheme(int schemeId, JwtBearerAuthenticationSchemeSaveViewModel authenticationScheme);
@@ -12,15 +12,25 @@ public interface IWebAppAuthenticationService
     Task<AuthenticationConfigurationViewModel> GetConfigurationsViewModel(int webApplicationId);
 }
 
-public class WebAppAuthenticationService : BaseService, IWebAppAuthenticationService
+public class WebAppAuthenticationService(IHttpContextAccessor contextAccessor
+, WebApp.Api.Grpc.WebAppAuthentication.WebAppAuthenticationClient webAppAuthenticationClient) : BaseService(contextAccessor), IWebAppAuthenticationService
 {
-    public WebAppAuthenticationService(IHttpContextAccessor contextAccessor) : base(contextAccessor)
-    {
-    }
+    private readonly WebApp.Api.Grpc.WebAppAuthentication.WebAppAuthenticationClient _webAppAuthenticationClient = webAppAuthenticationClient;
 
-    public async Task<AuthenticationSchemeListViewModel> GetSchemeListViewModel(int appId)
+    public async Task<AuthenticationSchemeListViewModel> GetSchemeListViewModel(string appName)
     {
-        throw new NotImplementedException();
+        var vm = new AuthenticationSchemeListViewModel();
+        var res = await _webAppAuthenticationClient.GetAllAsync(new () {
+            UserId = AuthUser.Id,
+            AppName = appName
+        });
+        vm.AuthenticationSchemes = res.Schemes.Select(s => new AuthenticationSchemeIndexItem {
+            Id = s.Id,
+            Type = (AuthenticationSchemeType)(int)s.Type,
+            Name = s.Name,
+            DisplayName = s.DisplayName
+        });
+        return vm;
     }
 
     public async Task SaveSettings(int appId, AuthenticationConfigurationViewModel viewModel)

@@ -7,7 +7,7 @@ using Npgsql;
 namespace WebApp.Infrastructure.Repositories.PostgreSql;
 public class WebAppRepository(IOptions<PostgresDatabaseOptions> databaseOptions) : BaseRepository(databaseOptions), IWebAppRepository
 {
-    public async Task Add(int userId, WebAppEntity app)
+    public async Task Add(string userId, WebAppEntity app)
     {
         var query =
         """
@@ -38,7 +38,7 @@ public class WebAppRepository(IOptions<PostgresDatabaseOptions> databaseOptions)
         });
     }
 
-    public async Task<WebAppEntity> FindByUserId(int userId, string name)
+    public async Task<WebAppEntity> FindByUserId(string userId, string name)
     {
         var query =
                 """

@@ -1,10 +1,12 @@
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
+using WebApp.Api.Grpc;
 
 namespace MycroCloud.WebMvc.Areas.Services.Services;
 public interface IWebAppService
 {
     Task<WebAppModel> Zzz(string userId, string appName);
-    Task<WebAppViewViewModel> Get(int appId);
+    Task<WebAppViewViewModel> Get(string name);
     Task<WebAppIndexViewModel> GetIndexViewModel(WebAppSearchModel searchModel);
     Task Create(WebAppCreateViewModel app);
     Task Rename(int appId, string name);
@@ -13,9 +15,12 @@ public interface IWebAppService
 
 public class WebAppService : BaseService, IWebAppService
 {
-    public WebAppService(IHttpContextAccessor contextAccessor) : base(contextAccessor)
+    private readonly WebApp.Api.Grpc.WebApp.WebAppClient _webAppClient;
+
+    public WebAppService(IHttpContextAccessor contextAccessor
+    , WebApp.Api.Grpc.WebApp.WebAppClient webAppClient) : base(contextAccessor)
     {
-        
+        _webAppClient = webAppClient;
     }
 
     public async Task<WebAppModel> Zzz(string userId, string appName)
@@ -23,28 +28,63 @@ public class WebAppService : BaseService, IWebAppService
         throw new NotImplementedException();
     }
 
-    public async Task<WebAppViewViewModel> Get(int appId)
+    public async Task<WebAppViewViewModel> Get(string name)
     {
-        throw new NotImplementedException();
+        var res = await _webAppClient.GetAsync(new()
+        {
+            UserId = AuthUser.Id,
+            Name = name
+        });
+        return new()
+        {
+            Name = res.Name,
+            Description = res.Description
+        };
     }
 
     public async Task<WebAppIndexViewModel> GetIndexViewModel(WebAppSearchModel searchModel)
     {
-        throw new NotImplementedException();
+        var result = await _webAppClient.GetAllAsync(new GetAllWebAppRequest()
+        {
+            UserId = AuthUser.Id
+        });
+        var viewModel = new WebAppIndexViewModel
+        {
+            WebApps = result.WebApps.Select(a => new WebAppIndexItem
+            {
+                WebAppId = a.Id,
+                Name = a.Name
+            })
+        };
+        return viewModel;
     }
 
-    public async Task Create(WebAppCreateViewModel app)
+    public async Task Create(WebAppCreateViewModel model)
     {
-        throw new NotImplementedException();
+        var result = await _webAppClient.CreateAsync(new CreateWebAppRequest()
+        {
+            UserId = AuthUser.Id,
+            Name = model.Name
+        });
+    }
+    private async Task ValidateCreate(WebAppCreateViewModel model, ModelStateDictionary modelState)
+    {
+
     }
 
     public async Task Rename(int appId, string name)
     {
-        throw new NotImplementedException();
+        var result = await _webAppClient.RenameAsync(new RenameWebAppRequest()
+        {
+            Name = name
+        });
     }
 
     public async Task Delete(int appId)
     {
-        throw new NotImplementedException();
+        var result = await _webAppClient.DeleteAsync(new DeleteWebAppRequest()
+        {
+            Name = appId.ToString()
+        });
     }
 }

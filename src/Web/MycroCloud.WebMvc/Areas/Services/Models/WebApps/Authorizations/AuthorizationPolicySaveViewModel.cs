@@ -8,7 +8,7 @@ public class AuthorizationPolicySaveViewModel : IValidatableObject
     public string Name { get; set; }
     public string Description { get; set; }
     public List<KeyValuePair<string, string>> Claims { get; set; }
-    public WebAppViewViewModel? WebApplication { get; set; }
+    
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         yield return ValidationResult.Success; 

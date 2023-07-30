@@ -11,10 +11,15 @@
     <ItemGroup>
         <Protobuf Include="Protos\webapp.proto" GrpcServices="Server" />
         <Protobuf Include="Protos\webapproute.proto" GrpcServices="Server" />
+        <Protobuf Include="Protos\webappauthentication.proto" GrpcServices="Server" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Grpc.AspNetCore" Version="2.52.0" />
+        <PackageReference Include="Grpc.Tools" Version="2.56.2">
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>

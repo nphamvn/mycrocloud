@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MycroCloud.WebMvc.Controllers;
-using MycroCloud.WebMvc.Filters;
+using Microsoft.AspNetCore.Mvc.Filters;
 using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
 using MycroCloud.WebMvc.Areas.Services.Services;
 using MycroCloud.WeMvc;
@@ -10,14 +9,13 @@ namespace MycroCloud.WebMvc.Areas.Services.Controllers;
 
 [Authorize]
 [Route("webapps/{WebApplicationName}/authorizations")]
-[GetAuthUserWebApplicationId(Constants.RouteName.WebAppName, Constants.RouteName.WebAppId)]
-public class WebAppAuthorizationsController : BaseController
+public class WebAppAuthorizationsController(IWebAppAuthorizationService webAppAuthorizationService) : BaseServiceController
 {
-    private readonly IWebAppAuthorizationService _webAppAuthorizationService;
+    private readonly IWebAppAuthorizationService _webAppAuthorizationService = webAppAuthorizationService;
 
-    public WebAppAuthorizationsController(IWebAppAuthorizationService webAppAuthorizationService)
+    public override void OnActionExecuting(ActionExecutingContext context)
     {
-        _webAppAuthorizationService = webAppAuthorizationService;
+        ViewData["WebAppName"] = context.ActionArguments["WebApplicationName"];
     }
 
     [HttpGet("Policies")]
@@ -41,7 +39,6 @@ public class WebAppAuthorizationsController : BaseController
         if (!ModelState.IsValid)
         {
             var temp = await _webAppAuthorizationService.GetPolicyCreateModel(WebApplicationId);
-            viewModel.WebApplication = temp.WebApplication;
             return View("/Areas/Services/Views/WebApp/Authorization/SavePolicy.cshtml", viewModel);
         }
         await _webAppAuthorizationService.CreatePolicy(WebApplicationId, viewModel);

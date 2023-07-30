@@ -1,0 +1,4 @@
+{
+    "dotnet.defaultSolution": "MycroCloud.WebMvc.sln",
+    "sqltools.connections": []
+}

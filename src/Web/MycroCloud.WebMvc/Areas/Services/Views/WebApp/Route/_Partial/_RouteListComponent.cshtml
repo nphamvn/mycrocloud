@@ -2,12 +2,15 @@
     <v-list>
         <v-list-item class="pa-0" v-for="route in routes" :key="route.id">
             <v-card v-on:click="clickRoute(route.id)" :class="{'bg-primary': route.id === clickRouteWebAppId}">
-                <v-card-title>{{route.name}}</v-card-title>
-                <v-card-text>
-                    <v-badge :color="getMethodBadgeColor(route)" text-color="white"
-                        :content="getMethodBadgeContent(route)" inline></v-badge>
-                    <small>{{route.match.path}}</small>
-                </v-card-text>
+                <v-card-text>{{route.name}}</v-card-text>
+                <v-row class="m-0">
+                    <v-badge v-for="m of route.matchMethods.slice(0,3)"
+                        :content="m"
+                        :color="getMethodBadgeColor(m)" text-color="white"
+                        inline>
+                    </v-badge>
+                </v-row>
+                <v-card-text>{{route.matchPath}}</v-card-text>
             </v-card>
         </v-list-item>
     </v-list>
@@ -28,34 +31,19 @@
                 clickRouteWebAppId.value = id;
                 emit('click-route', id);
             }
-            const getMethodBadgeColor = (route) => {
-                if (route.match.methods.length === 1) {
-                    switch (route.match.methods[0]) {
-                        case 'DELETE': return 'red';
-                        case 'POST': return 'orange';
-                        case 'PUT': return 'yellow';
-                        case 'GET': return 'light-blue';
-                        default: return 'light-blue';
-                    }
-                } else {
-                    return 'purple'
-                }
-            }
-            const getMethodBadgeContent = (route) => {
-                //TODO: use methods prop
-                if(route.match.methods.length === 1) {
-                    return route.match.methods[0]
-                }
-                else 
-                {
-                    return 'MULTI'
+            const getMethodBadgeColor = (method) => {
+                switch (method) {
+                    case 'DELETE': return 'red';
+                    case 'POST': return 'orange';
+                    case 'PUT': return 'yellow';
+                    case 'GET': return 'light-blue';
+                    default: return 'light-blue';
                 }
             }
             return {
                 clickRoute,
                 clickRouteWebAppId,
                 getMethodBadgeColor,
-                getMethodBadgeContent
             }
         }
     }

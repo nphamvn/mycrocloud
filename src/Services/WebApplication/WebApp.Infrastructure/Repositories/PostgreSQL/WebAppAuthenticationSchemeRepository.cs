@@ -45,25 +45,28 @@ INSERT INTO
         });
     }
 
-    public async Task<IEnumerable<AuthenticationSchemeEntity>> GetAll(int appId)
+    public async Task<IEnumerable<AuthenticationSchemeEntity>> GetAll(string userId, string appName)
     {
         var query =
 """
-SELECT
-    scheme_id SchemeId
-    ,web_application_id WebAppId
-    ,type Type
-    ,name Name
-    ,description Description
-FROM
-    web_application_authentication_scheme
-WHERE
-    web_application_id = @web_application_id
+select
+	scheme_id SchemeId,
+	waas.web_application_id WebAppId,
+	"type" Type,
+	waas."name" Name,
+	waas.description Description,
+	display_name DisplayName
+from
+	public.web_application_authentication_scheme waas
+	inner join web_application wa on wa.web_application_id = waas.web_application_id
+where 
+	wa.user_id = @user_id and wa."name" = @app_name;
 """;
         using var connection = new NpgsqlConnection(ConnectionString);
         return await connection.QueryAsync<AuthenticationSchemeEntity>(query, new
         {
-            web_application_id = appId
+            user_id = userId,
+            app_name = appName
         });
     }
 

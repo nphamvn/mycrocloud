@@ -5,7 +5,7 @@ public class JsonTypeHandler<T> : SqlMapper.TypeHandler<T>
 {
     public override void SetValue(System.Data.IDbDataParameter parameter, T value)
     {
-        parameter.Value = JsonSerializer.Serialize(value, new JsonSerializerOptions());
+        parameter.Value = JsonSerializer.Serialize(value);
     }
     public override T Parse(object value)
     {
@@ -13,6 +13,6 @@ public class JsonTypeHandler<T> : SqlMapper.TypeHandler<T>
         {
             return JsonSerializer.Deserialize<T>(json);
         }
-        return default(T);
+        return default;
     }
 }

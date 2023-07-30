@@ -1,15 +1,14 @@
 @using MycroCloud.WeMvc
-@using MycroCloud.WebMvc.Areas.Services.Controllers
 @model MycroCloud.WebMvc.Areas.Services.Models.WebApps.AuthorizationPolicyListViewModel
 @{
     ViewData["Tab"] = "Policies";
 }
 <div class="row">
     <div class="col-2">
-        <partial name="/Views/WebApplications/_SideBar.cshtml" viewModel="Model.WebApplication" />
+        <partial name="Shared/_SideBar" />
     </div>
     <div class="col-10">
-        <partial name="/Views/WebApplications/Authorization/_NavBar.cshtml" viewModel="Model.WebApplication" />
+        <partial name="_NavBar" />
         <div class="mt-2">
             <a class="btn btn-primary"
                 href="@Url.Action(nameof(WebAppAuthorizationsController.CreatePolicy), "WebAppAuthorizations",new { WebApplicationName = Model.WebApp.Name })">New</a>

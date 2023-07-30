@@ -1,0 +1,11 @@
+GET https://localhost:5002/webapps/app-1/routes/4
+X-Requested-With: XMLHttpRequest
+X-Dev-Key: 8D92604B-F47F-4C55-B9A4-D35EF8AE819F
+
+###
+POST  https://localhost:5002/webapps/app-1/routes/create
+X-Requested-With: XMLHttpRequest
+X-Dev-Key: 8D92604B-F47F-4C55-B9A4-D35EF8AE819F
+content-type: application/json
+
+{"name":"foo","description":"foo","matchOrder":1,"matchPath":"/foo","matchMethods":["GET","POST"],"authorization":{"type":"AllowAnonymous","authenticationSchemeIds":[1],"policyIds":[1,2]},"validation":{"queryParameters":[],"headers":[],"body":[]},"responseProvider":"Mock","response":{"mock":{"statusCode":{"renderedValue":{"engine":"None","template":"200"}},"headers":[],"body":{"renderedValue":{"engine":"None","template":"{\n  \"foo\": \"bar\"\n}","format":"json"}}}}}

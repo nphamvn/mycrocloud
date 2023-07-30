@@ -1,12 +1,11 @@
-@using MycroCloud.WebMvc.Areas.Services.Controllers
-@model MycroCloud.WebMvc.Areas.Services.Models.WebApps.WebAppModel
 @{
-    var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
-    var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
+    var appName = (string)ViewData["WebAppName"];
+    var action = ViewContext.RouteData.Values["action"].ToString();
 }
 <ul class="nav nav-tabs">
+    @action
     <li class="nav-item">
-        <a class="nav-link @(action.Equals("Settings", StringComparison.OrdinalIgnoreCase) ?"active":"")" href="@Url.Action(nameof(WebAppAuthenticationsController.Configurations),"WebAppAuthentications", new { WebApplicationName = Model.Name })">Settings</a>
+        <a class="nav-link @(action == nameof(WebAppAuthenticationsController.Configurations) ?"active": null)" href="@Url.Action(nameof(WebAppAuthenticationsController.Configurations),"WebAppAuthentications", new { WebApplicationName = appName })">Configurations</a>
     </li>
     <li class="nav-item">
         @{
@@ -14,6 +13,6 @@
                                action.Equals("newjwtbearerscheme", StringComparison.OrdinalIgnoreCase) ||
                                action.Equals("newapikeyscheme", StringComparison.OrdinalIgnoreCase);
         }
-        <a class="nav-link @(schemeAction ?"active":"")" href="@Url.Action(nameof(WebAppAuthenticationsController.SchemeList),"WebAppAuthentications", new { WebApplicationName = Model.Name })">Schemes</a>
+        <a class="nav-link @(schemeAction ?"active":"")" href="@Url.Action(nameof(WebAppAuthenticationsController.SchemeList),"WebAppAuthentications", appName)">Schemes</a>
     </li>
 </ul>

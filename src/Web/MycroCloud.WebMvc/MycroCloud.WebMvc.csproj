@@ -6,13 +6,20 @@
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(RunConfiguration)' == 'MockServer.Web' " />
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'MycroCloud.WebMvc' " />
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" Version="4.0.1" />
+    <PackageReference Include="FluentValidation" Version="11.6.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.24.0-rc2" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.55.0" />
     <PackageReference Include="Grpc.Net.ClientFactory" Version="2.55.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.56.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0-preview.6.23329.11" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-preview.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.5" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
     <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="5.2.2" />
     <PackageReference Include="System.CodeDom" Version="8.0.0-preview.1.23110.8" />
@@ -22,13 +29,11 @@
     <ProjectReference Include="..\..\Shared\MycroCloud.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Protobuf Include="Areas\Services\Protos\webapp.proto">
-      <GrpcServices>Client</GrpcServices>
-      <Access>Public</Access>
-      <ProtoCompile>True</ProtoCompile>
-      <CompileOutputs>True</CompileOutputs>
-      <OutputDir>obj\Debug/net8.0/</OutputDir>
-      <Generator>MSBuild:Compile</Generator>
-    </Protobuf>
+    <Protobuf Include="Areas\Services\Protos\webapp.proto" GrpcServices="Client" />
+    <Protobuf Include="Areas\Services\Protos\webapproute.proto" GrpcServices="Client" />
+    <Protobuf Include="Areas\Services\Protos\webappauthentication.proto" GrpcServices="Client" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Areas/Services/Views/Shared/" />
   </ItemGroup>
 </Project>

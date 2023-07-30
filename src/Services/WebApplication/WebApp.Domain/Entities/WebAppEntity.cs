@@ -1,6 +1,6 @@
 namespace WebApp.Domain.Entities;
 
-public class WebAppEntity
+public class WebAppEntity : BaseEntity
 {
     public int WebAppId { get; set; }
     public int UserId { get; set; }

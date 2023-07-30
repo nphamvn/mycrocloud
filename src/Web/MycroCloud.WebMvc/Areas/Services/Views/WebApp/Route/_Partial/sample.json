@@ -2,16 +2,14 @@
     "id": 1,
     "name": "foo",
     "description": "foo",
-    "match": {
-        "order": 1,
-        "path": "/foo",
-        "methods": [
-            "GET",
-            "POST"
-        ]
-    },
+    "matchOrder": 1,
+    "matchPath": "/foo",
+    "matchMethods": [
+        "GET",
+        "POST"
+    ],
+    "authorizationType": "Authorized",
     "authorization": {
-        "type": "Authorized",
         "authenticationSchemeIds": [
             1
         ],
@@ -54,32 +52,30 @@
             }
         ]
     },
+    "responseProvider": "Mock",
     "response": {
-        "provider": "Mock",
-        "mock": {
-            "statusCode": {
-                "renderedValue": {
-                    "engine": "None",
-                    "template": "200"
-                }
-            },
-            "headers": [
-                {
-                    "name": "foo",
-                    "value": {
-                        "renderedValue": {
-                            "engine": "None",
-                            "template": "bar"
-                        }
+        "statusCode": {
+            "renderedValue": {
+                "engine": "None",
+                "template": "200"
+            }
+        },
+        "headers": [
+            {
+                "name": "foo",
+                "value": {
+                    "renderedValue": {
+                        "engine": "None",
+                        "template": "bar"
                     }
                 }
-            ],
-            "body": {
-                "renderedValue": {
-                    "engine": "None",
-                    "template": "{\n  \"foo\": \"bar\"\n}",
-                    "format": "json"
-                }
+            }
+        ],
+        "body": {
+            "renderedValue": {
+                "engine": "None",
+                "template": "{\n  \"foo\": \"bar\"\n}",
+                "format": "json"
             }
         }
     }

@@ -1,16 +1,14 @@
-@using MycroCloud.WebMvc.Areas.Services.Controllers
 @model MycroCloud.WebMvc.Areas.Services.Models.WebApps.RouteIndexViewModel
 @{
-    ViewData["Title"] = Model.WebApp.Name;
+    var appName = (string)ViewData["WebAppName"];
+    var controller = "Routes";
+    ViewData["Title"] = appName + " - " + controller;
     var routes = Model.Routes.Select(r => new
     {
         Id = r.RouteId,
-        Name = r.Name,
-        Match = new
-        {
-            Methods = new List<string> { "GET" },
-            Path = "/foo"
-        }
+        r.Name,
+        r.MatchPath,
+        r.MatchMethods
     });
 }
 @section Scripts {
@@ -40,7 +38,7 @@
 }
 <div class="row">
     <div class="col-2">
-        <partial name="/Views/WebApplications/_SideBar.cshtml" viewModel="Model.WebApplication" />
+        <partial name="/Areas/Services/Views/WebApp/Shared/_SideBar.cshtml" />
     </div>
     <div id="app" class="col-10">
         <v-row>
@@ -48,7 +46,7 @@
                 <v-btn class="bg-primary" prepend-icon="mdi-plus" block @@click="newRoute">
                     NEW ROUTE
                 </v-btn>
-                <v-text-field class="mt-2" v-viewModel="searchTerm" @@keyup="fetchRoutes" variant="solo"
+                <v-text-field class="mt-2" v-model="searchTerm" @@keyup="fetchRoutes" variant="solo"
                     placeholder="Search">
                 </v-text-field>
                 <template v-if="routes.length > 0">
@@ -67,8 +65,8 @@
         </v-row>
     </div>
 </div>
-<partial name="/Views/WebApplications/Routes/_Partial/_RouteListComponent.cshtml" />
-<partial name="/Views/WebApplications/Routes/_Partial/_RouteEditorComponent.cshtml" />
+<partial name="_Partial/_RouteListComponent.cshtml" />
+<partial name="_Partial/_RouteEditorComponent.cshtml" />
 <script>
     const RootComponent = {
         setup() {
@@ -76,18 +74,18 @@
             const route = ref(null);
             let sampleRoute = null;
             const searchTerm = ref('');
-            const newRoute = () => {
+            const newRoute = async () => {
                 route.value = { ...sampleRoute, id: undefined };
             }
             const openRoute = async id => {
-                const TempRouteDetailUrl = '@Url.Action(nameof(WebAppRoutesController.Get),"WebAppRoutes", new { WebApplicationName = Model.WebApp.Name, RouteId = -9999})';
+                const TempRouteDetailUrl = '@Url.Action(nameof(WebAppRoutesController.Get),"WebAppRoutes", new { WebApplicationName = appName, RouteId = -9999})';
                 const res = await axios.get(TempRouteDetailUrl.replace('-9999', id));
                 route.value = res.data;
                 route.value.id = route.value.id || id;
             }
             let timeout = null;
             const fetchRoutes = () => {
-                const IndexUrl = '@Url.Action(nameof(WebAppRoutesController.List), "WebAppRoutes", new {WebApplicationName = Model.WebApp.Name})'
+                const IndexUrl = '@Url.Action(nameof(WebAppRoutesController.List), "WebAppRoutes", new {WebApplicationName = appName})'
                 clearTimeout(timeout);
                 timeout = setTimeout(async () => {
                     const params = {
@@ -124,7 +122,7 @@
             }
             onMounted(async () => {
                 routes.value = JSON.parse('@Html.Raw(Json.Serialize(routes))');
-                const response = await axios.get('@Url.Action(nameof(WebAppRoutesController.Sample), "WebAppRoutes", new {WebApplicationName = Model.WebApp.Name})')
+                const response = await axios.get('@Url.Action(nameof(WebAppRoutesController.Sample), "WebAppRoutes")')
                 sampleRoute = response.data;
             })
             return {

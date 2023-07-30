@@ -1,52 +1,56 @@
 using System.Text;
 using System.Text.Json;
 using MycroCloud.WebMvc.Attributes;
-using MycroCloud.WebMvc.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
 using MycroCloud.WebMvc.Areas.Services.Services;
-using MycroCloud.WeMvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace MycroCloud.WebMvc.Areas.Services.Controllers;
 
 [Authorize]
 [Route("webapps/{WebApplicationName}/routes")]
-[GetAuthUserWebApplicationId(Constants.RouteName.WebAppName, Constants.RouteName.WebAppId)]
-public class WebAppRoutesController : Controller
+public class WebAppRoutesController(IWebAppRouteService webAppRouteService
+    , ILogger<WebAppRoutesController> logger) : BaseServiceController
 {
-    private readonly IWebAppRouteService _webAppRouteService;
+    private readonly ILogger _logger = logger;
+    private readonly IWebAppRouteService _webAppRouteService = webAppRouteService;
 
-    public WebAppRoutesController(IWebAppRouteService webAppRouteService)
+    public override void OnActionExecuting(ActionExecutingContext context)
     {
-        _webAppRouteService = webAppRouteService;
+        if (context.ActionArguments.TryGetValue("WebApplicationName", out object appName)) ViewData["WebAppName"] = appName;
     }
-    
+
     [HttpGet]
-    public async Task<IActionResult> Index(int WebApplicationId, string SearchTerm, string Sort)
+    public async Task<IActionResult> Index(string WebApplicationName, string SearchTerm, string Sort)
     {
-        var vm = await _webAppRouteService.GetIndexViewModel(WebApplicationId, SearchTerm, Sort);
+        var vm = await _webAppRouteService.GetIndexViewModel(WebApplicationName, SearchTerm, Sort);
         return View("/Areas/Services/Views/WebApp/Route/Index.cshtml", vm);
     }
 
     [AjaxOnly]
     [HttpGet]
-    public async Task<IActionResult> List(int WebApplicationId, string SearchTerm, string Sort)
+    public async Task<IActionResult> List(string WebApplicationName, string SearchTerm, string Sort)
     {
-        var routes = await _webAppRouteService.GetList(WebApplicationId, SearchTerm, Sort);
+        var routes = await _webAppRouteService.GetList(WebApplicationName, SearchTerm, Sort);
         return Ok(routes.Select(r => new
         {
             r.RouteId,
             r.Name,
-            r.Description
+            r.Description,
+            r.MatchPath,
+            r.MatchMethods,
+            r.MatchOrder
         }));
     }
 
+    [AllowAnonymous]
     [AjaxOnly]
-    [HttpGet("sample")]
+    [HttpGet("/webapps/routes/sample")]
     public IActionResult Sample()
     {
-        var json = System.IO.File.ReadAllText("Views/WebApplications/Routes/_Partial/sample.json");
+        var json = System.IO.File.ReadAllText("Areas/Services/Views/WebApp/Route/_Partial/sample.json");
         var sampleRoute = JsonSerializer.Deserialize<dynamic>(json);
         return Ok(sampleRoute);
     }
@@ -62,18 +66,17 @@ public class WebAppRoutesController : Controller
 
     [AjaxOnly]
     [HttpGet("{RouteId:int}")]
-    public async Task<IActionResult> Get(int RouteId)
+    public async Task<IActionResult> Get(string WebApplicationName, int RouteId)
     {
-        var json = System.IO.File.ReadAllText("Views/WebApplications/Routes/_Partial/sample.json");
-        var sampleRoute = JsonSerializer.Deserialize<dynamic>(json);
-        return Ok(sampleRoute);
-        //return ok(route);
+        var route = await _webAppRouteService.GetRouteDetails(WebApplicationName, RouteId);
+        return Ok(route);
     }
 
     [AjaxOnly]
-    [HttpPost("create")]
-    public async Task<IActionResult> Create(int WebApplicationId, [FromBody] RouteSaveModel route)
+    [HttpPost("Create")]
+    public async Task<IActionResult> Create(string WebApplicationName, [FromBody] RouteSaveModel route)
     {
+        _logger.LogInformation(JsonSerializer.Serialize(route));
         return Ok(route);
     }
     

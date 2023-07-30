@@ -1,11 +1,11 @@
-@using MycroCloud.WebMvc.Areas.Services.Controllers
-@model MycroCloud.WebMvc.Areas.
+@model MycroCloud.WebMvc.Areas.Services.Models.WebApps.WebAppViewViewModel
 @{
     var rv = new { name = Model.Name };
+    ViewData["WebAppName"] = Model.Name;
 }
 <div class="row">
     <div class="col-2">
-        <partial name="/Views/WebApplications/_SideBar.cshtml" viewModel="Model"></partial>
+        <partial name="Shared/_SideBar.cshtml"></partial>
     </div>
     <div class="col-10">
         <div class="tab-content h-100">
@@ -55,7 +55,7 @@
                                         This will permanently delete everything in the <strong>@Model.Name</strong>
                                         project.
                                     </div>
-                                    <form asp-action="@nameof(WebAppsController.Delete)"
+                                    <form asp-action="@nameof(WebAppsController.Delete)" asp-controller="WebApps"
                                         asp-route-name="@Model.Name">
                                         <div>
                                             <div class="mb-3">

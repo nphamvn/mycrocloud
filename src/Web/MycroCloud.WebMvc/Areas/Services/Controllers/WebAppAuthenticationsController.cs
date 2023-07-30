@@ -1,19 +1,24 @@
 using MycroCloud.WebMvc.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MycroCloud.WebMvc.Controllers;
 using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
 using MycroCloud.WebMvc.Areas.Services.Services;
 using MycroCloud.WeMvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace MycroCloud.WebMvc.Areas.Services.Controllers;
 
 [Authorize]
 [Route("webapps/{WebApplicationName}/authentications")]
 [GetAuthUserWebApplicationId(Constants.RouteName.WebAppName, Constants.RouteName.WebAppId)]
-public class WebAppAuthenticationsController: BaseController
+public class WebAppAuthenticationsController: BaseServiceController
 {
     private readonly IWebAppAuthenticationService _webAppAuthenticationService;
+
+    public override void OnActionExecuting(ActionExecutingContext context)
+    {
+        ViewData["WebAppName"] = context.ActionArguments["WebApplicationName"];
+    }
 
     public WebAppAuthenticationsController(IWebAppAuthenticationService webAppAuthenticationService)
     {
@@ -35,9 +40,9 @@ public class WebAppAuthenticationsController: BaseController
     }
 
     [HttpGet("Schemes")]
-    public async Task<IActionResult> SchemeList(int WebApplicationId)
+    public async Task<IActionResult> SchemeList(string WebApplicationName)
     {
-        var vm = await _webAppAuthenticationService.GetSchemeListViewModel(WebApplicationId);
+        var vm = await _webAppAuthenticationService.GetSchemeListViewModel(WebApplicationName);
         return View("/Areas/Services/Views/WebApp/Authentication/SchemeList.cshtml", vm);
     }
 

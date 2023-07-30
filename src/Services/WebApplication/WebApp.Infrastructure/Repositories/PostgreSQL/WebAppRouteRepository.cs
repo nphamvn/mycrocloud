@@ -6,7 +6,8 @@ using WebApp.Domain.Repositories;
 
 namespace WebApp.Infrastructure.Repositories.PostgreSql;
 
-public class WebAppRouteRepository(IOptions<PostgresDatabaseOptions> databaseOptions) : BaseRepository(databaseOptions), IWebAppRouteRepository
+public class WebAppRouteRepository(IOptions<PostgresDatabaseOptions> databaseOptions) 
+    : BaseRepository(databaseOptions), IWebAppRouteRepository
 {
     public async Task<int> Create(int appId, RouteEntity route)
     {
@@ -86,30 +87,40 @@ WHERE
         });
     }
 
-    public async Task<RouteEntity> Get(int id)
+    public async Task<RouteEntity> Get(string userId, string appName, int routeId)
     {
         const string query = """
 SELECT
-    route_id RouteId,
-    web_application_id WebAppId,
-    name Name,
-    description Description,
-    match Match,
-    "authorization" Authorization,
-    validation Validation,
-    response Response
+	war.route_id RouteId,
+	war.web_application_id WebAppId,
+	war."name" Name,
+    war.description Description,
+	"path" MatchPath,
+    COALESCE(JSON_AGG(rmmb.method) FILTER (WHERE rmmb.method IS NOT NULL), '[]') MatchMethods,
+    war.match_order MatchOrder,
+    war.authorization_type AuthorizationType,
+    war.integration_type ResponseProvider,
+	war.created_date CreatedDate,
+    war.updated_date UpdatedDate
 FROM
-    web_application_route
-WHERE 
-    route_id = @route_id
+	public.web_application_route war
+	INNER JOIN web_application wa ON wa.web_application_id = war.web_application_id
+	LEFT JOIN  web_app_route_match_method_bind rmmb ON rmmb.route_id = war.route_id
+WHERE
+	wa.user_id = @user_id and wa."name" = @app_name and war.route_id  = @route_id
+GROUP BY
+	war.route_id
 """;
         await using var connection = new NpgsqlConnection(ConnectionString);
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<MatchMethodCollection>());
         SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteAuthorization>());
         SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteValidation>());
         SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteResponse>());
         return await connection.QuerySingleOrDefaultAsync<RouteEntity>(query, new
         {
-            route_id = id
+            user_id = userId,
+            app_name = appName,
+            route_id = routeId
         });
     }
 
@@ -175,6 +186,58 @@ WHERE
         return await connection.QuerySingleOrDefaultAsync<RouteMockResponse>(query, new
         {
             route_id = routeId
+        });
+    }
+
+    public async Task<IEnumerable<RouteEntity>> GetAll(string userId, string appName, string searchTerm, string sort)
+    {
+        var query =
+"""
+SELECT
+	war.route_id RouteId,
+	war.web_application_id WebAppId,
+	war."name" Name,
+    war.description Description,
+	"path" MatchPath,
+    COALESCE(JSON_AGG(rmmb.method) FILTER (WHERE rmmb.method IS NOT NULL), '[]') MatchMethods,
+    war.match_order MatchOrder,
+    war.authorization_type AuthorizationType,
+    war.integration_type ResponseProvider,
+	war.created_date CreatedDate,
+    war.updated_date UpdatedDate
+FROM
+	web_application_route war
+INNER JOIN
+	web_application wa ON wa.web_application_id = war.web_application_id
+    LEFT JOIN web_app_route_match_method_bind rmmb ON rmmb.route_id = war.route_id
+WHERE 
+	wa.user_id = @user_id and wa."name" = @web_app_name
+GROUP BY
+    war.route_id
+/**/
+""";
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            query +=
+                    """
+                    AND war."name" LIKE @query OR "path" LIKE @query
+                    """;
+        }
+        if (!string.IsNullOrEmpty(sort))
+        {
+            query +=
+                """
+                /**/
+                ORDER BY route_id
+                """;
+        }
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<MatchMethodCollection>());
+        await using var connection = new NpgsqlConnection(ConnectionString);
+        return await connection.QueryAsync<RouteEntity>(query, new
+        {
+            user_id = userId,
+            web_app_name = appName,
+            query = "%" + searchTerm + "%"
         });
     }
 }

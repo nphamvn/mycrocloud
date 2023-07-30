@@ -1,0 +1,4 @@
+{
+    "dotnet.defaultSolution": "WebApplication.sln",
+    "sqltools.connections": []
+}

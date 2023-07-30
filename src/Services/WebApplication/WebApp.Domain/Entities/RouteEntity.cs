@@ -3,23 +3,27 @@ using System.Text.Json.Serialization;
 using WebApp.Domain.Shared;
 
 namespace WebApp.Domain.Entities;
-public class RouteEntity
+public class RouteEntity : BaseEntity
 {
     public int RouteId { get; set; }
     public int WebAppId { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
     public int MatchOrder { get; set; }
-    public List<string> MatchMethods { get; set; }
-    public string MathPath { get; set; }
-    public RouteAuthorization RouteAuthorization { get; set; }
+    public string MatchPath { get; set; }
+    public MatchMethodCollection MatchMethods { get; set; }
+    public RouteAuthorizationType AuthorizationType { get; set; }
+    public RouteAuthorization Authorization { get; set; }
     public RouteValidation Validation { get; set; }
+    public RouteResponseProvider ResponseProvider { get; set; }
     public RouteResponse Response { get; set; }
+}
+public class MatchMethodCollection : List<string>
+{
+
 }
 public class RouteAuthorization
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public RouteAuthorizationType Type { get; set; }
     public List<int> PolicyIds { get; set; }
     public IEnumerable<AuthenticationSchemeEntity> AuthenticationSchemes { get; set; }
     public List<int> AuthenticationSchemeIds { get; set; }

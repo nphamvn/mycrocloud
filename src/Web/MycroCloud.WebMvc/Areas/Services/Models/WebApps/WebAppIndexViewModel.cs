@@ -2,7 +2,7 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps;
 public class WebAppIndexViewModel
 {
     public WebAppSearchModel Search { get; set; } = new WebAppSearchModel();
-    public IEnumerable<WebAppIndexItem> Applications { get; set; }
+    public IEnumerable<WebAppIndexItem> WebApps { get; set; }
 }
 public class WebAppSearchModel
 {

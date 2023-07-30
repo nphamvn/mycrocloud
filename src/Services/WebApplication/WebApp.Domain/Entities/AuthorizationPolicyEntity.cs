@@ -1,5 +1,5 @@
 namespace WebApp.Domain.Entities;
-public class AuthorizationPolicyEntity
+public class AuthorizationPolicyEntity : BaseEntity
 {
     public int PolicyId { get; set; }
     public string Name { get; set; }

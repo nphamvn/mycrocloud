@@ -1,23 +1,11 @@
-using MycroCloud.WebMvc.Controllers;
-using MycroCloud.WebMvc.Filters;
 using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MycroCloud.WebMvc.Areas.Services.Services;
 
 namespace MycroCloud.WebMvc.Areas.Services.Controllers;
-
-[Authorize]
-[Route("webapps")]
-//[GetAuthUserWebApplicationId(Constants.RouteName.WebAppName, Constants.RouteName.WebAppId)]
-public class WebAppsController : BaseController
+public class WebAppsController(IWebAppService webAppService) : BaseServiceController
 {
-    private readonly IWebAppService _webAppService;
-
-    public WebAppsController(IWebAppService webAppService)
-    {
-        _webAppService = webAppService;
-    }
+    private readonly IWebAppService _webAppService = webAppService;
 
     [HttpGet]
     public async Task<IActionResult> Index(WebAppSearchModel fm)
@@ -47,9 +35,9 @@ public class WebAppsController : BaseController
 
     [HttpGet("{WebApplicationName}")]
     //[HttpGet("{WebApplicationName}/View")]
-    public async Task<IActionResult> View(int WebApplicationId)
+    public async Task<IActionResult> View(string WebApplicationName)
     {
-        var vm = await _webAppService.Get(WebApplicationId);
+        var vm = await _webAppService.Get(WebApplicationName);
         return View("/Areas/Services/Views/WebApp/View.cshtml", vm);
     }
     
