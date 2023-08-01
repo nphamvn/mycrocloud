@@ -10,9 +10,18 @@ import "google/protobuf/timestamp.proto";
 service WebApp {
   rpc GetAll(GetAllWebAppRequest) returns (GetAllWebAppResponse);
   rpc Get(GetWebAppRequest) returns (GetWebAppResponse);
+  rpc FindByUsernameAndAppName(FindByUsernameAndAppNameRequest) returns (FindByUsernameAndAppNameResponse);
   rpc Create(CreateWebAppRequest) returns (CreateWebAppResponse);
   rpc Rename(RenameWebAppRequest) returns (RenameWebAppResponse);
   rpc Delete(DeleteWebAppRequest) returns (DeleteWebAppResponse);
+}
+message FindByUsernameAndAppNameRequest {
+  string username = 1;
+  string app_name = 2;
+}
+message FindByUsernameAndAppNameResponse {
+  int32 app_id = 1;
+  string user_id = 2;
 }
 message GetWebAppRequest {
   string user_id = 1;
@@ -22,8 +31,8 @@ message GetWebAppResponse {
   int32 id = 1;
   string name = 2;
   string description = 3;
-  // google.protobuf.Timestamp created_time = 4;
-  // google.protobuf.Timestamp updated_time = 5;
+  google.protobuf.Timestamp created_time = 4;
+  google.protobuf.Timestamp updated_time = 5;
 }
 message GetAllWebAppRequest {
   string user_id = 1;

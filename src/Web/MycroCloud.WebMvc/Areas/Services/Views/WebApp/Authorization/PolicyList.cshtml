@@ -11,7 +11,7 @@
         <partial name="_NavBar" />
         <div class="mt-2">
             <a class="btn btn-primary"
-                href="@Url.Action(nameof(WebAppAuthorizationsController.CreatePolicy), "WebAppAuthorizations",new { WebApplicationName = Model.WebApp.Name })">New</a>
+                href="@Url.Action(nameof(WebAppAuthorizationsController.CreatePolicy), "WebAppAuthorizations",new { WebApplicationName = ViewData["WebAppName"]})">New</a>
         </div>
         <div>
             <table class="table">
@@ -32,7 +32,7 @@
                                 <td>@no</td>
                                 <td>
                                     <a class="text-decoration-none"
-                                href="@Url.Action(nameof(WebAppAuthorizationsController.EditPolicy), "WebAppAuthorizations" ,new { WebApplicationName = Model.WebApp.Name , PolicyId = policy.PolicyId})">@policy.Name</a>
+                                href="@Url.Action(nameof(WebAppAuthorizationsController.EditPolicy), "WebAppAuthorizations" ,new { WebApplicationName = ViewData["WebAppName"] , PolicyId = policy.PolicyId})">@policy.Name</a>
                                 </td>
                                 <td>
                                     <button data-id="@policy.PolicyId" class="js-delete-button" data-bs-toggle="modal"
@@ -79,7 +79,7 @@
         const id = $(this).data('id');
         const modal = $('#delete-modal');
         const tempUrl = '@Url.Action(nameof(WebAppAuthorizationsController.DeletePolicy), "WebAppAuthorizations",
-            new RouteValueDictionary { [Constants.RouteName.WebAppName] = Model.WebApp.Name, [Constants.RouteName.WebAppAuthorizationPolicyId] = -9999})';
+            new RouteValueDictionary { [Constants.RouteName.WebAppName] = ViewData["WebAppName"], [Constants.RouteName.WebAppAuthorizationPolicyId] = -9999})';
         $('form', modal).attr('action', tempUrl.replace('-9999', id));
     })
 </script>

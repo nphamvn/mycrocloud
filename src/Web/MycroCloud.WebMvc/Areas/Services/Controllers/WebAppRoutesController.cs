@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 namespace MycroCloud.WebMvc.Areas.Services.Controllers;
 
 [Authorize]
-[Route("webapps/{WebApplicationName}/routes")]
+[Route("{Username}/[area]/webapps/{WebApplicationName}/routes")]
 public class WebAppRoutesController(IWebAppRouteService webAppRouteService
     , ILogger<WebAppRoutesController> logger) : BaseServiceController
 {

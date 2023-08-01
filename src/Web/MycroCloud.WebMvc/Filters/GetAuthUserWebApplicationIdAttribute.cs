@@ -15,7 +15,7 @@ public class GetAuthUserWebApplicationIdAttribute : ActionFilterAttribute
     }
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var user = context.HttpContext.User.ToIdentityUser();
+        var user = context.HttpContext.User.ToMycroCloudUser();
         var webAppService = context.HttpContext.RequestServices.GetService<IWebAppService>();
         string appName = null;
         if (context.ActionArguments.TryGetValue(_appNameKey, out var argument))
@@ -28,7 +28,7 @@ public class GetAuthUserWebApplicationIdAttribute : ActionFilterAttribute
         }
         if (!string.IsNullOrEmpty(appName))
         {
-            var app = await webAppService.Zzz(user.Id, appName);
+            var app = await webAppService.Find(user.Id, appName);
             if (app != null)
             {
                 context.ActionArguments[_setKey] = app.WebAppId;

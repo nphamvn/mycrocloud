@@ -1,12 +1,43 @@
 using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
 using Microsoft.AspNetCore.Mvc;
 using MycroCloud.WebMvc.Areas.Services.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Identity;
 
 namespace MycroCloud.WebMvc.Areas.Services.Controllers;
-public class WebAppsController(IWebAppService webAppService) : BaseServiceController
+[Authorize]
+public class WebAppsController(IWebAppService webAppService, ILogger<WebAppsController> logger) : BaseServiceController
 {
     private readonly IWebAppService _webAppService = webAppService;
+    private readonly ILogger<WebAppsController> _logger = logger;
 
+    public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    {
+        await base.OnActionExecutionAsync(context, next);
+        if (context.HttpContext.Items["ServiceOwner"] is not IdentityUser owner)
+        {
+            _logger.LogInformation("ServiceOwner not found");
+            context.Result = new NotFoundResult();
+            return;
+        }
+        if (context.ActionArguments.TryGetValue("WebApplicationName", out object appName))
+        {
+            ViewData["WebAppName"] = appName;
+            var webapp = await _webAppService.Find(owner.Id, appName.ToString());
+            if (webapp == null)
+            {
+                _logger.LogInformation("WebApp not found");
+                context.Result = new NotFoundResult();
+                return;
+            }
+            context.ActionArguments["WebAppId"] = webapp.WebAppId;
+            context.HttpContext.Items["WebApp"] = webapp;
+        }
+        await next();
+    }
+
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> Index(WebAppSearchModel fm)
     {
@@ -33,14 +64,14 @@ public class WebAppsController(IWebAppService webAppService) : BaseServiceContro
         return RedirectToAction(nameof(View), new { WebApplicationName = app.Name });
     }
 
+    [AllowAnonymous]
     [HttpGet("{WebApplicationName}")]
-    //[HttpGet("{WebApplicationName}/View")]
     public async Task<IActionResult> View(string WebApplicationName)
     {
         var vm = await _webAppService.Get(WebApplicationName);
         return View("/Areas/Services/Views/WebApp/View.cshtml", vm);
     }
-    
+
     [HttpPost("rename")]
     public async Task<IActionResult> Rename(int WebApplicationId, string newName)
     {

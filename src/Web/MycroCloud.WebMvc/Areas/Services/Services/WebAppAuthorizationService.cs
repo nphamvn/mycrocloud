@@ -11,7 +11,7 @@ public interface IWebAppAuthorizationService
     Task Delete(int policyId);
 }
 
-public class WebAppAuthorizationService : BaseService, IWebAppAuthorizationService
+public class WebAppAuthorizationService : ServiceBaseService, IWebAppAuthorizationService
 {
     public WebAppAuthorizationService(IHttpContextAccessor contextAccessor) : base(contextAccessor)
     {

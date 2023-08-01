@@ -13,7 +13,7 @@ public interface IWebAppAuthenticationService
 }
 
 public class WebAppAuthenticationService(IHttpContextAccessor contextAccessor
-, WebApp.Api.Grpc.WebAppAuthentication.WebAppAuthenticationClient webAppAuthenticationClient) : BaseService(contextAccessor), IWebAppAuthenticationService
+, WebApp.Api.Grpc.WebAppAuthentication.WebAppAuthenticationClient webAppAuthenticationClient) : ServiceBaseService(contextAccessor), IWebAppAuthenticationService
 {
     private readonly WebApp.Api.Grpc.WebAppAuthentication.WebAppAuthenticationClient _webAppAuthenticationClient = webAppAuthenticationClient;
 
@@ -21,7 +21,7 @@ public class WebAppAuthenticationService(IHttpContextAccessor contextAccessor
     {
         var vm = new AuthenticationSchemeListViewModel();
         var res = await _webAppAuthenticationClient.GetAllAsync(new () {
-            UserId = AuthUser.Id,
+            UserId = ServiceOwner.Id,
             AppName = appName
         });
         vm.AuthenticationSchemes = res.Schemes.Select(s => new AuthenticationSchemeIndexItem {

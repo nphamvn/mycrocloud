@@ -1,3 +1,4 @@
+using Grpc.Core;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
 using WebApp.Api.Grpc;
@@ -5,7 +6,7 @@ using WebApp.Api.Grpc;
 namespace MycroCloud.WebMvc.Areas.Services.Services;
 public interface IWebAppService
 {
-    Task<WebAppModel> Zzz(string userId, string appName);
+    Task<WebAppModel> Find(string userName, string appName);
     Task<WebAppViewViewModel> Get(string name);
     Task<WebAppIndexViewModel> GetIndexViewModel(WebAppSearchModel searchModel);
     Task Create(WebAppCreateViewModel app);
@@ -13,26 +14,36 @@ public interface IWebAppService
     Task Delete(int appId);
 }
 
-public class WebAppService : BaseService, IWebAppService
+public class WebAppService(IHttpContextAccessor contextAccessor
+    , WebApp.Api.Grpc.WebApp.WebAppClient webAppClient) : ServiceBaseService(contextAccessor), IWebAppService
 {
-    private readonly WebApp.Api.Grpc.WebApp.WebAppClient _webAppClient;
+    private readonly WebApp.Api.Grpc.WebApp.WebAppClient _webAppClient = webAppClient;
 
-    public WebAppService(IHttpContextAccessor contextAccessor
-    , WebApp.Api.Grpc.WebApp.WebAppClient webAppClient) : base(contextAccessor)
+    public async Task<WebAppModel> Find(string userId, string appName)
     {
-        _webAppClient = webAppClient;
-    }
-
-    public async Task<WebAppModel> Zzz(string userId, string appName)
-    {
-        throw new NotImplementedException();
+        try
+        {
+            var res = await _webAppClient.GetAsync(new()
+            {
+                UserId = userId,
+                Name = appName
+            });
+            return new()
+            {
+                WebAppId = res.Id
+            };
+        }
+        catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
+        {
+            return null;
+        }
     }
 
     public async Task<WebAppViewViewModel> Get(string name)
     {
         var res = await _webAppClient.GetAsync(new()
         {
-            UserId = AuthUser.Id,
+            UserId = ServiceOwner.Id,
             Name = name
         });
         return new()
@@ -46,7 +57,7 @@ public class WebAppService : BaseService, IWebAppService
     {
         var result = await _webAppClient.GetAllAsync(new GetAllWebAppRequest()
         {
-            UserId = AuthUser.Id
+            UserId = ServiceOwner.Id
         });
         var viewModel = new WebAppIndexViewModel
         {
@@ -63,7 +74,7 @@ public class WebAppService : BaseService, IWebAppService
     {
         var result = await _webAppClient.CreateAsync(new CreateWebAppRequest()
         {
-            UserId = AuthUser.Id,
+            UserId = ServiceOwner.Id,
             Name = model.Name
         });
     }

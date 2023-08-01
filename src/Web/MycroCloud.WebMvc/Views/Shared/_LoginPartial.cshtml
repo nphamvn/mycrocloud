@@ -1,7 +1,7 @@
 @using MycroCloud.WebMvc.Extentions
 @if (User!.Identity!.IsAuthenticated)
 {
-    var user = User.ToIdentityUser();
+    var user = User.ToMycroCloudUser();
     <form asp-area="Identity" asp-page="/Account/Logout" method="post" id="logoutForm">
         <div class="dropdown">
             <button class="btn dropdown-toggle text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">

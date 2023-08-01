@@ -1,11 +1,12 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using MycroCloud.WebMvc.Areas.Identity.Models;
 
 namespace MycroCloud.WebMvc.Extentions
 {
     public static class ClaimsPrincipalExtensions
     {
-        public static IdentityUser ToIdentityUser(this ClaimsPrincipal principal)
+        public static IdentityUser ToMycroCloudUser(this ClaimsPrincipal principal)
         {
             var user = new IdentityUser
             {

@@ -20,7 +20,7 @@ public interface IWebAppRouteService
 }
 public class WebAppRouteService(IHttpContextAccessor contextAccessor
     , WebAppRoute.WebAppRouteClient webAppRouteClient
-    , WebAppAuthentication.WebAppAuthenticationClient authenticationClient) : BaseService(contextAccessor), IWebAppRouteService
+    , WebAppAuthentication.WebAppAuthenticationClient authenticationClient) : ServiceBaseService(contextAccessor), IWebAppRouteService
 {
     private readonly WebAppRoute.WebAppRouteClient _webAppRouteClient = webAppRouteClient;
     private readonly WebAppAuthentication.WebAppAuthenticationClient _authenticationClient = authenticationClient;
@@ -30,7 +30,7 @@ public class WebAppRouteService(IHttpContextAccessor contextAccessor
         var viewModel = new RouteIndexViewModel();
         var getRouteResponse = await _webAppRouteClient.GetAllAsync(new()
         {
-            UserId = AuthUser.Id,
+            UserId = ServiceOwner.Id,
             AppName = name
         });
         viewModel.Routes = getRouteResponse.Routes.Select(r => new RouteIndexItem
@@ -62,7 +62,7 @@ public class WebAppRouteService(IHttpContextAccessor contextAccessor
     {
         var res = await _authenticationClient.GetAllAsync(new()
         {
-            UserId = AuthUser.Id,
+            UserId = ServiceOwner.Id,
             AppName = name
         });
         return res.Schemes.Select(s => new AuthenticationSchemeIndexItem
@@ -77,7 +77,7 @@ public class WebAppRouteService(IHttpContextAccessor contextAccessor
     {
         var res = await _webAppRouteClient.GetAllAsync(new()
         {
-            UserId = AuthUser.Id,
+            UserId = ServiceOwner.Id,
             AppName = appName
         });
         return res.Routes.Select(r => new RouteIndexItem
@@ -126,7 +126,7 @@ public class WebAppRouteService(IHttpContextAccessor contextAccessor
     {
         var res = await _webAppRouteClient.GetAsync(new()
         {
-            UserId = AuthUser.Id,
+            UserId = ServiceOwner.Id,
             AppName = appName,
             Id = routeId
         });
