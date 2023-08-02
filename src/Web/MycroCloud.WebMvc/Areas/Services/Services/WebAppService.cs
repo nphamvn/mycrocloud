@@ -30,7 +30,11 @@ public class WebAppService(IHttpContextAccessor contextAccessor
             });
             return new()
             {
-                WebAppId = res.Id
+                WebAppId = res.Id,
+                UserId = res.UserId,
+                WebAppName = res.Name,
+                CreatedDate = res.CreatedTime.ToDateTime(),
+                UpdatedDate = res.UpdatedTime?.ToDateTime()
             };
         }
         catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
@@ -39,12 +43,11 @@ public class WebAppService(IHttpContextAccessor contextAccessor
         }
     }
 
-    public async Task<WebAppViewViewModel> Get(string name)
+    public async Task<WebAppViewViewModel> Get(int appId)
     {
-        var res = await _webAppClient.GetAsync(new()
+        var res = await _webAppClient.GetByIdAsync(new()
         {
-            UserId = ServiceOwner.Id,
-            Name = name
+            Id = appId
         });
         return new()
         {

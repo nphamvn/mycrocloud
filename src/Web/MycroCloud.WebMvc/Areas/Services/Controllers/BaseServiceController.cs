@@ -8,6 +8,7 @@ namespace MycroCloud.WebMvc.Areas.Services.Controllers;
 
 [Area("Services")]
 [Route("{Username}/[area]/[controller]")]
+[Route("[area]/[controller]")]
 public class BaseServiceController : BaseController
 {
     protected IdentityUser ServiceOwner;

@@ -47,7 +47,8 @@ public class WebAppService(ILogger<WebAppService> logger
     }
     public override async Task<DeleteWebAppResponse> Delete(DeleteWebAppRequest request, ServerCallContext context)
     {
-        await _webAppRepository.Delete();
+        await _webAppRepository.Delete(request.UserId, request.Name);
+        return new();
     }
     public override Task<RenameWebAppResponse> Rename(RenameWebAppRequest request, ServerCallContext context)
     {

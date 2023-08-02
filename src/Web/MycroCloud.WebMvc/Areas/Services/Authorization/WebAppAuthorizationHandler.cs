@@ -9,7 +9,7 @@ using static WebApp.Api.Grpc.WebApp;
 
 namespace MycroCloud.WebMvc.Areas.Services.Authorization;
 
-public class WebAppAuthorizationHandler(WebAppClient webAppClient, UserManager<IdentityUser> userManager) 
+public class WebAppAuthorizationHandler(WebAppClient webAppClient, UserManager<IdentityUser> userManager)
     : AuthorizationHandler<OperationAuthorizationRequirement, WebAppModel>
 {
     private readonly WebAppClient _webAppClient = webAppClient;
@@ -65,8 +65,6 @@ public class WebAppAuthorizationHandler(WebAppClient webAppClient, UserManager<I
     {
         context.Succeed(requirement);
     }
-
-
     public static class Operations
     {
         public static OperationAuthorizationRequirement Index =

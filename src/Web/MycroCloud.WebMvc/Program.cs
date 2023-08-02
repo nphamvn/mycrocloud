@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using MycroCloud.WebMvc.Areas.Services.Authorization;
 using MycroCloud.WebMvc.Authentications;
 using MycroCloud.WebMvc.Extentions;
 using Serilog;
@@ -84,6 +85,7 @@ builder.Services
         };
     })
     ;
+builder.Services.AddTransient<IAuthorizationHandler, WebAppAuthorizationHandler>();
 
 builder.Services.AddAuthorization(options => {
     options.DefaultPolicy = new AuthorizationPolicyBuilder()
@@ -91,6 +93,8 @@ builder.Services.AddAuthorization(options => {
             .AddAuthenticationSchemes(IdentityConstants.ApplicationScheme, "DevAuthentication")
             .Build();
 });
+
+
 
 Action<GrpcClientFactoryOptions> options = (o) =>
 {

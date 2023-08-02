@@ -34,6 +34,7 @@
     <Protobuf Include="Areas\Services\Protos\webappauthentication.proto" GrpcServices="Client" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Areas/Services/Filters/" />
     <Folder Include="Areas/Services/Views/Shared/" />
   </ItemGroup>
 </Project>
