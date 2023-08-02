@@ -24,7 +24,7 @@ public class WebAppRepository(IOptions<PostgresDatabaseOptions> databaseOptions)
         });
     }
 
-    public async Task Delete(int id)
+    public async Task Delete(string userId, string appName)
     {
         var query =
         """
@@ -34,7 +34,8 @@ public class WebAppRepository(IOptions<PostgresDatabaseOptions> databaseOptions)
         using var connection = new NpgsqlConnection(ConnectionString);
         await connection.ExecuteAsync(query, new
         {
-            id = id
+            user_id = userId,
+            app_name = appName
         });
     }
 

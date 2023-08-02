@@ -1,3 +1,4 @@
+@using MycroCloud.WebMvc.Areas.Services.Models.WebApps
 @model MycroCloud.WebMvc.Areas.Services.Models.WebApps.RouteIndexViewModel
 @{
     var appName = (string)ViewData["WebAppName"];
@@ -54,7 +55,7 @@
                     </route-list>
                 </template>
                 <template v-else>
-                    <p>No routes available.Create some routes.</p>
+                    <p>No routes. Create some.</p>
                 </template>
             </v-col>
             <v-col>

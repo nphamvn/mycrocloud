@@ -15,15 +15,14 @@ public class WebAppsController(IWebAppService webAppService, ILogger<WebAppsCont
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         await base.OnActionExecutionAsync(context, next);
-        if (context.HttpContext.Items["ServiceOwner"] is not IdentityUser owner)
+        if (ServiceOwner is not IdentityUser owner)
         {
             _logger.LogInformation("ServiceOwner not found");
             context.Result = new NotFoundResult();
             return;
         }
-        if (context.ActionArguments.TryGetValue("WebApplicationName", out object appName))
+        if (context.ActionArguments.TryGetValue("WebAppName", out object appName))
         {
-            ViewData["WebAppName"] = appName;
             var webapp = await _webAppService.Find(owner.Id, appName.ToString());
             if (webapp == null)
             {
@@ -61,28 +60,28 @@ public class WebAppsController(IWebAppService webAppService, ILogger<WebAppsCont
         }
         await _webAppService.Create(app);
 
-        return RedirectToAction(nameof(View), new { WebApplicationName = app.Name });
+        return RedirectToAction(nameof(View), new { WebAppName = app.Name });
     }
 
     [AllowAnonymous]
-    [HttpGet("{WebApplicationName}")]
-    public async Task<IActionResult> View(string WebApplicationName)
+    [HttpGet("{WebAppName}")]
+    public async Task<IActionResult> View(int WebAppId)
     {
-        var vm = await _webAppService.Get(WebApplicationName);
+        var vm = await _webAppService.Get(WebAppId);
         return View("/Areas/Services/Views/WebApp/View.cshtml", vm);
     }
 
     [HttpPost("rename")]
-    public async Task<IActionResult> Rename(int WebApplicationId, string newName)
+    public async Task<IActionResult> Rename(int WebAppId, string newName)
     {
-        await _webAppService.Rename(WebApplicationId, newName);
-        return RedirectToAction(nameof(Index), new { WebApplicationName = newName });
+        await _webAppService.Rename(WebAppId, newName);
+        return RedirectToAction(nameof(Index), new { WebAppName = newName });
     }
 
     [HttpPost("delete")]
-    public async Task<IActionResult> Delete(int WebApplicationId)
+    public async Task<IActionResult> Delete(int WebAppId)
     {
-        await _webAppService.Delete(WebApplicationId);
+        await _webAppService.Delete(WebAppId);
         return RedirectToAction(nameof(Index));
     }
 }

@@ -8,5 +8,5 @@ public interface IWebAppRepository
     Task<IEnumerable<WebAppEntity>> Search(string userId, string query, string sort);
     Task Add(string userId, WebAppEntity app);
     Task Update(int id, WebAppEntity app);
-    Task Delete(int id);
+    Task Delete(string userId, string appName);
 }

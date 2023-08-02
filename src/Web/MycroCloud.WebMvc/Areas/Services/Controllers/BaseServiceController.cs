@@ -10,21 +10,20 @@ namespace MycroCloud.WebMvc.Areas.Services.Controllers;
 [Route("{Username}/[area]/[controller]")]
 public class BaseServiceController : BaseController
 {
+    protected IdentityUser ServiceOwner;
+    
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var username = context.HttpContext.Request.RouteValues["Username"].ToString();
         var authenticatedUser = context.HttpContext.User?.ToMycroCloudUser();
-        IdentityUser serviceOwner;
         if (authenticatedUser?.UserName == username)
         {
-            serviceOwner = authenticatedUser;
+            ServiceOwner = authenticatedUser;
         }
         else
         {
             var userManager = context.HttpContext.RequestServices.GetService<UserManager<IdentityUser>>();
-            var user = await userManager.FindByNameAsync(username);
-            serviceOwner = user;
+            ServiceOwner = await userManager.FindByNameAsync(username);
         }
-        context.HttpContext.Items["ServiceOwner"] = serviceOwner;
     }
 }

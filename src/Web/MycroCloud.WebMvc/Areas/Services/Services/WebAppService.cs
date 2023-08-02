@@ -7,7 +7,7 @@ namespace MycroCloud.WebMvc.Areas.Services.Services;
 public interface IWebAppService
 {
     Task<WebAppModel> Find(string userName, string appName);
-    Task<WebAppViewViewModel> Get(string name);
+    Task<WebAppViewViewModel> Get(int appId);
     Task<WebAppIndexViewModel> GetIndexViewModel(WebAppSearchModel searchModel);
     Task Create(WebAppCreateViewModel app);
     Task Rename(int appId, string name);
