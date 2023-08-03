@@ -24,7 +24,7 @@ namespace MycroCloud.WebMvc.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
-                    b.Property<string>("WebAppId")
+                    b.Property<string>("Id")
                         .HasColumnType("text");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -39,7 +39,7 @@ namespace MycroCloud.WebMvc.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
-                    b.HasKey("WebAppId");
+                    b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
@@ -50,11 +50,11 @@ namespace MycroCloud.WebMvc.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.Property<int>("WebAppId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WebAppId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("text");
@@ -66,7 +66,7 @@ namespace MycroCloud.WebMvc.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("WebAppId");
+                    b.HasKey("Id");
 
                     b.HasIndex("RoleId");
 
@@ -75,7 +75,7 @@ namespace MycroCloud.WebMvc.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
                 {
-                    b.Property<string>("WebAppId")
+                    b.Property<string>("Id")
                         .HasColumnType("text");
 
                     b.Property<int>("AccessFailedCount")
@@ -125,7 +125,7 @@ namespace MycroCloud.WebMvc.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
-                    b.HasKey("WebAppId");
+                    b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -139,11 +139,11 @@ namespace MycroCloud.WebMvc.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.Property<int>("WebAppId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WebAppId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("text");
@@ -155,7 +155,7 @@ namespace MycroCloud.WebMvc.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("WebAppId");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 

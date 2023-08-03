@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using Grpc.Net.ClientFactory;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
@@ -19,16 +18,7 @@ builder.Logging.AddSerilog(logger);
 builder.Services.ConfigureServices(builder.Configuration);
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 // Add services to the container.
-builder.Services.AddControllersWithViews(
-    options =>
-    {
-
-    }
-).AddJsonOptions(options =>
-{
-    //options.JsonSerializerOptions.Converters.Add(new RuleJsonConverter());
-    //options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-});
+builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 //builder.Services.AddServerSideBlazor();
 builder.Services
@@ -85,7 +75,7 @@ builder.Services
         };
     })
     ;
-builder.Services.AddTransient<IAuthorizationHandler, WebAppAuthorizationHandler>();
+//builder.Services.AddTransient<IAuthorizationHandler, WebAppAuthorizationHandler>();
 
 builder.Services.AddAuthorization(options => {
     options.DefaultPolicy = new AuthorizationPolicyBuilder()

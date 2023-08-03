@@ -29,8 +29,8 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps
         [Required]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public RouteAuthorizationType Type { get; set; }
-        [CanBeNull] public List<int> PolicyIds { get; set; }
-        [CanBeNull] public List<RouteAuthorizationClaimSaveModel> Claims { get; set; }
+        public List<int>? PolicyIds { get; set; }
+        public List<RouteAuthorizationClaimSaveModel>? Claims { get; set; }
     }
 
     public class RouteValidationSaveModel

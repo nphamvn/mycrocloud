@@ -1,7 +1,8 @@
-using MycroCloud.WebMvc.Areas.Identity.Services;
 using Microsoft.AspNetCore.Identity;
+using MycroCloud.WebMvc.Areas.Identity.Services;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using MycroCloud.WebMvc.Areas.Identity.Models;
 using MycroCloud.WebMvc.Areas.Services.Services;
 
 namespace MycroCloud.WebMvc.Extentions
@@ -20,9 +21,9 @@ namespace MycroCloud.WebMvc.Extentions
                 }
             });
             services.AddIdentityCore<IdentityUser>()
-                    .AddEntityFrameworkStores<IdentityDbContext>();
-            services.AddScoped<UserManager<IdentityUser>>();
-            services.AddScoped<SignInManager<IdentityUser>>();
+                .AddEntityFrameworkStores<IdentityDbContext>();
+            //services.AddScoped<UserManager<MycroCloudUser>>();
+            //services.AddScoped<SignInManager<MycroCloudUser>>();
             services.AddTransient<IEmailSender, SendGridEmailSender>();
             services.AddScoped<IWebAppService, WebAppService>();
             services.AddScoped<IWebAppAuthenticationService, WebAppAuthenticationService>();
