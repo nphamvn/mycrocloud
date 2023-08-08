@@ -1,7 +1,7 @@
 using Grpc.Core;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using MycroCloud.WebApp;
 using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
-using WebApp.Api.Grpc;
 
 namespace MycroCloud.WebMvc.Areas.Services.Services;
 public interface IWebAppService
@@ -15,15 +15,15 @@ public interface IWebAppService
 }
 
 public class WebAppService(IHttpContextAccessor contextAccessor
-    , WebApp.Api.Grpc.WebApp.WebAppClient webAppClient) : ServiceBaseService(contextAccessor), IWebAppService
+    , WebAppGrpcService.WebAppGrpcServiceClient webAppGrpcServiceClient) : ServiceBaseService(contextAccessor), IWebAppService
 {
-    private readonly WebApp.Api.Grpc.WebApp.WebAppClient _webAppClient = webAppClient;
+    private readonly WebAppGrpcService.WebAppGrpcServiceClient _webAppGrpcServiceClient = webAppGrpcServiceClient;
 
     public async Task<WebAppModel> Find(string userId, string appName)
     {
         try
         {
-            var res = await _webAppClient.GetAsync(new()
+            var res = await _webAppGrpcServiceClient.GetAsync(new()
             {
                 UserId = userId,
                 Name = appName
@@ -45,7 +45,7 @@ public class WebAppService(IHttpContextAccessor contextAccessor
 
     public async Task<WebAppViewViewModel> Get(int appId)
     {
-        var res = await _webAppClient.GetByIdAsync(new()
+        var res = await _webAppGrpcServiceClient.GetByIdAsync(new()
         {
             Id = appId
         });
@@ -58,7 +58,7 @@ public class WebAppService(IHttpContextAccessor contextAccessor
 
     public async Task<WebAppIndexViewModel> GetIndexViewModel(WebAppSearchModel searchModel)
     {
-        var result = await _webAppClient.GetAllAsync(new GetAllWebAppRequest()
+        var result = await _webAppGrpcServiceClient.GetAllAsync(new GetAllWebAppRequest()
         {
             UserId = ServiceOwner.Id
         });
@@ -75,7 +75,7 @@ public class WebAppService(IHttpContextAccessor contextAccessor
 
     public async Task Create(WebAppCreateViewModel model)
     {
-        var result = await _webAppClient.CreateAsync(new CreateWebAppRequest()
+        var result = await _webAppGrpcServiceClient.CreateAsync(new CreateWebAppRequest()
         {
             UserId = ServiceOwner.Id,
             Name = model.Name
@@ -88,7 +88,7 @@ public class WebAppService(IHttpContextAccessor contextAccessor
 
     public async Task Rename(int appId, string name)
     {
-        var result = await _webAppClient.RenameAsync(new RenameWebAppRequest()
+        var result = await _webAppGrpcServiceClient.RenameAsync(new RenameWebAppRequest()
         {
             Name = name
         });
@@ -96,7 +96,7 @@ public class WebAppService(IHttpContextAccessor contextAccessor
 
     public async Task Delete(int appId)
     {
-        var result = await _webAppClient.DeleteAsync(new DeleteWebAppRequest()
+        var result = await _webAppGrpcServiceClient.DeleteAsync(new DeleteWebAppRequest()
         {
             Name = appId.ToString()
         });

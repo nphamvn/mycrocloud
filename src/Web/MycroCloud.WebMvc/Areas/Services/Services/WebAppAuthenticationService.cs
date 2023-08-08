@@ -1,4 +1,6 @@
+using MycroCloud.WebApp;
 using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
+using static MycroCloud.WebApp.WebAppAuthenticationGrpcService;
 
 namespace MycroCloud.WebMvc.Areas.Services.Services;
 public interface IWebAppAuthenticationService
@@ -13,9 +15,9 @@ public interface IWebAppAuthenticationService
 }
 
 public class WebAppAuthenticationService(IHttpContextAccessor contextAccessor
-, WebApp.Api.Grpc.WebAppAuthentication.WebAppAuthenticationClient webAppAuthenticationClient) : ServiceBaseService(contextAccessor), IWebAppAuthenticationService
+, WebAppAuthenticationGrpcServiceClient webAppAuthenticationGrpcServiceClient) : ServiceBaseService(contextAccessor), IWebAppAuthenticationService
 {
-    private readonly WebApp.Api.Grpc.WebAppAuthentication.WebAppAuthenticationClient _webAppAuthenticationClient = webAppAuthenticationClient;
+    private readonly WebAppAuthenticationGrpcServiceClient _webAppAuthenticationClient = webAppAuthenticationGrpcServiceClient;
 
     public async Task<AuthenticationSchemeListViewModel> GetSchemeListViewModel(string appName)
     {

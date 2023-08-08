@@ -5,25 +5,24 @@ public class BaseActionFilterAttribute : ActionFilterAttribute
 {
     public static bool TryGetActionArgumentValue<T>(ActionExecutingContext context, string key, out T value)
     {
-        if (context.ActionArguments.ContainsKey(key))
+        if (context.ActionArguments.TryGetValue(key, out object argumentValue))
         {
-            object argumentValue = context.ActionArguments[key];
-            if (argumentValue is T)
+            if (argumentValue is T t)
             {
-                value = (T)argumentValue;
+                value = t;
                 return true;
             }
         }
 
-        value = default(T);
+        value = default;
         return false;
     }
 
     public static bool TryGetRouteDataValue<T>(ActionExecutingContext context, string key, out T value)
     {
-        if (context.RouteData.Values.TryGetValue(key, out object result) && result is T)
+        if (context.RouteData.Values.TryGetValue(key, out object result) && result is T t)
         {
-            value = (T)result;
+            value = t;
             return true;
         }
 

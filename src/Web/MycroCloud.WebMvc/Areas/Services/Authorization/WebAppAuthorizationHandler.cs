@@ -2,19 +2,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Identity;
-using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
+using MycroCloud.WebApp;
 using MycroCloud.WebMvc.Extentions;
-using WebApp.Api.Grpc;
-using static WebApp.Api.Grpc.WebApp;
-
+using WebMvcWebApp = MycroCloud.WebMvc.Areas.Services.Models.WebApps.WebAppModel;
 namespace MycroCloud.WebMvc.Areas.Services.Authorization;
 
-public class WebAppAuthorizationHandler(WebAppClient webAppClient, UserManager<IdentityUser> userManager)
-    : AuthorizationHandler<OperationAuthorizationRequirement, WebAppModel>
+public class WebAppAuthorizationHandler(WebAppGrpcService.WebAppGrpcServiceClient webAppGrpcServiceClient, UserManager<IdentityUser> userManager)
+    : AuthorizationHandler<OperationAuthorizationRequirement, WebMvcWebApp>
 {
-    private readonly WebAppClient _webAppClient = webAppClient;
-    private readonly UserManager<IdentityUser> _userManager = userManager;
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement, WebAppModel app)
+    private readonly WebAppGrpcService.WebAppGrpcServiceClient _webAppGrpcServiceClient = webAppGrpcServiceClient;
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement, WebMvcWebApp app)
     {
         var user = context.User?.ToMycroCloudUser();
 
@@ -35,11 +32,11 @@ public class WebAppAuthorizationHandler(WebAppClient webAppClient, UserManager<I
         }
     }
 
-    private async Task CheckViewRequirement(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement, WebAppModel app)
+    private async Task CheckViewRequirement(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement, WebMvcWebApp app)
     {
         try
         {
-            var res = await _webAppClient.GetAsync(new GetWebAppRequest()
+            var res = await _webAppGrpcServiceClient.GetAsync(new GetWebAppRequest()
             {
                 UserId = app.UserId,
                 Name = app.WebAppName

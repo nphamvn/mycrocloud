@@ -1,16 +1,13 @@
-using MycroCloud.WebMvc.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
 using MycroCloud.WebMvc.Areas.Services.Services;
-using MycroCloud.WeMvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace MycroCloud.WebMvc.Areas.Services.Controllers;
 
 [Authorize]
 [Route("webapps/{WebApplicationName}/authentications")]
-[GetAuthUserWebApplicationId(Constants.RouteName.WebAppName, Constants.RouteName.WebAppId)]
 public class WebAppAuthenticationsController: BaseServiceController
 {
     private readonly IWebAppAuthenticationService _webAppAuthenticationService;

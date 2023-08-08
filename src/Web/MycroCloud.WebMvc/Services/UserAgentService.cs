@@ -4,14 +4,9 @@ public interface IUserAgentService
     Platform GetPlatform();
 }
 
-public class UserAgentService : IUserAgentService
+public class UserAgentService(IHttpContextAccessor httpContextAccessor) : IUserAgentService
 {
-    private readonly string _userAgent;
-
-    public UserAgentService(IHttpContextAccessor httpContextAccessor)
-    {
-        _userAgent = httpContextAccessor.HttpContext.Request.Headers.UserAgent.ToString();
-    }
+    private readonly string _userAgent = httpContextAccessor.HttpContext.Request.Headers.UserAgent.ToString();
 
     public Platform GetPlatform()
     {

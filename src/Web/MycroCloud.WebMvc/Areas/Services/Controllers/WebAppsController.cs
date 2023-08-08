@@ -18,9 +18,10 @@ public class WebAppsController(IWebAppService webAppService
 
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        await base.OnActionExecutionAsync(context, next);
+
         var appName = context.RouteData.Values["WebAppName"] as string;
         WebAppModel app = default;
-        await base.OnActionExecutionAsync(context, next);
         if (ServiceOwner is not IdentityUser owner)
         {
             _logger.LogInformation("ServiceOwner not found");

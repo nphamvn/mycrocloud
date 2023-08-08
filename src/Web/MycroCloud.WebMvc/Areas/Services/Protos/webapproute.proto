@@ -3,11 +3,9 @@ syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
 
-option csharp_namespace = "WebApp.Api.Grpc";
+option csharp_namespace = "MycroCloud.WebApp";
 
-package webapp;
-
-service WebAppRoute {
+service WebAppRouteGrpcService {
   rpc GetAll(GetAllRouteRequest) returns (GetAllRouteResponse);
   rpc Get(GetRouteRequest) returns (GetRouteResponse);
   rpc CreateRoute(CreateRouteRequest) returns (CreateRouteResponse);

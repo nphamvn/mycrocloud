@@ -1,13 +1,11 @@
 
 syntax = "proto3";
 
-option csharp_namespace = "WebApp.Api.Grpc";
-
-package webapp;
+option csharp_namespace = "MycroCloud.WebApp";
 
 import "google/protobuf/timestamp.proto";
 
-service WebApp {
+service WebAppGrpcService {
   rpc GetAll(GetAllWebAppRequest) returns (GetAllWebAppResponse);
   rpc Get(GetWebAppRequest) returns (GetWebAppResponse);
   rpc GetById(GetByIdRequest) returns (GetByIdResponse);

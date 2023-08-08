@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
-using MycroCloud.WebMvc.Areas.Identity.Models;
 
 namespace MycroCloud.WebMvc.Extentions
 {

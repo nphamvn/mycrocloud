@@ -26,8 +26,7 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-preview.4" />
     <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="5.2.3-dev-00262" />
-    <PackageReference Include="System.CodeDom" Version="8.0.0-preview.6.23329.7" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.1.0-preview" />
+    <!-- <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.1.0-preview" /> -->
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\MycroCloud.Shared.csproj" />
@@ -36,9 +35,5 @@
     <Protobuf Include="Areas\Services\Protos\webapp.proto" GrpcServices="Client" />
     <Protobuf Include="Areas\Services\Protos\webapproute.proto" GrpcServices="Client" />
     <Protobuf Include="Areas\Services\Protos\webappauthentication.proto" GrpcServices="Client" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Areas/Services/Filters/" />
-    <Folder Include="Areas/Services/Views/Shared/" />
   </ItemGroup>
 </Project>

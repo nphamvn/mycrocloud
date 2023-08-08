@@ -2,7 +2,8 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
-using WebApp.Api.Grpc;
+using static MycroCloud.WebApp.WebAppAuthenticationGrpcService;
+using static MycroCloud.WebApp.WebAppRouteGrpcService;
 
 namespace MycroCloud.WebMvc.Areas.Services.Services;
 
@@ -19,11 +20,11 @@ public interface IWebAppRouteService
     Task<RouteSaveModel> GetDetails(int routeId);
 }
 public class WebAppRouteService(IHttpContextAccessor contextAccessor
-    , WebAppRoute.WebAppRouteClient webAppRouteClient
-    , WebAppAuthentication.WebAppAuthenticationClient authenticationClient) : ServiceBaseService(contextAccessor), IWebAppRouteService
+    , WebAppRouteGrpcServiceClient webAppRouteGrpcServiceClient
+    , WebAppAuthenticationGrpcServiceClient webAppAuthenticationGrpcServiceClient) : ServiceBaseService(contextAccessor), IWebAppRouteService
 {
-    private readonly WebAppRoute.WebAppRouteClient _webAppRouteClient = webAppRouteClient;
-    private readonly WebAppAuthentication.WebAppAuthenticationClient _authenticationClient = authenticationClient;
+    private readonly WebAppRouteGrpcServiceClient _webAppRouteClient = webAppRouteGrpcServiceClient;
+    private readonly WebAppAuthenticationGrpcServiceClient _authenticationClient = webAppAuthenticationGrpcServiceClient;
 
     public async Task<RouteIndexViewModel> GetIndexViewModel(string name, string searchTerm, string sort)
     {

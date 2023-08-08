@@ -1,5 +1,4 @@
-﻿@using MycroCloud.WebMvc.Controllers;
-@using MycroCloud.WebMvc.Areas.Services.Controllers
+﻿@using MycroCloud.WebMvc.Areas.Services.Controllers
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,19 +10,6 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/tailwind.css" asp-append-version="true"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        dataLayer.push({
-            pageCategory: "GoogleTagmanager",
-        });
-    </script>
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-553736F');</script>
-    <!-- End Google Tag Manager -->
     <script src="~/js/common.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <environment include="Development">
@@ -43,10 +29,6 @@
 </head>
 
 <body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-553736F"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
     <environment include="Development">
         <span class="tw-bg-red-100 tw-text-red-800 tw-text-sm tw-font-medium tw-mr-2 tw-px-2.5 tw-py-0.5 tw-rounded">Development Environment</span>
     </environment>
@@ -65,7 +47,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-white"
-                                href="@Url.Action(nameof(WebAppsController.Index), "WebApps")">Web Apps</a>
+                                href="@Url.Action(nameof(WebAppsController.Index), "WebApps", new { Area = AreaConstants.Services})">Web Apps</a>
                         </li>
                     </ul>
                     @{
