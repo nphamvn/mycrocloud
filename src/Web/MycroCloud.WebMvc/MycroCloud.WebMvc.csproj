@@ -10,23 +10,24 @@
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" Version="4.1.1" />
     <PackageReference Include="FluentValidation" Version="11.6.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.24.0-rc3" />
+    <PackageReference Include="Google.Protobuf" Version="3.24.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.56.0-pre1" />
     <PackageReference Include="Grpc.Net.ClientFactory" Version="2.56.0-pre1" />
     <PackageReference Include="Grpc.Tools" Version="2.57.0-pre1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.0-preview.6.23329.11" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0-preview.6.23329.11" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.6.23329.4">
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.0-preview.4.23260.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0-preview.4.23260.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.4.23259.3" />
+    <!-- <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.4.23259.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    </PackageReference> -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0-preview.4.23259.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-preview.4" />
     <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="5.2.3-dev-00262" />
-    <!-- <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.1.0-preview" /> -->
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\MycroCloud.Shared.csproj" />

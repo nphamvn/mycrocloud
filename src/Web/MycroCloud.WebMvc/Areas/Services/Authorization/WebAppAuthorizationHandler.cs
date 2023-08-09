@@ -4,10 +4,11 @@ using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using MycroCloud.WebApp;
 using MycroCloud.WebMvc.Extentions;
+using MycroCloud.WebMvc.Identity;
 using WebMvcWebApp = MycroCloud.WebMvc.Areas.Services.Models.WebApps.WebAppModel;
 namespace MycroCloud.WebMvc.Areas.Services.Authorization;
 
-public class WebAppAuthorizationHandler(WebAppGrpcService.WebAppGrpcServiceClient webAppGrpcServiceClient, UserManager<IdentityUser> userManager)
+public class WebAppAuthorizationHandler(WebAppGrpcService.WebAppGrpcServiceClient webAppGrpcServiceClient, UserManager<MycroCloudIdentityUser> userManager)
     : AuthorizationHandler<OperationAuthorizationRequirement, WebMvcWebApp>
 {
     private readonly WebAppGrpcService.WebAppGrpcServiceClient _webAppGrpcServiceClient = webAppGrpcServiceClient;

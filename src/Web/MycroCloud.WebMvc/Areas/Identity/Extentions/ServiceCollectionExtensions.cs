@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace MycroCloud.WebMvc.Areas.Identity;
+namespace MycroCloud.WebMvc.Identity;
 
 public static class ServiceCollectionExtensions
 {
@@ -50,17 +50,24 @@ public static class ServiceCollectionExtensions
                 options.Scope.Add("email");
             })
             ;
+        var identityDbContextAssembly = typeof(Program).Assembly.GetName().Name;
+        var identityDbConnectionString = configuration.GetValue<string>("Database:Identity:ConnectionString");
+        // services.AddDbContext<MycroCloudIdentityDbContext>(options =>
+        // {
+        //     options.UseNpgsql(identityDbConnectionString, b => b.MigrationsAssembly(identityDbContextAssembly));
+        // });
+        // services.AddIdentity<MycroCloudIdentityUser, MycroCloudIdentityRole>()
+        //         .AddEntityFrameworkStores<MycroCloudIdentityDbContext>();
+
+        // services.AddScoped<UserManager<MycroCloudIdentityUser>>();
+        // services.AddScoped<SignInManager<MycroCloudIdentityUser>>();
         services.AddDbContext<IdentityDbContext>(options =>
         {
-            var provider = configuration.GetValue<string>("Database:Identity:Provider");
-            var connectionString = configuration.GetValue<string>("Database:Identity:ConnectionString");
-            if (provider == "PostgresSql")
-            {
-                options.UseNpgsql(connectionString, b => b.MigrationsAssembly(typeof(Program).Assembly.GetName().Name));
-            }
+            options.UseNpgsql(identityDbConnectionString, b => b.MigrationsAssembly(identityDbContextAssembly));
         });
         services.AddIdentityCore<IdentityUser>()
-            .AddEntityFrameworkStores<IdentityDbContext>();
+                .AddEntityFrameworkStores<IdentityDbContext>();
+
         services.AddScoped<UserManager<IdentityUser>>();
         services.AddScoped<SignInManager<IdentityUser>>();
         return services;

@@ -1,5 +1,5 @@
 using MycroCloud.WebMvc.Areas.Identity.Services;
-using MycroCloud.WebMvc.Areas.Identity;
+using MycroCloud.WebMvc.Identity;
 using MycroCloud.WebMvc.Areas.Services;
 
 namespace MycroCloud.WebMvc.Extentions

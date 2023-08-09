@@ -2,6 +2,6 @@
 
 namespace MycroCloud.WebMvc.Identity;
 
-public class MycroCloudIdentityUser : IdentityUser
+public class MycroCloudIdentityRole : IdentityRole
 {
 }
