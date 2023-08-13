@@ -1,21 +1,14 @@
 using System.Net;
-using System.Text.Json;
+using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
-using WebApp.Domain.WebApplications;
-using MockServer.MockResponder.Extensions;
+using WebApp.Domain.Shared;
 
 namespace MockServer.MockResponder.Services {
-    public class HttpResponseRetriever : IHttpResponseRetriever
+    public class HttpResponseRetriever(IWebAppRouteRepository webAppRouteRepository) : IHttpResponseRetriever
     {
-        private readonly IWebAppRouteRepository _webAppRouteRepository;
-
-        public HttpResponseRetriever(IWebAppRouteRepository webAppRouteRepository)
-        {
-            _webAppRouteRepository = webAppRouteRepository;
-        }
         public async Task<HttpResponseMessage> GetResponseMessage(int routeId, HttpContext context)
         {
-            var response = await _webAppRouteRepository.GetMockResponse(routeId);
+            var response = await webAppRouteRepository.GetMockResponse(routeId);
             var message = new HttpResponseMessage();
             
             //Build StatusCode

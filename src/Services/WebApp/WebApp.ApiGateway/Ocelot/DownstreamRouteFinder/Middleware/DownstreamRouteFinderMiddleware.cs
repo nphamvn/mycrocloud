@@ -1,9 +1,10 @@
+using WebApp.Domain.Shared;
+
 namespace Ocelot.DownstreamRouteFinder.Middleware
 {
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Options;
     using WebApp.Domain.Repositories;
-    using WebApp.Domain.WebApplications;
     using Ocelot.Configuration;
     using Ocelot.Configuration.Builder;
     using Ocelot.Configuration.Creator;
@@ -55,7 +56,7 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
 
             var app = httpContext.Items.WebApplication();
 
-            var applicableRoutes = await _webAppRouteRepository.GetByApplicationId(app.WebApplicationId, string.Empty, string.Empty);
+            var applicableRoutes = await _webAppRouteRepository.List(app.WebAppId, string.Empty, string.Empty);
             var routes = _routesCreator.Create(applicableRoutes);
             var response = await provider.Get(upstreamUrlPath, upstreamQueryString, httpContext.Request.Method, routes);
             if (response.IsError)

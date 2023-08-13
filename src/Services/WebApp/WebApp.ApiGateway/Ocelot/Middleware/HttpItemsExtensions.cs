@@ -1,8 +1,8 @@
-﻿namespace Ocelot.Middleware
+﻿using WebApp.Domain.Entities;
+
+namespace Ocelot.Middleware
 {
-    using WebApp.Domain.WebApplications;
     using Ocelot.Configuration;
-    using Ocelot.DownstreamRouteFinder;
     using Ocelot.DownstreamRouteFinder.UrlMatcher;
     using Ocelot.Errors;
     using Ocelot.Request.Middleware;
@@ -115,13 +115,13 @@
             return !input.ContainsKey(key);
         }
 
-        public static void SetWebApplication(this IDictionary<object, object> input, WebApplication application)
+        public static void SetWebApplication(this IDictionary<object, object> input, WebAppEntity application)
         {
             input.Upsert("WebAppEntity", application);
         }
-        public static WebApplication WebApplication(this IDictionary<object, object> input)
+        public static WebAppEntity WebApplication(this IDictionary<object, object> input)
         {
-            return input.Get<WebApplication>("WebAppEntity");
+            return input.Get<WebAppEntity>("WebAppEntity");
         }
     }
 }

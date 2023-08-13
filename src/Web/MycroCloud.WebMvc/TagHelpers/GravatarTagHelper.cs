@@ -21,27 +21,20 @@ namespace MycroCloud.WebMvc.TagHelpers
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            using (var md5 = MD5.Create())
-            {
-                var result = md5.ComputeHash(Encoding.ASCII.GetBytes(Email));
-                var hash = BitConverter.ToString(result).Replace("-", "").ToLower();
-                var url = $"https://gravatar.com/avatar/{hash}";
-                var queryBuilder = new QueryBuilder();
-                queryBuilder.Add("s", Size.ToString());
-                queryBuilder.Add("d", GetModeValue(Mode));
-                queryBuilder.Add("r", Rating.ToString());
-                url = url + queryBuilder.ToQueryString();
-                output.Attributes.SetAttribute("src", url);
-            }
+            using var md5 = MD5.Create();
+            var result = md5.ComputeHash(Encoding.ASCII.GetBytes(Email));
+            var hash = BitConverter.ToString(result).Replace("-", "").ToLower();
+            var url = $"https://gravatar.com/avatar/{hash}";
+            var queryBuilder = new QueryBuilder();
+            queryBuilder.Add("s", Size.ToString());
+            queryBuilder.Add("d", GetModeValue(Mode));
+            queryBuilder.Add("r", Rating.ToString());
+            url = url + queryBuilder.ToQueryString();
+            output.Attributes.SetAttribute("src", url);
         }
         private static string GetModeValue(Mode mode)
         {
-            if (mode == Mode.NotFound)
-            {
-                return "404";
-            }
-
-            return mode.ToString().ToLower();
+            return mode == Mode.NotFound ? "404" : mode.ToString().ToLower();
         }
     }
     public enum Rating

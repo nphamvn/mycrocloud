@@ -5,12 +5,15 @@
     <form asp-area="Identity" asp-page="/Account/Logout" method="post" id="logoutForm">
         <div class="dropdown">
             <button class="btn dropdown-toggle text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                @* <img style="width: 40px; height: 40px" gravatar-email="@user.Email" /> *@
+                <img gravatar-email="@user.Email" style="width: 40px; height: 40px" alt=""/>
                 <span>@user.Email</span>
             </button>
             <ul class="dropdown-menu">
-                <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Manage Account</a></li>
-                <li><a class="dropdown-item" href="javascript:document.getElementByWebAppId('logoutForm').submit()">Logout</a>
+                <li>
+                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Manage Account</a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="javascript:document.getElementByWebAppId('logoutForm').submit()">Logout</a>
                 </li>
             </ul>
         </div>

@@ -1,3 +1,5 @@
+using WebApp.Domain.Entities;
+
 namespace Ocelot.Configuration.Creator
 {
     using Ocelot.Configuration.Builder;
@@ -71,7 +73,7 @@ namespace Ocelot.Configuration.Creator
                 })
                 .ToList();
         }
-        public List<Route> Create(IEnumerable<WebApp.Domain.WebApplications.Route> routes)
+        public List<Route> Create(IEnumerable<RouteEntity> routes)
         {
             return routes.Select(r =>
             {

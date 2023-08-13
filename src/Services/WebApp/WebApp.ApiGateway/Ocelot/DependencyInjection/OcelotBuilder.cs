@@ -45,7 +45,6 @@ namespace Ocelot.DependencyInjection
     using System.Reflection;
     using WebApp.Domain.Repositories;
     using WebApp.Infrastructure.Repositories.PostgreSql;
-    using WebApp.Domain.Settings;
 
     public class OcelotBuilder : IOcelotBuilder
     {
@@ -58,7 +57,7 @@ namespace Ocelot.DependencyInjection
             Configuration = configurationRoot;
             Services = services;
             Services.Configure<FileConfiguration>(configurationRoot);
-            Services.Configure<PostgresSettings>(configurationRoot.GetSection("Database:Application"));
+            Services.Configure<PostgresDatabaseOptions>(configurationRoot.GetSection("Database:Application"));
             Services.Configure<MockResponderOptions>(configurationRoot.GetSection("MockResponder"));
 
             Services.TryAddSingleton<IWebAppRouteRepository, WebAppRouteRepository>();

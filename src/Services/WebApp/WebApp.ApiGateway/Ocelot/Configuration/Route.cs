@@ -1,6 +1,7 @@
-﻿namespace Ocelot.Configuration
+﻿using WebApp.Domain.Shared;
+
+namespace Ocelot.Configuration
 {
-    using WebApp.Domain.WebApplications;
     using Ocelot.Configuration.File;
     using Ocelot.Values;
     using System.Collections.Generic;

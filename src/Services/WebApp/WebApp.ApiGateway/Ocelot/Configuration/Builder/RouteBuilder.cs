@@ -1,12 +1,12 @@
-﻿namespace Ocelot.Configuration.Builder
+﻿using WebApp.Domain.Shared;
+
+namespace Ocelot.Configuration.Builder
 {
-    using RouteResponseProvider = WebApp.Domain.WebApplications.RouteResponseProvider;
     using Ocelot.Configuration.File;
     using Ocelot.Values;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
-    using System;
 
     public class RouteBuilder
     {
@@ -18,12 +18,6 @@
         private string _aggregator;
         private RouteResponseProvider _responseProvider;
         private int _id;
-
-        public RouteBuilder()
-        {
-            _downstreamRoutes = new List<DownstreamRoute>();
-            _downstreamRoutesConfig = new List<AggregateRouteConfig>();
-        }
 
         public RouteBuilder WithDownstreamRoute(DownstreamRoute value)
         {

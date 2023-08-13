@@ -10,4 +10,5 @@ public interface IWebAppRouteRepository
     Task<RouteEntity> GetById(int id);
     Task Update(int id, RouteEntity route);
     Task Delete(int id);
+    Task<RouteMockResponse> GetMockResponse(int routeId);
 }

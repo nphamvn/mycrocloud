@@ -1,10 +1,11 @@
+using WebApp.Domain.Shared;
+
 namespace Ocelot.Configuration
 {
     using Ocelot.Configuration.Creator;
     using System;
     using System.Collections.Generic;
     using Ocelot.Values;
-    using WebApp.Domain.WebApplications.Security;
 
     public class DownstreamRoute
     {
@@ -114,6 +115,6 @@ namespace Ocelot.Configuration
         public SecurityOptions SecurityOptions { get; }
         public string DownstreamHttpMethod { get; }
         public Version DownstreamHttpVersion { get;  }
-        public AuthorizationType AuthorizationType { get; set; }
+        public RouteAuthorizationType AuthorizationType { get; set; }
     }
 }
