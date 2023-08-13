@@ -31,11 +31,8 @@
     <ProjectReference Include="..\..\Shared\MycroCloud.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Protobuf Include="Areas\Services\Services\Protos\webapp.proto">
-    </Protobuf>
-    <Protobuf Include="Areas\Services\Services\Protos\webappauthentication.proto">
-    </Protobuf>
-    <Protobuf Include="Areas\Services\Services\Protos\webapproute.proto">
-    </Protobuf>
+    <Protobuf Include="Areas\Services\Services\Protos\webapp.proto" GrpcServices="Client" />
+    <Protobuf Include="Areas\Services\Services\Protos\webapproute.proto" GrpcServices="Client" />
+    <Protobuf Include="Areas\Services\Services\Protos\webappauthentication.proto" GrpcServices="Client" />
   </ItemGroup>
 </Project>

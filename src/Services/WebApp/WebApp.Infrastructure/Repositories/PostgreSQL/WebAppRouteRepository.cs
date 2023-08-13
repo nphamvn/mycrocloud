@@ -9,7 +9,7 @@ namespace WebApp.Infrastructure.Repositories.PostgreSql;
 public class WebAppRouteRepository(IOptions<PostgresDatabaseOptions> databaseOptions) 
     : BaseRepository(databaseOptions), IWebAppRouteRepository
 {
-    public async Task<int> Create(int appId, RouteEntity route)
+    public async Task<int> Add(int appId, RouteEntity route)
     {
         const string query = """
 INSERT INTO web_application_route(
@@ -87,7 +87,7 @@ WHERE
         });
     }
 
-    public async Task<RouteEntity> Get(string userId, string appName, int routeId)
+    public async Task<RouteEntity> GetById(int id)
     {
         const string query = """
 SELECT
@@ -107,7 +107,7 @@ FROM
 	INNER JOIN web_application wa ON wa.web_application_id = war.web_application_id
 	LEFT JOIN  web_app_route_match_method_bind rmmb ON rmmb.route_id = war.route_id
 WHERE
-	wa.user_id = @user_id and wa."name" = @app_name and war.route_id  = @route_id
+	war.route_id  = @route_id
 GROUP BY
 	war.route_id
 """;
@@ -118,9 +118,7 @@ GROUP BY
         SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteResponse>());
         return await connection.QuerySingleOrDefaultAsync<RouteEntity>(query, new
         {
-            user_id = userId,
-            app_name = appName,
-            route_id = routeId
+            route_id = id
         });
     }
 
@@ -189,7 +187,7 @@ WHERE
         });
     }
 
-    public async Task<IEnumerable<RouteEntity>> GetAll(string userId, string appName, string searchTerm, string sort)
+    public async Task<IEnumerable<RouteEntity>> List(int appId, string searchTerm, string sort)
     {
         var query =
 """
@@ -211,7 +209,7 @@ INNER JOIN
 	web_application wa ON wa.web_application_id = war.web_application_id
     LEFT JOIN web_app_route_match_method_bind rmmb ON rmmb.route_id = war.route_id
 WHERE 
-	wa.user_id = @user_id and wa."name" = @web_app_name
+	wa.web_application_id = @web_application_id
 GROUP BY
     war.route_id
 /**/
@@ -235,8 +233,7 @@ GROUP BY
         await using var connection = new NpgsqlConnection(ConnectionString);
         return await connection.QueryAsync<RouteEntity>(query, new
         {
-            user_id = userId,
-            web_app_name = appName,
+            web_application_id = appId,
             query = "%" + searchTerm + "%"
         });
     }

@@ -1,4 +1,3 @@
-@using MycroCloud.WebMvc.Areas.Services.Models.WebApps
 @model RouteIndexViewModel
 @{
     var appName = (string)ViewData["WebAppName"];
@@ -29,7 +28,7 @@
 <partial name="_ValidationRulesConfigComponent.cshtml" />
 <template id="routeEditorTemplate">
     <v-btn @@click="importJson">Import</v-btn>
-    <v-btn @@click="exportJson">Export</v-btn>
+    <v-btn @@click="exportJson" :disabled="!route.id">Export</v-btn>
     <v-btn @@click="duplicate" :disabled="!route.id">Duplicate</v-btn>
     <v-btn @@click="deleteRoute" :disabled="!route.id">Delete</v-btn>
     <v-form v-on:submit.prevent="save">

@@ -34,7 +34,7 @@ public class WebAppAuthorizationHandler(WebAppGrpcService.WebAppGrpcServiceClien
     {
         try
         {
-            var res = await webAppGrpcServiceClient.GetByAppIdAsync(new GetByAppIdRequest()
+            var res = await webAppGrpcServiceClient.GetAppByIdAsync(new ()
             {
                 AppId = app.WebAppId
             });
