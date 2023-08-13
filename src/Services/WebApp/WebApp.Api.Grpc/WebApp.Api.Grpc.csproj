@@ -9,26 +9,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Grpc.AspNetCore" Version="2.56.0-pre1" />
+        <PackageReference Include="Grpc.AspNetCore" Version="2.55.0" />
         <PackageReference Include="Grpc.Tools" Version="2.57.0">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
     </ItemGroup>
-
     <ItemGroup>
-      <Content Include="..\..\..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
+        <Protobuf Include="Protos\webapp.proto" GrpcServices="Server" />
+        <Protobuf Include="Protos\webapproute.proto" GrpcServices="Server" />
+        <Protobuf Include="Protos\webappauthentication.proto" GrpcServices="Server" />
     </ItemGroup>
-
     <ItemGroup>
       <ProjectReference Include="..\WebApp.Domain\WebApp.Domain.csproj" />
       <ProjectReference Include="..\WebApp.Infrastructure\WebApp.Infrastructure.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Protos\" />
-    </ItemGroup>
-
 </Project>

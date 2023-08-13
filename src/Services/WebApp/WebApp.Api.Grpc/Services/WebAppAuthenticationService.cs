@@ -4,7 +4,7 @@ using WebApp.Domain.Repositories;
 namespace WebApp.Api.Grpc.Services;
 
 public class WebAppAuthenticationService(IWebAppAuthenticationSchemeRepository authenticationSchemeRepository
-    , ILogger<WebAppAuthenticationService> logger) : WebAppAuthentication.WebAppAuthenticationBase
+    , ILogger<WebAppAuthenticationService> logger) : WebAppAuthenticationGrpcService.WebAppAuthenticationGrpcServiceBase
 {
     private readonly IWebAppAuthenticationSchemeRepository _authenticationSchemeRepository = authenticationSchemeRepository;
     private readonly ILogger<WebAppAuthenticationService> _logger = logger;

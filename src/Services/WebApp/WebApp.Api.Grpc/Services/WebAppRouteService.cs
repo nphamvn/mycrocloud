@@ -10,15 +10,15 @@ namespace WebApp.Api.Grpc.Services
     {
         private readonly ILogger<WebAppRouteService> _logger = logger;
         private readonly IWebAppRouteRepository _webAppRouteRepository = webAppRouteRepository;
-        public override async Task<GetAllRouteResponse> GetAll(GetAllRouteRequest request, ServerCallContext context)
+        public override async Task<ListRoutesResponse> ListRoutes(ListRoutesRequest request, ServerCallContext context)
         {
-            var routes = await _webAppRouteRepository.GetAll(request.UserId, request.AppName, null, null);
-            var res = new GetAllRouteResponse();
+            var routes = await _webAppRouteRepository.List(request.WebAppId, null, null);
+            var res = new ListRoutesResponse();
             res.Routes.AddRange(routes.Select(r =>
             {
-                var route = new GetAllRouteResponse.Types.Route()
+                var route = new ListRoutesResponse.Types.Route()
                 {
-                    Id = r.RouteId,
+                    RouteId = r.RouteId,
                     Name = r.Name,
                     Description = r.Description,
                     MatchPath = r.MatchPath,
@@ -33,10 +33,10 @@ namespace WebApp.Api.Grpc.Services
             }));
             return res;
         }
-        public override async Task<GetRouteResponse> Get(GetRouteRequest request, ServerCallContext context)
+        public override async Task<GetRouteByIdResponse> GetRouteById(GetRouteByIdRequest request, ServerCallContext context)
         {
-            var route = await _webAppRouteRepository.Get(request.UserId, request.AppName, request.Id);
-            var res = new GetRouteResponse()
+            var route = await _webAppRouteRepository.GetById(request.Id);
+            var res = new GetRouteByIdResponse()
             {
                 Id = route.RouteId,
                 Name = route.Name,
