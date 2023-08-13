@@ -79,14 +79,14 @@
                 route.value = { ...sampleRoute, id: undefined };
             }
             const openRoute = async id => {
-                const TempRouteDetailUrl = '@Url.Action(nameof(WebAppRoutesController.Get),"WebAppRoutes", new { WebApplicationName = appName, RouteId = -9999})';
+                const TempRouteDetailUrl = '@Url.Action(nameof(WebAppRouteController.Get),"WebAppRoute", new { WebApplicationName = appName, RouteId = -9999})';
                 const res = await axios.get(TempRouteDetailUrl.replace('-9999', id));
                 route.value = res.data;
                 route.value.id = route.value.id || id;
             }
             let timeout = null;
             const fetchRoutes = () => {
-                const IndexUrl = '@Url.Action(nameof(WebAppRoutesController.List), "WebAppRoutes", new {WebApplicationName = appName})'
+                const IndexUrl = '@Url.Action(nameof(WebAppRouteController.List), "WebAppRoute", new {WebApplicationName = appName})'
                 clearTimeout(timeout);
                 timeout = setTimeout(async () => {
                     const params = {
@@ -123,7 +123,7 @@
             }
             onMounted(async () => {
                 routes.value = JSON.parse('@Html.Raw(Json.Serialize(routes))');
-                const response = await axios.get('@Url.Action(nameof(WebAppRoutesController.Sample), "WebAppRoutes")')
+                const response = await axios.get('@Url.Action(nameof(WebAppRouteController.Sample), "WebAppRoute")')
                 sampleRoute = response.data;
             })
             return {

@@ -8,7 +8,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection ConfigureIdentityArea(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddAuthentication(options =>
+        services
+            .AddAuthentication(options =>
             {
                 options.DefaultScheme = IdentityConstants.ApplicationScheme;
                 options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
@@ -52,24 +53,21 @@ public static class ServiceCollectionExtensions
             ;
         var identityDbContextAssembly = typeof(Program).Assembly.GetName().Name;
         var identityDbConnectionString = configuration.GetValue<string>("Database:Identity:ConnectionString");
-        // services.AddDbContext<MycroCloudIdentityDbContext>(options =>
-        // {
-        //     options.UseNpgsql(identityDbConnectionString, b => b.MigrationsAssembly(identityDbContextAssembly));
-        // });
-        // services.AddIdentity<MycroCloudIdentityUser, MycroCloudIdentityRole>()
-        //         .AddEntityFrameworkStores<MycroCloudIdentityDbContext>();
-
-        // services.AddScoped<UserManager<MycroCloudIdentityUser>>();
-        // services.AddScoped<SignInManager<MycroCloudIdentityUser>>();
-        services.AddDbContext<IdentityDbContext>(options =>
+        services.AddDbContext<MycroCloudIdentityDbContext>(options =>
         {
             options.UseNpgsql(identityDbConnectionString, b => b.MigrationsAssembly(identityDbContextAssembly));
         });
-        services.AddIdentityCore<IdentityUser>()
-                .AddEntityFrameworkStores<IdentityDbContext>();
+        
+        // services.AddIdentity<MycroCloudIdentityUser, MycroCloudIdentityRole>()
+        //     .AddEntityFrameworkStores<MycroCloudIdentityDbContext>();
+        
+        services.AddIdentityCore<MycroCloudIdentityUser>()
+                .AddRoles<MycroCloudIdentityRole>()
+                .AddEntityFrameworkStores<MycroCloudIdentityDbContext>();
 
-        services.AddScoped<UserManager<IdentityUser>>();
-        services.AddScoped<SignInManager<IdentityUser>>();
+        services.AddScoped<UserManager<MycroCloudIdentityUser>>();
+        services.AddScoped<SignInManager<MycroCloudIdentityUser>>();
+
         return services;
     }
 }

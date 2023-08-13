@@ -10,10 +10,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection ConfigureServicesArea(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddTransient<IAuthorizationHandler, WebAppAuthorizationHandler>();
-        static void options(GrpcClientFactoryOptions o)
-        {
-            o.Address = new Uri("https://localhost:5100");
-        }
         services.AddGrpcClient<WebAppGrpcService.WebAppGrpcServiceClient>(options);
         services.AddGrpcClient<WebAppRouteGrpcService.WebAppRouteGrpcServiceClient>(options);
         services.AddGrpcClient<WebAppAuthenticationGrpcService.WebAppAuthenticationGrpcServiceClient>(options);
@@ -22,5 +18,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IWebAppAuthorizationService, WebAppAuthorizationService>();
         services.AddScoped<IWebAppRouteService, WebAppRouteService>();
         return services;
+
+        static void options(GrpcClientFactoryOptions o)
+        {
+            o.Address = new Uri("https://localhost:5100");
+        }
     }
 }

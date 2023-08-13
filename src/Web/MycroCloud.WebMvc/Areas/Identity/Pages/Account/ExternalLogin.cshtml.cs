@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using MycroCloud.WebMvc.Identity;
 
 namespace MycroCloud.WebMvc.Areas.Identity.Pages.Account
 {
@@ -61,17 +62,17 @@ namespace MycroCloud.WebMvc.Areas.Identity.Pages.Account
             public string Email { get; set; }
         }
 
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly IUserStore<IdentityUser> _userStore;
-        private readonly IUserEmailStore<IdentityUser> _emailStore;
+        private readonly SignInManager<MycroCloudIdentityUser> _signInManager;
+        private readonly UserManager<MycroCloudIdentityUser> _userManager;
+        private readonly IUserStore<MycroCloudIdentityUser> _userStore;
+        private readonly IUserEmailStore<MycroCloudIdentityUser> _emailStore;
         //private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
 
         public ExternalLoginModel(
-            SignInManager<IdentityUser> signInManager,
-            UserManager<IdentityUser> userManager,
-            IUserStore<IdentityUser> userStore,
+            SignInManager<MycroCloudIdentityUser> signInManager,
+            UserManager<MycroCloudIdentityUser> userManager,
+            IUserStore<MycroCloudIdentityUser> userStore,
             ILogger<ExternalLoginModel> logger
             //,IEmailSender emailSender
             )
@@ -195,27 +196,27 @@ namespace MycroCloud.WebMvc.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private IdentityUser CreateUser()
+        private MycroCloudIdentityUser CreateUser()
         {
             try
             {
-                return Activator.CreateInstance<IdentityUser>();
+                return Activator.CreateInstance<MycroCloudIdentityUser>();
             }
             catch
             {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(IdentityUser)}'. " +
-                    $"Ensure that '{nameof(IdentityUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(MycroCloudIdentityUser)}'. " +
+                    $"Ensure that '{nameof(MycroCloudIdentityUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
                     $"override the external login page in /Areas/Identity/Pages/Account/ExternalLogin.cshtml");
             }
         }
 
-        private IUserEmailStore<IdentityUser> GetEmailStore()
+        private IUserEmailStore<MycroCloudIdentityUser> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)
             {
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
-            return (IUserEmailStore<IdentityUser>)_userStore;
+            return (IUserEmailStore<MycroCloudIdentityUser>)_userStore;
         }
     }
 }

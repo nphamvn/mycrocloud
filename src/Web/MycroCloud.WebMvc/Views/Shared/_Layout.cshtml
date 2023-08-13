@@ -1,4 +1,5 @@
 ﻿@using MycroCloud.WebMvc.Areas.Services.Controllers
+@using MycroCloud.WeMvc
 <!DOCTYPE html>
 <html lang="en">
 
@@ -47,7 +48,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-white"
-                                href="@Url.Action(nameof(WebAppsController.Index), "WebApps", new { Area = AreaConstants.Services})">Web Apps</a>
+                                href="@Url.Action(nameof(WebAppController.Index), "WebApp", new { Area = Constants.Area.Services})">Web Apps</a>
                         </li>
                     </ul>
                     @{

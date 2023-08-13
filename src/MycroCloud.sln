@@ -5,29 +5,27 @@ VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{5B33FB58-F561-44DD-BD78-E0233CC82C2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.Api.Rest", "Services\WebApplication\WebApp.Api.Rest\WebApp.Api.Rest.csproj", "{95CC5B4D-618E-47BE-A779-2993F1EEF27D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.Api.Rest", "Services\WebApp\WebApp.Api.Rest\WebApp.Api.Rest.csproj", "{95CC5B4D-618E-47BE-A779-2993F1EEF27D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.ApiGateway", "Services\WebApplication\WebApp.ApiGateway\WebApp.ApiGateway.csproj", "{A176E567-741B-480A-B857-B60CB65EDBD2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.ApiGateway", "Services\WebApp\WebApp.ApiGateway\WebApp.ApiGateway.csproj", "{A176E567-741B-480A-B857-B60CB65EDBD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.Domain", "Services\WebApplication\WebApp.Domain\WebApp.Domain.csproj", "{829C1461-32BA-49BA-A16D-1A0DE25C6D7A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.Domain", "Services\WebApp\WebApp.Domain\WebApp.Domain.csproj", "{829C1461-32BA-49BA-A16D-1A0DE25C6D7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.Infrastructure", "Services\WebApplication\WebApp.Infrastructure\WebApp.Infrastructure.csproj", "{76C37C96-1171-434F-8530-1866EDA1F170}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.Infrastructure", "Services\WebApp\WebApp.Infrastructure\WebApp.Infrastructure.csproj", "{76C37C96-1171-434F-8530-1866EDA1F170}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApp", "WebApp", "{BC43C176-CECE-4D9A-B9E4-885D41F034CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.MockResponder", "Services\WebApplication\WebApp.MockResponder\WebApp.MockResponder.csproj", "{9A5E0493-512A-4B5E-B669-8309B2F043C5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.MockResponder", "Services\WebApp\WebApp.MockResponder\WebApp.MockResponder.csproj", "{9A5E0493-512A-4B5E-B669-8309B2F043C5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{21601414-495D-48F2-B24C-86B6268C6C06}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MycroCloud.WebMvc", "Web\MycroCloud.WebMvc\MycroCloud.WebMvc.csproj", "{63884B17-DD22-4560-8D7E-72256B11A00D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.Api.Grpc", "Services\WebApplication\WebApp.Api.Grpc\WebApp.Api.Grpc.csproj", "{F4F92212-6346-4B7F-9649-B3C22292CFB1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.Api.Grpc", "Services\WebApp\WebApp.Api.Grpc\WebApp.Api.Grpc.csproj", "{F4F92212-6346-4B7F-9649-B3C22292CFB1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MycroCloud.Shared", "Shared\MycroCloud.Shared.csproj", "{7C0CD325-E155-425A-9414-67EECA79C5E9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{DA99DC2F-5E1A-4BDA-8B37-D7DA76B05A16}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MycroCloud.WebMvc.Domain", "Web\MycroCloud.WebMvc.Domain\MycroCloud.WebMvc.Domain.csproj", "{3416C2D1-E16B-4725-A7EE-2200774128D9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,10 +65,6 @@ Global
 		{7C0CD325-E155-425A-9414-67EECA79C5E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C0CD325-E155-425A-9414-67EECA79C5E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C0CD325-E155-425A-9414-67EECA79C5E9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3416C2D1-E16B-4725-A7EE-2200774128D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3416C2D1-E16B-4725-A7EE-2200774128D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3416C2D1-E16B-4725-A7EE-2200774128D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3416C2D1-E16B-4725-A7EE-2200774128D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -85,7 +79,6 @@ Global
 		{63884B17-DD22-4560-8D7E-72256B11A00D} = {21601414-495D-48F2-B24C-86B6268C6C06}
 		{F4F92212-6346-4B7F-9649-B3C22292CFB1} = {BC43C176-CECE-4D9A-B9E4-885D41F034CC}
 		{7C0CD325-E155-425A-9414-67EECA79C5E9} = {DA99DC2F-5E1A-4BDA-8B37-D7DA76B05A16}
-		{3416C2D1-E16B-4725-A7EE-2200774128D9} = {21601414-495D-48F2-B24C-86B6268C6C06}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CD031E65-36C2-4037-A150-3475EDB9EC92}

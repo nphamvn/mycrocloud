@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MycroCloud.WebMvc.Identity;
 
 namespace MycroCloud.WebMvc.Areas.Identity.Pages.Account
 {
@@ -73,10 +74,10 @@ namespace MycroCloud.WebMvc.Areas.Identity.Pages.Account
             public bool RememberMe { get; set; }
         }
 
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly SignInManager<MycroCloudIdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<MycroCloudIdentityUser> signInManager, ILogger<LoginModel> logger)
         {
             _signInManager = signInManager;
             _logger = logger;

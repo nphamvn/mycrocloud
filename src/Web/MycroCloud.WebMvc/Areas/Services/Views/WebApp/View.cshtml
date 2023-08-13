@@ -13,7 +13,7 @@
             <div class="row flex-nowrap">
                 <div class="col py-3">
                     <!-- Rename: Start-->
-                    <form action="@Url.Action(nameof(WebAppsController.Rename), "WebApps", rv)"
+                    <form action="@Url.Action(nameof(WebAppController.Rename), WebAppController.Name, rv)"
                         class="mb-2 border-bottom pb-3">
                         <div class="row">
                             <div class="col-3">
@@ -55,7 +55,7 @@
                                         This will permanently delete everything in the <strong>@Model.Name</strong>
                                         project.
                                     </div>
-                                    <form asp-action="@nameof(WebAppsController.Delete)" asp-controller="WebApps"
+                                    <form asp-action="@nameof(WebAppController.Delete)" asp-controller="WebApp"
                                         asp-route-name="@Model.Name">
                                         <div>
                                             <div class="mb-3">

@@ -1,26 +1,26 @@
 @{
     var appName = (string)ViewData["WebAppName"];
-    var routeValue = new { WebApplicationName = appName };
+    var app = new { WebAppName = appName };
     var controller = (string)ViewContext.RouteData.Values["Controller"];
 }
 <div class="d-flex flex-column flex-shrink-0">
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a href="@Url.Action(nameof(WebAppsController.View), "WebApps", routeValue)"
-                class="nav-link @(controller == "WebApps" ? "active": null) py-1" role="tab">Overview</a>
+            <a href="@Url.Action(nameof(WebAppController.View), WebAppController.Name, app)"
+                class="nav-link @(controller == WebAppController.Name ? "active": null) py-1" role="tab">Overview</a>
         </li>
         <li class="nav-item">
-            <a href="@Url.Action(nameof(WebAppRoutesController.Index), "WebAppRoutes", routeValue)"
-                class="nav-link @(controller == "WebAppRoutes" ? "active": null) py-1" role="tab">Routes</a>
+            <a href="@Url.Action(nameof(WebAppRouteController.Index), WebAppRouteController.Name, app)"
+                class="nav-link @(controller == WebAppRouteController.Name ? "active": null) py-1" role="tab">Routes</a>
         </li>
         <li class="nav-item">
-            <a href="@Url.Action(nameof(WebAppAuthenticationsController.SchemeList), "WebAppAuthentications", routeValue)"
-                class="nav-link @(controller == "WebAppAuthentications" ? "active": null) py-1"
+            <a href="@Url.Action(nameof(WebAppAuthenticationController.SchemeList), WebAppAuthenticationController.Name, app)"
+                class="nav-link @(controller == WebAppAuthenticationController.Name ? "active": null) py-1"
                 role="tab">Authentication</a>
         </li>
         <li class="nav-item">
-            <a href="@Url.Action(nameof(WebAppAuthorizationsController.PolicyList), "WebAppAuthorizations", routeValue)"
-                class="nav-link @(controller == "WebAppAuthorizations" ? "active": null) py-1"
+            <a href="@Url.Action(nameof(WebAppAuthorizationController.PolicyList), WebAppAuthorizationController.Name, app)"
+                class="nav-link @(controller == WebAppAuthenticationController.Name ? "active": null) py-1"
                 role="tab">Authorization</a>
         </li>
     </ul>

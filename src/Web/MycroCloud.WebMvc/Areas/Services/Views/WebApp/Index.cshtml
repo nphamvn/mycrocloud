@@ -1,4 +1,4 @@
-@model MycroCloud.WebMvc.Areas.Services.Models.WebApps.WebAppIndexViewModel
+@model WebAppIndexViewModel
 @{
     ViewData["Title"] = "Your Applications";
 }
@@ -7,7 +7,7 @@
         <h3>@ViewData["Title"]</h3>
         <div class="mt-2">
             <div class="d-flex">
-                <form id="search" class="flex-grow-1 row" action="@Url.Action(nameof(WebAppsController.Index), "WebApps")"
+                <form id="search" class="flex-grow-1 row" action="@Url.Action(nameof(WebAppController.Index), WebAppController.Name)"
                     method="get">
                     <div class="d-flex">
                         <div class="me-auto w-100">
@@ -29,7 +29,7 @@
                     </div>
                 </form>
                 <div>
-                    <a href="@Url.Action(nameof(WebAppsController.Create), "WebApps")" class="btn btn-outline-primary text-decoration-none px-5">New</a>
+                    <a href="@Url.Action(nameof(WebAppController.Create), WebAppController.Name)" class="btn btn-outline-primary text-decoration-none px-5">New</a>
                 </div>
             </div>
             <div id="projectList" class="my-3">
@@ -40,14 +40,14 @@
                             <div>
                                 <h3 class="text-xl">
                                     <a class="text-decoration-none me-2"
-                                    href="@Url.Action(nameof(WebAppsController.View), "WebApps" ,new {WebApplicationName=app.Name})">@app.Name</a>
+                                    href="@Url.Action(nameof(WebAppController.View), WebAppController.Name ,new { WebAppName=app.Name })">@app.Name</a>
                                 </h3>
                                 <p>@app.Description</p>
                                 <div class="d-flex">
-                                    @if (app.UpdatedAt > default(DateTime))
+                                    @if (app.ModifiedDateTime != null)
                                     {
                                         <div class="text-sm text-gray">
-                                        Updated <span name="updated-at" data-updated-at="@app.UpdatedAt.ToString("yyyy-MM-ddTHH:mm:ss")"></span>
+                                            Updated <span name="updated-at" data-updated-at="@app.ModifiedDateTime?.ToString("yyyy-MM-ddTHH:mm:ss")"></span>
                                         </div>
                                     }
                                 </div>
@@ -79,7 +79,10 @@
         }
     }
 </script>
-<script src="https://unpkg.com/javascript-time-ago@2.5.9/bundle/javascript-time-ago.js"></script>
+@section Scripts
+{
+    <script src="https://unpkg.com/javascript-time-ago@2.5.9/bundle/javascript-time-ago.js"></script>
+}
 <script>
     TimeAgo.addDefaultLocale({
         locale: 'en',

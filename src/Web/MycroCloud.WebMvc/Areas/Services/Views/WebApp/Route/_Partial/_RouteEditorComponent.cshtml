@@ -460,9 +460,9 @@
                 let url;
                 const isCreate = route.id === undefined || route.id === null;
                 if (isCreate) {
-                    url = '@Url.Action(nameof(WebAppRoutesController.Create), "WebAppRoutes", new { WebApplicationName = appName})'
+                    url = '@Url.Action(nameof(WebAppRouteController.Create), "WebAppRoute", new { WebApplicationName = appName})'
                 } else {
-                    let tempUrl = '@Url.Action(nameof(WebAppRoutesController.Edit), "WebAppRoutes", new { WebApplicationName = appName, RouteId = -9999})'
+                    let tempUrl = '@Url.Action(nameof(WebAppRouteController.Edit), "WebAppRoute", new { WebApplicationName = appName, RouteId = -9999})'
                     url = tempUrl.replace('-9999', route.id);
                 }
                 console.log('submitting...')

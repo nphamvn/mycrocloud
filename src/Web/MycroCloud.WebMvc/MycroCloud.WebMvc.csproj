@@ -19,12 +19,10 @@
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.0-preview.4.23260.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0-preview.4.23260.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.4.23259.3" />
-    <!-- <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.4.23259.3">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.5.23280.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
-    </PackageReference> -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0-preview.4.23259.3" />
+    </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-preview.4" />
     <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="5.2.3-dev-00262" />
@@ -33,8 +31,11 @@
     <ProjectReference Include="..\..\Shared\MycroCloud.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Protobuf Include="Areas\Services\Protos\webapp.proto" GrpcServices="Client" />
-    <Protobuf Include="Areas\Services\Protos\webapproute.proto" GrpcServices="Client" />
-    <Protobuf Include="Areas\Services\Protos\webappauthentication.proto" GrpcServices="Client" />
+    <Protobuf Include="Areas\Services\Services\Protos\webapp.proto">
+    </Protobuf>
+    <Protobuf Include="Areas\Services\Services\Protos\webappauthentication.proto">
+    </Protobuf>
+    <Protobuf Include="Areas\Services\Services\Protos\webapproute.proto">
+    </Protobuf>
   </ItemGroup>
 </Project>

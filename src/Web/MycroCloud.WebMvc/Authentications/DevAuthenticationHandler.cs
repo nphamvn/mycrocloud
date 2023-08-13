@@ -6,8 +6,8 @@ using Microsoft.Extensions.Options;
 
 namespace MycroCloud.WebMvc.Authentications;
 
-public class DevAuthenticationHandler(IOptionsMonitor<DevAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
-    : AuthenticationHandler<DevAuthenticationOptions>(options, logger, encoder, clock)
+public class DevAuthenticationHandler(IOptionsMonitor<DevAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder)
+    : AuthenticationHandler<DevAuthenticationOptions>(options, logger, encoder)
 {
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {

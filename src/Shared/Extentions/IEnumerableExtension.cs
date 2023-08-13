@@ -1,4 +1,4 @@
-namespace MycroCloud.Shared.Extensions;
+namespace MycroCloud.Extensions;
 
 public static class IEnumerableExtension
 {

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using MycroCloud.WebMvc.Identity;
 
 namespace MycroCloud.WebMvc.Areas.Identity.Pages.Account
 {
@@ -27,10 +28,10 @@ namespace MycroCloud.WebMvc.Areas.Identity.Pages.Account
         [TempData]
         public string StatusMessage { get; set; }
 
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<MycroCloudIdentityUser> _userManager;
+        private readonly SignInManager<MycroCloudIdentityUser> _signInManager;
 
-        public ConfirmEmailChangeModel(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public ConfirmEmailChangeModel(UserManager<MycroCloudIdentityUser> userManager, SignInManager<MycroCloudIdentityUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;

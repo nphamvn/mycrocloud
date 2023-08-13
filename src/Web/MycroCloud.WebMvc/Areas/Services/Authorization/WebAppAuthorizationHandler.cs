@@ -1,18 +1,15 @@
 ﻿using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
-using Microsoft.AspNetCore.Identity;
 using MycroCloud.WebApp;
+using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
 using MycroCloud.WebMvc.Extentions;
-using MycroCloud.WebMvc.Identity;
-using WebMvcWebApp = MycroCloud.WebMvc.Areas.Services.Models.WebApps.WebAppModel;
 namespace MycroCloud.WebMvc.Areas.Services.Authorization;
 
-public class WebAppAuthorizationHandler(WebAppGrpcService.WebAppGrpcServiceClient webAppGrpcServiceClient, UserManager<MycroCloudIdentityUser> userManager)
-    : AuthorizationHandler<OperationAuthorizationRequirement, WebMvcWebApp>
+public class WebAppAuthorizationHandler(WebAppGrpcService.WebAppGrpcServiceClient webAppGrpcServiceClient)
+    : AuthorizationHandler<OperationAuthorizationRequirement, WebAppModel>
 {
-    private readonly WebAppGrpcService.WebAppGrpcServiceClient _webAppGrpcServiceClient = webAppGrpcServiceClient;
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement, WebMvcWebApp app)
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement, WebAppModel app)
     {
         var user = context.User?.ToMycroCloudUser();
 
@@ -33,14 +30,13 @@ public class WebAppAuthorizationHandler(WebAppGrpcService.WebAppGrpcServiceClien
         }
     }
 
-    private async Task CheckViewRequirement(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement, WebMvcWebApp app)
+    private async Task CheckViewRequirement(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement, WebAppModel app)
     {
         try
         {
-            var res = await _webAppGrpcServiceClient.GetAsync(new GetWebAppRequest()
+            var res = await webAppGrpcServiceClient.GetByAppIdAsync(new GetByAppIdRequest()
             {
-                UserId = app.UserId,
-                Name = app.WebAppName
+                AppId = app.WebAppId
             });
             context.Succeed(requirement);
         }

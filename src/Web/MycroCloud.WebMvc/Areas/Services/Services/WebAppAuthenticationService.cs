@@ -5,26 +5,23 @@ using static MycroCloud.WebApp.WebAppAuthenticationGrpcService;
 namespace MycroCloud.WebMvc.Areas.Services.Services;
 public interface IWebAppAuthenticationService
 {
-    Task<AuthenticationSchemeListViewModel> GetSchemeListViewModel(string appName);
+    Task<AuthenticationSchemeListViewModel> GetSchemeListViewModel(int appId);
     Task SaveSettings(int appId, AuthenticationConfigurationViewModel viewModel);
     Task AddJwtBearerScheme(int appId, JwtBearerAuthenticationSchemeSaveViewModel authenticationScheme);
     Task EditJwtBearerScheme(int schemeId, JwtBearerAuthenticationSchemeSaveViewModel authenticationScheme);
     Task<JwtBearerAuthenticationSchemeSaveViewModel> GetCreateJwtBearerSchemeModel(int appId);
     Task<JwtBearerAuthenticationSchemeSaveViewModel> GetEditJwtBearerSchemeModel(int appId, int schemeId);
-    Task<AuthenticationConfigurationViewModel> GetConfigurationsViewModel(int webApplicationId);
+    Task<AuthenticationConfigurationViewModel> GetConfigurationsViewModel(int appId);
 }
 
 public class WebAppAuthenticationService(IHttpContextAccessor contextAccessor
-, WebAppAuthenticationGrpcServiceClient webAppAuthenticationGrpcServiceClient) : ServiceBaseService(contextAccessor), IWebAppAuthenticationService
+, WebAppAuthenticationGrpcServiceClient webAppAuthenticationGrpcServiceClient) : IWebAppAuthenticationService
 {
-    private readonly WebAppAuthenticationGrpcServiceClient _webAppAuthenticationClient = webAppAuthenticationGrpcServiceClient;
-
-    public async Task<AuthenticationSchemeListViewModel> GetSchemeListViewModel(string appName)
+    public async Task<AuthenticationSchemeListViewModel> GetSchemeListViewModel(int appId)
     {
         var vm = new AuthenticationSchemeListViewModel();
-        var res = await _webAppAuthenticationClient.GetAllAsync(new () {
-            UserId = ServiceOwner.Id,
-            AppName = appName
+        var res = await webAppAuthenticationGrpcServiceClient.GetAllAsync(new () {
+            
         });
         vm.AuthenticationSchemes = res.Schemes.Select(s => new AuthenticationSchemeIndexItem {
             Id = s.Id,

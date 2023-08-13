@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MycroCloud.WebMvc.Identity;
 
 namespace MycroCloud.WebMvc.Areas.Identity.Pages.Account
 {
@@ -24,10 +25,10 @@ namespace MycroCloud.WebMvc.Areas.Identity.Pages.Account
         {
         }
 
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly SignInManager<MycroCloudIdentityUser> _signInManager;
         private readonly ILogger<LogoutModel> _logger;
 
-        public LogoutModel(SignInManager<IdentityUser> signInManager, ILogger<LogoutModel> logger)
+        public LogoutModel(SignInManager<MycroCloudIdentityUser> signInManager, ILogger<LogoutModel> logger)
         {
             _signInManager = signInManager;
             _logger = logger;

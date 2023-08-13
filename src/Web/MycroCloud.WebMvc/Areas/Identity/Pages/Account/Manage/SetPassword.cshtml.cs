@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MycroCloud.WebMvc.Identity;
 
 namespace MycroCloud.WebMvc.Areas.Identity.Pages.Account.Manage
 {
@@ -55,12 +56,12 @@ namespace MycroCloud.WebMvc.Areas.Identity.Pages.Account.Manage
             public string ConfirmPassword { get; set; }
         }
 
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<MycroCloudIdentityUser> _userManager;
+        private readonly SignInManager<MycroCloudIdentityUser> _signInManager;
 
         public SetPasswordModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            UserManager<MycroCloudIdentityUser> userManager,
+            SignInManager<MycroCloudIdentityUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;

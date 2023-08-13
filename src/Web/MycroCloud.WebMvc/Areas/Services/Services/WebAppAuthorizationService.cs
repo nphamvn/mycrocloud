@@ -11,12 +11,8 @@ public interface IWebAppAuthorizationService
     Task Delete(int policyId);
 }
 
-public class WebAppAuthorizationService : ServiceBaseService, IWebAppAuthorizationService
+public class WebAppAuthorizationService : IWebAppAuthorizationService
 {
-    public WebAppAuthorizationService(IHttpContextAccessor contextAccessor) : base(contextAccessor)
-    {
-    }
-
     public async Task<AuthorizationPolicyListViewModel> GetPolicyListViewModel(int appId)
     {
         throw new NotImplementedException();

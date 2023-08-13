@@ -1,11 +1,11 @@
 {
   "profiles": {
-    "MockServer.Web": {
+    "MycroCloud.WebMvc": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:5008"
+      "applicationUrl": "https://localhost:5002"
     },
     "Docker": {
       "commandName": "Docker",

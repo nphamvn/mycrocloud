@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 
-namespace MycroCloud.Shared.Helpers;
+namespace MycroCloud.Helpers;
 /// <summary>
 ///  Represents the class implementation of cryptographic random number generator derive
 /// </summary>

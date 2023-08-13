@@ -17,11 +17,11 @@
                 <ul class="dropdown-menu">
                     <li>
                         <a class="dropdown-item"
-                            href="@Url.Action(nameof(WebAppAuthenticationsController.CreateJwtBearerScheme), "WebAppAuthentications", new { WebApplicationName = appName})">JWT Bearer</a>
+                            href="@Url.Action(nameof(WebAppAuthenticationController.CreateJwtBearerScheme), "WebAppAuthentication", new { WebApplicationName = appName})">JWT Bearer</a>
                     </li>
                     <li>
                         <a class="dropdown-item"
-                            href="@Url.Action(nameof(WebAppAuthenticationsController.CreateApiKeyScheme),"WebAppAuthentications", new { WebApplicationName = appName})">API
+                            href="@Url.Action(nameof(WebAppAuthenticationController.CreateApiKeyScheme),"WebAppAuthentication", new { WebApplicationName = appName})">API
                             Key</a>
                     </li>
                 </ul>
@@ -52,11 +52,11 @@
                                             var editAction = "";
                                             if (scheme.Type == AuthenticationSchemeType.JwtBearer)
                                             {
-                                                editAction = Url.Action(nameof(WebAppAuthenticationsController.EditJwtBearerScheme), "WebAppAuthentications",new { WebApplicationName = appName, SchemeId = scheme.Id});
+                                                editAction = Url.Action(nameof(WebAppAuthenticationController.EditJwtBearerScheme), "WebAppAuthentication",new { WebApplicationName = appName, SchemeId = scheme.Id});
                                             }
                                             else if (scheme.Type == AuthenticationSchemeType.ApiKey)
                                             {
-                                                editAction = Url.Action(nameof(WebAppAuthenticationsController.EditApiKeyScheme), "WebAppAuthentications",new { WebApplicationName = appName, SchemeId = scheme.Id});
+                                                editAction = Url.Action(nameof(WebAppAuthenticationController.EditApiKeyScheme), "WebAppAuthentication",new { WebApplicationName = appName, SchemeId = scheme.Id});
                                             }
                                         }
                                         <a class="btn btn-primary" href="@editAction">Edit</a>

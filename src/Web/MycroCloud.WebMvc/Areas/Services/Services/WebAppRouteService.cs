@@ -9,9 +9,9 @@ namespace MycroCloud.WebMvc.Areas.Services.Services;
 
 public interface IWebAppRouteService
 {
-    Task<RouteIndexViewModel> GetIndexViewModel(string name, string searchTerm, string sort);
-    Task<IEnumerable<RouteIndexItem>> GetList(string appName, string searchTerm, string sort);
-    Task<RouteModel> GetRouteDetails(string appName, int routeId);
+    Task<RouteIndexViewModel> GetIndexViewModel(int appId, string searchTerm, string sort);
+    Task<IEnumerable<RouteIndexItem>> GetList(int appId, string searchTerm, string sort);
+    Task<RouteModel> GetRouteDetails(int appId, int routeId);
     Task<bool> ValidateCreate(int appId, RouteSaveModel route, ModelStateDictionary modelState);
     Task<int> Create(int appId, RouteSaveModel route);
     Task<bool> ValidateEdit(int routeId, RouteSaveModel route, ModelStateDictionary modelState);
@@ -19,24 +19,19 @@ public interface IWebAppRouteService
     Task Delete(int routeId);
     Task<RouteSaveModel> GetDetails(int routeId);
 }
-public class WebAppRouteService(IHttpContextAccessor contextAccessor
-    , WebAppRouteGrpcServiceClient webAppRouteGrpcServiceClient
-    , WebAppAuthenticationGrpcServiceClient webAppAuthenticationGrpcServiceClient) : ServiceBaseService(contextAccessor), IWebAppRouteService
+public class WebAppRouteService(WebAppRouteGrpcServiceClient webAppRouteGrpcServiceClient
+    , WebAppAuthenticationGrpcServiceClient webAppAuthenticationGrpcServiceClient) : IWebAppRouteService
 {
-    private readonly WebAppRouteGrpcServiceClient _webAppRouteClient = webAppRouteGrpcServiceClient;
-    private readonly WebAppAuthenticationGrpcServiceClient _authenticationClient = webAppAuthenticationGrpcServiceClient;
-
-    public async Task<RouteIndexViewModel> GetIndexViewModel(string name, string searchTerm, string sort)
+    public async Task<RouteIndexViewModel> GetIndexViewModel(int appId, string searchTerm, string sort)
     {
         var viewModel = new RouteIndexViewModel();
-        var getRouteResponse = await _webAppRouteClient.GetAllAsync(new()
+        var getRouteResponse = await webAppRouteGrpcServiceClient.ListRoutesAsync(new()
         {
-            UserId = ServiceOwner.Id,
-            AppName = name
+            
         });
         viewModel.Routes = getRouteResponse.Routes.Select(r => new RouteIndexItem
         {
-            RouteId = r.Id,
+            RouteId = r.RouteId,
             Name = r.Name,
             Description = r.Description,
             MatchPath = r.MatchPath,
@@ -50,7 +45,7 @@ public class WebAppRouteService(IHttpContextAccessor contextAccessor
         viewModel.HttpMethodSelectListItem = CommonHttpMethods
                                                 .Select(m => new SelectListItem(m.ToUpper(), m.ToUpper()))
                                                 .Prepend(new SelectListItem("ALL", "ALL"));
-        viewModel.AuthorizationAuthenticationSchemeSelectListItem = (await GetAuthenticationSchemeItems(name))
+        viewModel.AuthorizationAuthenticationSchemeSelectListItem = (await GetAuthenticationSchemeItems(appId))
                                                         .Select(s => new SelectListItem(s.DisplayName, s.Id.ToString()));
         viewModel.AuthorizationPolicySelectListItem = new List<SelectListItem>();
         return viewModel;
@@ -59,12 +54,11 @@ public class WebAppRouteService(IHttpContextAccessor contextAccessor
         "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
     };
 
-    private async Task<IEnumerable<AuthenticationSchemeIndexItem>> GetAuthenticationSchemeItems(string name)
+    private async Task<IEnumerable<AuthenticationSchemeIndexItem>> GetAuthenticationSchemeItems(int appId)
     {
-        var res = await _authenticationClient.GetAllAsync(new()
+        var res = await webAppAuthenticationGrpcServiceClient.GetAllAsync(new()
         {
-            UserId = ServiceOwner.Id,
-            AppName = name
+            
         });
         return res.Schemes.Select(s => new AuthenticationSchemeIndexItem
         {
@@ -74,16 +68,15 @@ public class WebAppRouteService(IHttpContextAccessor contextAccessor
             DisplayName = s.DisplayName
         });
     }
-    public async Task<IEnumerable<RouteIndexItem>> GetList(string appName, string searchTerm, string sort)
+    public async Task<IEnumerable<RouteIndexItem>> GetList(int appId, string searchTerm, string sort)
     {
-        var res = await _webAppRouteClient.GetAllAsync(new()
+        var res = await webAppRouteGrpcServiceClient.ListRoutesAsync(new()
         {
-            UserId = ServiceOwner.Id,
-            AppName = appName
+            
         });
         return res.Routes.Select(r => new RouteIndexItem
         {
-            RouteId = r.Id,
+            RouteId = r.RouteId,
             Name = r.Name,
             MatchPath = r.MatchPath,
             MatchMethods = r.MatchMethods.Select(m => m).ToList(),
@@ -123,12 +116,10 @@ public class WebAppRouteService(IHttpContextAccessor contextAccessor
         throw new NotImplementedException();
     }
 
-    public async Task<RouteModel> GetRouteDetails(string appName, int routeId)
+    public async Task<RouteModel> GetRouteDetails(int appId, int routeId)
     {
-        var res = await _webAppRouteClient.GetAsync(new()
+        var res = await webAppRouteGrpcServiceClient.GetRouteByIdAsync(new()
         {
-            UserId = ServiceOwner.Id,
-            AppName = appName,
             Id = routeId
         });
         return new()

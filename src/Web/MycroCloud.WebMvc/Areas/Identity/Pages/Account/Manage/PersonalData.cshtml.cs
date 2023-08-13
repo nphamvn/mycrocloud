@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using MycroCloud.WebMvc.Identity;
 
 namespace MycroCloud.WebMvc.Areas.Identity.Pages.Account.Manage
 {
@@ -17,11 +18,11 @@ namespace MycroCloud.WebMvc.Areas.Identity.Pages.Account.Manage
     //[IdentityDefaultUI(typeof(PersonalDataModel<>))]
     public class PersonalDataModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<MycroCloudIdentityUser> _userManager;
         private readonly ILogger<PersonalDataModel> _logger;
 
         public PersonalDataModel(
-            UserManager<IdentityUser> userManager,
+            UserManager<MycroCloudIdentityUser> userManager,
             ILogger<PersonalDataModel> logger)
         {
             _userManager = userManager;

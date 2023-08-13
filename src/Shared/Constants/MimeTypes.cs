@@ -1,4 +1,4 @@
-﻿namespace MycroCloud.Shared.Constants
+﻿namespace MycroCloud
 {
     /// <summary>
     /// Collection of MimeType Constants for using to avoid Typos

@@ -15,8 +15,8 @@ public class WebAppIndexItem
     public string Name { get; set; }
     public string Description { get; set; }
     public WebAppAccessibility Accessibility { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
+    public DateTime CreatedDateTime { get; set; }
+    public DateTime? ModifiedDateTime { get; set; }
     public string BadgeColor => Accessibility switch
     {
         WebAppAccessibility.Public => "bg-light",

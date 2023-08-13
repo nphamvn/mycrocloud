@@ -1,6 +1,6 @@
 using System.Dynamic;
 
-namespace  MycroCloud.Shared.Helpers;
+namespace  MycroCloud.Helpers;
 
 public static class ExpandoObjectHelper
 {

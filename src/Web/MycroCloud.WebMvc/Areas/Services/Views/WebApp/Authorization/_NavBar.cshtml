@@ -7,6 +7,6 @@
 }
 <ul class="nav nav-tabs">
     <li class="nav-item">
-        <a class="nav-link @(tab.Equals("Policies", StringComparison.OrdinalIgnoreCase) ?"active":"")" href="@Url.Action(nameof(WebAppAuthorizationsController.PolicyList), "WebAppAuthorizations", new { WebApplicationName = ViewData["WebAppName"] })">Policies</a>
+        <a class="nav-link @(tab.Equals("Policies", StringComparison.OrdinalIgnoreCase) ?"active":"")" href="@Url.Action(nameof(WebAppAuthorizationController.PolicyList), "WebAppAuthorization", new { WebApplicationName = ViewData["WebAppName"] })">Policies</a>
     </li>
 </ul>

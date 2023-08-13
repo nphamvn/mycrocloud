@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Reflection;
 
-namespace MycroCloud.Shared.Helpers;
+namespace MycroCloud.Helpers;
 
 public class ConstructorInfoUtilities
 {
