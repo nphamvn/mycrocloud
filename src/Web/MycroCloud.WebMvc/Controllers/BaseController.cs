@@ -7,6 +7,5 @@ namespace MycroCloud.WebMvc.Controllers;
 [Controller]
 public class BaseController : Controller
 {
-    protected MycroCloudIdentityUser AuthenticatedMycroCloudUser
-        => User.ToMycroCloudUser();
+    protected MycroCloudIdentityUser? MycroCloudUser  => User?.ToMycroCloudUser();
 }

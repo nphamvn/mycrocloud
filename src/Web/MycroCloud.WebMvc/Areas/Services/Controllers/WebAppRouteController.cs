@@ -9,9 +9,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace MycroCloud.WebMvc.Areas.Services.Controllers;
 
-[Authorize]
 [Route("[area]/webapp/{WebAppName}/route")]
-[Route("{Username}/[area]/webapp/{WebAppName}/route")]
 public class WebAppRouteController(IWebAppRouteService webAppRouteService
     , ILogger<WebAppRouteController> logger) : BaseServiceController
 {
@@ -20,7 +18,7 @@ public class WebAppRouteController(IWebAppRouteService webAppRouteService
 
     public override void OnActionExecuting(ActionExecutingContext context)
     {
-        base.OnActionExecuting(context);
+        //base.OnActionExecuting(context);
         ViewData["WebAppName"] = context.ActionArguments["WebAppName"];
     }
 

@@ -21,7 +21,8 @@ public static class ServiceCollectionExtensions
             })
             .AddCookie(IdentityConstants.ExternalScheme, options =>
             {
-                options.LoginPath = "/identity/account/login";
+                options.LoginPath = "/Identity/Account/Login";
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
             })
             .AddCookie(IdentityConstants.TwoFactorUserIdScheme)
             .AddCookie(IdentityConstants.TwoFactorRememberMeScheme)

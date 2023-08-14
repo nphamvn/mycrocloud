@@ -8,25 +8,17 @@ using MycroCloud.WebMvc.Identity;
 
 namespace MycroCloud.WebMvc.Areas.Services.Controllers;
 
-[Authorize]
 public class WebAppController(IWebAppService webAppService
     , IAuthorizationService authorizationService
     , ILogger<WebAppController> logger) : BaseServiceController
 {
     public const string Name = "WebApp";
 
-    public override void OnActionExecuting(ActionExecutingContext context)
-    {
-        base.OnActionExecuting(context);
-        ViewData["WebAppName"] = context.ActionArguments["WebAppName"];
-    }
-
     [AllowAnonymous]
     [HttpGet]
-    public async Task<IActionResult> Index(string Username, WebAppSearchModel fm)
+    public async Task<IActionResult> Index(WebAppSearchModel fm)
     {
-        var vm = await webAppService.GetIndexViewModel(fm,
-            string.IsNullOrEmpty(Username) ? AuthenticatedMycroCloudUser.Id : ServiceOwner.Id);
+        var vm = await webAppService.GetIndexViewModel(fm, MycroCloudUser.Id);
         return View("/Areas/Services/Views/WebApp/Index.cshtml", vm);
     }
 
@@ -45,7 +37,7 @@ public class WebAppController(IWebAppService webAppService
             return View("/Areas/Services/Views/WebApp/Create.cshtml", app);
         }
 
-        await webAppService.Create(app, AuthenticatedMycroCloudUser.Id);
+        await webAppService.Create(app, MycroCloudUser.Id);
         return RedirectToAction(nameof(View), new { WebAppName = app.Name });
     }
 
@@ -53,11 +45,11 @@ public class WebAppController(IWebAppService webAppService
     [HttpGet("{WebAppName}")]
     public async Task<IActionResult> View(string WebAppName)
     {
-        var app = await webAppService.FindByUserIdAndAppName(ServiceOwner.Id, WebAppName);
+        var app = await webAppService.FindByUserIdAndAppName(MycroCloudUser.Id, WebAppName);
         if (app == null) return NotFound();
         var authResult = await authorizationService.AuthorizeAsync(User, app,
             WebAppAuthorizationHandler.Operations.View);
-        if (!authResult.Succeeded) return AuthenticatedMycroCloudUser != null ? Forbid() : NotFound();
+        if (!authResult.Succeeded) return NotFound();
         
         var vm = await webAppService.GetViewViewModel(app.WebAppId);
         return View("/Areas/Services/Views/WebApp/View.cshtml", vm);
@@ -66,11 +58,11 @@ public class WebAppController(IWebAppService webAppService
     [HttpPost("{WebAppName}/Rename")]
     public async Task<IActionResult> Rename(string WebAppName, WebAppRenameRequestModel renameRequestModel)
     {
-        var app = await webAppService.FindByUserIdAndAppName(ServiceOwner.Id, WebAppName);
+        var app = await webAppService.FindByUserIdAndAppName(MycroCloudUser.Id, WebAppName);
         if (app == null) return NotFound();
         var authResult = await authorizationService.AuthorizeAsync(User, app,
             WebAppAuthorizationHandler.Operations.View);
-        if (!authResult.Succeeded) return AuthenticatedMycroCloudUser != null ? Forbid() : NotFound();
+        if (!authResult.Succeeded) return NotFound();
         
         await webAppService.Rename(app.WebAppId, renameRequestModel.Name);
         return RedirectToAction(nameof(View), new { WebAppName = renameRequestModel.Name });
@@ -79,11 +71,11 @@ public class WebAppController(IWebAppService webAppService
     [HttpPost("{WebAppName}/Delete")]
     public async Task<IActionResult> Delete(string WebAppName)
     {
-        var app = await webAppService.FindByUserIdAndAppName(ServiceOwner.Id, WebAppName);
+        var app = await webAppService.FindByUserIdAndAppName(MycroCloudUser.Id, WebAppName);
         if (app == null) return NotFound();
         var authResult = await authorizationService.AuthorizeAsync(User, app,
             WebAppAuthorizationHandler.Operations.View);
-        if (!authResult.Succeeded) return AuthenticatedMycroCloudUser != null ? Forbid() : NotFound();
+        if (!authResult.Succeeded) return MycroCloudUser != null ? Forbid() : NotFound();
         
         await webAppService.Delete(app.WebAppId);
         return RedirectToAction(nameof(Index));

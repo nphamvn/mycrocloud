@@ -4,15 +4,17 @@ using Microsoft.AspNetCore.Authorization.Infrastructure;
 using MycroCloud.WebApp;
 using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
 using MycroCloud.WebMvc.Extentions;
+using MycroCloud.WebMvc.Identity;
+
 namespace MycroCloud.WebMvc.Areas.Services.Authorization;
 
 public class WebAppAuthorizationHandler(WebAppGrpcService.WebAppGrpcServiceClient webAppGrpcServiceClient)
     : AuthorizationHandler<OperationAuthorizationRequirement, WebAppModel>
 {
+    private MycroCloudIdentityUser _user;
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement, WebAppModel app)
     {
-        var user = context.User?.ToMycroCloudUser();
-
+        _user = context.User?.ToMycroCloudUser();
         if (requirement.Name == nameof(Operations.Index))
         {
             CheckIndexRequirement(context, requirement);
@@ -38,7 +40,14 @@ public class WebAppAuthorizationHandler(WebAppGrpcService.WebAppGrpcServiceClien
             {
                 AppId = app.WebAppId
             });
-            context.Succeed(requirement);
+            if (res.UserId == _user.Id)
+            {
+                context.Succeed(requirement);
+            }
+            else
+            {
+                context.Fail();
+            }
         }
         catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
         {

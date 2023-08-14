@@ -10,5 +10,6 @@
 	},
 	"settings": {
 		"dotnet.defaultSolution": "src/MycroCloud.sln"
+		
 	}
 }

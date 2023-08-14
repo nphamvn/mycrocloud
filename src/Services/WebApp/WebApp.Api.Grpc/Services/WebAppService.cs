@@ -64,6 +64,7 @@ public class WebAppService(ILogger<WebAppService> logger
         return new()
         {
             AppId = app.WebAppId,
+            UserId = app.UserId,
             AppName = app.Name,
             Description = app.Description,
             CreatedTime = DateTime.SpecifyKind(app.CreatedDate, DateTimeKind.Utc).ToTimestamp(),
