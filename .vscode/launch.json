@@ -2,47 +2,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "MockServer.Web",
+            "name": "WebMvc",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build_web",
-            "program": "${workspaceFolder}/src/MockServer.Web/bin/Debug/net7.0/MockServer.Web.dll",
+            "program": "${workspaceFolder}/src/Web/MycroCloud.WebMvc/bin/Debug/net8.0/MycroCloud.WebMvc.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/src/MockServer.Web",
+            "cwd": "${workspaceFolder}/src/MycroCloud.WebMvc",
             "stopAtEntry": false,
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
                 "ASPNETCORE_URLS":"https://localhost:5002"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceFolder}/src/MockServer.Web/Views"
+                "/Views": "${workspaceFolder}/src/MycroCloud.WebMvc/Views"
             },
             "requireExactSource": false
-        },
-        {
-            // Use IntelliSense to find out which attributes exist for C# debugging
-            // Use hover for the description of the existing attributes
-            // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-            "name": "MockServer.ApiGateway",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build_api",
-            // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/MockServer.ApiGateway/bin/Debug/net6.0/MockServer.ApiGateway.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/src/MockServer.ApiGateway",
-            "stopAtEntry": false,
-            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
-            // "serverReadyAction": {
-            //     "action": "openExternally",
-            //     "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
-            // },
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceFolder}/src/MockServer.ApiGateway/Views"
-            }
         }
     ]
 }

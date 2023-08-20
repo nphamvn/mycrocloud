@@ -47,7 +47,7 @@ public class WebAppService(WebAppGrpcService.WebAppGrpcServiceClient webAppGrpcS
         });
         return new()
         {
-            Name = res.AppName,
+            AppName = res.AppName,
             Description = res.Description
         };
     }

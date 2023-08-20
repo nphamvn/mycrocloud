@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using MycroCloud.WebApp;
 using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
 using static MycroCloud.WebApp.WebAppAuthenticationGrpcService;
 using static MycroCloud.WebApp.WebAppRouteGrpcService;
@@ -62,7 +63,7 @@ public class WebAppRouteService(WebAppRouteGrpcServiceClient webAppRouteGrpcServ
         });
         return res.Schemes.Select(s => new AuthenticationSchemeIndexItem
         {
-            Id = s.Id,
+            Id = s.SchemeId,
             Type = (AuthenticationSchemeType)(int)s.Type,
             Name = s.Name,
             DisplayName = s.DisplayName
@@ -93,7 +94,37 @@ public class WebAppRouteService(WebAppRouteGrpcServiceClient webAppRouteGrpcServ
 
     public async Task<int> Create(int appId, RouteSaveModel route)
     {
-        throw new NotImplementedException();
+        var req = new CreateRouteRequest {
+            AppId = appId,
+            Name = route.Name,
+            Description = route.Description,
+            MatchPath = route.MatchPath,
+            MatchOrder = route.MatchOrder ?? 1,
+            ResponseType = (int)route.ResponseProvider,
+            //ResponseJson = route.Response != null ? JsonSerializer.Serialize(route.Response) : ""
+        };
+        req.MatchMethods.AddRange(route.MatchMethods);
+        if (route.ResponseProvider == RouteResponseProvider.Mock)
+        {
+            var mockResponse = (MockResponseSaveModel)route.Response;
+            req.MockResponse = new MockResponse {
+                StatusCode = new MockResponse.Types.StatusCode {
+                    ValueType = (MockResponse.Types.ValueType)mockResponse.StatusCode.ValueType,
+                    Code = mockResponse.StatusCode.Code ?? default,
+                    EvaluatedExpresion = mockResponse.StatusCode.Expression ?? default,
+                }
+            };
+            foreach (var header in mockResponse.Headers)
+            {
+                req.MockResponse.Headers.Add(header.Key, new MockResponse.Types.Header {
+                    ValueType = (MockResponse.Types.ValueType)header.Value.ValueType,
+                    StaticValue = header.Value.StaticValue,
+                    EvaluatedExpresion = header.Value.EvaluatedExpression
+                });
+            }
+        }
+        var res = await webAppRouteGrpcServiceClient.CreateRouteAsync(req);
+        return res.RouteId;
     }
 
     public async Task<bool> ValidateEdit(int routeId, RouteSaveModel route, ModelStateDictionary modelState)

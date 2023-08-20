@@ -4,7 +4,7 @@ using WebApp.Domain.Repositories;
 using WebApp.Domain.Shared;
 
 namespace MockServer.MockResponder.Services {
-    public class HttpResponseRetriever(IWebAppRouteRepository webAppRouteRepository) : IHttpResponseRetriever
+    public class HttpResponseRetriever(IRouteRepository webAppRouteRepository) : IHttpResponseRetriever
     {
         public async Task<HttpResponseMessage> GetResponseMessage(int routeId, HttpContext context)
         {

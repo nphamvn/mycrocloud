@@ -1,18 +1,18 @@
+@model WebAppModel
 @{
-    var appName = (string)ViewData["WebAppName"];
-    var action = ViewContext.RouteData.Values["action"].ToString();
+    var action = ViewContext.RouteData.Values["Action"].ToString();
+    var shemeTabActions = new List<string> {
+        nameof(WebAppAuthenticationController.SchemeList),
+        nameof(WebAppAuthenticationController.Configurations),
+        nameof(WebAppAuthenticationController.CreateJwtBearerScheme),
+        nameof(WebAppAuthenticationController.EditJwtBearerScheme)
+    };
 }
 <ul class="nav nav-tabs">
-    @action
     <li class="nav-item">
-        <a class="nav-link @(action == nameof(WebAppAuthenticationController.Configurations) ?"active": null)" href="@Url.Action(nameof(WebAppAuthenticationController.Configurations),"WebAppAuthentication", new { WebApplicationName = appName })">Configurations</a>
+        <a class="nav-link @(action == nameof(WebAppAuthenticationController.Configurations) ? "active": null)" href="@Url.Action(nameof(WebAppAuthenticationController.Configurations),"WebAppAuthentication", new { WebAppName = Model.WebAppName })">Configurations</a>
     </li>
     <li class="nav-item">
-        @{
-            var schemeAction = action.Equals("Schemes", StringComparison.OrdinalIgnoreCase) ||
-                               action.Equals("newjwtbearerscheme", StringComparison.OrdinalIgnoreCase) ||
-                               action.Equals("newapikeyscheme", StringComparison.OrdinalIgnoreCase);
-        }
-        <a class="nav-link @(schemeAction ?"active":"")" href="@Url.Action(nameof(WebAppAuthenticationController.SchemeList),"WebAppAuthentication", appName)">Schemes</a>
+        <a class="nav-link @(shemeTabActions.Contains(action) ? "active":"")" href="@Url.Action(nameof(WebAppAuthenticationController.SchemeList),"WebAppAuthentication", new { WebAppName = Model.WebAppName })">Schemes</a>
     </li>
 </ul>

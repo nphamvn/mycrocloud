@@ -11,7 +11,6 @@ builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 
 builder.Services.ConfigureServices(builder.Configuration);
-builder.Services.AddAuthorization();
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

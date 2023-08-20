@@ -1,6 +1,7 @@
 @model RouteIndexViewModel
 @{
-    var appName = (string)ViewData["WebAppName"];
+    var app = ViewBag._App as WebAppModel;
+    var appName = app.WebAppName;
     var matchHttpMethodItems = Model.HttpMethodSelectListItem.Select(m => new
     {
         Title = m.Text.ToUpper(),
@@ -27,35 +28,35 @@
 }
 <partial name="_ValidationRulesConfigComponent.cshtml" />
 <template id="routeEditorTemplate">
-    <v-btn @@click="importJson">Import</v-btn>
-    <v-btn @@click="exportJson" :disabled="!route.id">Export</v-btn>
-    <v-btn @@click="duplicate" :disabled="!route.id">Duplicate</v-btn>
-    <v-btn @@click="deleteRoute" :disabled="!route.id">Delete</v-btn>
+    <div class="p-2">
+        <v-btn @@click="importJson" class="me-2">Import</v-btn>
+        <v-btn @@click="exportJson" class="me-2" :disabled="!route.id">Export</v-btn>
+        <v-btn @@click="duplicate" class="me-2" :disabled="!route.id">Duplicate</v-btn>
+        <v-btn @@click="deleteRoute" :disabled="!route.id">Delete</v-btn>
+    </div>
     <v-form v-on:submit.prevent="save">
         <v-card>
             <v-card-text>
                 <section>
-                    <h5>BASIC INFORMATION</h5>
+                    <h5>BASIC INFO</h5>
                     <v-text-field v-model="route.name" clearable label="Name" variant="solo"></v-text-field>
                     <v-textarea v-model="route.description" clearable label="Description" variant="solo"
                         rows="2"></v-textarea>
                 </section>
-                <v-divider></v-divider>
                 <section>
                     <h5>MATCH</h5>
                     <v-select v-model="route.matchMethods" :items="matchHttpMethodItems" item-title="title"
                         item-value="value" label="METHOD(S)" clearable chips multiple variant="solo">
                     </v-select>
                     <v-text-field v-model="route.matchPath" label="PATH" variant="solo" clearable></v-text-field>
-                    <v-row no-gutters>
+                    <v-row v-if="false" no-gutters>
                         <v-col cols="3">
                             <v-text-field v-model="route.matchOrder" label="ORDER" type="number"
                                 variant="solo"></v-text-field>
                         </v-col>
                     </v-row>
                 </section>
-                <v-divider></v-divider>
-                <section>
+                <section v-if="false">
                     <h5>AUTHORIZATION</h5>
                     <div>
                         <v-radio-group v-model="route.authorizationType" inline label="TYPE">
@@ -77,8 +78,7 @@
                         </v-expand-transition>
                     </div>
                 </section>
-                <v-divider></v-divider>
-                <section>
+                <section v-if="false">
                     <h5>VALIDATION</h5>
                     <v-card>
                         <v-tabs v-model="requestValidationTab">
@@ -255,7 +255,6 @@
                         @@save="saveValidationRules" @@close="closeValidationRulesConfigDialog">
                     </validation-rules-config-dialog>
                 </section>
-                <v-divider></v-divider>
                 <section>
                     <h5>RESPONSE</h5>
                     <v-select class="col-3" v-model="route.responseProvider" label="PROVIDER" :items="responseProviders"
@@ -265,42 +264,47 @@
                         <div class="text-subtitle-2">STATUS CODE</div>
                         <v-row>
                             <v-col cols="3">
-                                <v-select v-model="route.response.statusCode.renderedValue.engine" label="TYPE"
-                                    :items="[{value: 'None', title: 'STATIC'}, {value: 'JavaScript', title: 'EVALUATED'}]"
+                                <v-select v-model="route.response.statusCode.engine" label="TYPE"
+                                    :items="[{value: 'None', title: 'STATIC'}, {value: 'Evaluated', title: 'EVALUATED'}]"
                                     variant="solo">
                                 </v-select>
                             </v-col>
                             <v-col>
-                                <v-text-field v-model="route.response.statusCode.renderedValue.template"
-                                    :type="route.response.statusCode.renderedValue.engine == 'None'? 'number': 'text'"
-                                    :label="route.response.statusCode.renderedValue.engine == 'None'? 'VALUE': 'EXPRESSION'"
-                                    variant="solo"></v-text-field>
+                                <v-text-field v-if="route.response.statusCode.engine=='None'" v-model="route.response.statusCode.code"
+                                    type="number" label="VALUE"variant="solo">
+                                </v-text-field>
+                                <v-text-field v-if="route.response.statusCode.engine=='Evaluated'" v-model="route.response.statusCode.expression"
+                                    type="text" label="EXPRESSION" variant="solo">
+                                </v-text-field>
                             </v-col>
                         </v-row>
                         <v-container class="px-0">
                             <div class="text-subtitle-2">HEADERS</div>
-                            <v-row v-for="(header, index) of route.response?.headers" class="py-0">
+                            <v-row v-for="(header, index) of mockResponseHeaders" class="py-0">
                                 <v-col cols="3">
                                     <v-text-field label="NAME" v-model="header.name" variant="solo"></v-text-field>
                                 </v-col>
                                 <v-col cols="3">
-                                    <v-select v-model="header.value.renderedValue.engine" label="VALUE TYPE"
-                                        :items="[{value: 'None', title: 'STATIC'}, {value: 'JavaScript', title: 'EVALUATED'}]"
+                                    <v-select v-model="header.valueType" label="VALUE TYPE"
+                                        :items="[{value: 'Static', title: 'STATIC'}, {value: 'ExpressionEvaluated', title: 'EVALUATED'}]"
                                         variant="solo">
                                     </v-select>
                                 </v-col>
                                 <v-col>
-                                    <v-text-field v-model="header.value.renderedValue.template"
-                                        :label="header.value.renderedValue.engine === 'None' ? 'VALUE': 'EXPRESSION'"
-                                        variant="solo"></v-text-field>
+                                    <v-text-field v-if="header.valueType === 'Static'" v-model="header.staticValue"
+                                        label="VALUE" variant="solo">
+                                    </v-text-field>
+                                    <v-text-field v-if="header.valueType === 'ExpressionEvaluated'" v-model="header.evalExpression"
+                                        label="EXPRESSION" variant="solo">
+                                    </v-text-field>
                                 </v-col>
                                 <v-col cols="1">
                                     <v-btn icon="mdi-delete" color="danger"
-                                        v-on:click="route.response.headers.splice(index)"></v-btn>
+                                        v-on:click="mockResponseHeaders.splice(index)"></v-btn>
                                 </v-col>
                             </v-row>
                             <v-btn prepend-icon="mdi-plus" color="secondary"
-                                v-on:click="route.response.headers.push({value: {renderedValue: { engine: 'None'}}})">ADD</v-btn>
+                                v-on:click="mockResponseHeaders.push({valueType: 'Static'})">ADD</v-btn>
                         </v-container>
                         <v-container class="px-0">
                             <div class="text-subtitle-2">BODY</div>
@@ -351,8 +355,9 @@
         emits: ['route-save'],
         setup(props, { emit }) {
             const { route } = props;
-            console.log('setting...')
+            console.log('setting...');
             console.log(JSON.stringify(route))
+            
             // Match:START
             const matchHttpMethodItems = JSON.parse('@Json.Serialize(matchHttpMethodItems)');
             // Match:END
@@ -414,19 +419,18 @@
             const valueProviderItems = [{ value: 'Static', title: 'Static' }];
             //
             //Mock Response: START
-            const mockResponseStatusCodeValueType = ref('number');
             let mockResponseBodyEditor;
             watch(() => route.responseProvider, (provider) => {
                 if (provider === '@nameof(RouteResponseProvider.Mock)' && mockResponseBodyEditor === undefined) {
                     initializeMockResponseBodyEditor();
                 }
             });
+            const mockResponseHeaders = ref(Object.keys(route.response.headers).map(key => {
+                const item = route.response.headers[key];
+                return { name: key, valueType: item.valueType, staticValue: item.staticValue, evalExpression: item.evalExpression }
+            }));
+
             //add watcher for route.response.body.textFormat
-            @* watch(() => route.response?.mock?.body?.renderedValue?.format, (newValue) => {
-                if (mockResponseBodyEditor) {
-                monaco.editor.setModelLanguage(mockResponseBodyEditor.getModel(), newValue)
-                }
-                }); *@
             const mockResponseBodyEditorLanguages = ref([]);
             function initializeMockResponseBodyEditor() {
                 require.config({ paths: { vs: "lib/monaco-editor/min/vs" } });
@@ -449,19 +453,16 @@
             //Mock Response: END
             //
             const save = async () => {
-                route.response.$provider ??= route.responseProvider;
-                if (route.responseProvider === '@nameof(RouteResponseProvider.Mock)') {
-                    //route.response.body.renderedValue.template = mockResponseBodyEditor.getValue();
-                }
+                map(route);
                 if (!await validate()) {
                     return;
                 }
                 let url;
                 const isCreate = route.id === undefined || route.id === null;
                 if (isCreate) {
-                    url = '@Url.Action(nameof(WebAppRouteController.Create), "WebAppRoute", new { WebApplicationName = appName})'
+                    url = '@Url.Action(nameof(WebAppRouteController.Create), WebAppRouteController.Name, new { WebAppName = appName})'
                 } else {
-                    let tempUrl = '@Url.Action(nameof(WebAppRouteController.Edit), "WebAppRoute", new { WebApplicationName = appName, RouteId = -9999})'
+                    let tempUrl = '@Url.Action(nameof(WebAppRouteController.Edit), WebAppRouteController.Name, new { WebAppName = appName, RouteId = -9999})'
                     url = tempUrl.replace('-9999', route.id);
                 }
                 console.log('submitting...')
@@ -472,6 +473,25 @@
                 }
                 route.id = 1;
                 emit('route-save', route);
+            }
+            function map(route) {
+                route.response.$provider = route.responseProvider;
+                if (route.responseProvider === '@nameof(RouteResponseProvider.Mock)') {
+                    route.response.headers = Object.fromEntries(
+                        mockResponseHeaders.value.map(header =>
+                            {
+                                const { name, valueType, staticValue, evalExpression } = header;
+                                const data = { valueType };
+                                if (valueType === "Static") {
+                                    data.staticValue = staticValue;
+                                } else if (valueType === "ExpressionEvaluated") {
+                                    data.evalExpression = evalExpression;
+                                }
+                                return [name, data];
+                            }
+                        )
+                    );
+                }
             }
             async function validate() {
                 return true;
@@ -517,7 +537,7 @@
                 closeValidationRulesConfigDialog,
                 saveValidationRules,
                 responseProviders,
-                mockResponseStatusCodeValueType,
+                mockResponseHeaders,
                 mockResponseBodyEditorLanguages,
                 save,
                 importJson,

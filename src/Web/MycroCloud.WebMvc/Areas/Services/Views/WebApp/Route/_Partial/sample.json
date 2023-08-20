@@ -2,12 +2,12 @@
     "id": 1,
     "name": "foo",
     "description": "foo",
-    "matchOrder": 1,
-    "matchPath": "/foo",
     "matchMethods": [
         "GET",
         "POST"
     ],
+    "matchPath": "/foo",
+    "matchOrder": 1,
     "authorizationType": "Authorized",
     "authorization": {
         "authenticationSchemeIds": [
@@ -55,22 +55,15 @@
     "responseProvider": "Mock",
     "response": {
         "statusCode": {
-            "renderedValue": {
-                "engine": "None",
-                "template": "200"
+            "engine": "None",
+            "code": 200
+        },
+        "headers": {
+            "foo": {
+                "valueType": "Static",
+                "staticValue": "barzz"
             }
         },
-        "headers": [
-            {
-                "name": "foo",
-                "value": {
-                    "renderedValue": {
-                        "engine": "None",
-                        "template": "bar"
-                    }
-                }
-            }
-        ],
         "body": {
             "renderedValue": {
                 "engine": "None",

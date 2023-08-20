@@ -2,20 +2,21 @@
 @if (User!.Identity!.IsAuthenticated)
 {
     var user = User.ToMycroCloudUser();
+    <div class="dropdown">
+        <button class="btn dropdown-toggle text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <span>@user.Email</span>
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Manage Account</a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="javascript:document.getElementById('logoutForm').submit()">Logout</a>
+            </li>
+        </ul>
+    </div>
     <form asp-area="Identity" asp-page="/Account/Logout" method="post" id="logoutForm">
-        <div class="dropdown">
-            <button class="btn dropdown-toggle text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <span>@user.Email</span>
-            </button>
-            <ul class="dropdown-menu">
-                <li>
-                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Manage Account</a>
-                </li>
-                <li>
-                    <a class="dropdown-item" href="javascript:document.getElementByWebAppId('logoutForm').submit()">Logout</a>
-                </li>
-            </ul>
-        </div>
+        <input type="hidden" name="returnUrl" value="/">
     </form>
 }
 else

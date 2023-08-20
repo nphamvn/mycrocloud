@@ -1,32 +1,40 @@
-@model MycroCloud.WebMvc.Areas.Services.Models.WebApps.JwtBearerAuthenticationSchemeSaveViewModel
+@model JwtBearerSchemeSaveViewModel
+@{
+    var app = ViewBag._App as WebAppModel;
+}
 <div class="row">
     <div class="col-2">
-        <partial name="Shared/_SideBar" />
+        <partial name="../Shared/_SideBar.cshtml" model="app" />
     </div>
     <div class="col-10">
-        <partial name="_NavBar" />
+        <partial name="_NavBar.cshtml" model="app" />
         <div class="mt-2">
             <h5>Create new JwtBearer Scheme</h5>
             <form method="post">
                 <div>
                     <label asp-for="Name" class="form-label"></label>
-                    <input type="text" class="form-control" asp-for="Name" autocomplete="off" aria-autocomplete="none">
+                    <input type="text" class="form-control" asp-for="Name" aria-autocomplete="none">
+                    <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
                 <div class="mt-2">
                     <label asp-for="DisplayName" class="form-label"></label>
-                    <input type="text" class="form-control" asp-for="DisplayName" autocomplete="off" aria-autocomplete="none">
+                    <input type="text" class="form-control" asp-for="DisplayName">
+                    <span asp-validation-for="DisplayName" class="text-danger"></span>
                 </div>
                 <div class="mt-2">
                     <label asp-for="Description" class="form-label"></label>
                     <textarea type="text" class="form-control" asp-for="Description" rows="2"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
                 <div class="mt-2">
-                    <label asp-for="Options.Authority" class="form-label">Authority</label>
-                    <input type="text" class="form-control" asp-for="Options.Authority">
+                    <label asp-for="Authority" class="form-label">Authority</label>
+                    <input type="text" class="form-control" asp-for="Authority">
+                    <span asp-validation-for="Authority" class="text-danger"></span>
                 </div>
                 <div class="mt-2">
-                    <label asp-for="Options.Audience" class="form-label">Audience</label>
-                    <input type="text" class="form-control" asp-for="Options.Audience">
+                    <label asp-for="Audience" class="form-label">Audience</label>
+                    <input type="text" class="form-control" asp-for="Audience">
+                    <span asp-validation-for="Audience" class="text-danger"></span>
                 </div>
                 <div class="mt-2">
                     <button type="submit" class="btn btn-primary">Save</button>

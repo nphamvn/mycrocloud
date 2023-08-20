@@ -2,7 +2,7 @@ using WebApp.Domain.Entities;
 
 namespace WebApp.Domain.Repositories;
 
-public interface IWebAppRouteRepository
+public interface IRouteRepository
 {
     Task<IEnumerable<RouteEntity>> List(int appId, string searchTerm, string sort);
     Task<int> Add(int appId, RouteEntity route);

@@ -5,7 +5,7 @@ using MockServer.MockResponder.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<PostgresDatabaseOptions>(builder.Configuration.GetSection("Database:Application"));
-builder.Services.AddScoped<IWebAppRouteRepository, WebAppRouteRepository>();
+builder.Services.AddScoped<IRouteRepository, RouteRepository>();
 builder.Services.AddScoped<IHttpResponseRetriever, HttpResponseRetriever>();
 const string RouteIdKey = "__RouteId";
 var app = builder.Build();

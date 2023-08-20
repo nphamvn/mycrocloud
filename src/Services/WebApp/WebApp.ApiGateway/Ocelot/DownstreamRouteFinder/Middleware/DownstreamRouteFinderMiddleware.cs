@@ -24,13 +24,13 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
         private readonly RequestDelegate _next;
         private readonly IDownstreamRouteProviderFactory _factory;
         private readonly IRoutesCreator _routesCreator;
-        private readonly IWebAppRouteRepository _webAppRouteRepository;
+        private readonly IRouteRepository _webAppRouteRepository;
         private readonly MockResponderOptions _mockResponderOptions;
         public DownstreamRouteFinderMiddleware(RequestDelegate next,
             IOcelotLoggerFactory loggerFactory,
             IDownstreamRouteProviderFactory downstreamRouteFinder,
             IRoutesCreator routesCreator,
-            IWebAppRouteRepository webAppRouteRepository,
+            IRouteRepository webAppRouteRepository,
             IOptions<MockResponderOptions> mockResponderOptions
             )
                 : base(loggerFactory.CreateLogger<DownstreamRouteFinderMiddleware>())
@@ -56,7 +56,7 @@ namespace Ocelot.DownstreamRouteFinder.Middleware
 
             var app = httpContext.Items.WebApplication();
 
-            var applicableRoutes = await _webAppRouteRepository.List(app.WebAppId, string.Empty, string.Empty);
+            var applicableRoutes = await _webAppRouteRepository.List(app.AppId, string.Empty, string.Empty);
             var routes = _routesCreator.Create(applicableRoutes);
             var response = await provider.Get(upstreamUrlPath, upstreamQueryString, httpContext.Request.Method, routes);
             if (response.IsError)

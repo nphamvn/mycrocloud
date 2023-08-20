@@ -53,11 +53,38 @@ message GetRouteByIdResponse {
   google.protobuf.Timestamp updated_date = 13;
   int32 authorization_type = 14;
 }
+message MockResponse {
+    enum ValueType {
+      UNKNOWN = 0;
+      STATIC = 1;
+      EXPRESSION_EVALUATED = 2;
+    }
+    message StatusCode {
+      ValueType value_type = 1;
+      optional int32 code = 2;
+      optional string evaluated_expresion = 3;
+    }
+    message Header {
+      ValueType value_type = 1;
+      optional string static_value = 2;
+      optional string evaluated_expresion = 3;
+    }
+    StatusCode status_code = 1;
+    map<string, Header> headers = 2;
+}
 message CreateRouteRequest {
-  string name = 1;
+  int32 app_id = 1;
+  string name = 2;
+  string description = 3;
+  repeated string match_methods = 4;
+  string match_path = 5;
+  int32 match_order = 6;
+  int32 response_type = 7;
+  MockResponse mock_response  = 8; 
+  //string response_json = 8;
 }
 message CreateRouteResponse {
-
+  int32 route_id = 1;
 }
 message EditRouteRequest {
   string name = 1;

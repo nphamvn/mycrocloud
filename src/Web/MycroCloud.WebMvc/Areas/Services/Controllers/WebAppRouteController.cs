@@ -5,27 +5,31 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
 using MycroCloud.WebMvc.Areas.Services.Services;
-using Microsoft.AspNetCore.Mvc.Filters;
+using MycroCloud.WebMvc.Areas.Services.Authorization;
 
 namespace MycroCloud.WebMvc.Areas.Services.Controllers;
 
 [Route("[area]/webapp/{WebAppName}/route")]
 public class WebAppRouteController(IWebAppRouteService webAppRouteService
+    , IWebAppService webAppService
+    , IAuthorizationService authorizationService
     , ILogger<WebAppRouteController> logger) : BaseServiceController
 {
     public const string Name = "WebAppRoute";
     private readonly ILogger _logger = logger;
 
-    public override void OnActionExecuting(ActionExecutingContext context)
-    {
-        //base.OnActionExecuting(context);
-        ViewData["WebAppName"] = context.ActionArguments["WebAppName"];
-    }
-
     [HttpGet]
-    public async Task<IActionResult> Index(int WebAppId, string SearchTerm, string Sort)
+    public async Task<IActionResult> Index(string WebAppName, string SearchTerm, string Sort)
     {
-        var vm = await webAppRouteService.GetIndexViewModel(WebAppId, SearchTerm, Sort);
+        var app = await webAppService.FindByUserIdAndAppName(MycroCloudUser.Id, WebAppName);
+        if (app == null || !(await authorizationService.AuthorizeAsync(User, app,
+            WebAppAuthorizationHandler.Operations.View)).Succeeded)
+        {
+            return NotFound();
+        }
+        ViewBag._App = app;
+
+        var vm = await webAppRouteService.GetIndexViewModel(app.WebAppId, SearchTerm, Sort);
         return View("/Areas/Services/Views/WebApp/Route/Index.cshtml", vm);
     }
 
@@ -66,18 +70,31 @@ public class WebAppRouteController(IWebAppRouteService webAppRouteService
 
     [AjaxOnly]
     [HttpGet("{RouteId:int}")]
-    public async Task<IActionResult> Get(int WebAppId, int RouteId)
+    public async Task<IActionResult> Get(string WebAppName, int RouteId)
     {
-        var route = await webAppRouteService.GetRouteDetails(WebAppId, RouteId);
+        var app = await webAppService.FindByUserIdAndAppName(MycroCloudUser.Id, WebAppName);
+        if (app == null || !(await authorizationService.AuthorizeAsync(User, app,
+            WebAppAuthorizationHandler.Operations.View)).Succeeded)
+        {
+            return NotFound();
+        }
+        var route = await webAppRouteService.GetRouteDetails(app.WebAppId, RouteId);
         return Ok(route);
     }
 
     [AjaxOnly]
     [HttpPost("Create")]
-    public async Task<IActionResult> Create(string WebApplicationName, [FromBody] RouteSaveModel route)
+    public async Task<IActionResult> Create(string WebAppName, [FromBody] RouteSaveModel route)
     {
+        var app = await webAppService.FindByUserIdAndAppName(MycroCloudUser.Id, WebAppName);
+        if (app == null || !(await authorizationService.AuthorizeAsync(User, app,
+            WebAppAuthorizationHandler.Operations.View)).Succeeded)
+        {
+            return NotFound();
+        }
         _logger.LogInformation(JsonSerializer.Serialize(route));
-        return Ok(route);
+        var routeId = await webAppRouteService.Create(app.WebAppId, route);
+        return Ok(routeId);
     }
     
     [AjaxOnly]

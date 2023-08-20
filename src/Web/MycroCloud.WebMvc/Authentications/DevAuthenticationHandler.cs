@@ -4,7 +4,7 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 
-namespace MycroCloud.WebMvc.Authentications;
+namespace MycroCloud.WebMvc.Authentication;
 
 public class DevAuthenticationHandler(IOptionsMonitor<DevAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder)
     : AuthenticationHandler<DevAuthenticationOptions>(options, logger, encoder)

@@ -4,14 +4,14 @@ using WebApp.Domain.Repositories;
 
 namespace WebApp.Api.Grpc.Services;
 
-public class WebAppService(ILogger<WebAppService> logger
-    , IWebAppRepository webAppRepository) : WebAppGrpcService.WebAppGrpcServiceBase
+public class AppService(ILogger<AppService> logger
+    , IAppRepository webAppRepository) : WebAppGrpcService.WebAppGrpcServiceBase
 {
-    private readonly ILogger<WebAppService> _logger = logger;
+    private readonly ILogger<AppService> _logger = logger;
 
     public override async Task<CreateAppResponse> CreateApp(CreateAppRequest request, ServerCallContext context)
     {
-        var existingApp = await webAppRepository.FindByUserId(request.UserId, request.AppName);
+        var existingApp = await webAppRepository.FindByUserIdAndAppName(request.UserId, request.AppName);
         if (existingApp != null)
         {
             return new();
@@ -27,11 +27,11 @@ public class WebAppService(ILogger<WebAppService> logger
     public override async Task<ListAppsByUserIdResponse> ListAppsByUserId(ListAppsByUserIdRequest request,
         ServerCallContext context)
     {
-        var apps = await webAppRepository.Search(request.UserId, null, null);
+        var apps = await webAppRepository.ListByUserId(request.UserId, null, null);
         var res = new ListAppsByUserIdResponse();
         res.Apps.AddRange(apps.Select(a => new ListAppsByUserIdResponse.Types.App
         {
-            AppId = a.WebAppId,
+            AppId = a.AppId,
             AppName = a.Name
         }));
         return res;
@@ -40,7 +40,7 @@ public class WebAppService(ILogger<WebAppService> logger
     public override async Task<GetAppByUserIdAndAppNameResponse> GetAppByUserIdAndAppName(
         GetAppByUserIdAndAppNameRequest request, ServerCallContext context)
     {
-        var app = await webAppRepository.FindByUserId(request.UserId, request.AppName);
+        var app = await webAppRepository.FindByUserIdAndAppName(request.UserId, request.AppName);
         if (app == null)
         {
             return new();
@@ -48,28 +48,28 @@ public class WebAppService(ILogger<WebAppService> logger
 
         return new()
         {
-            AppId = app.WebAppId,
+            AppId = app.AppId,
             AppName = app.Name,
             Description = app.Description ?? "",
-            CreatedTime = DateTime.SpecifyKind(app.CreatedDate, DateTimeKind.Utc).ToTimestamp(),
-            UpdatedTime = app.UpdatedDate != null
-                ? DateTime.SpecifyKind(app.UpdatedDate.Value, DateTimeKind.Utc).ToTimestamp()
+            CreatedTime = DateTime.SpecifyKind(app.CreatedAt, DateTimeKind.Utc).ToTimestamp(),
+            UpdatedTime = app.UpdatedAt != null
+                ? DateTime.SpecifyKind(app.UpdatedAt.Value, DateTimeKind.Utc).ToTimestamp()
                 : null
         };
     }
 
     public override async Task<GetAppByIdResponse> GetAppById(GetAppByIdRequest request, ServerCallContext context)
     {
-        var app = await webAppRepository.Get(request.AppId);
+        var app = await webAppRepository.GetByAppId(request.AppId);
         return new()
         {
-            AppId = app.WebAppId,
+            AppId = app.AppId,
             UserId = app.UserId,
             AppName = app.Name,
             Description = app.Description,
-            CreatedTime = DateTime.SpecifyKind(app.CreatedDate, DateTimeKind.Utc).ToTimestamp(),
-            UpdatedTime = app.UpdatedDate != null
-                ? DateTime.SpecifyKind(app.UpdatedDate.Value, DateTimeKind.Utc).ToTimestamp()
+            CreatedTime = DateTime.SpecifyKind(app.CreatedAt, DateTimeKind.Utc).ToTimestamp(),
+            UpdatedTime = app.UpdatedAt != null
+                ? DateTime.SpecifyKind(app.UpdatedAt.Value, DateTimeKind.Utc).ToTimestamp()
                 : null
         };
     }

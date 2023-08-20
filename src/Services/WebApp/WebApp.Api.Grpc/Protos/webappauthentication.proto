@@ -5,23 +5,35 @@ option csharp_namespace = "WebApp.Api.Grpc";
 
 service WebAppAuthenticationGrpcService {
   rpc GetAll(GetAllSchemeRequest) returns (GetAllSchemeResponse);
+  rpc CreateJwtBearerScheme(CreateJwtBearerSchemeRequest) returns (CreateJwtBearerSchemeResponse);
+}
+enum SchemeType {
+  NONE = 0;
+  JWT_BEARER = 1;
+  API_KEY = 2;
+}
+message Scheme {
+  int32 scheme_id = 1;
+  SchemeType type = 2;
+  string name = 3;
+  string display_name = 4;
+  string description = 5;
 }
 message GetAllSchemeRequest {
-  string user_id = 1;
-  string app_name = 2;
-  int32 page = 3;
+  int32 app_id = 1;
+  int32 page = 2;
 }
 message GetAllSchemeResponse {
-  message Scheme {
-    enum Type {
-      NONE = 0;
-      JWT_BEARER = 1;
-      API_KEY = 2;
-    }
-    int32 id = 1;
-    Type type = 2;
-    string name = 3;
-    string display_name = 4;
-  }
   repeated Scheme schemes = 1;
+}
+message CreateJwtBearerSchemeRequest {
+  int32 app_id = 1;
+  string name = 2;
+  string display_name = 3;
+  string description = 4;
+  string authority = 5;
+  string audience = 6;
+}
+message CreateJwtBearerSchemeResponse {
+  int32 scheme_id = 1;
 }

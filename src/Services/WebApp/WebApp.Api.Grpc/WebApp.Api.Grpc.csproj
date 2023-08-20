@@ -9,11 +9,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Grpc.AspNetCore" Version="2.55.0" />
+        <PackageReference Include="Grpc.AspNetCore" Version="2.56.0-pre2" />
         <PackageReference Include="Grpc.Tools" Version="2.57.0">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
     </ItemGroup>
     <ItemGroup>
         <Protobuf Include="Protos\webapp.proto" GrpcServices="Server" />

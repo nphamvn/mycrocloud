@@ -1,11 +1,10 @@
 @model MycroCloud.WebMvc.Areas.Services.Models.WebApps.WebAppViewViewModel
 @{
-    var rv = new { name = Model.Name };
-    ViewData["WebAppName"] = Model.Name;
+    var rv = new { name = Model.AppName };
 }
 <div class="row">
     <div class="col-2">
-        <partial name="Shared/_SideBar.cshtml"></partial>
+        <partial name="Shared/_SideBar.cshtml" model="Model.AppName"></partial>
     </div>
     <div class="col-10">
         <div class="tab-content h-100">
@@ -20,7 +19,7 @@
                                 <strong for="newName" class="form-label font-semibold">Application name</strong>
                                 <div class="d-flex">
                                     <input class="form-control me-2" type="text" name="newName"
-                                        value="@Model.Name" autocomplete="off">
+                                        value="@Model.AppName" autocomplete="off">
                                     <button class="btn btn-sm border" type="submit">Rename</button>
                                 </div>
                             </div>
@@ -52,14 +51,14 @@
                                 <div class="modal-body">
                                     <div class="alert alert-warning mb-3">
                                         This action <strong>cannot</strong> be undone.
-                                        This will permanently delete everything in the <strong>@Model.Name</strong>
+                                        This will permanently delete everything in the <strong>@Model.AppName</strong>
                                         application.
                                     </div>
                                     <form asp-action="@nameof(WebAppController.Delete)" asp-controller="WebApp"
-                                        asp-route-name="@Model.Name">
+                                        asp-route-name="@Model.AppName">
                                         <div>
                                             <div class="mb-3">
-                                                <label class="form-label">Please type <strong>@Model.Name</strong> to
+                                                <label class="form-label">Please type <strong>@Model.AppName</strong> to
                                                     confirm.</label>
                                                 <input id="project-name" class="form-control" type="text"
                                                     autocomplete="off">

@@ -5,14 +5,12 @@ using WebApp.Domain.Repositories;
 
 namespace WebApp.Api.Grpc.Services
 {
-    public class WebAppRouteService(ILogger<WebAppRouteService> logger
-        , IWebAppRouteRepository webAppRouteRepository) : WebAppRouteGrpcService.WebAppRouteGrpcServiceBase
+    public class RouteService(ILogger<RouteService> logger
+        , IRouteRepository routeRepository) : WebAppRouteGrpcService.WebAppRouteGrpcServiceBase
     {
-        private readonly ILogger<WebAppRouteService> _logger = logger;
-        private readonly IWebAppRouteRepository _webAppRouteRepository = webAppRouteRepository;
         public override async Task<ListRoutesResponse> ListRoutes(ListRoutesRequest request, ServerCallContext context)
         {
-            var routes = await _webAppRouteRepository.List(request.WebAppId, null, null);
+            var routes = await routeRepository.List(request.WebAppId, null, null);
             var res = new ListRoutesResponse();
             res.Routes.AddRange(routes.Select(r =>
             {
@@ -20,13 +18,13 @@ namespace WebApp.Api.Grpc.Services
                 {
                     RouteId = r.RouteId,
                     Name = r.Name,
-                    Description = r.Description,
+                    Description = r.Description ?? "",
                     MatchPath = r.MatchPath,
                     MatchOrder = r.MatchOrder,
                     AuthorizationType = (int)r.AuthorizationType,
                     ResponseProvider = (int)r.ResponseProvider,
-                    CreatedDate = DateTime.SpecifyKind(r.CreatedDate, DateTimeKind.Utc).ToTimestamp(),
-                    UpdatedDate = r.UpdatedDate != null ? DateTime.SpecifyKind(r.UpdatedDate.Value, DateTimeKind.Utc).ToTimestamp() : default,
+                    CreatedDate = DateTime.SpecifyKind(r.CreatedAt, DateTimeKind.Utc).ToTimestamp(),
+                    UpdatedDate = r.UpdatedAt != null ? DateTime.SpecifyKind(r.UpdatedAt.Value, DateTimeKind.Utc).ToTimestamp() : default,
                 };
                 route.MatchMethods.AddRange(r.MatchMethods);
                 return route;
@@ -35,12 +33,12 @@ namespace WebApp.Api.Grpc.Services
         }
         public override async Task<GetRouteByIdResponse> GetRouteById(GetRouteByIdRequest request, ServerCallContext context)
         {
-            var route = await _webAppRouteRepository.GetById(request.Id);
+            var route = await routeRepository.GetById(request.Id);
             var res = new GetRouteByIdResponse()
             {
                 Id = route.RouteId,
                 Name = route.Name,
-                Description = route.Description,
+                Description = route.Description ?? "",
                 MatchPath = route.MatchPath,
                 MatchOrder = route.MatchOrder,
                 AuthorizationType = (int)route.AuthorizationType,
@@ -48,8 +46,8 @@ namespace WebApp.Api.Grpc.Services
                 ValidationJson = route.Validation != null ? JsonSerializer.Serialize(route.Validation) : "",
                 ResponseProvider = (int)route.ResponseProvider,
                 ResponseJson = route.Response != null ? JsonSerializer.Serialize(route.Response) : "",
-                CreatedDate = DateTime.SpecifyKind(route.CreatedDate, DateTimeKind.Utc).ToTimestamp(),
-                UpdatedDate = route.UpdatedDate != null ? DateTime.SpecifyKind(route.UpdatedDate.Value, DateTimeKind.Utc).ToTimestamp() : default,
+                CreatedDate = DateTime.SpecifyKind(route.CreatedAt, DateTimeKind.Utc).ToTimestamp(),
+                UpdatedDate = route.UpdatedAt != null ? DateTime.SpecifyKind(route.UpdatedAt.Value, DateTimeKind.Utc).ToTimestamp() : default,
             };
             res.MatchMethods.AddRange(route.MatchMethods);
             return res;

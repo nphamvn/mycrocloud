@@ -6,7 +6,7 @@ namespace WebApp.Domain.Entities;
 public class RouteEntity : BaseEntity
 {
     public int RouteId { get; set; }
-    public int WebAppId { get; set; }
+    public int AppId { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
     public int MatchOrder { get; set; }

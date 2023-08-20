@@ -7,15 +7,15 @@ public interface IWebAppAuthenticationService
 {
     Task<AuthenticationSchemeListViewModel> GetSchemeListViewModel(int appId);
     Task SaveSettings(int appId, AuthenticationConfigurationViewModel viewModel);
-    Task AddJwtBearerScheme(int appId, JwtBearerAuthenticationSchemeSaveViewModel authenticationScheme);
-    Task EditJwtBearerScheme(int schemeId, JwtBearerAuthenticationSchemeSaveViewModel authenticationScheme);
-    Task<JwtBearerAuthenticationSchemeSaveViewModel> GetCreateJwtBearerSchemeModel(int appId);
-    Task<JwtBearerAuthenticationSchemeSaveViewModel> GetEditJwtBearerSchemeModel(int appId, int schemeId);
+    Task AddJwtBearerScheme(int appId, JwtBearerSchemeSaveViewModel authenticationScheme);
+    Task EditJwtBearerScheme(int schemeId, JwtBearerSchemeSaveViewModel authenticationScheme);
+    Task<JwtBearerSchemeSaveViewModel> GetCreateJwtBearerSchemeModel(int appId);
+    Task<JwtBearerSchemeSaveViewModel> GetEditJwtBearerSchemeModel(int appId, int schemeId);
     Task<AuthenticationConfigurationViewModel> GetConfigurationsViewModel(int appId);
 }
 
-public class WebAppAuthenticationService(IHttpContextAccessor contextAccessor
-, WebAppAuthenticationGrpcServiceClient webAppAuthenticationGrpcServiceClient) : IWebAppAuthenticationService
+public class WebAppAuthenticationService(
+WebAppAuthenticationGrpcServiceClient webAppAuthenticationGrpcServiceClient) : IWebAppAuthenticationService
 {
     public async Task<AuthenticationSchemeListViewModel> GetSchemeListViewModel(int appId)
     {
@@ -24,7 +24,7 @@ public class WebAppAuthenticationService(IHttpContextAccessor contextAccessor
             
         });
         vm.AuthenticationSchemes = res.Schemes.Select(s => new AuthenticationSchemeIndexItem {
-            Id = s.Id,
+            Id = s.SchemeId,
             Type = (AuthenticationSchemeType)(int)s.Type,
             Name = s.Name,
             DisplayName = s.DisplayName
@@ -37,22 +37,29 @@ public class WebAppAuthenticationService(IHttpContextAccessor contextAccessor
         throw new NotImplementedException();
     }
 
-    public async Task AddJwtBearerScheme(int appId, JwtBearerAuthenticationSchemeSaveViewModel authenticationScheme)
+    public async Task AddJwtBearerScheme(int appId, JwtBearerSchemeSaveViewModel model)
+    {
+        await webAppAuthenticationGrpcServiceClient.CreateJwtBearerSchemeAsync(new CreateJwtBearerSchemeRequest {
+            AppId = appId,
+            Name = model.Name,
+            DisplayName = model.DisplayName,
+            Description = model.Description,
+            Authority = model.Authority,
+            Audience = model.Audience
+        });
+    }
+
+    public async Task EditJwtBearerScheme(int schemeId, JwtBearerSchemeSaveViewModel authenticationScheme)
     {
         throw new NotImplementedException();
     }
 
-    public async Task EditJwtBearerScheme(int schemeId, JwtBearerAuthenticationSchemeSaveViewModel authenticationScheme)
+    public async Task<JwtBearerSchemeSaveViewModel> GetCreateJwtBearerSchemeModel(int appId)
     {
-        throw new NotImplementedException();
+        return new JwtBearerSchemeSaveViewModel();
     }
 
-    public async Task<JwtBearerAuthenticationSchemeSaveViewModel> GetCreateJwtBearerSchemeModel(int appId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<JwtBearerAuthenticationSchemeSaveViewModel> GetEditJwtBearerSchemeModel(int appId, int schemeId)
+    public async Task<JwtBearerSchemeSaveViewModel> GetEditJwtBearerSchemeModel(int appId, int schemeId)
     {
         throw new NotImplementedException();
     }

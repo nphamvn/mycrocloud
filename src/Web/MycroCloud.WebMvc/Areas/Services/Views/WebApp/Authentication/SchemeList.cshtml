@@ -1,14 +1,13 @@
-@using MycroCloud.WebMvc.Areas.Services.Models.WebApps
-@model MycroCloud.WebMvc.Areas.Services.Models.WebApps.AuthenticationSchemeListViewModel
+@model AuthenticationSchemeListViewModel
 @{
-    var appName = (string)ViewData["WebAppName"];
+    var app = ViewBag._App as WebAppModel;
 }
 <div class="row">
     <div class="col-2">
-        <partial name="../Shared/_SideBar.cshtml" />
+        <partial name="../Shared/_SideBar.cshtml" model="app" />
     </div>
     <div class="col-10">
-        <partial name="_NavBar.cshtml" />
+        <partial name="_NavBar.cshtml" model="app" />
         <div class="mt-2">
             <div class="btn-group">
                 <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"
@@ -17,12 +16,11 @@
                 <ul class="dropdown-menu">
                     <li>
                         <a class="dropdown-item"
-                            href="@Url.Action(nameof(WebAppAuthenticationController.CreateJwtBearerScheme), "WebAppAuthentication", new { WebApplicationName = appName})">JWT Bearer</a>
+                            href="@Url.Action(nameof(WebAppAuthenticationController.CreateJwtBearerScheme), "WebAppAuthentication", new { WebAppName = app.WebAppName })">JWT Bearer</a>
                     </li>
                     <li>
-                        <a class="dropdown-item"
-                            href="@Url.Action(nameof(WebAppAuthenticationController.CreateApiKeyScheme),"WebAppAuthentication", new { WebApplicationName = appName})">API
-                            Key</a>
+                        <a class="dropdown-item disabled"
+                            href="@Url.Action(nameof(WebAppAuthenticationController.CreateApiKeyScheme),"WebAppAuthentication", new { WebAppName = app.WebAppName })'">API Key</a>
                     </li>
                 </ul>
             </div>
@@ -52,11 +50,11 @@
                                             var editAction = "";
                                             if (scheme.Type == AuthenticationSchemeType.JwtBearer)
                                             {
-                                                editAction = Url.Action(nameof(WebAppAuthenticationController.EditJwtBearerScheme), "WebAppAuthentication",new { WebApplicationName = appName, SchemeId = scheme.Id});
+                                                editAction = Url.Action(nameof(WebAppAuthenticationController.EditJwtBearerScheme), "WebAppAuthentication", new { WebAppName = app.WebAppName, SchemeId = scheme.Id});
                                             }
                                             else if (scheme.Type == AuthenticationSchemeType.ApiKey)
                                             {
-                                                editAction = Url.Action(nameof(WebAppAuthenticationController.EditApiKeyScheme), "WebAppAuthentication",new { WebApplicationName = appName, SchemeId = scheme.Id});
+                                                editAction = Url.Action(nameof(WebAppAuthenticationController.EditApiKeyScheme), "WebAppAuthentication", new { WebAppName = app.WebAppName, SchemeId = scheme.Id});
                                             }
                                         }
                                         <a class="btn btn-primary" href="@editAction">Edit</a>

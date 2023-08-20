@@ -1,6 +1,8 @@
 using MycroCloud.WebMvc.Areas.Identity.Services;
 using MycroCloud.WebMvc.Identity;
 using MycroCloud.WebMvc.Areas.Services;
+using Microsoft.AspNetCore.Authorization;
+using MycroCloud.WebMvc.Authorization;
 
 namespace MycroCloud.WebMvc.Extentions
 {
@@ -18,6 +20,11 @@ namespace MycroCloud.WebMvc.Extentions
             
             services.ConfigureIdentityArea(configuration);
             services.ConfigureServicesArea(configuration);
+
+            services.AddAuthorizationBuilder()
+                .AddPolicy("read:messages", policy => policy.Requirements.Add(new 
+                            HasScopeRequirement("read:messages", "issuer domain")));
+            services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
         }
     }
 }

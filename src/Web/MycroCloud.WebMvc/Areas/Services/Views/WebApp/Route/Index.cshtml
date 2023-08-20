@@ -1,8 +1,8 @@
 @model MycroCloud.WebMvc.Areas.Services.Models.WebApps.RouteIndexViewModel
 @{
-    var appName = (string)ViewData["WebAppName"];
+    var app = ViewBag._App as WebAppModel;
     var controller = "Routes";
-    ViewData["Title"] = appName + " - " + controller;
+    ViewData["Title"] = app.WebAppName + " - " + controller;
     var routes = Model.Routes.Select(r => new
     {
         Id = r.RouteId,
@@ -38,7 +38,7 @@
 }
 <div class="row">
     <div class="col-2">
-        <partial name="/Areas/Services/Views/WebApp/Shared/_SideBar.cshtml" />
+        <partial name="../Shared/_SideBar.cshtml" model="app.WebAppName" />
     </div>
     <div id="app" class="col-10">
         <v-row>
@@ -50,42 +50,65 @@
                     placeholder="Search">
                 </v-text-field>
                 <template v-if="routes.length > 0">
-                    <route-list :routes="routes" :route="route" @@click-route="openRoute">
-                    </route-list>
+                    <v-list class="p-0">
+                        <v-list-item class="pa-0 mt-1" v-for="route in routes" :key="route.id" v-on:click="openRoute(route.id)">
+                            <div class="p-2" :class="{'bg-primary': route.id === selectedRoute?.id}">
+                                <div>{{route.name}}</div>
+                                <div>
+                                    <v-badge v-for="m of route.matchMethods.slice(0,3)"
+                                        :content="m"
+                                        :color="getMethodBadgeColor(m)"
+                                        text-color="white"
+                                        inline>
+                                    </v-badge>
+                                </div>
+                                <div>{{route.matchPath}}</div>
+                            </div>
+                        </v-list-item>
+                    </v-list>
                 </template>
                 <template v-else>
                     <p>No routes. Create some.</p>
                 </template>
             </v-col>
-            <v-col>
-                <div v-if="route" class="overflow-y-auto" style="height: 80vh;">
-                    <route-editor :route="route" @@route-save="routeSave"></route-editor>
+            <v-col cols="9">
+                <div v-if="selectedRoute" class="overflow-y-auto" style="height: 80vh;">
+                    <route-editor :route="selectedRoute" @@route-save="routeSave"></route-editor>
                 </div>
             </v-col>
         </v-row>
     </div>
 </div>
-<partial name="_Partial/_RouteListComponent.cshtml" />
 <partial name="_Partial/_RouteEditorComponent.cshtml" />
 <script>
     const RootComponent = {
         setup() {
             const routes = ref([]);
-            const route = ref(null);
+            const selectedRoute = ref(null);
             let sampleRoute = null;
             const searchTerm = ref('');
             const newRoute = async () => {
-                route.value = { ...sampleRoute, id: undefined };
+                selectedRoute.value = { ...sampleRoute, id: undefined };
             }
             const openRoute = async id => {
-                const TempRouteDetailUrl = '@Url.Action(nameof(WebAppRouteController.Get),"WebAppRoute", new { WebApplicationName = appName, RouteId = -9999})';
+                const TempRouteDetailUrl = '@Url.Action(nameof(WebAppRouteController.Get), WebAppRouteController.Name, new { WebAppName = app.WebAppName, RouteId = -9999})';
                 const res = await axios.get(TempRouteDetailUrl.replace('-9999', id));
-                route.value = res.data;
-                route.value.id = route.value.id || id;
+                selectedRoute.value = res.data;
+                selectedRoute.value.id = selectedRoute.value.id || id;
             }
-            let timeout = null;
+            const getMethodBadgeColor = (method) => {
+                switch (method) {
+                    case 'DELETE': return 'red';
+                    case 'POST': return 'orange';
+                    case 'PUT': return 'yellow';
+                    case 'GET': return 'light-blue';
+                    default: return 'light-blue';
+                }
+            }
+            
             const fetchRoutes = () => {
-                const IndexUrl = '@Url.Action(nameof(WebAppRouteController.List), "WebAppRoute", new {WebApplicationName = appName})'
+                let timeout = null;
+                const IndexUrl = '@Url.Action(nameof(WebAppRouteController.List), "WebAppRoute", new {WebApplicationName = app.WebAppName})'
                 clearTimeout(timeout);
                 timeout = setTimeout(async () => {
                     const params = {
@@ -112,7 +135,7 @@
                 }
             }
             const cancel = () => {
-                route.value = null
+                selectedRoute.value = null
             }
             const onRouteDeleted = (id) => {
                 const index = routes.value.findIndex(r => r.id === id);
@@ -122,19 +145,21 @@
             }
             onMounted(async () => {
                 routes.value = JSON.parse('@Html.Raw(Json.Serialize(routes))');
-                const response = await axios.get('@Url.Action(nameof(WebAppRouteController.Sample), "WebAppRoute")')
+                const response = await axios.get('@Url.Action(nameof(WebAppRouteController.Sample), WebAppRouteController.Name)')
                 sampleRoute = response.data;
+                console.log(JSON.stringify(sampleRoute));
             })
             return {
                 newRoute,
                 routes,
-                route,
+                selectedRoute,
                 openRoute,
                 routeSave,
                 fetchRoutes,
                 searchTerm,
                 cancel,
                 onRouteDeleted,
+                getMethodBadgeColor
             }
         }
     }
@@ -142,14 +167,48 @@
 <script>
     window.axios = axios;
     axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    const { createApp, onMounted, ref, nextTick, computed, watch } = Vue
-    const { createVuetify } = Vuetify
+    const { createApp, onMounted, ref, nextTick, computed, watch } = Vue;
+    const { createVuetify } = Vuetify;
+    const theme = {
+        dark: false,
+        colors: {
+            background: '#0000',
+            surface: '#FFFFFF',
+            primary: '#6200EE',
+            'primary-darken-1': '#3700B3',
+            secondary: '#03DAC6',
+            'secondary-darken-1': '#018786',
+            error: '#B00020',
+            info: '#2196F3',
+            success: '#4CAF50',
+            warning: '#FB8C00',
+        },
+    };
     const vuetify = createVuetify({
-        ssr: true
-    })
+        ssr: true,
+        theme: {
+            defaultTheme: 'default',
+            themes: {
+                default: {
+                    dark: false,
+                    colors: {
+                        background: '#0000',
+                        surface: '#FFFFFF',
+                        primary: '#0d6efd',
+                        'primary-darken-1': '#3700B3',
+                        secondary: '#03DAC6',
+                        'secondary-darken-1': '#018786',
+                        error: '#B00020',
+                        info: '#2196F3',
+                        success: '#4CAF50',
+                        warning: '#FB8C00',
+                    },
+                }
+            }
+        }
+    });
     const app = createApp(RootComponent);
-    app.component('route-list', RouteListComponent)
-    app.component('route-editor', RouteEditorComponent)
-    app.use(vuetify)
-    app.mount('#app')
+    app.component('route-editor', RouteEditorComponent);
+    app.use(vuetify);
+    app.mount('#app');
 </script>

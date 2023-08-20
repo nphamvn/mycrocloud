@@ -60,8 +60,8 @@ namespace Ocelot.DependencyInjection
             Services.Configure<PostgresDatabaseOptions>(configurationRoot.GetSection("Database:Application"));
             Services.Configure<MockResponderOptions>(configurationRoot.GetSection("MockResponder"));
 
-            Services.TryAddSingleton<IWebAppRouteRepository, WebAppRouteRepository>();
-            Services.TryAddSingleton<IWebAppRepository, WebAppRepository>();
+            Services.TryAddSingleton<IRouteRepository, RouteRepository>();
+            Services.TryAddSingleton<IAppRepository, AppRepository>();
 
             Services.TryAddSingleton<IOcelotCache<FileConfiguration>, AspMemoryCache<FileConfiguration>>();
             Services.TryAddSingleton<IOcelotCache<CachedResponse>, AspMemoryCache<CachedResponse>>();

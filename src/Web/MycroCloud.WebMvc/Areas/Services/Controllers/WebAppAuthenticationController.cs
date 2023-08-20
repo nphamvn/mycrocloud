@@ -3,25 +3,31 @@ using Microsoft.AspNetCore.Mvc;
 using MycroCloud.WebMvc.Areas.Services.Models.WebApps;
 using MycroCloud.WebMvc.Areas.Services.Services;
 using Microsoft.AspNetCore.Mvc.Filters;
+using MycroCloud.WebMvc.Areas.Services.Authorization;
 
 namespace MycroCloud.WebMvc.Areas.Services.Controllers;
 
 [Authorize]
 [Route("webapp/{WebAppName}/authentications")]
 public class WebAppAuthenticationController
-    (IWebAppAuthenticationService webAppAuthenticationService) : BaseServiceController
+    (IWebAppAuthenticationService webAppAuthenticationService
+    , IWebAppService webAppService
+    , IAuthorizationService authorizationService
+    ) : BaseServiceController
 {
     public const string Name = "WebAppAuthentication";
-    public override void OnActionExecuting(ActionExecutingContext context)
-    {
-        base.OnActionExecuting(context);
-        ViewData["WebAppName"] = context.ActionArguments["WebAppName"];
-    }
 
     [HttpGet("Configurations")]
-    public async Task<IActionResult> Configurations(int WebApplicationId)
+    public async Task<IActionResult> Configurations(string WebAppName)
     {
-        var vm = await webAppAuthenticationService.GetConfigurationsViewModel(WebApplicationId);
+        var app = await webAppService.FindByUserIdAndAppName(MycroCloudUser.Id, WebAppName);
+        if (app == null || !(await authorizationService.AuthorizeAsync(User, app,
+            WebAppAuthorizationHandler.Operations.View)).Succeeded)
+        {
+            return NotFound();
+        }
+        ViewBag._WebApp = app;
+        var vm = await webAppAuthenticationService.GetConfigurationsViewModel(app.WebAppId);
         return View("/Areas/Services/Views/WebApp/Authentication/Configuration.cshtml", vm);
     }
 
@@ -33,23 +39,45 @@ public class WebAppAuthenticationController
     }
 
     [HttpGet("Schemes")]
-    public async Task<IActionResult> SchemeList(int WebAppId)
+    public async Task<IActionResult> SchemeList(string WebAppName)
     {
-        var vm = await webAppAuthenticationService.GetSchemeListViewModel(WebAppId);
+        var app = await webAppService.FindByUserIdAndAppName(MycroCloudUser.Id, WebAppName);
+        if (app == null || !(await authorizationService.AuthorizeAsync(User, app,
+            WebAppAuthorizationHandler.Operations.View)).Succeeded)
+        {
+            return NotFound();
+        }
+        ViewBag._App = app;
+
+        var vm = await webAppAuthenticationService.GetSchemeListViewModel(app.WebAppId);
         return View("/Areas/Services/Views/WebApp/Authentication/SchemeList.cshtml", vm);
     }
 
     [HttpGet("Schemes/JwtBearer/Create")]
-    public async Task<IActionResult> CreateJwtBearerScheme(int WebApplicationId)
+    public async Task<IActionResult> CreateJwtBearerScheme(string WebAppName)
     {
-        var model = await webAppAuthenticationService.GetCreateJwtBearerSchemeModel(WebApplicationId);
+        var app = await webAppService.FindByUserIdAndAppName(MycroCloudUser.Id, WebAppName);
+        if (app == null || !(await authorizationService.AuthorizeAsync(User, app,
+            WebAppAuthorizationHandler.Operations.View)).Succeeded)
+        {
+            return NotFound();
+        }
+        ViewBag._App = app;
+
+        var model = await webAppAuthenticationService.GetCreateJwtBearerSchemeModel(app.WebAppId);
         return View("/Areas/Services/Views/WebApp/Authentication/SaveJwtBearerScheme.cshtml", model);
     }
 
     [HttpPost("Schemes/JwtBearer/Create")]
-    public async Task<IActionResult> CreateJwtBearerScheme(int WebApplicationId, string WebAppName, JwtBearerAuthenticationSchemeSaveViewModel model)
+    public async Task<IActionResult> CreateJwtBearerScheme(string WebAppName, JwtBearerSchemeSaveViewModel model)
     {
-        await webAppAuthenticationService.AddJwtBearerScheme(WebApplicationId, model);
+        var app = await webAppService.FindByUserIdAndAppName(MycroCloudUser.Id, WebAppName);
+        if (app == null || !(await authorizationService.AuthorizeAsync(User, app,
+            WebAppAuthorizationHandler.Operations.View)).Succeeded)
+        {
+            return NotFound();
+        }
+        await webAppAuthenticationService.AddJwtBearerScheme(app.WebAppId, model);
         return RedirectToAction(nameof(SchemeList), new { WebAppName });
     }
 
@@ -68,7 +96,7 @@ public class WebAppAuthenticationController
     }
 
     [HttpPost("Schemes/ApiKey/Create")]
-    public async Task<IActionResult> CreateApiKeyScheme(int WebApplicationId, string WebAppName, JwtBearerAuthenticationSchemeSaveViewModel model)
+    public async Task<IActionResult> CreateApiKeyScheme(int WebApplicationId, string WebAppName, JwtBearerSchemeSaveViewModel model)
     {
         await webAppAuthenticationService.AddJwtBearerScheme(WebApplicationId, model);
         return RedirectToAction(nameof(SchemeList), new { WebAppName });
@@ -82,7 +110,7 @@ public class WebAppAuthenticationController
     }
 
     [HttpPost("Schemes/ApiKey/{SchemeId:int}/Edit")]
-    public async Task<IActionResult> EditApiKeyScheme(string WebAppName, int SchemeId, JwtBearerAuthenticationSchemeSaveViewModel model)
+    public async Task<IActionResult> EditApiKeyScheme(string WebAppName, int SchemeId, JwtBearerSchemeSaveViewModel model)
     {
         await webAppAuthenticationService.EditJwtBearerScheme(SchemeId, model);
         return RedirectToAction(nameof(SchemeList), new { WebAppName });

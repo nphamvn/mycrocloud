@@ -11,12 +11,12 @@ namespace Ocelot.DownstreamWebApplicationFinder.Middleware
     public class DownstreamWebApplicationFinderMiddleware : OcelotMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IWebAppRepository _webAppRepository;
+        private readonly IAppRepository _webAppRepository;
         private readonly IConfiguration _configuration;
 
         public DownstreamWebApplicationFinderMiddleware(
             RequestDelegate next
-            , IWebAppRepository webAppRepository
+            , IAppRepository webAppRepository
             , IConfiguration configuration
             , IOcelotLoggerFactory loggerFactory) : base(loggerFactory.CreateLogger<DownstreamWebApplicationFinderMiddleware>())
         {
@@ -32,7 +32,7 @@ namespace Ocelot.DownstreamWebApplicationFinder.Middleware
                 httpContext.Items.UpsertErrors(new() { new UnableToFindApplicationError() });
                 return;
             }
-            var app = await _webAppRepository.Get(appId);
+            var app = await _webAppRepository.GetByAppId(appId);
             if (app == null)
             {
                 httpContext.Items.UpsertErrors(new() { new UnableToFindApplicationError() });

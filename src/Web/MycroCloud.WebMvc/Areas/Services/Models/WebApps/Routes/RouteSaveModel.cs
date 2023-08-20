@@ -1,8 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using System.Reflection.Metadata;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using JetBrains.Annotations;
 
 namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps
 {
@@ -17,8 +15,8 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps
         [StringLength(50, ErrorMessage = "Name length can't be more than 50.")]
         public string MatchPath { get; set; }
         public List<string> MatchMethods { get; set; }
-        public RouteAuthorizationSaveModel? Authorization { get; set; }
-        public RouteValidationSaveModel? Validation { get; set; }
+        //public RouteAuthorizationSaveModel? Authorization { get; set; }
+        //public RouteValidationSaveModel? Validation { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public RouteResponseProvider ResponseProvider { get; set; }
         [JsonConverter(typeof(RouteResponseSaveModelJsonConverter))]
@@ -44,10 +42,34 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps
     {
         public const string ProviderDiscriminator = "$provider";
     }
-
+    public enum MockResponseValueType {
+        Static = 1,
+        ExpressionEvaluated = 2
+    }
     public class MockResponseSaveModel : RouteResponseSaveModel
     {
-
+        public StatusCodeValue StatusCode { get; set; }
+        public Dictionary<string, HeaderValue> Headers { get; set; }
+        //public dynamic Body { get; set; }
+    }
+    public class StatusCodeValue
+    {
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public MockResponseValueType ValueType { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public int? Code { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string Expression { get; set; }
+    }
+    public class HeaderValue
+    {
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public MockResponseValueType ValueType { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string StaticValue { get; set; }
+        [JsonPropertyName("evalExpression")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string EvaluatedExpression { get; set; }
     }
     public class RouteResponseSaveModelJsonConverter : JsonConverter<RouteResponseSaveModel>
     {
@@ -95,19 +117,16 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps
         public string Name { get; set; }
         public List<RouteRequestValidationRule> Rules { get; set; }
     }
-
     public class RouteValidationHeaderRuleSaveModel
     {
         public string Name { get; set; }
         public List<RouteRequestValidationRule> Rules { get; set; }
     }
-
     public class RouteValidationQueryRuleSaveModel
     {
         public string Name { get; set; }
         public List<RouteRequestValidationRule> Rules { get; set; }
     }
-
     public class RouteAuthorizationClaimSaveModel
     {
         [Required]
@@ -115,13 +134,11 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps
         [Required]
         public string Value { get; set; }
     }
-
     [JsonConverter(typeof(RouteRequestValidationRuleJsonConverter))]
     public abstract class RouteRequestValidationRule
     {
         public abstract string Name { get; }
     }
-
     public class RouteRequestValidationRuleJsonConverter : JsonConverter<RouteRequestValidationRule>
     {
         public override RouteRequestValidationRule Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -165,7 +182,6 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps
             }
         }
     }
-
     public class RequiredValidationRule : RouteRequestValidationRule
     {
         public override string Name => "required";

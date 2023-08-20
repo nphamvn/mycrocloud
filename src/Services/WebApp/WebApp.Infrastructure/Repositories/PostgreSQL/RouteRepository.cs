@@ -6,35 +6,48 @@ using WebApp.Domain.Repositories;
 
 namespace WebApp.Infrastructure.Repositories.PostgreSql;
 
-public class WebAppRouteRepository(IOptions<PostgresDatabaseOptions> databaseOptions) 
-    : BaseRepository(databaseOptions), IWebAppRouteRepository
+public class RouteRepository(IOptions<PostgresDatabaseOptions> databaseOptions) 
+    : BaseRepository(databaseOptions), IRouteRepository
 {
     public async Task<int> Add(int appId, RouteEntity route)
     {
         const string query = """
-INSERT INTO web_application_route(
-    web_application_id,
-    name,
-    method,
-    path,
-    description)
-VALUES (
-    @web_application_id,
+insert into 
+  route (
+    app_id, 
+    name, 
+    description, 
+    match_path, 
+    match_order, 
+    authorization_type,
+    authorization, 
+    response_provider
+  )
+values
+  (
+    @app_id, 
     @name, 
-    @method,
-    @path, 
-    @description)
+    @description, 
+    @match_path, 
+    @match_order, 
+    @authorization_type,
+    @authorization, 
+    @response_provider
+  );
 RETURNING route_id;
 """;
 
         await using var connection = new NpgsqlConnection(ConnectionString);
         return await connection.QuerySingleAsync<int>(query, new
         {
-            web_application_id = appId,
+            app_id = appId,
             name = route.Name,
-            //method = route.Method,
-            //path = route.Path,
-            description = route.Description
+            description = route.Description, 
+            match_path = route.MatchPath,
+            match_order = route.MatchOrder,
+            authorization_type = route.AuthorizationType,
+            authorization = route.Authorization,
+            response_provider = route.ResponseProvider
         });
     }
 
@@ -72,7 +85,7 @@ SELECT
     request_header,
     request_body
 FROM
-    web_application_route
+    route
 WHERE
     web_application_id = @web_application_id AND
     upper(method) = upper(@method) AND 
@@ -91,25 +104,24 @@ WHERE
     {
         const string query = """
 SELECT
-	war.route_id RouteId,
-	war.web_application_id WebAppId,
-	war."name" Name,
-    war.description Description,
-	"path" MatchPath,
-    COALESCE(JSON_AGG(rmmb.method) FILTER (WHERE rmmb.method IS NOT NULL), '[]') MatchMethods,
-    war.match_order MatchOrder,
-    war.authorization_type AuthorizationType,
-    war.integration_type ResponseProvider,
-	war.created_date CreatedDate,
-    war.updated_date UpdatedDate
-FROM
-	public.web_application_route war
-	INNER JOIN web_application wa ON wa.web_application_id = war.web_application_id
-	LEFT JOIN  web_app_route_match_method_bind rmmb ON rmmb.route_id = war.route_id
+    r.route_id RouteId
+    ,app_id AppId
+    ,name Name
+    ,description Description
+    ,match_path MatchPath
+    ,COALESCE(JSON_AGG(rmmb.method) FILTER (WHERE rmmb.method IS NOT NULL), '[]') MatchMethods
+    ,match_order MatchOrder
+    ,authorization_type AuthorizationType
+    ,"authorization" Authorization
+    ,response_provider ResponseProvider
+    ,created_at CreatedAt
+    ,updated_at UpdatedAt
+FROM route r
+LEFT JOIN route_match_method_bind rmmb ON rmmb.route_id = r.route_id
 WHERE
-	war.route_id  = @route_id
+    r.route_id = @route_id
 GROUP BY
-	war.route_id
+    r.route_id;
 """;
         await using var connection = new NpgsqlConnection(ConnectionString);
         SqlMapper.AddTypeHandler(new JsonTypeHandler<MatchMethodCollection>());
@@ -132,7 +144,7 @@ SELECT
     "name" Name,
     description Description
 FROM
-    web_application_route
+    route
 WHERE
     web_application_id = @web_application_id
 /**/
@@ -192,27 +204,24 @@ WHERE
         var query =
 """
 SELECT
-	war.route_id RouteId,
-	war.web_application_id WebAppId,
-	war."name" Name,
-    war.description Description,
-	"path" MatchPath,
-    COALESCE(JSON_AGG(rmmb.method) FILTER (WHERE rmmb.method IS NOT NULL), '[]') MatchMethods,
-    war.match_order MatchOrder,
-    war.authorization_type AuthorizationType,
-    war.integration_type ResponseProvider,
-	war.created_date CreatedDate,
-    war.updated_date UpdatedDate
-FROM
-	web_application_route war
-INNER JOIN
-	web_application wa ON wa.web_application_id = war.web_application_id
-    LEFT JOIN web_app_route_match_method_bind rmmb ON rmmb.route_id = war.route_id
-WHERE 
-	wa.web_application_id = @web_application_id
+    r.route_id RouteId
+    ,app_id AppId
+    ,name Name
+    ,description Description
+    ,match_path MatchPath
+    ,COALESCE(JSON_AGG(rmmb.method) FILTER (WHERE rmmb.method IS NOT NULL), '[]') MatchMethods
+    ,match_order MatchOrder
+    ,authorization_type AuthorizationType
+    ,"authorization" Authorization
+    ,response_provider ResponseProvider
+    ,created_at CreatedAt
+    ,updated_at UpdatedAt
+FROM route r
+LEFT JOIN route_match_method_bind rmmb ON rmmb.route_id = r.route_id
+WHERE
+    app_id = @app_id
 GROUP BY
-    war.route_id
-/**/
+    r.route_id;
 """;
         if (!string.IsNullOrEmpty(searchTerm))
         {

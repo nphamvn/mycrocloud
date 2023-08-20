@@ -14,7 +14,6 @@ public class WebAppController(IWebAppService webAppService
 {
     public const string Name = "WebApp";
 
-    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> Index(WebAppSearchModel fm)
     {
@@ -41,16 +40,17 @@ public class WebAppController(IWebAppService webAppService
         return RedirectToAction(nameof(View), new { WebAppName = app.Name });
     }
 
-    [AllowAnonymous]
     [HttpGet("{WebAppName}")]
     public async Task<IActionResult> View(string WebAppName)
     {
         var app = await webAppService.FindByUserIdAndAppName(MycroCloudUser.Id, WebAppName);
-        if (app == null) return NotFound();
-        var authResult = await authorizationService.AuthorizeAsync(User, app,
-            WebAppAuthorizationHandler.Operations.View);
-        if (!authResult.Succeeded) return NotFound();
-        
+        if (app == null || !(await authorizationService.AuthorizeAsync(User, app,
+            WebAppAuthorizationHandler.Operations.View)).Succeeded)
+        {
+            return NotFound();
+        }
+        ViewBag._App = app;
+
         var vm = await webAppService.GetViewViewModel(app.WebAppId);
         return View("/Areas/Services/Views/WebApp/View.cshtml", vm);
     }
@@ -63,7 +63,7 @@ public class WebAppController(IWebAppService webAppService
         var authResult = await authorizationService.AuthorizeAsync(User, app,
             WebAppAuthorizationHandler.Operations.View);
         if (!authResult.Succeeded) return NotFound();
-        
+
         await webAppService.Rename(app.WebAppId, renameRequestModel.Name);
         return RedirectToAction(nameof(View), new { WebAppName = renameRequestModel.Name });
     }
@@ -76,7 +76,7 @@ public class WebAppController(IWebAppService webAppService
         var authResult = await authorizationService.AuthorizeAsync(User, app,
             WebAppAuthorizationHandler.Operations.View);
         if (!authResult.Succeeded) return MycroCloudUser != null ? Forbid() : NotFound();
-        
+
         await webAppService.Delete(app.WebAppId);
         return RedirectToAction(nameof(Index));
     }
@@ -105,7 +105,7 @@ public class WebAppAuthorization(IAuthorizationService authorizationService
                 WebAppAuthorizationHandler.Operations.Delete),
             _ => throw new Exception()
         };
-        
+
         if (authorizationResult is { Succeeded: false })
         {
             if (user.Identity is { IsAuthenticated: true })
