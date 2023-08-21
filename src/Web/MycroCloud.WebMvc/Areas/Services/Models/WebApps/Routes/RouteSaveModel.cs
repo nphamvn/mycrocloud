@@ -42,7 +42,7 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps
     {
         public const string ProviderDiscriminator = "$provider";
     }
-    public enum MockResponseValueType {
+    public enum MockResponseValueGenerator {
         Static = 1,
         ExpressionEvaluated = 2
     }
@@ -55,7 +55,7 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps
     public class StatusCodeValue
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public MockResponseValueType ValueType { get; set; }
+        public MockResponseValueGenerator ValueType { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? Code { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -64,7 +64,7 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps
     public class HeaderValue
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public MockResponseValueType ValueType { get; set; }
+        public MockResponseValueGenerator ValueType { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string StaticValue { get; set; }
         [JsonPropertyName("evalExpression")]

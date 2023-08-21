@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
 
 namespace WebApp.Api.Grpc.Services
@@ -54,7 +55,26 @@ namespace WebApp.Api.Grpc.Services
         }
         public override async Task<CreateRouteResponse> CreateRoute(CreateRouteRequest request, ServerCallContext context)
         {
-            return await base.CreateRoute(request, context);
+            
+            var entity = new RouteEntity
+            {
+                Name = request.Name,
+                Description = request.Description,
+                MatchPath = request.MatchPath,
+                MatchOrder = request.MatchOrder,
+                AuthorizationType = Domain.Shared.RouteAuthorizationType.AllowAnonymous
+            };
+            switch (request.ResponseCase)
+            {
+                case CreateRouteRequest.ResponseOneofCase.MockResponse:
+                    entity.ResponseProvider = Domain.Shared.RouteResponseProvider.Mock;
+                    break;
+                default:
+                    break;
+            }
+            var id = await routeRepository.Add(request.AppId, entity);
+            await routeRepository.AddMatchMethods(id, request.MatchMethods.ToList());
+            return new CreateRouteResponse { RouteId = id };
         }
         public override async Task<EditRouteResponse> EdiRoute(EditRouteRequest request, ServerCallContext context)
         {

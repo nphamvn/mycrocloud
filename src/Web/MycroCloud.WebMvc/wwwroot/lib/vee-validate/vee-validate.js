@@ -1,5 +1,5 @@
 /**
-  * vee-validate v4.10.5
+  * vee-validate v4.11.2
   * (c) 2023 Abdelrahman Awad
   * @license MIT
   */
@@ -58,6 +58,24 @@
             target[key] = source[key];
         });
         return target;
+    }
+    /**
+     * Constructs a path with dot paths for arrays to use brackets to be compatible with vee-validate path syntax
+     */
+    function normalizeFormPath(path) {
+        const pathArr = path.split('.');
+        if (!pathArr.length) {
+            return '';
+        }
+        let fullPath = String(pathArr[0]);
+        for (let i = 1; i < pathArr.length; i++) {
+            if (isIndex(pathArr[i])) {
+                fullPath += `[${pathArr[i]}]`;
+                continue;
+            }
+            fullPath += `.${pathArr[i]}`;
+        }
+        return fullPath;
     }
 
     const RULES = {};
@@ -421,9 +439,6 @@
         const vm = vue.getCurrentInstance();
         return (vm === null || vm === void 0 ? void 0 : vm.provides[symbol]) || vue.inject(symbol, def);
     }
-    function warn(message) {
-        vue.warn(`[vee-validate]: ${message}`);
-    }
     function resolveNextCheckboxValue(currentValue, checkedValue, uncheckedValue) {
         if (Array.isArray(currentValue)) {
             const newVal = [...currentValue];
@@ -496,19 +511,14 @@
         });
         return baseRef;
     }
-    function lazyToRef(value) {
-        return vue.computed(() => vue.toValue(value));
-    }
     function normalizeErrorItem(message) {
         return Array.isArray(message) ? message : message ? [message] : [];
     }
     function resolveFieldOrPathState(path) {
         const form = injectWithSelf(FormContextKey);
-        const state = path ? vue.computed(() => form === null || form === void 0 ? void 0 : form.getPathState(vue.unref(path))) : undefined;
+        const state = path ? vue.computed(() => form === null || form === void 0 ? void 0 : form.getPathState(vue.toValue(path))) : undefined;
         const field = path ? undefined : vue.inject(FieldContextKey);
-        if (!field && !(state === null || state === void 0 ? void 0 : state.value)) {
-            warn(`field with name ${vue.unref(path)} was not found`);
-        }
+        if (!field && !(state === null || state === void 0 ? void 0 : state.value)) ;
         return state || field;
     }
     function omit(obj, keys) {
@@ -519,6 +529,26 @@
             }
         }
         return target;
+    }
+    function debounceNextTick(inner) {
+        let lastTick = null;
+        let resolves = [];
+        return function (...args) {
+            // Run the function after a certain amount of time
+            const thisTick = vue.nextTick(() => {
+                if (lastTick !== thisTick) {
+                    return;
+                }
+                // Get the result of the inner function, then apply it to the resolve function of
+                // each promise that has been created since the last time the inner function was run
+                const result = inner(...args);
+                resolves.forEach(r => r(result));
+                resolves = [];
+                lastTick = null;
+            });
+            lastTick = thisTick;
+            return new Promise(resolve => resolves.push(resolve));
+        };
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -553,6 +583,9 @@
 
     function parseInputValue(el) {
         if (el.type === 'number') {
+            return Number.isNaN(el.valueAsNumber) ? el.value : el.valueAsNumber;
+        }
+        if (el.type === 'range') {
             return Number.isNaN(el.valueAsNumber) ? el.value : el.valueAsNumber;
         }
         return el.value;
@@ -1130,9 +1163,9 @@
         const { initialValue: modelValue, validateOnMount, bails, type, checkedValue, label, validateOnValueUpdate, uncheckedValue, controlled, keepValueOnUnmount, syncVModel, form: controlForm, } = normalizeOptions(opts);
         const injectedForm = controlled ? injectWithSelf(FormContextKey) : undefined;
         const form = controlForm || injectedForm;
-        const name = lazyToRef(path);
+        const name = vue.computed(() => normalizeFormPath(vue.toValue(path)));
         const validator = vue.computed(() => {
-            const schema = vue.unref(form === null || form === void 0 ? void 0 : form.schema);
+            const schema = vue.toValue(form === null || form === void 0 ? void 0 : form.schema);
             if (schema) {
                 return undefined;
             }
@@ -1169,12 +1202,12 @@
         async function validateCurrentValue(mode) {
             var _a, _b;
             if (form === null || form === void 0 ? void 0 : form.validateSchema) {
-                return (_a = (await form.validateSchema(mode)).results[vue.unref(name)]) !== null && _a !== void 0 ? _a : { valid: true, errors: [] };
+                return (_a = (await form.validateSchema(mode)).results[vue.toValue(name)]) !== null && _a !== void 0 ? _a : { valid: true, errors: [] };
             }
             if (validator.value) {
                 return validate(value.value, validator.value, {
-                    name: vue.unref(name),
-                    label: vue.unref(label),
+                    name: vue.toValue(name),
+                    label: vue.toValue(label),
                     values: (_b = form === null || form === void 0 ? void 0 : form.values) !== null && _b !== void 0 ? _b : {},
                     bails,
                 });
@@ -1332,7 +1365,7 @@
         });
         vue.onBeforeUnmount(() => {
             var _a;
-            const shouldKeepValue = (_a = vue.unref(field.keepValueOnUnmount)) !== null && _a !== void 0 ? _a : vue.unref(form.keepValuesOnUnmount);
+            const shouldKeepValue = (_a = vue.toValue(field.keepValueOnUnmount)) !== null && _a !== void 0 ? _a : vue.toValue(form.keepValuesOnUnmount);
             const path = vue.toValue(name);
             if (shouldKeepValue || !form || flags.pendingUnmount[field.id]) {
                 form === null || form === void 0 ? void 0 : form.removePathState(path, id);
@@ -1347,7 +1380,7 @@
                 return;
             }
             if ((pathState === null || pathState === void 0 ? void 0 : pathState.multiple) && Array.isArray(pathState.value)) {
-                const valueIdx = pathState.value.findIndex(i => isEqual(i, vue.unref(field.checkedValue)));
+                const valueIdx = pathState.value.findIndex(i => isEqual(i, vue.toValue(field.checkedValue)));
                 if (valueIdx > -1) {
                     const newVal = [...pathState.value];
                     newVal.splice(valueIdx, 1);
@@ -1400,8 +1433,8 @@
         function patchCheckedApi(field) {
             const handleChange = field.handleChange;
             const checked = vue.computed(() => {
-                const currentValue = vue.unref(field.value);
-                const checkedVal = vue.unref(checkedValue);
+                const currentValue = vue.toValue(field.value);
+                const checkedVal = vue.toValue(checkedValue);
                 return Array.isArray(currentValue)
                     ? currentValue.findIndex(v => isEqual(v, checkedVal)) >= 0
                     : isEqual(checkedVal, currentValue);
@@ -1417,12 +1450,12 @@
                 const path = vue.toValue(name);
                 const pathState = form === null || form === void 0 ? void 0 : form.getPathState(path);
                 const value = normalizeEventValue(e);
-                let newValue = (_b = vue.unref(checkedValue)) !== null && _b !== void 0 ? _b : value;
+                let newValue = (_b = vue.toValue(checkedValue)) !== null && _b !== void 0 ? _b : value;
                 if (form && (pathState === null || pathState === void 0 ? void 0 : pathState.multiple) && pathState.type === 'checkbox') {
                     newValue = resolveNextCheckboxValue(getFromPath(form.values, path) || [], newValue, undefined);
                 }
                 else if ((opts === null || opts === void 0 ? void 0 : opts.type) === 'checkbox') {
-                    newValue = resolveNextCheckboxValue(vue.unref(field.value), newValue, vue.unref(uncheckedValue));
+                    newValue = resolveNextCheckboxValue(vue.toValue(field.value), newValue, vue.toValue(uncheckedValue));
                 }
                 handleChange(newValue, shouldValidate);
             }
@@ -1694,6 +1727,13 @@
         const formValues = vue.reactive(resolveInitialValues(opts));
         const pathStates = vue.ref([]);
         const extraErrorsBag = vue.ref({});
+        const pathStateLookup = vue.ref({});
+        const rebuildPathLookup = debounceNextTick(() => {
+            pathStateLookup.value = pathStates.value.reduce((names, state) => {
+                names[normalizeFormPath(vue.toValue(state.path))] = state;
+                return names;
+            }, {});
+        });
         /**
          * Manually sets an error message on a specific field
          */
@@ -1701,9 +1741,16 @@
             const state = findPathState(field);
             if (!state) {
                 if (typeof field === 'string') {
-                    extraErrorsBag.value[field] = normalizeErrorItem(message);
+                    extraErrorsBag.value[normalizeFormPath(field)] = normalizeErrorItem(message);
                 }
                 return;
+            }
+            // Move the error from the extras path if exists
+            if (typeof field === 'string') {
+                const normalizedPath = normalizeFormPath(field);
+                if (extraErrorsBag.value[normalizedPath]) {
+                    delete extraErrorsBag.value[normalizedPath];
+                }
             }
             state.errors = normalizeErrorItem(message);
             state.valid = !state.errors.length;
@@ -1773,7 +1820,7 @@
         function createPathState(path, config) {
             var _a, _b;
             const initialValue = vue.computed(() => getFromPath(initialValues.value, vue.toValue(path)));
-            const pathStateExists = pathStates.value.find(state => state.path === vue.unref(path));
+            const pathStateExists = pathStateLookup.value[vue.toValue(path)];
             if (pathStateExists) {
                 if ((config === null || config === void 0 ? void 0 : config.type) === 'checkbox' || (config === null || config === void 0 ? void 0 : config.type) === 'radio') {
                     pathStateExists.multiple = true;
@@ -1816,16 +1863,19 @@
                 }),
             });
             pathStates.value.push(state);
-            // if it has errors before, validate it.
+            pathStateLookup.value[pathValue] = state;
+            rebuildPathLookup();
             if (errors.value[pathValue] && !initialErrors[pathValue]) {
                 vue.nextTick(() => {
-                    validateField(pathValue);
+                    validateField(pathValue, { mode: 'silent' });
                 });
             }
             // Handles when a path changes
             if (vue.isRef(path)) {
                 vue.watch(path, newPath => {
+                    rebuildPathLookup();
                     const nextValue = klona(currentValue.value);
+                    pathStateLookup.value[newPath] = state;
                     vue.nextTick(() => {
                         setInPath(formValues, newPath, nextValue);
                     });
@@ -1888,7 +1938,8 @@
             pathStates.value.forEach(mutation);
         }
         function findPathState(path) {
-            const pathState = typeof path === 'string' ? pathStates.value.find(state => state.path === path) : path;
+            const normalizedPath = typeof path === 'string' ? normalizeFormPath(path) : path;
+            const pathState = typeof normalizedPath === 'string' ? pathStateLookup.value[normalizedPath] : normalizedPath;
             return pathState;
         }
         function findHoistedPath(path) {
@@ -1978,6 +2029,9 @@
             if (idx === -1 || !pathState) {
                 return;
             }
+            vue.nextTick(() => {
+                validateField(path, { mode: 'silent', warn: false });
+            });
             if (pathState.multiple && pathState.fieldsCount) {
                 pathState.fieldsCount--;
             }
@@ -1991,6 +2045,8 @@
             if (!pathState.multiple || pathState.fieldsCount <= 0) {
                 pathStates.value.splice(idx, 1);
                 unsetInitialValue(path);
+                rebuildPathLookup();
+                delete pathStateLookup.value[path];
             }
         }
         function markForUnmount(path) {
@@ -2038,6 +2094,9 @@
             initialValues: initialValues,
             getAllPathStates: () => pathStates.value,
             markForUnmount,
+            isFieldTouched,
+            isFieldDirty,
+            isFieldValid,
         };
         /**
          * Sets a single field value
@@ -2057,10 +2116,13 @@
         /**
          * Sets multiple fields values
          */
-        function setValues(fields) {
+        function setValues(fields, shouldValidate = true) {
             merge(formValues, fields);
             // regenerate the arrays when the form values change
             fieldArrays.forEach(f => f && f.reset());
+            if (shouldValidate) {
+                validate();
+            }
         }
         function createModel(path) {
             const pathState = findPathState(vue.unref(path)) || createPathState(path);
@@ -2094,10 +2156,28 @@
                 pathState.touched = isTouched;
             }
         }
+        function isFieldTouched(field) {
+            var _a;
+            return !!((_a = findPathState(field)) === null || _a === void 0 ? void 0 : _a.touched);
+        }
+        function isFieldDirty(field) {
+            var _a;
+            return !!((_a = findPathState(field)) === null || _a === void 0 ? void 0 : _a.dirty);
+        }
+        function isFieldValid(field) {
+            var _a;
+            return !!((_a = findPathState(field)) === null || _a === void 0 ? void 0 : _a.valid);
+        }
         /**
          * Sets the touched meta state on multiple fields
          */
         function setTouched(fields) {
+            if (typeof fields === 'boolean') {
+                mutateAllPathState(state => {
+                    state.touched = fields;
+                });
+                return;
+            }
             keysOf(fields).forEach(field => {
                 setFieldTouched(field, !!fields[field]);
             });
@@ -2114,7 +2194,8 @@
          * Resets all fields
          */
         function resetForm(resetState) {
-            const newValues = (resetState === null || resetState === void 0 ? void 0 : resetState.values) ? resetState.values : originalInitialValues.value;
+            let newValues = (resetState === null || resetState === void 0 ? void 0 : resetState.values) ? resetState.values : originalInitialValues.value;
+            newValues = isTypedSchema(schema) && isCallable(schema.cast) ? schema.cast(newValues) : newValues;
             setInitialValues(newValues);
             mutateAllPathState(state => {
                 var _a;
@@ -2123,7 +2204,7 @@
                 setFieldValue(state.path, getFromPath(newValues, state.path), false);
                 setFieldError(state.path, undefined);
             });
-            setValues(newValues);
+            setValues(newValues, false);
             setErrors((resetState === null || resetState === void 0 ? void 0 : resetState.errors) || {});
             submitCount.value = (resetState === null || resetState === void 0 ? void 0 : resetState.submitCount) || 0;
             vue.nextTick(() => {
@@ -2174,21 +2255,20 @@
                 errors,
             };
         }
-        async function validateField(path) {
+        async function validateField(path, opts) {
+            var _a;
             const state = findPathState(path);
             if (state) {
                 state.validated = true;
             }
             if (schema) {
-                const { results } = await validateSchema('validated-only');
+                const { results } = await validateSchema((opts === null || opts === void 0 ? void 0 : opts.mode) || 'validated-only');
                 return results[path] || { errors: [], valid: true };
             }
             if (state === null || state === void 0 ? void 0 : state.validate) {
-                return state.validate();
+                return state.validate(opts);
             }
-            if (!state) {
-                vue.warn(`field with path ${path} was not found`);
-            }
+            !state && ((_a = opts === null || opts === void 0 ? void 0 : opts.warn) !== null && _a !== void 0 ? _a : true);
             return Promise.resolve({ errors: [], valid: true });
         }
         function unsetInitialValue(path) {
@@ -2576,11 +2656,9 @@
             move: noOp,
         };
         if (!form) {
-            warn('FieldArray requires being a child of `<Form/>` or `useForm` being called before it. Array fields may not work correctly');
             return noOpApi;
         }
         if (!vue.unref(arrayPath)) {
-            warn('FieldArray requires a field path to be provided, did you forget to pass the `name` prop?');
             return noOpApi;
         }
         const alreadyExists = form.fieldArrays.find(a => vue.unref(a.path) === vue.unref(arrayPath));
@@ -2627,7 +2705,6 @@
                     set(value) {
                         const idx = fields.value.findIndex(e => e.key === key);
                         if (idx === -1) {
-                            warn(`Attempting to update a non-existent array item`);
                             return;
                         }
                         update(idx, value);
@@ -2658,7 +2735,8 @@
             fields.value.splice(idx, 1);
             afterMutation();
         }
-        function push(value) {
+        function push(initialValue) {
+            const value = klona(initialValue);
             const pathName = vue.unref(arrayPath);
             const pathValue = getFromPath(form === null || form === void 0 ? void 0 : form.values, pathName);
             const normalizedPathValue = isNullOrUndefined(pathValue) ? [] : pathValue;
@@ -2691,7 +2769,8 @@
             fields.value = newFields;
             updateEntryFlags();
         }
-        function insert(idx, value) {
+        function insert(idx, initialValue) {
+            const value = klona(initialValue);
             const pathName = vue.unref(arrayPath);
             const pathValue = getFromPath(form === null || form === void 0 ? void 0 : form.values, pathName);
             if (!Array.isArray(pathValue) || pathValue.length < idx) {
@@ -2721,7 +2800,8 @@
             setInPath(form.values, `${pathName}[${idx}]`, value);
             form === null || form === void 0 ? void 0 : form.validate({ mode: 'validated-only' });
         }
-        function prepend(value) {
+        function prepend(initialValue) {
+            const value = klona(initialValue);
             const pathName = vue.unref(arrayPath);
             const pathValue = getFromPath(form === null || form === void 0 ? void 0 : form.values, pathName);
             const normalizedPathValue = isNullOrUndefined(pathValue) ? [] : pathValue;
@@ -2872,9 +2952,6 @@
 
     function useResetForm() {
         const form = injectWithSelf(FormContextKey);
-        if (!form) {
-            warn('No vee-validate <Form /> or `useForm` was detected in the component tree');
-        }
         return function resetForm(state) {
             if (!form) {
                 return;
@@ -2930,9 +3007,6 @@
      */
     function useIsSubmitting() {
         const form = injectWithSelf(FormContextKey);
-        if (!form) {
-            warn('No vee-validate <Form /> or `useForm` was detected in the component tree');
-        }
         return vue.computed(() => {
             var _a;
             return (_a = form === null || form === void 0 ? void 0 : form.isSubmitting.value) !== null && _a !== void 0 ? _a : false;
@@ -2944,9 +3018,6 @@
      */
     function useIsValidating() {
         const form = injectWithSelf(FormContextKey);
-        if (!form) {
-            warn('No vee-validate <Form /> or `useForm` was detected in the component tree');
-        }
         return vue.computed(() => {
             var _a;
             return (_a = form === null || form === void 0 ? void 0 : form.isValidating.value) !== null && _a !== void 0 ? _a : false;
@@ -2964,9 +3035,8 @@
                 return field.validate();
             }
             if (form && path) {
-                return form === null || form === void 0 ? void 0 : form.validateField(vue.unref(path));
+                return form === null || form === void 0 ? void 0 : form.validateField(vue.toValue(path));
             }
-            warn(`field with name ${vue.unref(path)} was not found`);
             return Promise.resolve({
                 errors: [],
                 valid: true,
@@ -2979,9 +3049,6 @@
      */
     function useIsFormDirty() {
         const form = injectWithSelf(FormContextKey);
-        if (!form) {
-            warn('No vee-validate <Form /> or `useForm` was detected in the component tree');
-        }
         return vue.computed(() => {
             var _a;
             return (_a = form === null || form === void 0 ? void 0 : form.meta.value.dirty) !== null && _a !== void 0 ? _a : false;
@@ -2993,9 +3060,6 @@
      */
     function useIsFormTouched() {
         const form = injectWithSelf(FormContextKey);
-        if (!form) {
-            warn('No vee-validate <Form /> or `useForm` was detected in the component tree');
-        }
         return vue.computed(() => {
             var _a;
             return (_a = form === null || form === void 0 ? void 0 : form.meta.value.touched) !== null && _a !== void 0 ? _a : false;
@@ -3007,9 +3071,6 @@
      */
     function useIsFormValid() {
         const form = injectWithSelf(FormContextKey);
-        if (!form) {
-            warn('No vee-validate <Form /> or `useForm` was detected in the component tree');
-        }
         return vue.computed(() => {
             var _a;
             return (_a = form === null || form === void 0 ? void 0 : form.meta.value.valid) !== null && _a !== void 0 ? _a : false;
@@ -3021,9 +3082,6 @@
      */
     function useValidateForm() {
         const form = injectWithSelf(FormContextKey);
-        if (!form) {
-            warn('No vee-validate <Form /> or `useForm` was detected in the component tree');
-        }
         return function validateField() {
             if (!form) {
                 return Promise.resolve({ results: {}, errors: {}, valid: true });
@@ -3037,9 +3095,6 @@
      */
     function useSubmitCount() {
         const form = injectWithSelf(FormContextKey);
-        if (!form) {
-            warn('No vee-validate <Form /> or `useForm` was detected in the component tree');
-        }
         return vue.computed(() => {
             var _a;
             return (_a = form === null || form === void 0 ? void 0 : form.submitCount.value) !== null && _a !== void 0 ? _a : 0;
@@ -3055,9 +3110,9 @@
         const field = path ? undefined : vue.inject(FieldContextKey);
         return vue.computed(() => {
             if (path) {
-                return getFromPath(form === null || form === void 0 ? void 0 : form.values, vue.unref(path));
+                return getFromPath(form === null || form === void 0 ? void 0 : form.values, vue.toValue(path));
             }
-            return vue.unref(field === null || field === void 0 ? void 0 : field.value);
+            return vue.toValue(field === null || field === void 0 ? void 0 : field.value);
         });
     }
 
@@ -3066,9 +3121,6 @@
      */
     function useFormValues() {
         const form = injectWithSelf(FormContextKey);
-        if (!form) {
-            warn('No vee-validate <Form /> or `useForm` was detected in the component tree');
-        }
         return vue.computed(() => {
             return (form === null || form === void 0 ? void 0 : form.values) || {};
         });
@@ -3079,9 +3131,6 @@
      */
     function useFormErrors() {
         const form = injectWithSelf(FormContextKey);
-        if (!form) {
-            warn('No vee-validate <Form /> or `useForm` was detected in the component tree');
-        }
         return vue.computed(() => {
             return ((form === null || form === void 0 ? void 0 : form.errors.value) || {});
         });
@@ -3096,7 +3145,7 @@
         const field = path ? undefined : vue.inject(FieldContextKey);
         return vue.computed(() => {
             if (path) {
-                return form === null || form === void 0 ? void 0 : form.errors.value[vue.unref(path)];
+                return form === null || form === void 0 ? void 0 : form.errors.value[vue.toValue(path)];
             }
             return field === null || field === void 0 ? void 0 : field.errorMessage.value;
         });
@@ -3104,9 +3153,6 @@
 
     function useSubmitForm(cb) {
         const form = injectWithSelf(FormContextKey);
-        if (!form) {
-            warn('No vee-validate <Form /> or `useForm` was detected in the component tree');
-        }
         const onSubmit = form ? form.handleSubmit(cb) : undefined;
         return function submitForm(e) {
             if (!onSubmit) {
@@ -3114,6 +3160,105 @@
             }
             return onSubmit(e);
         };
+    }
+
+    /**
+     * Sets a field's error message
+     */
+    function useSetFieldError(path) {
+        const form = injectWithSelf(FormContextKey);
+        // We don't want to use self injected context as it doesn't make sense
+        const field = path ? undefined : vue.inject(FieldContextKey);
+        return function setFieldError(message) {
+            if (path && form) {
+                form.setFieldError(vue.toValue(path), message);
+                return;
+            }
+            if (field) {
+                field.setErrors(message || []);
+                return;
+            }
+        };
+    }
+
+    /**
+     * Sets a field's touched meta state
+     */
+    function useSetFieldTouched(path) {
+        const form = injectWithSelf(FormContextKey);
+        // We don't want to use self injected context as it doesn't make sense
+        const field = path ? undefined : vue.inject(FieldContextKey);
+        return function setFieldTouched(touched) {
+            if (path && form) {
+                form.setFieldTouched(vue.toValue(path), touched);
+                return;
+            }
+            if (field) {
+                field.setTouched(touched);
+                return;
+            }
+        };
+    }
+
+    /**
+     * Sets a field's value
+     */
+    function useSetFieldValue(path) {
+        const form = injectWithSelf(FormContextKey);
+        // We don't want to use self injected context as it doesn't make sense
+        const field = path ? undefined : vue.inject(FieldContextKey);
+        return function setFieldValue(value, shouldValidate = true) {
+            if (path && form) {
+                form.setFieldValue(vue.toValue(path), value, shouldValidate);
+                return;
+            }
+            if (field) {
+                field.setValue(value, shouldValidate);
+                return;
+            }
+        };
+    }
+
+    /**
+     * Sets multiple fields errors
+     */
+    function useSetFormErrors() {
+        const form = injectWithSelf(FormContextKey);
+        function setFormErrors(fields) {
+            if (form) {
+                form.setErrors(fields);
+                return;
+            }
+        }
+        return setFormErrors;
+    }
+
+    /**
+     * Sets multiple fields touched or all fields in the form
+     */
+    function useSetFormTouched() {
+        const form = injectWithSelf(FormContextKey);
+        function setFormTouched(fields) {
+            if (form) {
+                form.setTouched(fields);
+                return;
+            }
+        }
+        return setFormTouched;
+    }
+
+    /**
+     * Sets multiple fields values
+     */
+    function useSetFormValues() {
+        const form = injectWithSelf(FormContextKey);
+        function setFormValues(fields) {
+            if (form) {
+                form.setValues(fields);
+                return;
+            }
+        }
+        return setFormValues;
     }
 
     exports.ErrorMessage = ErrorMessage;
@@ -3125,6 +3270,7 @@
     exports.IS_ABSENT = IS_ABSENT;
     exports.configure = configure;
     exports.defineRule = defineRule;
+    exports.normalizeRules = normalizeRules;
     exports.useField = useField;
     exports.useFieldArray = useFieldArray;
     exports.useFieldError = useFieldError;
@@ -3141,6 +3287,12 @@
     exports.useIsSubmitting = useIsSubmitting;
     exports.useIsValidating = useIsValidating;
     exports.useResetForm = useResetForm;
+    exports.useSetFieldError = useSetFieldError;
+    exports.useSetFieldTouched = useSetFieldTouched;
+    exports.useSetFieldValue = useSetFieldValue;
+    exports.useSetFormErrors = useSetFormErrors;
+    exports.useSetFormTouched = useSetFormTouched;
+    exports.useSetFormValues = useSetFormValues;
     exports.useSubmitCount = useSubmitCount;
     exports.useSubmitForm = useSubmitForm;
     exports.useValidateField = useValidateField;

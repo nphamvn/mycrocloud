@@ -55,7 +55,7 @@
     "responseProvider": "Mock",
     "response": {
         "statusCode": {
-            "engine": "None",
+            "valueType": "Static",
             "code": 200
         },
         "headers": {

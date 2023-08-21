@@ -28,7 +28,7 @@
       ]
     },
     {
-      "library": "vuetify@3.3.7",
+      "library": "vuetify@3.3.13",
       "destination": "wwwroot/lib/vuetify",
       "files": [
         "vuetify.min.css",
@@ -36,11 +36,11 @@
       ]
     },
     {
-      "library": "vee-validate@4.10.5",
+      "library": "vee-validate@4.11.2",
       "destination": "wwwroot/lib/vee-validate"
     },
     {
-      "library": "monaco-editor@0.39.0",
+      "library": "monaco-editor@0.41.0",
       "destination": "wwwroot/lib/monaco-editor"
     }
   ]

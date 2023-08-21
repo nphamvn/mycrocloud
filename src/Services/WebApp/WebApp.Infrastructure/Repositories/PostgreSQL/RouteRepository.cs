@@ -246,4 +246,27 @@ GROUP BY
             query = "%" + searchTerm + "%"
         });
     }
+
+    public async Task AddMatchMethods(int id, List<string> methods)
+    {
+        const string sql = """
+delete from 
+route_match_method_bind 
+where 
+route_id = @route_id
+
+insert into 
+  route_match_method_bind (
+    route_id, 
+    method
+  )
+values
+  (
+    @route_id, 
+    @method
+  );
+""";
+        await using var connection = new NpgsqlConnection(ConnectionString);
+        await connection.ExecuteAsync(sql, methods.Select(m => new { route_id = id, method = m}));
+    }
 }

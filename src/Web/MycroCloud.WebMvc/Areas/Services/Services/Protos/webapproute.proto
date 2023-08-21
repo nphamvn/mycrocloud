@@ -54,23 +54,23 @@ message GetRouteByIdResponse {
   int32 authorization_type = 14;
 }
 message MockResponse {
-    enum ValueType {
-      UNKNOWN = 0;
-      STATIC = 1;
-      EXPRESSION_EVALUATED = 2;
+  message StatusCode {
+    oneof value {
+      int32 code = 1;
+      string evaluated_expresion = 2;
     }
-    message StatusCode {
-      ValueType value_type = 1;
-      optional int32 code = 2;
-      optional string evaluated_expresion = 3;
+  }
+  message Header {
+    oneof value {
+      string static_value = 1;
+      string evaluated_expresion = 2;
     }
-    message Header {
-      ValueType value_type = 1;
-      optional string static_value = 2;
-      optional string evaluated_expresion = 3;
-    }
-    StatusCode status_code = 1;
-    map<string, Header> headers = 2;
+  }
+  StatusCode status_code = 1;
+  map<string, Header> headers = 2;
+}
+message ProxiedServer {
+
 }
 message CreateRouteRequest {
   int32 app_id = 1;
@@ -80,8 +80,10 @@ message CreateRouteRequest {
   string match_path = 5;
   int32 match_order = 6;
   int32 response_type = 7;
-  MockResponse mock_response  = 8; 
-  //string response_json = 8;
+  oneof response {
+    MockResponse mock_response = 8;
+    ProxiedServer proxied_server = 9;
+  }
 }
 message CreateRouteResponse {
   int32 route_id = 1;

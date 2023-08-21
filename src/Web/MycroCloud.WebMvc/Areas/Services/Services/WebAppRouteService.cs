@@ -28,7 +28,7 @@ public class WebAppRouteService(WebAppRouteGrpcServiceClient webAppRouteGrpcServ
         var viewModel = new RouteIndexViewModel();
         var getRouteResponse = await webAppRouteGrpcServiceClient.ListRoutesAsync(new()
         {
-            
+
         });
         viewModel.Routes = getRouteResponse.Routes.Select(r => new RouteIndexItem
         {
@@ -59,7 +59,7 @@ public class WebAppRouteService(WebAppRouteGrpcServiceClient webAppRouteGrpcServ
     {
         var res = await webAppAuthenticationGrpcServiceClient.GetAllAsync(new()
         {
-            
+
         });
         return res.Schemes.Select(s => new AuthenticationSchemeIndexItem
         {
@@ -73,7 +73,7 @@ public class WebAppRouteService(WebAppRouteGrpcServiceClient webAppRouteGrpcServ
     {
         var res = await webAppRouteGrpcServiceClient.ListRoutesAsync(new()
         {
-            
+
         });
         return res.Routes.Select(r => new RouteIndexItem
         {
@@ -94,34 +94,68 @@ public class WebAppRouteService(WebAppRouteGrpcServiceClient webAppRouteGrpcServ
 
     public async Task<int> Create(int appId, RouteSaveModel route)
     {
-        var req = new CreateRouteRequest {
+        var req = new CreateRouteRequest
+        {
             AppId = appId,
             Name = route.Name,
             Description = route.Description,
             MatchPath = route.MatchPath,
             MatchOrder = route.MatchOrder ?? 1,
             ResponseType = (int)route.ResponseProvider,
-            //ResponseJson = route.Response != null ? JsonSerializer.Serialize(route.Response) : ""
         };
         req.MatchMethods.AddRange(route.MatchMethods);
-        if (route.ResponseProvider == RouteResponseProvider.Mock)
+        switch (route.ResponseProvider)
         {
-            var mockResponse = (MockResponseSaveModel)route.Response;
-            req.MockResponse = new MockResponse {
-                StatusCode = new MockResponse.Types.StatusCode {
-                    ValueType = (MockResponse.Types.ValueType)mockResponse.StatusCode.ValueType,
-                    Code = mockResponse.StatusCode.Code ?? default,
-                    EvaluatedExpresion = mockResponse.StatusCode.Expression ?? default,
+            case RouteResponseProvider.Mock:
+                var mockResponse = (MockResponseSaveModel)route.Response;
+                req.MockResponse = new MockResponse();
+                switch (mockResponse.StatusCode.ValueType)
+                {
+                    case MockResponseValueGenerator.Static:
+                        req.MockResponse.StatusCode = new MockResponse.Types.StatusCode
+                        {
+                            Code = mockResponse.StatusCode.Code.Value
+                        };
+                        break;
+                    case MockResponseValueGenerator.ExpressionEvaluated:
+                        req.MockResponse.StatusCode = new MockResponse.Types.StatusCode
+                        {
+                            EvaluatedExpresion = mockResponse.StatusCode.Expression,
+                        };
+                        break;
+                    default:
+                        break;
                 }
-            };
-            foreach (var header in mockResponse.Headers)
-            {
-                req.MockResponse.Headers.Add(header.Key, new MockResponse.Types.Header {
-                    ValueType = (MockResponse.Types.ValueType)header.Value.ValueType,
-                    StaticValue = header.Value.StaticValue,
-                    EvaluatedExpresion = header.Value.EvaluatedExpression
-                });
-            }
+                foreach (var header in mockResponse.Headers)
+                {
+                    switch (header.Value.ValueType)
+                    {
+                        case MockResponseValueGenerator.Static:
+                            req.MockResponse.Headers.Add(header.Key, new MockResponse.Types.Header
+                            {
+                                StaticValue = header.Value.StaticValue
+                            });
+                            break;
+                        case MockResponseValueGenerator.ExpressionEvaluated:
+                            req.MockResponse.Headers.Add(header.Key, new MockResponse.Types.Header
+                            {
+                                EvaluatedExpresion = header.Value.EvaluatedExpression
+                            });
+                            break;
+                        default:
+                            break;
+                    }
+                    
+                }
+                break;
+            case RouteResponseProvider.ProxiedServer:
+                req.ProxiedServer = new ProxiedServer
+                {
+
+                };
+                break;
+            default:
+                break;
         }
         var res = await webAppRouteGrpcServiceClient.CreateRouteAsync(req);
         return res.RouteId;

@@ -261,24 +261,26 @@
                         variant="solo">
                     </v-select>
                     <div v-show="route.responseProvider=='@nameof(RouteResponseProvider.Mock)'">
-                        <div class="text-subtitle-2">STATUS CODE</div>
-                        <v-row>
-                            <v-col cols="3">
-                                <v-select v-model="route.response.statusCode.engine" label="TYPE"
-                                    :items="[{value: 'None', title: 'STATIC'}, {value: 'Evaluated', title: 'EVALUATED'}]"
-                                    variant="solo">
-                                </v-select>
-                            </v-col>
-                            <v-col>
-                                <v-text-field v-if="route.response.statusCode.engine=='None'" v-model="route.response.statusCode.code"
-                                    type="number" label="VALUE"variant="solo">
-                                </v-text-field>
-                                <v-text-field v-if="route.response.statusCode.engine=='Evaluated'" v-model="route.response.statusCode.expression"
-                                    type="text" label="EXPRESSION" variant="solo">
-                                </v-text-field>
-                            </v-col>
-                        </v-row>
-                        <v-container class="px-0">
+                        <div v-if="true">
+                            <div class="text-subtitle-2">STATUS CODE</div>
+                            <v-row>
+                                <v-col cols="3">
+                                    <v-select v-model="route.response.statusCode.valueType" label="TYPE"
+                                        :items="[{value: 'Static', title: 'STATIC'}, {value: 'Evaluated', title: 'EXPRESSION EVALUATED'}]"
+                                        variant="solo">
+                                    </v-select>
+                                </v-col>
+                                <v-col>
+                                    <v-text-field v-if="route.response.statusCode.valueType=='Static'" v-model="route.response.statusCode.code"
+                                        type="number" label="VALUE"variant="solo">
+                                    </v-text-field>
+                                    <v-text-field v-if="route.response.statusCode.valueType=='Evaluated'" v-model="route.response.statusCode.expression"
+                                        type="text" label="EXPRESSION" variant="solo">
+                                    </v-text-field>
+                                </v-col>
+                            </v-row>
+                        </div>
+                        <div v-if="false">
                             <div class="text-subtitle-2">HEADERS</div>
                             <v-row v-for="(header, index) of mockResponseHeaders" class="py-0">
                                 <v-col cols="3">
@@ -305,8 +307,8 @@
                             </v-row>
                             <v-btn prepend-icon="mdi-plus" color="secondary"
                                 v-on:click="mockResponseHeaders.push({valueType: 'Static'})">ADD</v-btn>
-                        </v-container>
-                        <v-container class="px-0">
+                        </div>
+                        <div v-if="false">
                             <div class="text-subtitle-2">BODY</div>
                             <v-select class="col-3" v-model="route.response.body.renderedValue.engine" label="TYPE"
                                 :items="[{value: 'None', title: 'STATIC'}, {value: 'JavaScript', title: 'EVALUATED'},
@@ -323,7 +325,7 @@
                                     style="height: 100px; border: 1px solid grey;">
                                 </div>
                             </div>
-                        </v-container>
+                        </div>
                     </div>
                     <div v-show="route.responseProvider=='@nameof(RouteResponseProvider.ProxiedServer)'">
                         <v-container>Proxied Server</v-container>
