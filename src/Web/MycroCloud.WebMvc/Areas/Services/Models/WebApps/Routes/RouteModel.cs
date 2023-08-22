@@ -27,20 +27,13 @@ public abstract class RouteResponse
 }
 public class RouteMockResponse : RouteResponse
 {
-    public MockResponseStatusCode StatusCode { get; set; }
+    public MockResponseStatusCodeSaveModel StatusCode { get; set; }
     public List<MockResponseHeader> Headers { get; set; }
 }
 
 public class MockResponseHeader
 {
     public string Name { get; set; }
-    public HttpRequestBasedValueProvider ValueProvider { get; set; }
-    [JsonPropertyName("value")]
-    public string StringValue { get; set; }
-}
-
-public class MockResponseStatusCode
-{
     public HttpRequestBasedValueProvider ValueProvider { get; set; }
     [JsonPropertyName("value")]
     public string StringValue { get; set; }

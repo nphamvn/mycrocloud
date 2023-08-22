@@ -28,7 +28,6 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public RouteAuthorizationType Type { get; set; }
         public List<int>? PolicyIds { get; set; }
-        public List<RouteAuthorizationClaimSaveModel>? Claims { get; set; }
     }
 
     public class RouteValidationSaveModel
@@ -48,11 +47,11 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps
     }
     public class MockResponseSaveModel : RouteResponseSaveModel
     {
-        public StatusCodeValue StatusCode { get; set; }
-        public Dictionary<string, HeaderValue> Headers { get; set; }
+        public MockResponseStatusCodeSaveModel StatusCode { get; set; }
+        public Dictionary<string, MockResponseHeaderValueSaveModel> Headers { get; set; }
         //public dynamic Body { get; set; }
     }
-    public class StatusCodeValue
+    public class MockResponseStatusCodeSaveModel
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public MockResponseValueGenerator ValueType { get; set; }
@@ -61,7 +60,7 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Expression { get; set; }
     }
-    public class HeaderValue
+    public class MockResponseHeaderValueSaveModel
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public MockResponseValueGenerator ValueType { get; set; }

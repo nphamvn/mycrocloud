@@ -30,19 +30,7 @@ public class WebAppRouteService(WebAppRouteGrpcServiceClient webAppRouteGrpcServ
         {
 
         });
-        viewModel.Routes = getRouteResponse.Routes.Select(r => new RouteIndexItem
-        {
-            RouteId = r.RouteId,
-            Name = r.Name,
-            Description = r.Description,
-            MatchPath = r.MatchPath,
-            MatchMethods = r.MatchMethods.Select(m => m).ToList(),
-            MatchOrder = r.MatchOrder,
-            AuthorizationType = (RouteAuthorizationType)r.AuthorizationType,
-            ResponseProvider = (RouteResponseProvider)r.ResponseProvider,
-            CreatedDate = r.CreatedDate.ToDateTime(),
-            UpdatedDate = r.UpdatedDate?.ToDateTime()
-        });
+        viewModel.Routes = getRouteResponse.Routes.Select(Map);
         viewModel.HttpMethodSelectListItem = CommonHttpMethods
                                                 .Select(m => new SelectListItem(m.ToUpper(), m.ToUpper()))
                                                 .Prepend(new SelectListItem("ALL", "ALL"));
@@ -50,6 +38,21 @@ public class WebAppRouteService(WebAppRouteGrpcServiceClient webAppRouteGrpcServ
                                                         .Select(s => new SelectListItem(s.DisplayName, s.Id.ToString()));
         viewModel.AuthorizationPolicySelectListItem = new List<SelectListItem>();
         return viewModel;
+    }
+    private static RouteIndexItem Map(ListRoutesResponse.Types.Route route) {
+        return new RouteIndexItem
+        {
+            RouteId = route.RouteId,
+            Name = route.Name,
+            Description = route.Description,
+            MatchPath = route.MatchPath,
+            MatchMethods = route.MatchMethods.Select(m => m).ToList(),
+            MatchOrder = route.MatchOrder,
+            AuthorizationType = (RouteAuthorizationType)route.AuthorizationType,
+            ResponseProvider = (RouteResponseProvider)route.ResponseProvider,
+            CreatedDate = route.CreatedDate.ToDateTime(),
+            UpdatedDate = route.UpdatedDate?.ToDateTime()
+        };
     }
     private static List<string> CommonHttpMethods => new() {
         "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
@@ -75,16 +78,7 @@ public class WebAppRouteService(WebAppRouteGrpcServiceClient webAppRouteGrpcServ
         {
 
         });
-        return res.Routes.Select(r => new RouteIndexItem
-        {
-            RouteId = r.RouteId,
-            Name = r.Name,
-            MatchPath = r.MatchPath,
-            MatchMethods = r.MatchMethods.Select(m => m).ToList(),
-            MatchOrder = r.MatchOrder,
-            CreatedDate = r.CreatedDate.ToDateTime(),
-            UpdatedDate = r.UpdatedDate?.ToDateTime()
-        });
+        return res.Routes.Select(Map);
     }
 
     public async Task<bool> ValidateCreate(int appId, RouteSaveModel route, ModelStateDictionary modelState)
@@ -94,9 +88,15 @@ public class WebAppRouteService(WebAppRouteGrpcServiceClient webAppRouteGrpcServ
 
     public async Task<int> Create(int appId, RouteSaveModel route)
     {
+        var req = Map(route);
+        req.AppId = appId;
+        var res = await webAppRouteGrpcServiceClient.CreateRouteAsync(req);
+        return res.RouteId;
+    }
+    private static CreateRouteRequest Map(RouteSaveModel route)
+    {
         var req = new CreateRouteRequest
         {
-            AppId = appId,
             Name = route.Name,
             Description = route.Description,
             MatchPath = route.MatchPath,
@@ -145,7 +145,7 @@ public class WebAppRouteService(WebAppRouteGrpcServiceClient webAppRouteGrpcServ
                         default:
                             break;
                     }
-                    
+
                 }
                 break;
             case RouteResponseProvider.ProxiedServer:
@@ -157,8 +157,7 @@ public class WebAppRouteService(WebAppRouteGrpcServiceClient webAppRouteGrpcServ
             default:
                 break;
         }
-        var res = await webAppRouteGrpcServiceClient.CreateRouteAsync(req);
-        return res.RouteId;
+        return req;
     }
 
     public async Task<bool> ValidateEdit(int routeId, RouteSaveModel route, ModelStateDictionary modelState)
