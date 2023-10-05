@@ -1,10 +1,6 @@
-<script setup>
-
+<script setup lang="ts">
 </script>
 
 <template>
-  <RouterView />
+  <h1>Welcome to MycroCloud</h1>
 </template>
-
-<style scoped>
-</style>

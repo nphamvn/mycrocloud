@@ -72,6 +72,12 @@ message MockResponse {
 message ProxiedServer {
 
 }
+message RequestValidation {
+  message QueryParameter {
+    
+  }
+  QueryParameter query_parameter = 1;
+} 
 message CreateRouteRequest {
   int32 app_id = 1;
   string name = 2;
@@ -84,6 +90,7 @@ message CreateRouteRequest {
     MockResponse mock_response = 8;
     ProxiedServer proxied_server = 9;
   }
+  RequestValidation request_validation = 10;
 }
 message CreateRouteResponse {
   int32 route_id = 1;

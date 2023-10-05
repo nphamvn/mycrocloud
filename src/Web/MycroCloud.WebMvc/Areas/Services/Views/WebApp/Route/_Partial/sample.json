@@ -2,11 +2,11 @@
     "id": 1,
     "name": "foo",
     "description": "foo",
+    "matchPath": "/foo",
     "matchMethods": [
         "GET",
         "POST"
     ],
-    "matchPath": "/foo",
     "matchOrder": 1,
     "authorizationType": "Authorized",
     "authorization": {
@@ -50,35 +50,35 @@
                     }
                 ]
             }
-        ],
-        "queryParameters" : {
-            "page" : {
-                "required": true,
-                "range": {
-                    "min": 1,
-                    "max": 100
-                }
-            }
-        }
+        ]
     },
     "responseProvider": "Mock",
     "response": {
         "statusCode": {
-            "valueType": "Static",
-            "code": 200
+            "type": "Static",
+            "staticCode": 200
         },
-        "headers": {
-            "foo": {
-                "valueType": "Static",
-                "staticValue": "barzz"
+        "headers": [
+            {
+                "name": "Static",
+                "value": {
+                    "type": "Static",
+                    "staticValue": "foo"
+                }
+            },
+            {
+                "name": "Dynamic",
+                "value": {
+                    "type": "Expression",
+                    "expression": "foo"
+                }
             }
-        },
+        ],
         "body": {
-            "renderedValue": {
-                "engine": "None",
-                "template": "{\n  \"foo\": \"bar\"\n}",
-                "format": "json"
-            }
+            "type": "Static",
+            "engine": null,
+            "text": "{\n  \"foo\": \"bar\"\n}",
+            "textFormat": "json"
         }
     }
 }

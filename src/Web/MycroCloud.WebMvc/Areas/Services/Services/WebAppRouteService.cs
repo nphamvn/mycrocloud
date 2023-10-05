@@ -104,12 +104,17 @@ public class WebAppRouteService(WebAppRouteGrpcServiceClient webAppRouteGrpcServ
             ResponseType = (int)route.ResponseProvider,
         };
         req.MatchMethods.AddRange(route.MatchMethods);
+        req.RequestValidation = new RequestValidation {
+            QueryParameter = new RequestValidation.Types.QueryParameter {
+
+            }
+        };
         switch (route.ResponseProvider)
         {
             case RouteResponseProvider.Mock:
                 var mockResponse = (MockResponseSaveModel)route.Response;
                 req.MockResponse = new MockResponse();
-                switch (mockResponse.StatusCode.ValueType)
+                switch (mockResponse.StatusCode.Type)
                 {
                     case MockResponseValueGenerator.Static:
                         req.MockResponse.StatusCode = new MockResponse.Types.StatusCode
@@ -128,7 +133,7 @@ public class WebAppRouteService(WebAppRouteGrpcServiceClient webAppRouteGrpcServ
                 }
                 foreach (var header in mockResponse.Headers)
                 {
-                    switch (header.Value.ValueType)
+                    switch (header.Value.Type)
                     {
                         case MockResponseValueGenerator.Static:
                             req.MockResponse.Headers.Add(header.Key, new MockResponse.Types.Header
@@ -139,7 +144,7 @@ public class WebAppRouteService(WebAppRouteGrpcServiceClient webAppRouteGrpcServ
                         case MockResponseValueGenerator.ExpressionEvaluated:
                             req.MockResponse.Headers.Add(header.Key, new MockResponse.Types.Header
                             {
-                                EvaluatedExpresion = header.Value.EvaluatedExpression
+                                EvaluatedExpresion = header.Value.Expression
                             });
                             break;
                         default:

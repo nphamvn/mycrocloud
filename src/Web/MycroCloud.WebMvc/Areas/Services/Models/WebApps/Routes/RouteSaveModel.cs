@@ -41,7 +41,8 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps
     {
         public const string ProviderDiscriminator = "$provider";
     }
-    public enum MockResponseValueGenerator {
+    public enum MockResponseValueGenerator
+    {
         Static = 1,
         ExpressionEvaluated = 2
     }
@@ -49,12 +50,19 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps
     {
         public MockResponseStatusCodeSaveModel StatusCode { get; set; }
         public Dictionary<string, MockResponseHeaderValueSaveModel> Headers { get; set; }
+        public List<MockResponseHeaderSaveModel> HeadersV2 { get; set; }
         //public dynamic Body { get; set; }
+    }
+
+    public class MockResponseHeaderSaveModel
+    {
+        public string Name { get; set; }
+        public MockResponseHeaderValueSaveModel Value { get; set; }
     }
     public class MockResponseStatusCodeSaveModel
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public MockResponseValueGenerator ValueType { get; set; }
+        public MockResponseValueGenerator Type { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? Code { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -63,12 +71,12 @@ namespace MycroCloud.WebMvc.Areas.Services.Models.WebApps
     public class MockResponseHeaderValueSaveModel
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public MockResponseValueGenerator ValueType { get; set; }
+        public MockResponseValueGenerator Type { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string StaticValue { get; set; }
         [JsonPropertyName("evalExpression")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string EvaluatedExpression { get; set; }
+        public string Expression { get; set; }
     }
     public class RouteResponseSaveModelJsonConverter : JsonConverter<RouteResponseSaveModel>
     {
