@@ -9,7 +9,7 @@ namespace WebApp.Infrastructure.Repositories.PostgreSql;
 public class RouteRepository(IOptions<PostgresDatabaseOptions> databaseOptions) 
     : BaseRepository(databaseOptions), IRouteRepository
 {
-    public async Task<int> Add(int appId, RouteEntity route)
+    public async Task<int> Add(int appId, Route route)
     {
         const string query = """
 insert into 
@@ -69,7 +69,7 @@ RETURNING route_id;
         }
     }
 
-    public async Task<RouteEntity> Find(int appId, string method, string path)
+    public async Task<Route> Find(int appId, string method, string path)
     {
         const string query = """
 SELECT
@@ -92,7 +92,7 @@ WHERE
     upper(path) = upper(@path);
 """;
         await using var connection = new NpgsqlConnection(ConnectionString);
-        return await connection.QuerySingleOrDefaultAsync<RouteEntity>(query, new
+        return await connection.QuerySingleOrDefaultAsync<Route>(query, new
         {
             web_application_id = appId,
             method = method,
@@ -100,7 +100,7 @@ WHERE
         });
     }
 
-    public async Task<RouteEntity> GetById(int id)
+    public async Task<Route> GetById(int id)
     {
         const string query = """
 SELECT
@@ -128,13 +128,13 @@ GROUP BY
         SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteAuthorization>());
         SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteValidation>());
         SqlMapper.AddTypeHandler(new JsonTypeHandler<RouteResponse>());
-        return await connection.QuerySingleOrDefaultAsync<RouteEntity>(query, new
+        return await connection.QuerySingleOrDefaultAsync<Route>(query, new
         {
             route_id = id
         });
     }
 
-    public async Task<IEnumerable<RouteEntity>> GetByApplicationId(int appId, string searchTerm, string sort)
+    public async Task<IEnumerable<Route>> GetByApplicationId(int appId, string searchTerm, string sort)
     {
         var query =
 """
@@ -166,14 +166,14 @@ WHERE
         }
 
         await using var connection = new NpgsqlConnection(ConnectionString);
-        return await connection.QueryAsync<RouteEntity>(query, new
+        return await connection.QueryAsync<Route>(query, new
         {
             web_application_id = appId,
             query = "%" + searchTerm + "%"
         });
     }
 
-    public async Task Update(int id, RouteEntity route)
+    public async Task Update(int id, Route route)
     {
         const string sql = """
 
@@ -199,7 +199,7 @@ WHERE
         });
     }
 
-    public async Task<IEnumerable<RouteEntity>> List(int appId, string searchTerm, string sort)
+    public async Task<IEnumerable<Route>> List(int appId, string searchTerm, string sort)
     {
         var query =
 """
@@ -240,7 +240,7 @@ GROUP BY
         }
         SqlMapper.AddTypeHandler(new JsonTypeHandler<MatchMethodCollection>());
         await using var connection = new NpgsqlConnection(ConnectionString);
-        return await connection.QueryAsync<RouteEntity>(query, new
+        return await connection.QueryAsync<Route>(query, new
         {
             web_application_id = appId,
             query = "%" + searchTerm + "%"

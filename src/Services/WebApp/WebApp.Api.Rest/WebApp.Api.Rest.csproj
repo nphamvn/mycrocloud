@@ -6,6 +6,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <LangVersion>preview</LangVersion>
+        <AssemblyName>WebApp.Api</AssemblyName>
+        <RootNamespace>WebApp.Api</RootNamespace>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
@@ -26,8 +28,7 @@
       <ProjectReference Include="..\WebApp.Infrastructure\WebApp.Infrastructure.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Services\" />
-    </ItemGroup>
+
+
 
 </Project>

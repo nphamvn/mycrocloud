@@ -1,7 +1,7 @@
 using WebApp.Domain.Shared;
 
 namespace WebApp.Domain.Entities;
-public class AuthenticationSchemeEntity : BaseEntity
+public class AuthenticationScheme : BaseEntity
 {
     public int SchemeId { get; set; }
     public int AppId { get; set; }

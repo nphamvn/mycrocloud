@@ -1,4 +1,4 @@
-namespace WebApp.Domain.Shared;
+namespace WebApp.Authentication;
 
 public enum AuthenticationSchemeType
 {

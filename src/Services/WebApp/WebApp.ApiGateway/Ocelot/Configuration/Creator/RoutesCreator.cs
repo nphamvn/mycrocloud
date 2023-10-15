@@ -73,7 +73,7 @@ namespace Ocelot.Configuration.Creator
                 })
                 .ToList();
         }
-        public List<Route> Create(IEnumerable<RouteEntity> routes)
+        public List<Route> Create(IEnumerable<WebApp.Domain.Entities.Route> routes)
         {
             return routes.Select(r =>
             {

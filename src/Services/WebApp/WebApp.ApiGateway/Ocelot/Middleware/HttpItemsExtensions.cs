@@ -115,13 +115,13 @@ namespace Ocelot.Middleware
             return !input.ContainsKey(key);
         }
 
-        public static void SetWebApplication(this IDictionary<object, object> input, AppEntity application)
+        public static void SetWebApplication(this IDictionary<object, object> input, App application)
         {
             input.Upsert("WebAppEntity", application);
         }
-        public static AppEntity WebApplication(this IDictionary<object, object> input)
+        public static App WebApplication(this IDictionary<object, object> input)
         {
-            return input.Get<AppEntity>("WebAppEntity");
+            return input.Get<App>("WebAppEntity");
         }
     }
 }

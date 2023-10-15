@@ -8,7 +8,7 @@ namespace WebApp.Infrastructure.Repositories.PostgreSql;
 
 public class AuthorizationPolicyRepository(IOptions<PostgresDatabaseOptions> databaseOptions) : BaseRepository(databaseOptions), IAuthorizationPolicyRepository
 {
-    public async Task Add(int appId, AuthorizationPolicyEntity policy)
+    public async Task Add(int appId, AuthorizationPolicy policy)
     {
         const string sql =
 """
@@ -50,7 +50,7 @@ where
         });
     }
 
-    public async Task<AuthorizationPolicyEntity> Get(int policyId)
+    public async Task<AuthorizationPolicy> Get(int policyId)
     {
         const string sql =
 """
@@ -67,13 +67,13 @@ WHERE
     policy_id = @policy_id
 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        return await connection.QuerySingleOrDefaultAsync<AuthorizationPolicyEntity>(sql, new
+        return await connection.QuerySingleOrDefaultAsync<AuthorizationPolicy>(sql, new
         {
             policy_id = policyId
         });
     }
 
-    public async Task<IEnumerable<AuthorizationPolicyEntity>> GetAllByAppId(int appId)
+    public async Task<IEnumerable<AuthorizationPolicy>> GetAllByAppId(int appId)
     {
         const string sql =
 """
@@ -92,13 +92,13 @@ ORDER BY
     created_at DESC
 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        return await connection.QueryAsync<AuthorizationPolicyEntity>(sql, new
+        return await connection.QueryAsync<AuthorizationPolicy>(sql, new
         {
             app_id = appId
         });
     }
 
-    public async Task Update(int id, AuthorizationPolicyEntity policy)
+    public async Task Update(int id, AuthorizationPolicy policy)
     {
         var query =
 """

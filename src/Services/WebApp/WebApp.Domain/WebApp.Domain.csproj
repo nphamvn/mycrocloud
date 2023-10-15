@@ -11,10 +11,6 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Events\" />
-    <Folder Include="Settings\" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\MycroCloud.Shared.csproj" />
   </ItemGroup>
 </Project>

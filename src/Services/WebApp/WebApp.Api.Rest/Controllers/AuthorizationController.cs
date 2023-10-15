@@ -1,15 +1,13 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebApp.Api.Rest.Models.WebApps.Authentications;
+using WebApp.Api.Models;
 
-namespace MycroCloud.WebApp.Api.Rest.Controllers;
+namespace WebApp.Api.Controllers;
 
-[Authorize]
-[Route("webapp/{WebAppName}/authorization")]
-public class WebApplicationAuthorizationsController : BaseApiController
+[Route("apps/{appId:int}/authorization")]
+public class AuthorizationController : ControllerBase
 {
     [HttpGet("policies")]
-    public async Task<IActionResult> PolicyIndex(int WebApplicationId)
+    public async Task<IActionResult> PolicyIndex(int appId)
     {
         return Ok();
     }

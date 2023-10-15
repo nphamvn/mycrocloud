@@ -1,17 +1,28 @@
-import { Link, useParams } from "react-router-dom"
-import { App } from "../apps/App"
+import { useParams } from "react-router-dom"
+import RouteCreateUpdate from "./RouteCreateUpdate";
+import { useEffect, useState } from "react";
+import Route from "./Route";
+import routeData from "../../data/routes.json";
+
 function RouteList() {
     const { appId } = useParams();
-    const app: App = { AppId: parseInt(appId!), AppName: 'My App' };
+    const [routes, setRoutes] = useState<Route[]>([]);
+    const [routeId, setRouteId] = useState<number | undefined>();
+
+    useEffect(() => {
+        setRoutes(routeData);
+    }, []);
+
     return (
         <>
             <h1>Routes</h1>
-            <Link to={`/apps/${app.AppId}/routes/new`}>New Route</Link>
+            <button onClick={() => setRouteId(undefined)}>New</button>
             <ul>
-                <li>Route 1</li>
-                <li>Route 2</li>
-                <li>Route 3</li>
+                {routes.map(route => {
+                    return (<li key={route.id} onClick={() => setRouteId(route.id)}>{route.name}</li>)
+                })}
             </ul>
+            <RouteCreateUpdate routeId={routeId} />
         </>
     )
 }

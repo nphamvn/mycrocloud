@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-
-namespace WebApp.Domain.Shared;
+namespace WebApp.Routes;
 public enum RouteResponseProvider
 {
     [Display(Name = "Mock")]

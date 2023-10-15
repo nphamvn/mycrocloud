@@ -1,21 +1,37 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './App.css'
-import Main from './components/Main'
-import GuardedRoutes from './routes/GuardedRoutes'
-import RouteAuthGuard from './routes/RouteAuthGuard'
+import Home from './components/Home'
+import RouteList from './components/routes/RouteList'
+import AppList from './components/apps/AppList'
+import AppCreate from './components/apps/AppCreate'
+import { AuthContext } from './context/AuthContext'
+import { useAuth } from './hooks/useAuth'
+import Header from './components/Header'
+import { useEffect } from 'react'
 
 function App() {
+  const { user, login, logout, setUser } = useAuth();
+
+  useEffect(() => {
+    login({
+      id: 'nampham',
+      accessToken: ''
+    })
+  }, [])
+
   return (
     <>
-      <BrowserRouter>
-        <Routes>
-          <Route path='/' element={<Main />}>
-            {GuardedRoutes.map((route, index) => {
-              return <RouteAuthGuard key={index} path={route.path} component={route.component} />
-            })}
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <AuthContext.Provider value={{ user, setUser }} >
+        <Header />
+        <BrowserRouter>
+          <Routes>
+            <Route path='/' Component={Home} />
+            <Route path='/apps' element={<AppList />} />
+            <Route path='/apps/new' element={<AppCreate />} />
+            <Route path='/apps/:appId/routes' element={<RouteList />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthContext.Provider>
     </>
   )
 }

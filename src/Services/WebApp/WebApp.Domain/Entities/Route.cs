@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using WebApp.Domain.Shared;
 
 namespace WebApp.Domain.Entities;
-public class RouteEntity : BaseEntity
+public class Route : BaseEntity
 {
     public int RouteId { get; set; }
     public int AppId { get; set; }
@@ -25,7 +25,7 @@ public class MatchMethodCollection : List<string>
 public class RouteAuthorization
 {
     public List<int> PolicyIds { get; set; }
-    public IEnumerable<AuthenticationSchemeEntity> AuthenticationSchemes { get; set; }
+    public IEnumerable<AuthenticationScheme> AuthenticationSchemes { get; set; }
     public List<int> AuthenticationSchemeIds { get; set; }
     public Dictionary<string, object> Claims { get; set; }
 }

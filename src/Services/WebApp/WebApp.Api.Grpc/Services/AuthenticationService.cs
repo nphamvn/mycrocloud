@@ -25,7 +25,7 @@ public class AuthenticationService(
     }
     public override async Task<CreateJwtBearerSchemeResponse> CreateJwtBearerScheme(CreateJwtBearerSchemeRequest request, ServerCallContext context)
     {
-        await authenticationSchemeRepository.AddJwtBearerScheme(request.AppId, new JwtBearerAuthenticationSchemeEntity
+        await authenticationSchemeRepository.AddJwtBearerScheme(request.AppId, new JwtBearerAuthenticationScheme
         {
             Name = request.Name,
             DisplayName = request.DisplayName,

@@ -1,4 +1,4 @@
-namespace WebApp.Domain.Shared;
+namespace WebApp.Authorization;
 public enum RouteAuthorizationType
 {
     AllowAnonymous = 0,

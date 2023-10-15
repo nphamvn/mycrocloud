@@ -1,4 +1,4 @@
-namespace WebApp.Api.Rest.Models.WebApps.Authentications;
+namespace WebApp.Api.Models;
 
 public class AuthenticationSettingsModel
 {

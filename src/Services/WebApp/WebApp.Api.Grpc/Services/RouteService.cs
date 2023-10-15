@@ -3,6 +3,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
+using Route = WebApp.Domain.Entities.Route;
 
 namespace WebApp.Api.Grpc.Services
 {
@@ -56,7 +57,7 @@ namespace WebApp.Api.Grpc.Services
         public override async Task<CreateRouteResponse> CreateRoute(CreateRouteRequest request, ServerCallContext context)
         {
             
-            var entity = new RouteEntity
+            var entity = new Route
             {
                 Name = request.Name,
                 Description = request.Description,

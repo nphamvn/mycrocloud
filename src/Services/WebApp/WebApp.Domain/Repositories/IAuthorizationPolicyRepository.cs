@@ -4,9 +4,9 @@ namespace WebApp.Domain.Repositories;
 
 public interface IAuthorizationPolicyRepository
 {
-    Task Add(int policyId, AuthorizationPolicyEntity policy);
-    Task Update(int policyId, AuthorizationPolicyEntity policy);
-    Task<IEnumerable<AuthorizationPolicyEntity>> GetAllByAppId(int appId);
-    Task<AuthorizationPolicyEntity> Get(int policyId);
+    Task Add(int policyId, AuthorizationPolicy policy);
+    Task Update(int policyId, AuthorizationPolicy policy);
+    Task<IEnumerable<AuthorizationPolicy>> GetAllByAppId(int appId);
+    Task<AuthorizationPolicy> Get(int policyId);
     Task Delete(int policyId);
 }

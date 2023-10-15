@@ -9,7 +9,7 @@ namespace WebApp.Infrastructure.Repositories.PostgreSql;
 public class AuthenticationSchemeRepository(IOptions<PostgresDatabaseOptions> databaseOptions) 
     : BaseRepository(databaseOptions), IAuthenticationSchemeRepository
 {
-    public async Task AddJwtBearerScheme(int appId, JwtBearerAuthenticationSchemeEntity scheme)
+    public async Task AddJwtBearerScheme(int appId, JwtBearerAuthenticationScheme scheme)
     {
         const string sql =
 """
@@ -44,7 +44,7 @@ values
         });
     }
 
-    public async Task<IEnumerable<AuthenticationSchemeEntity>> GetAllByAppId(int appId)
+    public async Task<IEnumerable<AuthenticationScheme>> GetAllByAppId(int appId)
     {
         const string sql =
 """
@@ -63,13 +63,13 @@ WHERE
     app_id = @app_id;
 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        return await connection.QueryAsync<AuthenticationSchemeEntity>(sql, new
+        return await connection.QueryAsync<AuthenticationScheme>(sql, new
         {
             app_id = appId,
         });
     }
 
-    public async Task UpdateJwtBearerScheme(int schemeId, JwtBearerAuthenticationSchemeEntity scheme)
+    public async Task UpdateJwtBearerScheme(int schemeId, JwtBearerAuthenticationScheme scheme)
     {
         const string sql =
 """
@@ -96,7 +96,7 @@ where
         });
     }
 
-    public async Task<JwtBearerAuthenticationSchemeEntity> GetJwtBearerScheme(int id)
+    public async Task<JwtBearerAuthenticationScheme> GetJwtBearerScheme(int id)
     {
         const string sql =
 """
@@ -116,7 +116,7 @@ WHERE
     scheme_id = @scheme_id
 """;
         using var connection = new NpgsqlConnection(ConnectionString);
-        return await connection.QuerySingleOrDefaultAsync<JwtBearerAuthenticationSchemeEntity>(sql, new
+        return await connection.QuerySingleOrDefaultAsync<JwtBearerAuthenticationScheme>(sql, new
         {
             scheme_id = id
         });

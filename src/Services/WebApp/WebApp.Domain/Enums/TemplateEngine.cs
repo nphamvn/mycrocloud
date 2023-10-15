@@ -1,4 +1,4 @@
-namespace WebApp.Domain.Shared;
+namespace WebApp.Domain;
 public enum TemplateEngine
 {
     None,

@@ -7,6 +7,6 @@ namespace Ocelot.Configuration.Creator
     public interface IRoutesCreator
     {
         List<Route> Create(FileConfiguration fileConfiguration);
-        List<Route> Create(IEnumerable<RouteEntity> routes);
+        List<Route> Create(IEnumerable<WebApp.Domain.Entities.Route> routes);
     }
 }

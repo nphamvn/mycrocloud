@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom"
+import { useAuth } from "../hooks/useAuth";
 
 function Header() {
+    const { user } = useAuth();
     return (
-        <nav>
-            <ul>
-                <li><Link to='/'>Home</Link></li>
-            </ul>
-        </nav>
+        <>
+            <h1>MycroCloud</h1>
+            <div>Hi, {user?.id}</div>
+        </>
     )
 }
 export default Header
