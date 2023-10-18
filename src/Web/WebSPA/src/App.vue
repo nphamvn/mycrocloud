@@ -2,5 +2,11 @@
 </script>
 
 <template>
-  <h1>Welcome to MycroCloud</h1>
+  <v-app>
+    <v-app-bar :elevation="2"></v-app-bar>
+    <v-main>
+      <router-view></router-view>
+    </v-main>
+    <v-footer></v-footer>
+  </v-app>
 </template>
