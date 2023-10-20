@@ -1,4 +1,4 @@
-using WebApp.Domain.Shared;
+using WebApp.Authentication;
 
 namespace WebApp.Domain.Entities;
 public class AuthenticationScheme : BaseEntity

@@ -1,6 +1,8 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using WebApp.Authorization;
 using WebApp.Domain.Shared;
+using WebApp.Routes;
 
 namespace WebApp.Domain.Entities;
 public class Route : BaseEntity
@@ -11,7 +13,7 @@ public class Route : BaseEntity
     public string Description { get; set; }
     public int MatchOrder { get; set; }
     public string MatchPath { get; set; }
-    public MatchMethodCollection MatchMethods { get; set; }
+    public List<HttpMethod> MatchMethods { get; set; }
     public RouteAuthorizationType AuthorizationType { get; set; }
     public RouteAuthorization Authorization { get; set; }
     public RouteValidation Validation { get; set; }

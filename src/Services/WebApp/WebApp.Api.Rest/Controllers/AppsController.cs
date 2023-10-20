@@ -1,11 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Api.Models;
+using WebApp.Api.Services;
 
 namespace WebApp.Api.Controllers;
 
 [Route("[controller]")]
 public class AppsController : ControllerBase
 {
+    private readonly IAppService _appService;
+
+    public AppsController(IAppService appService)
+    {
+        _appService = appService;
+    }
     [HttpGet]
     public async Task<IActionResult> Index([FromQuery]AppSearchRequest request)
     {
@@ -15,11 +22,7 @@ public class AppsController : ControllerBase
     [HttpPost("Create")]
     public async Task<IActionResult> Create(AppCreateRequest appCreateRequest)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(appCreateRequest);
-        }
-        
+        await _appService.Create(appCreateRequest);
         return Ok(appCreateRequest);
     }
 

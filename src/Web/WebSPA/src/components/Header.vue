@@ -5,7 +5,7 @@
           <v-list-tile-action>
             <v-icon>icon</v-icon>
           </v-list-tile-action>
-          <v-list-tile-content>title</v-list-tile-content>
+          <v-list-tile-content>Apps</v-list-tile-content>
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>

@@ -9,9 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "vee-validate": "^4.11.8",
     "vue": "^3.3.4",
     "vue-router": "^4.2.5",
-    "vuetify": "^3.3.22"
+    "vuetify": "^3.3.22",
+    "yup": "^1.3.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",
