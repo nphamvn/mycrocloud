@@ -7,22 +7,24 @@ import AppList from './components/AppList.vue'
 import AppCreate from './components/AppCreate.vue';
 import AppHome from './components/AppHome.vue';
 import AppDetails from './components/AppDetails.vue';
-import RouteList from './components/RouteList.vue'
+import RouteView from './components/RouteView.vue';
 
 // Vuetify
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+import { aliases, mdi } from 'vuetify/iconsets/mdi'
+import '@mdi/font/css/materialdesignicons.css'
 
 const routes: RouteRecordRaw[] = [
   { path: '/', component: Home },
-  { path: '/apps', component: AppList },
+  { path: '/apps', component: AppList, name: 'AppList' },
   { path: '/apps/new', component: AppCreate },
   {
     path: '/apps/:id', component: AppHome, children: [
       { path: '', component: AppDetails },
-      { path: 'routes', component: RouteList }
+      { path: 'routes', component: RouteView }
     ]
   }
 ]
@@ -37,6 +39,13 @@ const router = createRouter({
 const vuetify = createVuetify({
   components,
   directives,
+  icons: {
+    defaultSet: 'mdi',
+    aliases: aliases,
+    sets : {
+      mdi
+    }
+  }
 })
 
 const app = createApp(App);
