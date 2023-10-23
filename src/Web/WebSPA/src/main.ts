@@ -9,13 +9,6 @@ import AppHome from './components/AppHome.vue';
 import AppDetails from './components/AppDetails.vue';
 import RouteView from './components/RouteView.vue';
 
-// Vuetify
-import 'vuetify/styles'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
-import { aliases, mdi } from 'vuetify/iconsets/mdi'
-import '@mdi/font/css/materialdesignicons.css'
 
 const routes: RouteRecordRaw[] = [
   { path: '/', component: Home },
@@ -35,20 +28,7 @@ const router = createRouter({
 })
 
 
-
-const vuetify = createVuetify({
-  components,
-  directives,
-  icons: {
-    defaultSet: 'mdi',
-    aliases: aliases,
-    sets : {
-      mdi
-    }
-  }
-})
-
 const app = createApp(App);
-app.use(router).use(vuetify);
+app.use(router);
 
 app.mount('#app')

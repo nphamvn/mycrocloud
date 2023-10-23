@@ -1,28 +1,23 @@
 <template>
-    <v-row class="ma-0">
-        <v-col cols="3" class="border">
-            <div>
-                <v-btn @click="openRoute(undefined)">New</v-btn>
+    <div class="flex">
+        <div>
+            <div class="flex">
+                <button @click="openRoute(undefined)" class="bg-violet-600 text-white px-4 py-2">New</button>
+                <input type="search" placeholder="Search" />
             </div>
             <div>
-                <v-text-field placeholder="Search">
-
-                </v-text-field>
-            </div>
-            <v-divider></v-divider>
-            <div>
-                <v-list>
-                    <v-list-item v-for="route in routes" :title="route.name"
+                <ul>
+                    <li v-for="route in routes"
                         :class="route.id === openingRoute?.id ? 'v-list-item-active' : ''"
-                        v-on:click="openRoute(route.id)">
-                    </v-list-item>
-                </v-list>
+                        v-on:click="openRoute(route.id)">{{ route.name }}
+                    </li>
+                </ul>
             </div>
-        </v-col>
-        <v-col class="border">
+        </div>
+        <div class="border">
             <RouteEditor v-if="openingRoute" />
-        </v-col>
-    </v-row>
+        </div>
+    </div>
 </template>
 <script setup lang="ts" >
 import { onMounted } from 'vue';

@@ -36,32 +36,29 @@ function fetchApps(searchTerm: string | undefined) {
 </script>
 
 <template>
-    <v-container>
+    <div>
         <h1>Your Apps</h1>
-        <v-row>
-            <v-col>
-                <v-text-field type="search" v-model="searchTerm" placeholder="Search apps..."></v-text-field>
-            </v-col>
-            <v-col cols="1">
+        <div class="flex">
+            <div>
+                <input type="search" v-model="searchTerm" class="p-2 border rounded-md" placeholder="Search apps..." />
+            </div>
+            <div class="ms-auto">
                 <RouterLink to="/apps/new" class="ms-auto">
-                    <v-btn color="primary">New</v-btn>
+                    <button type="button" class="p-2 bg-violet-600 text-white rounded-md">New</button>
                 </RouterLink>
-            </v-col>
-        </v-row>
+            </div>
+        </div>
         <div v-if="!loading" class="mt-5">
             <div v-if="apps.length === 0">You don't have any app. Create one.</div>
-            <v-list v-else>
-                <v-list-item v-for="app in apps" :key="app.id">
+            <ul v-else>
+                <li v-for="app in apps" :key="app.id">
                     <div class="pb-3">
-                        <div class="text-h5">
-                            <RouterLink :to="`/apps/${app.id}`" class="">{{ app.name }}</RouterLink>
-                        </div>
-                        <p class="text-medium-emphasis">{{ app.description }}</p>
-                        <p class="text-medium-emphasis">Created {{ moment(app.createdAt).fromNow() }}</p>
+                        <h3 class="text-lg text"><RouterLink :to="`/apps/${app.id}`">{{ app.name }}</RouterLink></h3>
+                        <p class="">{{ app.description }}</p>
+                        <p class="">Created {{ moment(app.createdAt).fromNow() }}</p>
                     </div>
-                    <v-divider></v-divider>
-                </v-list-item>
-            </v-list>
+                </li>
+            </ul>
         </div>
-    </v-container>
+    </div>
 </template>

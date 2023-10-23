@@ -1,13 +1,18 @@
 <template>
-  <v-app>
-    <v-app-bar title="MycroCloud" color="primary">
+  <div>
+    <header class="bg-violet-600 text-white px-3 py-2">
+      <nav>
+        <ul>
+          <li><router-link to="/">MycroCloud</router-link></li>
+        </ul>
+      </nav>
 
-    </v-app-bar>
-    <v-main>
+    </header>
+    <div class="container px-4 py-5">
       <router-view></router-view>
-    </v-main>
-    <v-footer>
+    </div>
+    <div>
 
-    </v-footer>
-  </v-app>
+    </div>
+  </div>
 </template>

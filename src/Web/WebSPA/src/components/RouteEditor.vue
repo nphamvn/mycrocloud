@@ -29,9 +29,29 @@
                 <v-tab value="Headers">Headers</v-tab>
                 <v-tab value="Body">Body</v-tab>
             </v-tabs>
-            <v-window v-model="validationTab">
+            <v-window v-model="validationTab" class="pa-2">
                 <v-window-item value="QueryParams">
-                    QueryParams
+                    <v-table>
+                        <thead>
+                            <tr>
+                                <th class="text-left">
+                                    Key
+                                </th>
+                                <th class="text-left">
+                                    Rules
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item, index) in queryParamValidationSchemes.value.value" :key="index">
+                                <td>
+                                    {{ item.name }}
+                                </td>
+                                <td>{{ item.rules.length }}</td>
+                            </tr>
+                        </tbody>
+                    </v-table>
+                    <v-btn @click="onAddValidationRule('QueryParams')">Add</v-btn>
                 </v-window-item>
 
                 <v-window-item value="Headers">
@@ -53,11 +73,17 @@ import { useField, useForm } from 'vee-validate';
 import { ref } from 'vue';
 import * as yup from 'yup';
 
+interface QueryParamValidationScheme {
+    name: string;
+    rules: string[]
+}
 interface Inputs {
     name: string;
     path: string;
     method: string;
     authorizationType: string;
+    authorizationPolicies: string[];
+    queryParamValidationSchemes: QueryParamValidationScheme[];
 }
 
 const methodItems = ['ANY', 'GET', 'POST', 'PUT', 'PACTH', 'DELETE'];
@@ -76,7 +102,9 @@ const { handleSubmit } = useForm<Inputs>({
         name: 'Foo',
         path: '/foo',
         method: methodItems[0],
-        authorizationType: 'None'
+        authorizationType: 'None',
+        authorizationPolicies: [],
+        queryParamValidationSchemes: []
     }
 });
 const onSubmit = handleSubmit(data => {
@@ -87,5 +115,17 @@ const name = useField('name');
 const path = useField('path');
 const method = useField('method');
 const authorizationType = useField('authorizationType');
+const queryParamValidationSchemes = useField<QueryParamValidationScheme[]>('queryParamValidationSchemes');
+
+const onAddValidationRule = (prop: string) => {
+    switch (prop) {
+        case 'QueryParams':
+            queryParamValidationSchemes.value.value.push({ name: '', rules: [] })
+            break;
+
+        default:
+            break;
+    }
+}
 
 </script>
