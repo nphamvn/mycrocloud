@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <div>
         <v-breadcrumbs :items="[{ title: 'Apps', exact: true, to: { name: 'AppList' } }, { title: app?.name! }]"
             divider="/"></v-breadcrumbs>
         <div class="w-100 border-b">
@@ -9,7 +9,7 @@
         <div class="mt-4">
             <router-view></router-view>
         </div>
-    </v-container>
+    </div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
