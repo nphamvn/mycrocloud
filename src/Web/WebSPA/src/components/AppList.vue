@@ -37,10 +37,10 @@ function fetchApps(searchTerm: string | undefined) {
 
 <template>
     <div>
-        <h1>Your Apps</h1>
-        <div class="flex">
+        <h1 class="text-lg font-bold">Your Apps</h1>
+        <div class="flex mt-2">
             <div>
-                <input type="search" v-model="searchTerm" class="p-2 border rounded-md" placeholder="Search apps..." />
+                <input type="search" v-model="searchTerm" class="p-2 border rounded-md focus:outline-none" placeholder="Search apps..." />
             </div>
             <div class="ms-auto">
                 <RouterLink to="/apps/new" class="ms-auto">
@@ -50,12 +50,12 @@ function fetchApps(searchTerm: string | undefined) {
         </div>
         <div v-if="!loading" class="mt-5">
             <div v-if="apps.length === 0">You don't have any app. Create one.</div>
-            <ul v-else>
-                <li v-for="app in apps" :key="app.id">
+            <ul v-else role="list" class="p-2">
+                <li role="listitem" v-for="app in apps" :key="app.id" class="p-2">
                     <div class="pb-3">
-                        <h3 class="text-lg text"><RouterLink :to="`/apps/${app.id}`">{{ app.name }}</RouterLink></h3>
-                        <p class="">{{ app.description }}</p>
-                        <p class="">Created {{ moment(app.createdAt).fromNow() }}</p>
+                        <h3 class="text-lg text font-semibold text-blue-500"><RouterLink :to="`/apps/${app.id}`">{{ app.name }}</RouterLink></h3>
+                        <p class="text-sm">{{ app.description }}</p>
+                        <p class="text-sm text-slate-500">Created {{ moment(app.createdAt).fromNow() }}</p>
                     </div>
                 </li>
             </ul>

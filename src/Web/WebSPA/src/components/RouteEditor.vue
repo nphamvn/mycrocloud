@@ -1,12 +1,17 @@
 <template>
-    <v-form v-on:submit="onSubmit">
+    <form v-on:submit="onSubmit" class="p-2">
         <section>
-            <div class="text-h6">Basic Info</div>
-            <v-text-field v-model="name.value.value" label="Name" aria-autocomplete="none"
-                :error-messages="name.errorMessage.value">
-            </v-text-field>
-            <v-text-field v-model="path.value.value" label="Path" :error-messages="path.errorMessage.value">
-            </v-text-field>
+            <div class="text-lg font-semibold">Basic Info</div>
+            <div class="mt-1">
+                <label for="name" class="block text-sm font-medium leading-6 text-gray-900">Name</label>
+                <input id="name" v-model="name.value.value" aria-autocomplete="none" class="block border rounded-md px-2 py-1.5 text-gray-900 placeholder:text-gray-400 focus:ring-0"/>
+                <span class="text-red-500">{{ name.errorMessage.value }}</span>
+            </div>
+            <div class="mt-1">
+                <label for="path" class="block text-sm font-medium leading-6 text-gray-900">Path</label>
+                <input v-model="path.value.value" class="block border rounded-md px-2 py-1.5 text-gray-900 placeholder:text-gray-400 focus:ring-0"/>
+                <span class="text-red-500">{{ path.errorMessage.value }}</span>
+            </div>
             <v-select v-model="method.value.value" label="Method" :items="methodItems"
                 :error-messages="method.errorMessage.value">
             </v-select>
@@ -66,7 +71,7 @@
         <div class="d-flex">
             <v-btn type="submit" class="ms-auto">Save</v-btn>
         </div>
-    </v-form>
+    </form>
 </template>
 <script setup lang="ts">
 import { useField, useForm } from 'vee-validate';

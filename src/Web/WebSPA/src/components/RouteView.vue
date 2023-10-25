@@ -1,24 +1,24 @@
 <template>
     <div class="flex flex-row">
-        <div>
+        <div class="border">
             <div>
                 <button @click="openRoute(undefined)" class="bg-violet-600 text-white px-x py-1 w-full rounded-md">New</button>
             </div>
-            <div>
-                <input type="search" class="border rounded-md px-2 py-1" placeholder="Search" />
+            <div class="mt-1">
+                <input type="search" class="border rounded-md px-2 py-1 focus:outline-none" placeholder="Search" />
             </div>
             <div class="mt-2">
-                <ul>
+                <ul role="list">
                     <li v-for="route in routes"
-                        :class="route.id === openingRoute?.id ? 'bg-violet-300' : ''" class="border-b">
+                        :class="route.id === openingRoute?.id ? 'bg-slate-200' : ''" class="border-b p-1 hover:bg-slate-100">
                         <a href="#" v-on:click="(e) => { e.preventDefault(); openRoute(route.id)}" class="block">
-                            <p class="text-sm font-semibold">{{ route.name }}</p>
+                            <p class="text-sm font-medium text-slate-900">{{ route.name }}</p>
                             <span 
                                 class="text-xs uppercase text-white px-1 py-0 border rounded-md max-w-xs" 
                                 :class="routeMethodBgColors.find(m => m.method === route.method)?.bgColor">
                                 {{ route.method }}
                             </span>
-                            <span class="ms-2 text-sm">{{ route.template }}</span>
+                            <span class="ms-2 text-sm text-slate-600">{{ route.template }}</span>
                         </a>
                     </li>
                 </ul>
