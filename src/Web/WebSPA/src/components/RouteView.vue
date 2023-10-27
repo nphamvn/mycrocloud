@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-row">
-        <div class="border">
+        <div class="basis-1/5 border">
             <div>
                 <button @click="openRoute(undefined)" class="bg-violet-600 text-white px-x py-1 w-full rounded-md">New</button>
             </div>
@@ -24,7 +24,7 @@
                 </ul>
             </div>
         </div>
-        <div class="border">
+        <div class="basis-4/5 border">
             <RouteEditor v-if="openingRoute" />
         </div>
     </div>
