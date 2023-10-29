@@ -1,0 +1,18 @@
+{
+    "id" : 1,
+    "name": "Foo",
+    "method": "GET",
+    "path": "/foo",
+    "description": "Return \"bar\"",
+    "response": {
+        "type": "mock",
+        "props": {
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ]
+        }
+    }
+}

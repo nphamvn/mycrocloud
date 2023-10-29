@@ -1,27 +1,33 @@
 <template>
     <form v-on:submit="onSubmit" class="p-2">
-        <section>
-            <div class="mt-3">
-                <label for="name" class="block mb-2 text-sm font-medium text-gray-900">Name</label>
-                <input type="text" v-model="name.value.value" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Enter route name..." aria-autocomplete="none">
+        <section v-if="enabledSections.basic">
+            <div class="mt-2">
+                <label for="name" class="block mb-1 text-sm font-medium text-gray-900">Name</label>
+                <input type="text" v-model="name.value.value" id="name"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
+                    placeholder="Enter route name..." aria-autocomplete="none">
+                <span class="text-red-500">{{ name.errorMessage.value }}</span>
             </div>
-            <div class="mt-3">
-                <label class="block mb-2 text-sm font-medium text-gray-900">Method and Path</label>
+            <div class="mt-2">
+                <label class="block mb-1 text-sm font-medium text-gray-900">Method and Path</label>
                 <div class="flex">
-                    <select v-model="method.value.value" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <select v-model="method.value.value"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500">
                         <option v-for="method in methodItems" :key="method" :value="method">{{ method }}</option>
                     </select>
                     <input type="text" v-model="path.value.value"
-                        class="ms-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
+                        class="ms-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2" />
                 </div>
-                <span class="text-red-500" v-for="message in [method.errorMessage.value, path.errorMessage.value]">{{ message }}</span>
+                <span class="text-red-500" v-for="message in [method.errorMessage.value, path.errorMessage.value]">{{
+                    message }}</span>
             </div>
-            <div class="mt-3">
-                <label for="desciption" class="block mb-2 text-sm font-medium text-gray-900 ">Desciption</label>
-                <textarea id="desciption" rows="2" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"></textarea>
+            <div class="mt-2">
+                <label for="desciption" class="block mb-1 text-sm font-medium text-gray-900 ">Desciption</label>
+                <textarea id="desciption" v-model="desciption.value.value" rows="2"
+                    class="block p-2 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"></textarea>
             </div>
         </section>
-        <section v-if="false">
+        <section v-if="enabledSections.authorization">
             <div class="text-h6">Authorization</div>
             <v-radio-group inline v-model="authorizationType.value.value"
                 :error-messages="authorizationType.errorMessage.value">
@@ -32,9 +38,8 @@
 
             </v-select>
         </section>
-        <section class="mt-4">
+        <section v-if="enabledSections.validation" class="mt-4">
             <div class="text-lg font-semibold">Validation</div>
-
             <div class="mb-4 border-b border-gray-200">
                 <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-tab"
                     data-tabs-toggle="#default-tab-content" role="tablist">
@@ -78,7 +83,7 @@
                                     </td>
                                     <td class="p-3 font-medium text-gray-900 whitespace-nowrap">
                                         <div class="flex flex-auto">
-                                            <span v-for="i in 20">Required {{ i }}</span>
+                                            <span v-for="i in 5">Required {{ i }}</span>
                                             <button>Add</button>
                                         </div>
                                     </td>
@@ -93,8 +98,9 @@
                 </div>
             </div>
         </section>
-        <div class="d-flex">
-            <v-btn type="submit" class="ms-auto">Save</v-btn>
+        <div class="mt-2 d-flex">
+            <button type="submit"
+                class="ms-auto focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2">Save</button>
         </div>
     </form>
 </template>
@@ -104,17 +110,37 @@ import { useField, useForm } from 'vee-validate';
 import { onMounted } from 'vue';
 import * as yup from 'yup';
 
+const enabledSections = {
+    basic: true,
+    authorization: false,
+    validation: false,
+    response: true
+}
+
 interface QueryParamValidationScheme {
     name: string;
     rules: string[]
 }
+interface Response {
+    type: string;
+    props: ResponseProps;
+}
+interface ResponseProps {
+
+}
+interface MockResponseProps extends ResponseProps {
+    statusCode: number;
+    body: string;
+}
 interface Inputs {
     name: string;
-    path: string;
     method: string;
+    path: string;
+    desciption: string;
     authorizationType: string;
     authorizationPolicies: string[];
     queryParamValidationSchemes: QueryParamValidationScheme[];
+    response: Response;
 }
 
 const methodItems = ['ANY', 'GET', 'POST', 'PUT', 'PACTH', 'DELETE'];
@@ -134,16 +160,23 @@ const { handleSubmit } = useForm<Inputs>({
         method: methodItems[0],
         authorizationType: 'None',
         authorizationPolicies: [],
-        queryParamValidationSchemes: []
+        queryParamValidationSchemes: [],
+        response: {
+            type: 'mock',
+            props: {
+                statusCode: 200
+            } as MockResponseProps
+        }
     }
 });
 const onSubmit = handleSubmit(data => {
     alert(JSON.stringify(data));
 })
 
-const name = useField('name');
-const path = useField('path');
-const method = useField('method');
+const name = useField<string>('name');
+const path = useField<string>('path');
+const method = useField<string>('method');
+const desciption = useField<string>('desciption');
 const authorizationType = useField('authorizationType');
 const queryParamValidationSchemes = useField<QueryParamValidationScheme[]>('queryParamValidationSchemes');
 

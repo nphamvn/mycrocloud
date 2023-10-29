@@ -1,23 +1,25 @@
 <template>
-    <div>
-        <v-breadcrumbs :items="[{ title: 'Apps', exact: true, to: { name: 'AppList' } }, { title: app?.name! }]"
-            divider="/"></v-breadcrumbs>
-        <div class="w-100 border-b">
-            <router-link :to="`/apps/${appId}`"><v-btn class="px-6" rounded="0">Home</v-btn></router-link>
-            <router-link :to="`/apps/${appId}/routes`"><v-btn class="px-6" rounded="0">Routes</v-btn></router-link>
+    <Breadcrumb :items="[{ title: 'Apps', link: '/apps' }, { title: app?.name!, link: `#zzz` }]" divider="/"></Breadcrumb>
+    <div class="mt-4 flex w-full h-[calc(100%-100px)]">
+        <div class="w-20 flex flex-col border p-1 h-full">
+            <router-link :to="`/app/${appId}`" class="text-sm p-1" exact-active-class="border rounded-md bg-slate-50">Overview</router-link>
+            <router-link :to="`/app/${appId}/route`" class="text-sm p-1" exact-active-class="border rounded-md bg-slate-50">Routes</router-link>
+            <p>{{ router.currentRoute.value.matched[1].name }}</p>
         </div>
-        <div class="mt-4">
+        <div class="w-full h-full">
             <router-view></router-view>
         </div>
     </div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import AppItem from '../AppItem';
 import { onMounted } from 'vue';
-
-const appId = parseInt(useRoute().params['id'].toString());
+import Breadcrumb from './Breadcrumb.vue';
+const router = useRouter();
+const location = useRoute();
+const appId = parseInt(location.params['id'].toString());
 const app = ref<AppItem>();
 
 onMounted(() => {

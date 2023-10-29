@@ -1,0 +1,1 @@
+export const ROUTE_METHODS = ['ANY', 'GET', 'POST', 'PUT', 'PACTH', 'DELETE'];

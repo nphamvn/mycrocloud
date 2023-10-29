@@ -9,8 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@heroicons/vue": "^2.0.18",
     "flowbite": "^2.0.0",
     "moment": "^2.29.4",
+    "monaco-editor": "^0.44.0",
+    "pinia": "^2.1.7",
     "vee-validate": "^4.11.8",
     "vue": "^3.3.4",
     "vue-router": "^4.2.5",
