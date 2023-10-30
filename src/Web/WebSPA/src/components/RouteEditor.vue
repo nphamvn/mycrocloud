@@ -1,43 +1,5 @@
 <template>
     <form v-on:submit="onSubmit" class="p-2">
-        <section v-if="enabledSections.basic">
-            <div class="mt-2">
-                <label for="name" class="block mb-1 text-sm font-medium text-gray-900">Name</label>
-                <input type="text" v-model="name.value.value" id="name"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-                    placeholder="Enter route name..." aria-autocomplete="none">
-                <span class="text-red-500">{{ name.errorMessage.value }}</span>
-            </div>
-            <div class="mt-2">
-                <label class="block mb-1 text-sm font-medium text-gray-900">Method and Path</label>
-                <div class="flex">
-                    <select v-model="method.value.value"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                        <option v-for="method in methodItems" :key="method" :value="method">{{ method }}</option>
-                    </select>
-                    <input type="text" v-model="path.value.value"
-                        class="ms-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2" />
-                </div>
-                <span class="text-red-500" v-for="message in [method.errorMessage.value, path.errorMessage.value]">{{
-                    message }}</span>
-            </div>
-            <div class="mt-2">
-                <label for="desciption" class="block mb-1 text-sm font-medium text-gray-900 ">Desciption</label>
-                <textarea id="desciption" v-model="desciption.value.value" rows="2"
-                    class="block p-2 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"></textarea>
-            </div>
-        </section>
-        <section v-if="enabledSections.authorization">
-            <div class="text-h6">Authorization</div>
-            <v-radio-group inline v-model="authorizationType.value.value"
-                :error-messages="authorizationType.errorMessage.value">
-                <v-radio label="None" value="None"></v-radio>
-                <v-radio label="Authorized" value="Authorized"></v-radio>
-            </v-radio-group>
-            <v-select v-show="authorizationType.value.value === 'Authorized'" label="Policies" :items="policies" multiple>
-
-            </v-select>
-        </section>
         <section v-if="enabledSections.validation" class="mt-4">
             <div class="text-lg font-semibold">Validation</div>
             <div class="mb-4 border-b border-gray-200">
@@ -143,8 +105,6 @@ interface Inputs {
     response: Response;
 }
 
-const methodItems = ['ANY', 'GET', 'POST', 'PUT', 'PACTH', 'DELETE'];
-const policies = ['Foo', 'Bar'];
 
 const schema = yup.object({
     name: yup.string().required('Route name is required'),
@@ -155,9 +115,6 @@ const schema = yup.object({
 const { handleSubmit } = useForm<Inputs>({
     validationSchema: schema,
     initialValues: {
-        name: 'Foo',
-        path: '/foo',
-        method: methodItems[0],
         authorizationType: 'None',
         authorizationPolicies: [],
         queryParamValidationSchemes: [],
@@ -173,11 +130,6 @@ const onSubmit = handleSubmit(data => {
     alert(JSON.stringify(data));
 })
 
-const name = useField<string>('name');
-const path = useField<string>('path');
-const method = useField<string>('method');
-const desciption = useField<string>('desciption');
-const authorizationType = useField('authorizationType');
 const queryParamValidationSchemes = useField<QueryParamValidationScheme[]>('queryParamValidationSchemes');
 
 onMounted(() => initFlowbite());

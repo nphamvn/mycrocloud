@@ -44,7 +44,10 @@
             </div>
             <span class="text-red-500">{{ responseType.errorMessage.value }}</span>
         </div>
-        <button v-if="openingRoute?.id !== undefined" type="button"
+        <section v-if="openingRoute?.id !== undefined" type="button">
+
+        </section>
+        <button v-if="openingRoute?.id !== undefined" type="button" :disabled="openingRoute?.id === undefined"
             class="mt-2 focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-3 py-2 mr-2 mb-2"
             @click="router.push(`/app/1/route/${openingRoute?.id}/response/${openingRoute?.responseType}`)">
             Configure
@@ -66,6 +69,7 @@ import { onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 const router = useRouter();
 const store = useRouteStore();
+const { setOpeningRoute, createRoute, getRouteById, updateRoute } = store;
 const { openingRoute } = storeToRefs(store);
 
 interface Inputs {
@@ -96,12 +100,12 @@ const { handleSubmit, resetForm } = useForm<Inputs>({
 const onSubmit = handleSubmit(async (data) => {
     const routeId = openingRoute.value?.id;
     if (!routeId) {
-        const newRoute = await store.createRoute(data);
-        store.setOpeningRoute(newRoute);
+        const newRoute = await createRoute(data);
+        setOpeningRoute(newRoute);
         router.replace(`/app/1/route/${newRoute.id}`);
     }
     else {
-        await store.updateRoute({ ...data, id: routeId });
+        await updateRoute({ ...data, id: routeId });
     }
 })
 
@@ -114,8 +118,8 @@ const responseType = useField<string>('responseType');
 async function render() {
     const routeId = openingRoute.value?.id;
     if (routeId) {
-        const route = await store.getRouteById(routeId);
-        store.setOpeningRoute(route!);
+        const route = await getRouteById(routeId);
+        setOpeningRoute(route!);
         resetForm({ values: route });
     } else {
         resetForm({ values: initialValues });

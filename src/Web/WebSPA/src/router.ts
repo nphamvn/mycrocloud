@@ -8,7 +8,8 @@ import NoteHome from './components/NoteHome.vue'
 import RouteEditorV2 from './components/RouteEditorV2.vue'
 import RouteViewHome from './components/RouteViewHome.vue'
 import { RouteRecordRaw, createRouter, createWebHashHistory } from 'vue-router';
-import RouteMockResponse from './components/RouteMockResponse.vue'
+import RouteMockResponse from './components/RouteMockResponse.vue';
+import RouteAuthorization from './components/RouteAuthorization.vue';
 
 const routes: RouteRecordRaw[] = [
   { path: '/', component: Home },
@@ -22,7 +23,8 @@ const routes: RouteRecordRaw[] = [
           { path: '', component: RouteViewHome },
           { path: 'new', name: 'NewRoute', component: RouteEditorV2 },
           { path: ':routeId', name: 'EditRoute', component: RouteEditorV2 },
-          { path: ':routeId/response/mock', component: RouteMockResponse }
+          { path: ':routeId/response/mock', component: RouteMockResponse },
+          { path: ':routeId/authorization', component: RouteAuthorization }
         ]
       }
     ]

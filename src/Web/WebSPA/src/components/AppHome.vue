@@ -12,23 +12,24 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import AppItem from '../AppItem';
 import { onMounted } from 'vue';
 import Breadcrumb from './Breadcrumb.vue';
+import { useAppStore } from './appStore';
+import { storeToRefs } from "pinia";
 const router = useRouter();
 const location = useRoute();
 const appId = parseInt(location.params['id'].toString());
-const app = ref<AppItem>();
 
-onMounted(() => {
-    app.value = {
-        id: appId,
-        name: `App ${appId}`,
-        createdAt: new Date()
-    }
-    document.title = app.value.name;
+const store = useAppStore();
+const { getAppById, setCurrentApp } = store;
+
+const { currentApp: app } = storeToRefs(store);
+
+onMounted(async () => {
+    const app = await getAppById(appId)!;
+    await setCurrentApp(app);
+    document.title = app.name;
 });
 
 </script>
