@@ -17,7 +17,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/app/new', component: AppCreate },
   {
     path: '/app/:id', component: AppHome, children: [
-      { path: '', component: AppDetails },
+      { path: '', name: 'Overview' ,component: AppDetails },
       {
         path: 'route', name: 'RouteView', component: RouteView, children: [
           { path: '', component: RouteViewHome },
