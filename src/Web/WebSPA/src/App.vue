@@ -50,6 +50,8 @@ import { useAuth0 } from '@auth0/auth0-vue';
 import { nextTick, onMounted, watch } from 'vue';
 import { initFlowbite } from 'flowbite'
 
+import { useAuth } from './auth';
+
 const { 
   loginWithRedirect, 
   logout, user, isAuthenticated, isLoading, getAccessTokenSilently } 
