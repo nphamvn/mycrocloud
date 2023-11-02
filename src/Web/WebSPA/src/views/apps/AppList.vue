@@ -7,7 +7,7 @@
                     placeholder="Search apps..." />
             </div>
             <div class="ms-auto">
-                <RouterLink to="/apps/new" class="ms-auto">
+                <RouterLink :to="{ name: 'AppCreate' }" class="ms-auto">
                     <button type="button" class="p-2 bg-violet-600 text-white rounded-md">New</button>
                 </RouterLink>
             </div>
@@ -56,7 +56,7 @@ function fetchApps(searchTerm: string | undefined) {
     setTimeout(() => {
         apps.value = Array.from({ length: 10 }, (_, index) => (
             {
-                id: index + 1, name: `App ${index + 1}`, description: `App ${index + 1 }`, createdAt: new Date()
+                id: index + 1, name: `App ${index + 1}`, description: `App ${index + 1}`, createdAt: new Date()
             }))
         loading.value = false;
     }, 100)

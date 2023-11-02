@@ -5,6 +5,8 @@ import router from './router';
 import './userWorker';
 import { createPinia } from 'pinia'
 import { createAuth0 } from '@auth0/auth0-vue';
+import Spinner from './components/Spinner.vue';
+
 const pinia = createPinia();
 const auth0 = createAuth0({
   domain: 'dev-vzxphouz.us.auth0.com',
@@ -14,7 +16,9 @@ const auth0 = createAuth0({
   }
 })
 
-const app = createApp(App);
+const app = createApp(App)
+app.component('Spinner', Spinner)
+
 app.use(router)
   .use(pinia)
   .use(auth0);

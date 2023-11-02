@@ -4,13 +4,15 @@
       <nav>
         <ul class="flex flex-row space-x-4">
           <li><router-link to="/">MycroCloud</router-link></li>
-          <li><router-link to="app">App</router-link></li>
+          <li><router-link :to="{ name: 'AppList' }">App</router-link></li>
           <li><router-link to="/note">Note</router-link></li>
-          <li v-if="isLoading">isLoading</li>
-          <li v-if="!isAuthenticated">
-            <button v-if="!isAuthenticated" @click="login">Log in</button>
+          <li v-if="isLoading">
+            <Spinner></Spinner>
           </li>
-          <li v-else>
+          <li v-if="!isLoading && !isAuthenticated">
+            <button @click="login">Log in</button>
+          </li>
+          <li v-if="isAuthenticated">
             <button id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar"
               class="flex items-center justify-between w-full py-2 pl-3 pr-4 rounded hover:text-slate-100 md:border-0 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent">
               {{ user?.name }}
@@ -29,7 +31,7 @@
                 </li>
               </ul>
               <div class="py-1">
-                <a href="#"
+                <a href="#" @click="signOut"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white">Sign
                   out</a>
               </div>
@@ -47,30 +49,25 @@
 </template>
 <script setup lang="ts">
 import { useAuth0 } from '@auth0/auth0-vue';
-import { nextTick, onMounted, watch } from 'vue';
-import { initFlowbite } from 'flowbite'
+import { nextTick, watch } from 'vue';
+import { initDropdowns } from 'flowbite'
 
-import { useAuth } from './auth';
+const {
+  loginWithRedirect,
+  logout, user, isAuthenticated, isLoading }
+  = useAuth0();
 
-const { 
-  loginWithRedirect, 
-  logout, user, isAuthenticated, isLoading, getAccessTokenSilently } 
-= useAuth0();
 const login = () => {
   loginWithRedirect();
 }
-// const logout = () => {
-//   logout({ logoutParams: { returnTo: window.location.origin } });
-// }
-watch(isLoading, async () => {
-  console.log(isLoading.value)
-  if (!isLoading) {
-    //await nextTick();
-    //initFlowbite()
+const signOut = () => {
+  debugger;
+  logout({ logoutParams: { returnTo: window.location.origin } });
+}
+watch(isAuthenticated, async () => {
+  if (isAuthenticated.value) {
+    await nextTick();
+    initDropdowns()
   }
-})
-onMounted(async () => {
-  const token = await getAccessTokenSilently();
-  console.log(token);
 })
 </script>

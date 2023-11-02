@@ -19,6 +19,7 @@ import { storeToRefs } from "pinia";
 const router = useRouter();
 const location = useRoute();
 const appId = parseInt(location.params['id'].toString());
+console.log(appId)
 
 const store = useAppStore();
 const { getAppById, setCurrentApp } = store;
@@ -27,6 +28,7 @@ const { currentApp: app } = storeToRefs(store);
 
 onMounted(async () => {
     const app = await getAppById(appId)!;
+    console.log(app)
     await setCurrentApp(app);
     document.title = app.name;
 });
