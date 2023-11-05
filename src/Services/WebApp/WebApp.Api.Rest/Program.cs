@@ -14,7 +14,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer();
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "https://localhost:5024";
+        options.Audience = "mycrocloud";
+    });
 builder.Services.AddAuthorization();
 
 var app = builder.Build();

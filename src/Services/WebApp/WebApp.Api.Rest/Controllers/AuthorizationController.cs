@@ -4,7 +4,7 @@ using WebApp.Api.Models;
 namespace WebApp.Api.Controllers;
 
 [Route("apps/{appId:int}/authorization")]
-public class AuthorizationController : ControllerBase
+public class AuthorizationController : BaseController
 {
     [HttpGet("policies")]
     public async Task<IActionResult> PolicyIndex(int appId)

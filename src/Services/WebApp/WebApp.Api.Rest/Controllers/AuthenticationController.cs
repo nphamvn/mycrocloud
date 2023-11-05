@@ -4,7 +4,7 @@ using WebApp.Api.Models;
 namespace WebApp.Api.Controllers;
 
 [Route("apps/{appId:int}/authentication")]
-public class WebApplicationAuthenticationsController: ControllerBase
+public class AuthenticationsController: BaseController
 {
     [HttpGet("settings")]
     public async Task<IActionResult> Settings(int appId)

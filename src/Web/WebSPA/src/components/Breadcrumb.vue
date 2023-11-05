@@ -11,7 +11,7 @@
     </nav>
 </template>
 <script setup lang="ts">
-export interface BreadcrumbItem {
+interface BreadcrumbItem {
     title: string;
     link?: string;
 }

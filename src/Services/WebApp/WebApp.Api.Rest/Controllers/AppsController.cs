@@ -4,8 +4,7 @@ using WebApp.Api.Services;
 
 namespace WebApp.Api.Controllers;
 
-[Route("[controller]")]
-public class AppsController : ControllerBase
+public class AppsController : BaseController
 {
     private readonly IAppService _appService;
 
@@ -13,6 +12,7 @@ public class AppsController : ControllerBase
     {
         _appService = appService;
     }
+    
     [HttpGet]
     public async Task<IActionResult> Index([FromQuery]AppSearchRequest request)
     {
@@ -32,7 +32,7 @@ public class AppsController : ControllerBase
         return Ok(appId);
     }
     
-    [HttpPost("{appId:int/}/Rename")]
+    [HttpPost("{appId:int}/Rename")]
     public async Task<IActionResult> Rename(int appId, string newName)
     {
         return RedirectToAction(nameof(Index), new { WebApplicationName = newName });

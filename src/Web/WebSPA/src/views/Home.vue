@@ -1,7 +1,7 @@
-<script setup lang="ts">
-
-</script>
 <template>
-    <h1>Home</h1>
-    <RouterLink :to="{ name: 'AppList' }">Apps</RouterLink>
+    <div class="h-full">
+        <div class="flex flex-col items-center justify-items-center text-center h-full">
+            <h1>Welcome to MycroCloud</h1>
+        </div>
+    </div>
 </template>

@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MycroCloud.Shared", "Shared
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{DA99DC2F-5E1A-4BDA-8B37-D7DA76B05A16}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity", "Services\Identity\Identity.csproj", "{CE4DFF16-1D89-4C26-8951-D9A5013D541E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{7C0CD325-E155-425A-9414-67EECA79C5E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C0CD325-E155-425A-9414-67EECA79C5E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C0CD325-E155-425A-9414-67EECA79C5E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE4DFF16-1D89-4C26-8951-D9A5013D541E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE4DFF16-1D89-4C26-8951-D9A5013D541E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE4DFF16-1D89-4C26-8951-D9A5013D541E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE4DFF16-1D89-4C26-8951-D9A5013D541E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -79,6 +85,7 @@ Global
 		{63884B17-DD22-4560-8D7E-72256B11A00D} = {21601414-495D-48F2-B24C-86B6268C6C06}
 		{F4F92212-6346-4B7F-9649-B3C22292CFB1} = {BC43C176-CECE-4D9A-B9E4-885D41F034CC}
 		{7C0CD325-E155-425A-9414-67EECA79C5E9} = {DA99DC2F-5E1A-4BDA-8B37-D7DA76B05A16}
+		{CE4DFF16-1D89-4C26-8951-D9A5013D541E} = {5B33FB58-F561-44DD-BD78-E0233CC82C2F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CD031E65-36C2-4037-A150-3475EDB9EC92}

@@ -4,16 +4,10 @@ using WebApp.Api.Models;
 namespace WebApp.Api.Controllers;
 
 [Route("apps/{appId:int}/routes")]
-public class RoutesController : ControllerBase
+public class RoutesController : BaseController
 {
     [HttpGet]
     public async Task<IActionResult> Index(int appId, string SearchTerm, string Sort)
-    {
-        return Ok();
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> List(int appId, string SearchTerm, string Sort)
     {
         return Ok();
     }
