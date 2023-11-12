@@ -6,7 +6,7 @@ export const useAppStore = defineStore("app", () => {
   const apps = ref<App[]>([]);
   const currentApp = ref<App>();
 
-  const fake_apps = Array.from({ length: 10 }, (_, index) => ({
+  const fake_apps: App[] = Array.from({ length: 10 }, (_, index) => ({
     id: index + 1,
     name: `App ${index + 1}`,
     description: `App ${index + 1}`,
@@ -14,7 +14,7 @@ export const useAppStore = defineStore("app", () => {
     routeCount: (index + 1) * 10
   }));
 
-  const getApps = async () => {
+  const getApps = async (query: string) => {
     apps.value = fake_apps;
     return fake_apps;
   };
@@ -27,5 +27,5 @@ export const useAppStore = defineStore("app", () => {
     currentApp.value = app;
   }
 
-  return { getApps, apps, getAppById, currentApp, setCurrentApp};
+  return { getApps, apps, getAppById, currentApp, setCurrentApp };
 });

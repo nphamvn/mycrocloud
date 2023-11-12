@@ -8,11 +8,5 @@ import { useRoute } from 'vue-router';
 import { computed } from 'vue';
 
 const route = useRoute();
-const layout = computed(() => {
-    const layout = route?.meta?.layout;
-    if (layout) {
-        return layout;
-    }
-    return 'div';
-});
+const layout = computed(() => route?.meta?.layout ?? 'div');
 </script>

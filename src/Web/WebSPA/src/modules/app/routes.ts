@@ -12,6 +12,7 @@ import RouteViewHomeVue from "./views/routes/RouteViewHome.vue";
 import RouteEditorV2Vue from "./views/routes/RouteEditorV2.vue";
 import RouteAuthorizationVue from "./views/routes/RouteAuthorization.vue";
 import RouteResponse from "./views/routes/RouteResponse.vue";
+import RequestLogging from "./views/RequestLogging.vue";
 
 const routes: RouteRecordRaw[] = [
   { path: "/app", name: "AppList", component: AppListVue, meta: { layout: LayoutVue } },
@@ -39,6 +40,7 @@ const routes: RouteRecordRaw[] = [
         name: "AppLog",
         component: AppLogVue,
       },
+      { path: "RequestLogging", name: "RequestLogging", component: RequestLogging },
     ],
     meta: { layout: LayoutVue }
   },

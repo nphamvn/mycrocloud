@@ -45,9 +45,10 @@
                     </form>
                     <div class="text-center text-gray-700">Or</div>
                     <p>Login Using the Implicit Flow with Form Post</p>
-                    <FwbButtonGroup class="flex flex-col w-full">
-                        <FwbButton outline @click="loginWithGitHub">Sign In with GitHub</FwbButton>
-                        <FwbButton outline @click="loginWithGoogle">Sign In with Google</FwbButton>
+                    <FwbButtonGroup class="flex flex-col w-full space-y-1">
+                        <FwbButton disabled outline @click="loginWithGitHub">Sign In with GitHub</FwbButton>
+                        <FwbButton disabled outline @click="loginWithGoogle">Sign In with Google</FwbButton>
+                        <FwbButton outline @click="loginWithAuth0">Sign In with Auth0</FwbButton>
                     </FwbButtonGroup>
                 </div>
             </div>
@@ -55,10 +56,16 @@
     </section>
 </template>
 <script setup lang="ts">
+import { useAuth0 } from '@auth0/auth0-vue';
 import { FwbButton, FwbButtonGroup } from 'flowbite-vue';
 import { useRouter } from 'vue-router';
+const { loginWithRedirect } = useAuth0();
 
 const router = useRouter();
+
+const loginWithAuth0 = () => {
+    loginWithRedirect();
+}
 
 const loginWithGitHub = async () => {
     const { authorizeUrl, clientId } = await getAuthFlowInfo('GitHub');

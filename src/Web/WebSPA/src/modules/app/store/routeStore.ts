@@ -46,5 +46,22 @@ export const useRouteStore = defineStore('route', () => {
         }
     }
 
-    return { routes, getRoutes, openingRoute, setOpeningRoute, createRoute, getRouteById, updateRoute, setRouteResponse };
+    const deleteRoute = async (id: number) => {
+        const index = routes.value.findIndex(r => r.id === id);
+        if (index >= 0) {
+            routes.value.splice(index, 1);
+        }
+    }
+
+    return {
+        routes,
+        getRoutes,
+        openingRoute,
+        setOpeningRoute,
+        createRoute,
+        getRouteById,
+        updateRoute,
+        setRouteResponse,
+        deleteRoute
+    };
 })

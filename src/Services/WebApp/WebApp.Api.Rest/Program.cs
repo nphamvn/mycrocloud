@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using WebApp.Api.Filters;
 
@@ -13,12 +14,26 @@ builder.Services.AddControllers(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
     {
-        options.Authority = "https://localhost:5024";
-        options.Audience = "mycrocloud";
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     });
+});
+
+// 1. Add Authentication Services
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.Authority = "https://dev-vzxphouz.us.auth0.com/";
+    options.Audience = "https://mycrocloud.com";
+});
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -32,9 +47,16 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapGet("Ping", () => "Pong")
+    .RequireAuthorization();
+
+app.MapGet("WhoAmI", (ClaimsPrincipal user) => user.FindFirstValue(ClaimTypes.NameIdentifier)!)
+    .RequireAuthorization();
 
 app.Run();

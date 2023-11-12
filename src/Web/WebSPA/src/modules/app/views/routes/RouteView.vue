@@ -2,10 +2,7 @@
     <div class="flex flex-row h-full">
         <div class="basis-1/5 border">
             <div class="p-1">
-                <button type="button" @click="newRoute" class="bg-violet-600 text-white py-1 w-full rounded-md">New</button>
-            </div>
-            <div class="p-1">
-                <FwbButton class="w-full" @click="newRoute">New</FwbButton>
+                <FwbButton size="sm" class="w-full" @click="newRoute">New</FwbButton>
             </div>
             <div class="p-1">
                 <input type="search"
@@ -19,13 +16,13 @@
                         v-on:click="openRoute(route.id)">
                         <div class="flex flex-row p-1">
                             <span class="inline-flex items-center rounded-md px-1 text-xs text-white leading-6"
-                                :class="routeMethodBgColors.find(m => m.method === route.method)?.bgColor">{{ route.method
-                                }}</span>
+                                :class="getRouteMethodBgColors(route.method)">
+                                {{ route.method }}</span>
                             <span class="ms-1 inline-block align-middle text-sm my-auto text-slate-900 leading-6">{{
                                 route.name
                             }}</span>
                             <span class="ms-auto my-auto align-middle route-item-menu-button"
-                                @click="(e) => showMenu(e, route.id)">
+                                @click="(e) => showMenu(e, route)">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                     class="w-6 h-6">
                                     <path fill-rule="evenodd"
@@ -48,7 +45,8 @@
                     </div>
                 </template>
                 <RouteDeleteConfirmModal v-if="showDeleteConfirmModal" @on-delete-click="handleModalDeleteButtonClick"
-                    @on-cancle-click="handleModalCancleButtonClick" @on-hide="showDeleteConfirmModal = false"></RouteDeleteConfirmModal>
+                    @on-cancle-click="handleModalCancleButtonClick" @on-hide="showDeleteConfirmModal = false">
+                </RouteDeleteConfirmModal>
             </div>
         </div>
         <div class="basis-4/5 border p-2 h-[600]">
@@ -65,12 +63,17 @@
 import { ref, nextTick, onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia'
 import RouteDeleteConfirmModal from './RouteDeleteConfirmModal.vue';
-import { FwbButton, FwbInput } from 'flowbite-vue';
+import { FwbButton } from 'flowbite-vue';
+import { useRoute, useRouter } from 'vue-router';
+import RouteItem from '../../models/RouteItem';
+import { useRouteStore } from '../../store/routeStore';
+import { Dropdown } from "flowbite";
+import { DropdownOptions, DropdownInterface } from "flowbite";
 
 const router = useRouter();
 const location = useRoute();
 const store = useRouteStore();
-const { getRoutes, setOpeningRoute } = store;
+const { getRoutes, setOpeningRoute, deleteRoute } = store;
 const { routes, openingRoute } = storeToRefs(store);
 
 const routeMethodBgColors = [
@@ -82,7 +85,9 @@ const routeMethodBgColors = [
     { method: "PACTH", bgColor: "bg-red-500" }
 ];
 
-
+const getRouteMethodBgColors = (method: string) => {
+    return routeMethodBgColors.find(m => m.method === method)?.bgColor;
+}
 
 watch(openingRoute, () => {
     if (openingRoute.value) {
@@ -112,19 +117,16 @@ onMounted(async () => {
 });
 
 //#region PopupMenu
-import { Dropdown } from "flowbite";
-import { DropdownOptions, DropdownInterface } from "flowbite";
+
 const showDropdownMenu = ref(false);
 const dropdownMenu = ref()
 const showDeleteConfirmModal = ref(false);
+const menuRoute = ref<RouteItem>();
 
-import { useRoute, useRouter } from 'vue-router';
-import RouteItem from '../../models/RouteItem';
-import { useRouteStore } from '../../store/routeStore';
-
-const showMenu = async (e, id) => {
+const showMenu = async (e: MouseEvent, route: RouteItem) => {
     e.stopPropagation();
     showDropdownMenu.value = true;
+    menuRoute.value = route;
     let dropdown: DropdownInterface;
     const dropdownOptions: DropdownOptions = {
         placement: 'bottom',
@@ -135,7 +137,7 @@ const showMenu = async (e, id) => {
         onHide: () => {
             console.log('dropdown has been hidden');
             dropdown.destroyAndRemoveInstance();
-            showDropdownMenu.value = false;
+            showDropdownMenu.value = false;            
         },
         onShow: () => {
             console.log('dropdown has been shown');
@@ -156,8 +158,9 @@ const handleDeleteButtonClick = (e) => {
     showDeleteConfirmModal.value = true;
 }
 
-const handleModalDeleteButtonClick = () => {
+const handleModalDeleteButtonClick = async () => {
     console.log('handleModalDeleteButtonClick');
+    await deleteRoute(menuRoute.value!.id);
     showDeleteConfirmModal.value = false;
 }
 

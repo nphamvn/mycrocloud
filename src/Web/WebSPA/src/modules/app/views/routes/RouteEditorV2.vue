@@ -43,9 +43,6 @@
             </div>
             <span class="text-red-500">{{ responseType.errorMessage.value }}</span>
         </div>
-        <section v-if="openingRoute?.id !== undefined" type="button">
-
-        </section>
         <button v-if="openingRoute?.id !== undefined" type="button" :disabled="openingRoute?.id === undefined"
             class="mt-2 focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-3 py-2 mr-2 mb-2"
             @click="router.push({ name: 'RouteResponse', params: { appId: 1, routeId: openingRoute?.id }, query: { type: openingRoute?.responseType } })">
@@ -79,11 +76,6 @@ interface Inputs {
     desciption: string;
 }
 
-const schema = yup.object({
-    name: yup.string().required('Route name is required'),
-    path: yup.string().required('Path is required').matches(/^\/.*/, 'Path must start with "/"'),
-});
-
 const initialValues: Inputs = {
     name: 'Foo',
     method: ROUTE_METHODS[Math.floor(Math.random() * ROUTE_METHODS.length)],
@@ -92,10 +84,22 @@ const initialValues: Inputs = {
     responseType: 'mock',
 }
 
+const schema = yup.object({
+    name: yup.string().required('Route name is required'),
+    path: yup.string().required('Path is required').matches(/^\/.*/, 'Path must start with "/"'),
+});
+
 const { handleSubmit, resetForm } = useForm<Inputs>({
     validationSchema: schema,
     initialValues: initialValues,
 });
+
+const name = useField<string>('name');
+const path = useField<string>('path');
+const method = useField<string>('method');
+const desciption = useField<string>('desciption');
+const responseType = useField<string>('responseType');
+
 const onSubmit = handleSubmit(async (data) => {
     const routeId = openingRoute.value?.id;
     if (!routeId) {
@@ -108,11 +112,11 @@ const onSubmit = handleSubmit(async (data) => {
     }
 })
 
-const name = useField<string>('name');
-const path = useField<string>('path');
-const method = useField<string>('method');
-const desciption = useField<string>('desciption');
-const responseType = useField<string>('responseType');
+onMounted(async () => await render())
+
+watch(openingRoute, async (newRoute, oldRoute) => {
+    if (newRoute?.id != oldRoute?.id) await render();
+})
 
 async function render() {
     const routeId = openingRoute.value?.id;
@@ -124,10 +128,4 @@ async function render() {
         resetForm({ values: initialValues });
     }
 }
-
-onMounted(async () => await render())
-
-watch(openingRoute, async (newRoute, oldRoute) => {
-    if (newRoute?.id != oldRoute?.id) await render();
-})
 </script>

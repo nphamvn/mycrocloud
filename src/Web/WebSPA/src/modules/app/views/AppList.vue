@@ -57,7 +57,7 @@ watch(searchTerm, () => {
 })
 
 async function fetchApps(searchTerm: string | undefined) {
-    apps.value = await getApps();
+    apps.value = await getApps(searchTerm);
     loading.value = false;
 }
 </script>
