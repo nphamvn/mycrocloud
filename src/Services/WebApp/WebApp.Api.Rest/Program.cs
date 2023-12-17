@@ -45,18 +45,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.MapGet("Ping", () => "Pong")
-    .RequireAuthorization();
-
-app.MapGet("WhoAmI", (ClaimsPrincipal user) => user.FindFirstValue(ClaimTypes.NameIdentifier)!)
+app.Map("api/ping", () => "pong");
+app.Map("api/me", (ClaimsPrincipal user) => user.FindFirstValue(ClaimTypes.NameIdentifier)!)
     .RequireAuthorization();
 
 app.Run();

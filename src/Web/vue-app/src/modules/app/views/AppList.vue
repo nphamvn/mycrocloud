@@ -33,18 +33,15 @@ import { onMounted, ref } from 'vue';
 import { watch } from 'vue';
 import moment from 'moment';
 import AppItem from '../models/AppItem';
-import debounce from '@/modules/core/utils';
+import { debounce } from '../../core/utils';
 import { FwbButton } from 'flowbite-vue';
-import { useAppStore } from '../store/appStore';
-
-const { getApps } = useAppStore();
 
 const loading = ref(true);
 
 const apps = ref<AppItem[]>([])
 
 onMounted(async () => {
-    await fetchApps(undefined);
+    await fetchApps();
 })
 
 const searchTerm = ref();
@@ -56,8 +53,8 @@ watch(searchTerm, () => {
     debouncedSearch();
 })
 
-async function fetchApps(searchTerm: string | undefined) {
-    apps.value = await getApps(searchTerm);
+async function fetchApps(searchTerm?: string) {
+    console.log(searchTerm);
     loading.value = false;
 }
 </script>

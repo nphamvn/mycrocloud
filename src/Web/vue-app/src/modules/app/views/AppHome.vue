@@ -19,10 +19,8 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
 import { onMounted } from 'vue';
-import { storeToRefs } from "pinia";
-import { useAppStore } from '../store/appStore';
 import { computed } from '@vue/reactivity';
-import { useAuth0 } from '@auth0/auth0-vue';
+import { useAppStore } from '../store/appStore';
 
 const router = useRouter();
 const currentRouteName = computed(() => router.currentRoute.value.matched[1].name);
@@ -31,17 +29,21 @@ const activeClasses = ['border', 'rounded', 'bg-slate-50'];
 const location = useRoute();
 const appId = parseInt(location.params['id'].toString());
 
-const store = useAppStore();
-const { getAppById, setCurrentApp } = store;
+const { setCurrentApp } = useAppStore();
 
-const { currentApp: app } = storeToRefs(store);
-const { getAccessTokenSilently } = useAuth0();
 onMounted(async () => {
-    const accessToken = await getAccessTokenSilently();
-    console.log('accessToken:', accessToken);
     const app = await getAppById(appId)!;
-    await setCurrentApp(app);
+    setCurrentApp(app);
     document.title = app.name;
 });
 
+const getAppById = async (id: number) => {
+    return {
+        id: id,
+        name: "string",
+        description: "string",
+        createdAt: new Date(),
+        routeCount: 100
+    }
+}
 </script>

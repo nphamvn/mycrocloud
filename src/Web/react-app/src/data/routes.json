@@ -1,8 +1,14 @@
 [
-    {
-        "id": 1,
-        "name": "Route 1",
-        "path": "/foo",
-        "method": "GET"
-    }
+  {
+    "id": 1,
+    "name": "Route 1",
+    "path": "/foo",
+    "method": "GET"
+  },
+  {
+    "id": 2,
+    "name": "Route 2",
+    "path": "/bar",
+    "method": "POST"
+  }
 ]
