@@ -35,11 +35,10 @@ function App() {
             <Route path="/apps" Component={AppList} />
             <Route path="/apps/new" Component={AppCreate} />
             <Route path="/apps/:appId" Component={AppIndex}>
-              <Route index Component={AppOverview} />
-              <Route path="routes" Component={RouteIndex}>
-                <Route path="new" Component={RouteCreateUpdate} />
-                <Route path=":routeId" Component={RouteCreateUpdate} />
-              </Route>
+              <Route index path="overview" Component={AppOverview} />
+              <Route path="routes" Component={RouteIndex} />
+              <Route path="routes/:routeId" Component={RouteIndex} />
+              <Route path="routes/new" Component={RouteIndex} />
               <Route path="logs" Component={AppLogs} />
             </Route>
           </Routes>

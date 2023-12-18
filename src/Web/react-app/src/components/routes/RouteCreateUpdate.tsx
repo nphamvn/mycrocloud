@@ -3,7 +3,7 @@ import Route from "./Route";
 import routes from "../../data/routes.json";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
-import { Button, Checkbox, Label, Select, TextInput } from "flowbite-react";
+import { Button, Label, Select, TextInput } from "flowbite-react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
