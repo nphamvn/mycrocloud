@@ -13,7 +13,11 @@ builder.Services.AddControllers(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddLogging(options => {
+    options.AddSeq(builder.Configuration["Logging:Seq:ServerUrl"]);
+});
+builder.Services.AddHttpLogging(o => { });
+builder.Services.AddHealthChecks();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -37,7 +41,8 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
-
+app.UseHttpLogging();
+app.MapHealthChecks("/healthz");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

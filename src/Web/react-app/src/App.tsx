@@ -10,14 +10,12 @@ import "react-toastify/dist/ReactToastify.css";
 import AppIndex from "./components/apps/AppIndex";
 import AppLogs from "./components/apps/AppLog";
 import AppOverview from "./components/apps/AppOverview";
-import RouteCreateUpdate from "./components/routes/RouteCreateUpdate";
 import RouteIndex from "./components/routes/RouteIndex";
 import { useEffect } from "react";
-import AppConfig from "./constants/AppConfig";
 
 function App() {
   useEffect(() => {
-    fetch(`${AppConfig.BASE_API_URL}/api/ping`)
+    fetch(`/api/ping`)
       .then((res) => res.text())
       .then((msg) => console.log(msg));
   }, []);
@@ -29,7 +27,7 @@ function App() {
     >
       <BrowserRouter>
         <Header />
-        <div className="container mx-auto min-h-screen bg-slate-50 p-2">
+        <div className="container mx-auto min-h-screen p-2">
           <Routes>
             <Route path="/" Component={Home} />
             <Route path="/apps" Component={AppList} />

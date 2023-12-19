@@ -1,20 +1,23 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+﻿# https://hub.docker.com/_/microsoft-dotnet
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /source
+
+# copy csproj and restore as distinct layers
+COPY WebApp.Api.Rest/WebApp.Api.Rest.csproj WebApp.Api.Rest/
+COPY WebApp.Domain/WebApp.Domain.csproj WebApp.Domain/
+COPY WebApp.Infrastructure/WebApp.Infrastructure.csproj WebApp.Infrastructure/
+
+RUN dotnet restore WebApp.Api.Rest/WebApp.Api.Rest.csproj
+
+# copy and build app and libraries
+COPY WebApp.Api.Rest/ WebApp.Api.Rest/
+COPY WebApp.Domain/ WebApp.Domain/
+COPY WebApp.Infrastructure/ WebApp.Infrastructure/
+
+RUN dotnet publish WebApp.Api.Rest/WebApp.Api.Rest.csproj -c Release -o /app
+
+# final stage/image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
-
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-WORKDIR /src
-COPY ["Services/WebApplication.Api/WebApplication.Api.csproj", "Services/WebApplication.Api/"]
-RUN dotnet restore "Services/WebApplication.Api/WebApplication.Api.csproj"
-COPY . .
-WORKDIR "/src/Services/WebApplication.Api"
-RUN dotnet build "WebApplication.Api.csproj" -c Release -o /app/build
-
-FROM build AS publish
-RUN dotnet publish "WebApplication.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "WebApplication.Api.dll"]
+COPY --from=build /app .
+ENTRYPOINT ["dotnet", "WebApp.Api.Rest.dll"]

@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  app-rest-api:
+    build:
+      dockerfile: WebApp.Api.Rest/Dockerfile
+    ports:
+      - "8080:8080"
+
+  seq:
+    image: datalust/seq
+    ports:
+      - "8000:80"
+      - "5341:5341"
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_ADMINPASSWORDHASH=QGPsRgTPFdJUQfb+3rFJaorRrIjIn9/qmeykLr1vO5I0ZlEGK+a/6/hcK/OkaZZy92I9h3U/3XH7dAP3FeQ5mzZmfVa6KvtBTq1DEia04KQb
+    volumes:
+      - seq_data:/data
+    restart: "unless-stopped"
+    
+volumes:
+  seq_data:

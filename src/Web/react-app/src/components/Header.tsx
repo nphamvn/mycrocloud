@@ -34,11 +34,7 @@ function Header() {
 
   return (
     <Navbar fluid rounded className="border-b-[1px]">
-      <Navbar.Brand href="/">
-        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
-          MycroCloud
-        </span>
-      </Navbar.Brand>
+      <Link to='' className="flex items-center"><span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">MycroCloud</span></Link>
       {isAuthenticated ? (
         <>
           <div className="flex md:order-2">
