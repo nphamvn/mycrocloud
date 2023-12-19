@@ -12,6 +12,7 @@ import AppLogs from "./components/apps/AppLog";
 import AppOverview from "./components/apps/AppOverview";
 import RouteIndex from "./components/routes/RouteIndex";
 import { useEffect } from "react";
+import RouteCreateUpdate from "./components/routes/RouteCreateUpdate";
 
 function App() {
   useEffect(() => {
@@ -34,9 +35,10 @@ function App() {
             <Route path="/apps/new" Component={AppCreate} />
             <Route path="/apps/:appId" Component={AppIndex}>
               <Route index path="overview" Component={AppOverview} />
-              <Route path="routes" Component={RouteIndex} />
-              <Route path="routes/:routeId" Component={RouteIndex} />
-              <Route path="routes/new" Component={RouteIndex} />
+              <Route path="routes" Component={RouteIndex}>
+                <Route path=":routeId" Component={RouteIndex} />
+                <Route path="new" Component={RouteIndex} />
+              </Route>
               <Route path="logs" Component={AppLogs} />
             </Route>
           </Routes>
