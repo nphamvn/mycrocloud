@@ -12,7 +12,6 @@ import AppLogs from "./components/apps/AppLog";
 import AppOverview from "./components/apps/AppOverview";
 import RouteIndex from "./components/routes/RouteIndex";
 import { useEffect } from "react";
-import RouteCreateUpdate from "./components/routes/RouteCreateUpdate";
 
 function App() {
   useEffect(() => {
