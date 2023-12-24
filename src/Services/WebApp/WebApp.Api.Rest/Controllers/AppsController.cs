@@ -1,45 +1,63 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Api.Models;
-using WebApp.Api.Services;
+using WebApp.Api.Rest;
+using WebApp.Domain.Services;
+using WebApp.Domain.Repositories;
 
 namespace WebApp.Api.Controllers;
 
 public class AppsController : BaseController
 {
     private readonly IAppService _appService;
+    private readonly IAppRepository _appRepository;
 
-    public AppsController(IAppService appService)
+    public AppsController(IAppService appService, IAppRepository appRepository)
     {
         _appService = appService;
-    }
-    
-    [HttpGet]
-    public async Task<IActionResult> Index([FromQuery]AppSearchRequest request)
-    {
-        return Ok(request);
+        _appRepository = appRepository;
     }
 
-    [HttpPost("Create")]
+    [HttpGet]
+    public async Task<IActionResult> Index([FromQuery] AppSearchRequest request)
+    {
+        var apps = await _appRepository.ListByUserId(User.ToIdentityUser().UserId, "", "");
+        return Ok(apps.Select(a => new {
+            a.Id,
+            a.Name,
+            a.Description,
+            a.CreatedAt,
+            a.UpdatedAt
+        }));
+    }
+
+    [HttpPost]
     public async Task<IActionResult> Create(AppCreateRequest appCreateRequest)
     {
-        await _appService.Create(appCreateRequest);
-        return Ok(appCreateRequest);
+        await _appService.Create(User.ToIdentityUser().UserId, appCreateRequest.ToEntity());
+        return Created();
     }
 
-    [HttpGet("{appId:int}/Details")]
-    public async Task<IActionResult> Details(int appId)
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> Get(int id)
     {
-        return Ok(appId);
+        var app = await _appRepository.GetByAppId(id);
+        return Ok(new {
+            app.Id,
+            app.Name,
+            app.Description,
+            app.CreatedAt,
+            app.UpdatedAt
+        });
     }
-    
-    [HttpPost("{appId:int}/Rename")]
-    public async Task<IActionResult> Rename(int appId, string newName)
+
+    [HttpPut("{id:int}/Rename")]
+    public async Task<IActionResult> Rename(int id, string newName)
     {
         return RedirectToAction(nameof(Index), new { WebApplicationName = newName });
     }
 
-    [HttpPost("{appId:int}/Delete")]
-    public async Task<IActionResult> Delete(int appId)
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
     {
         return NoContent();
     }

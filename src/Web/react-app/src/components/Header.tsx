@@ -1,7 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
 import { Link } from "react-router-dom";
-import AppConfig from "../constants/AppConfig";
+import { useEffect } from "react";
 
 function Header() {
   const {
@@ -11,20 +11,22 @@ function Header() {
     user,
     loginWithPopup,
     logout,
-    //getAccessTokenSilently,
+    getAccessTokenSilently,
   } = useAuth0();
 
-  // useEffect(() => {
-  //   if (!isLoading && isAuthenticated) {
-  //     getAccessTokenSilently().then((token) => {
-  //       fetch(`${AppConfig.BASE_API_URL}/me`, {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       })
-  //         .then((res) => res.json())
-  //         .then((data) => console.log(data));
-  //     });
-  //   }
-  // }, [isLoading]);
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      getAccessTokenSilently().then((token) => {
+        fetch("/api/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+          .then((res) => res.json())
+          .then((user) => console.log(user));
+      });
+    }
+  }, [isLoading]);
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -53,13 +55,9 @@ function Header() {
                   {user?.email}
                 </span>
               </Dropdown.Header>
-              <Dropdown.Item>
-                <button disabled>Settings</button>
-              </Dropdown.Item>
+              <Dropdown.Item disabled>Settings</Dropdown.Item>
               <Dropdown.Divider />
-              <Dropdown.Item>
-                <button onClick={() => logout()}>Log out</button>
-              </Dropdown.Item>
+              <Dropdown.Item onClick={() => logout()}>Log out</Dropdown.Item>
             </Dropdown>
             <Navbar.Toggle />
           </div>

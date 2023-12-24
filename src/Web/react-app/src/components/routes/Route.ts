@@ -1,6 +1,7 @@
 export default interface Route {
-    id: number | undefined;
-    name: string;
-    path: string;
-    method: string;
+  id: number | undefined;
+  name: string;
+  path: string;
+  method: string;
+  responseText: string;
 }

@@ -1,24 +1,19 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using WebApp.Authorization;
 using WebApp.Domain.Shared;
 using WebApp.Routes;
 
 namespace WebApp.Domain.Entities;
 public class Route : BaseEntity
 {
-    public int RouteId { get; set; }
+    public int Id { get; set; }
     public int AppId { get; set; }
+    public App App { get; set; }
     public string Name { get; set; }
+    public string Method { get; set; }
+    public string Path { get; set; }
     public string Description { get; set; }
-    public int MatchOrder { get; set; }
-    public string MatchPath { get; set; }
-    public List<HttpMethod> MatchMethods { get; set; }
-    public RouteAuthorizationType AuthorizationType { get; set; }
-    public RouteAuthorization Authorization { get; set; }
-    public RouteValidation Validation { get; set; }
-    public RouteResponseProvider ResponseProvider { get; set; }
-    public RouteResponse Response { get; set; }
+    public string ResponseText { get; set; }
 }
 public class MatchMethodCollection : List<string>
 {

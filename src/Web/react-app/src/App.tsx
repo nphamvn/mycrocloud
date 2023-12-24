@@ -15,7 +15,7 @@ import { useEffect } from "react";
 
 function App() {
   useEffect(() => {
-    fetch(`/api/ping`)
+    fetch("/api/ping")
       .then((res) => res.text())
       .then((msg) => console.log(msg));
   }, []);
@@ -23,7 +23,10 @@ function App() {
     <Auth0Provider
       domain={import.meta.env.VITE_AUTH0_DOMAIN}
       clientId={import.meta.env.VITE_AUTH0_CLIENTID}
-      authorizationParams={{ redirect_uri: window.location.origin }}
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+        audience: "https://mycrocloud.com",
+      }}
     >
       <BrowserRouter>
         <Header />

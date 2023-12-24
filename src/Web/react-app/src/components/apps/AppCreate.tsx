@@ -1,10 +1,9 @@
 import { SubmitHandler, useForm } from "react-hook-form";
-import AppConfig from "../../constants/AppConfig";
-import { useAuth } from "../../hooks/useAuth";
 import { toast } from "react-toastify";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 
 type Inputs = {
   name: string;
@@ -12,8 +11,8 @@ type Inputs = {
 };
 
 function AppCreate() {
-  const { user } = useAuth()!;
   const navigate = useNavigate();
+  const { getAccessTokenSilently } = useAuth0();
   const schema = yup.object({
     name: yup.string().required(),
   });
@@ -26,13 +25,19 @@ function AppCreate() {
   });
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      toast(data.name);
-      await fetch(`${AppConfig.BASE_API_URL}/api/apps/create`, {
+      const accessToken = await getAccessTokenSilently();
+      const res = await fetch("/api/apps", {
         method: "POST",
         headers: {
-          Authorzation: `Bearer ${user?.accessToken}`,
+          "content-type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
+        body: JSON.stringify(data),
       });
+      if (res.ok) {
+        toast("Created app");
+        navigate("/apps");
+      }
     } catch (error) {
       console.log(error);
     }

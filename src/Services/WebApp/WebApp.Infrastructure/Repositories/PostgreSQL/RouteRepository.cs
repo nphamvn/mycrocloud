@@ -43,11 +43,11 @@ RETURNING route_id;
             app_id = appId,
             name = route.Name,
             description = route.Description, 
-            match_path = route.MatchPath,
-            match_order = route.MatchOrder,
-            authorization_type = route.AuthorizationType,
-            authorization = route.Authorization,
-            response_provider = route.ResponseProvider
+            // match_path = route.MatchPath,
+            // match_order = route.MatchOrder,
+            // authorization_type = route.AuthorizationType,
+            // authorization = route.Authorization,
+            // response_provider = route.ResponseProvider
         });
     }
 

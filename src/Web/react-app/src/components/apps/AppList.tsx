@@ -1,16 +1,24 @@
 import { Link, useNavigate } from "react-router-dom";
-import appData from "../../data/apps.json";
 import App from "./App";
 import { useEffect, useState } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function AppList() {
   const location = useNavigate();
   const [apps, setApps] = useState<App[]>([]);
+  const { getAccessTokenSilently } = useAuth0();
   useEffect(() => {
-    setTimeout(() => {
-      const apps = appData as App[];
+    const getApps = async () => {
+      const accessToken = await getAccessTokenSilently();
+      const res = await fetch("/api/apps", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const apps = (await res.json()) as App[];
       setApps(apps);
-    }, 100);
+    };
+    getApps();
   }, []);
   return (
     <div className="mx-auto mt-2 max-w-4xl p-2">

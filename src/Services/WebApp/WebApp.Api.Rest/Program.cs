@@ -1,6 +1,11 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using WebApp.Api.Filters;
+using WebApp.Api.Rest;
+using WebApp.Domain.Services;
+using WebApp.Domain.Repositories;
+using WebApp.Infrastructure.Repositories.EfCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +18,8 @@ builder.Services.AddControllers(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddLogging(options => {
+builder.Services.AddLogging(options =>
+{
     options.AddSeq(builder.Configuration["Logging:Seq:ServerUrl"]);
 });
 builder.Services.AddHttpLogging(o => { });
@@ -35,10 +41,18 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
 {
-    options.Authority = "https://dev-vzxphouz.us.auth0.com/";
-    options.Audience = "https://mycrocloud.com";
+    options.Authority = builder.Configuration["Authentication:Schemes:Auth0JwtBearer:Authority"];
+    options.Audience = builder.Configuration["Authentication:Schemes:Auth0JwtBearer:Audience"];
 });
 builder.Services.AddAuthorization();
+builder.Services.AddDbContext<AppDbContext>(options => {
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
+});
+builder.Services.AddScoped<IAppRepository, AppRepository>();
+builder.Services.AddScoped<IAppService, AppService>();
+builder.Services.AddScoped<IRouteRepository, RouteRepository>();
+builder.Services.AddScoped<IRouteService, RouteService>();
+builder.Services.AddScoped<ILogRepository, LogRepository>();
 
 var app = builder.Build();
 app.UseHttpLogging();
@@ -56,7 +70,12 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.Map("api/ping", () => "pong");
-app.Map("api/me", (ClaimsPrincipal user) => user.FindFirstValue(ClaimTypes.NameIdentifier)!)
+app.Map("api/me", (ClaimsPrincipal user) => {
+    var identityUser = user.ToIdentityUser();
+    return new {
+        Sub = identityUser.UserId
+    };
+})
     .RequireAuthorization();
 
 app.Run();

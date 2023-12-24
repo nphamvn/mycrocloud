@@ -3,22 +3,27 @@ import { AppContext } from "./AppContext";
 import { useEffect, useState } from "react";
 import App from "./App";
 import { Breadcrumb } from "flowbite-react";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function AppIndex() {
+  const { getAccessTokenSilently } = useAuth0();
   const appId = parseInt(useParams()["appId"]!.toString());
   const [app, setApp] = useState<App>();
   const { pathname } = useLocation();
   const path = pathname.split("/")[3];
   useEffect(() => {
-    setTimeout(() => {
-      const app = {
-        id: appId,
-        name: `App ${appId}`,
-        createdAt: new Date().toString(),
-        description: `App ${appId}`,
-      };
+    const getApp = async () => {
+      const accessToken = await getAccessTokenSilently();
+      const app = (await (
+        await fetch(`/api/apps/${appId}`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+      ).json()) as App;
       setApp(app);
-    }, 100);
+    };
+    getApp();
   }, []);
   useEffect(() => {
     const path = pathname.split("/")[3];

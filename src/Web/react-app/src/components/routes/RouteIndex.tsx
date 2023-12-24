@@ -1,24 +1,34 @@
-import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import Route from "./Route";
-import routeData from "../../data/routes.json";
 import { AppContext } from "../apps/AppContext";
 import { Dropdown } from "flowbite-react";
 import RouteCreateUpdate from "./RouteCreateUpdate";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function RouteIndex() {
   const app = useContext(AppContext)!;
   const [routes, setRoutes] = useState<Route[]>([]);
   const [methods, setMethods] = useState<string[]>([]);
+  const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const childPath = pathname.split("/")[4];
   const params = useParams();
   const routeId = params["routeId"] ? parseInt(params["routeId"]) : undefined;
   useEffect(() => {
-    setTimeout(() => {
-      setRoutes(routeData.map((r) => ({ ...r, appId: app.id })));
-    }, 100);
+    const getRoutes = async () => {
+      const accessToken = await getAccessTokenSilently();
+      const routes = (await (
+        await fetch(`/api/apps/${app.id}/routes`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+      ).json()) as Route[];
+      setRoutes(routes);
+    };
+    getRoutes();
     setTimeout(() => {
       setMethods(["GET", "POST"]);
     }, 100);
@@ -26,7 +36,10 @@ export default function RouteIndex() {
   useEffect(() => {
     const childPath = pathname.split("/")[4];
     if (childPath === "new") {
-      setRoutes([{ id: 0, name: "", method: "GET", path: "" }, ...routes]);
+      setRoutes([
+        { id: 0, name: "", method: "GET", path: "", responseText: "" },
+        ...routes,
+      ]);
     }
   }, [pathname]);
   const handleNewFolderClick = () => {};
@@ -75,7 +88,7 @@ function RouteItem({ route }: { route: Route }) {
     ["POST", "text-orange-400"],
   ]);
   return (
-    <div className="flex items-center" style={{ cursor: "pointer" }}>
+    <div className="flex items-center p-0.5" style={{ cursor: "pointer" }}>
       <span
         className={`me-1 font-semibold ${methodTextColors.get(
           route.method.toUpperCase(),
