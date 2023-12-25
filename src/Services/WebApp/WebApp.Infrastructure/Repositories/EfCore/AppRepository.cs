@@ -35,8 +35,9 @@ public class AppRepository(AppDbContext dbContext) : IAppRepository
         return await _dbContext.Apps.Where(a => a.UserId == userId).ToListAsync();
     }
 
-    public Task Update(int id, App app)
+    public async Task Update(int id, App app)
     {
-        throw new NotImplementedException();
+        _dbContext.Apps.Update(app);
+        await _dbContext.SaveChangesAsync();
     }
 }

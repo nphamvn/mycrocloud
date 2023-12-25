@@ -20,7 +20,7 @@ public class AppsController : BaseController
     [HttpGet]
     public async Task<IActionResult> Index([FromQuery] AppSearchRequest request)
     {
-        var apps = await _appRepository.ListByUserId(User.ToIdentityUser().UserId, "", "");
+        var apps = await _appRepository.ListByUserId(User.GetUserId(), "", "");
         return Ok(apps.Select(a => new {
             a.Id,
             a.Name,
@@ -33,7 +33,7 @@ public class AppsController : BaseController
     [HttpPost]
     public async Task<IActionResult> Create(AppCreateRequest appCreateRequest)
     {
-        await _appService.Create(User.ToIdentityUser().UserId, appCreateRequest.ToEntity());
+        await _appService.Create(User.GetUserId(), appCreateRequest.ToEntity());
         return Created();
     }
 
@@ -50,10 +50,11 @@ public class AppsController : BaseController
         });
     }
 
-    [HttpPut("{id:int}/Rename")]
-    public async Task<IActionResult> Rename(int id, string newName)
+    [HttpPatch("{id:int}/Rename")]
+    public async Task<IActionResult> Rename(int id, AppRenameRequest renameRequest)
     {
-        return RedirectToAction(nameof(Index), new { WebApplicationName = newName });
+        await _appService.Rename(id, renameRequest.Name);
+        return NoContent();
     }
 
     [HttpDelete("{id:int}")]

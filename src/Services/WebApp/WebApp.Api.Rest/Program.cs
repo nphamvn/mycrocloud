@@ -70,12 +70,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.Map("api/ping", () => "pong");
-app.Map("api/me", (ClaimsPrincipal user) => {
-    var identityUser = user.ToIdentityUser();
-    return new {
-        Sub = identityUser.UserId
-    };
-})
+app.Map("api/me", (ClaimsPrincipal user) => user.GetUserId())
     .RequireAuthorization();
 
 app.Run();

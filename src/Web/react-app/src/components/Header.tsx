@@ -15,16 +15,18 @@ function Header() {
   } = useAuth0();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      getAccessTokenSilently().then((token) => {
-        fetch("/api/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-          .then((res) => res.json())
-          .then((user) => console.log(user));
+    const getUserInfo = async () => {
+      const accessToken = await getAccessTokenSilently();
+      const res = await fetch("/api/me", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
+      const userId = await res.text();
+      console.log(userId);
+    };
+    if (!isLoading && isAuthenticated) {
+      getUserInfo();
     }
   }, [isLoading]);
   if (isLoading) {

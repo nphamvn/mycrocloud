@@ -11,11 +11,14 @@ public class RoutesController : BaseController
     private readonly IRouteService _routeService;
     private readonly IRouteRepository _routeRepository;
 
-    public RoutesController(IRouteService routeService, IRouteRepository routeRepository)
+    public RoutesController(IRouteService routeService, 
+        IRouteRepository routeRepository
+    )
     {
         _routeService = routeService;
         _routeRepository = routeRepository;
     }
+
     [HttpGet]
     public async Task<IActionResult> Index(int appId, string? SearchTerm, string? Sort)
     {
