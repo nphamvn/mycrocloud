@@ -3,5 +3,6 @@ export default interface Route {
   name: string;
   path: string;
   method: string;
+  responseStatusCode: number;
   responseText: string;
 }

@@ -13,6 +13,7 @@ public class Route : BaseEntity
     public string Method { get; set; }
     public string Path { get; set; }
     public string Description { get; set; }
+    public int ResponseStatusCode { get; set; }
     public string ResponseText { get; set; }
 }
 public class MatchMethodCollection : List<string>

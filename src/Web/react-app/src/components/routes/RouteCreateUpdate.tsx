@@ -13,6 +13,7 @@ type Inputs = {
   name: string;
   path: string;
   method: string;
+  responseStatusCode: number;
   responseText: string;
 };
 
@@ -30,6 +31,7 @@ export default function RouteCreateUpdate({
     name: yup.string().required(),
     path: yup.string().required(),
     method: yup.string().required(),
+    responseStatusCode: yup.number().required(),
     responseText: yup
       .string()
       .required()
@@ -56,6 +58,7 @@ export default function RouteCreateUpdate({
       setValue("name", route.name);
       setValue("method", route.method.toUpperCase());
       setValue("path", route.path);
+      setValue("responseStatusCode", route.responseStatusCode);
       setValue("responseText", route.responseText);
     };
     if (isEditMode) {
@@ -124,6 +127,21 @@ export default function RouteCreateUpdate({
         </div>
         {errors.method && <span>{errors.method.message}</span>}
         {errors.path && <span>{errors.path.message}</span>}
+      </div>
+      <div>
+        <div className="mb-1 block">
+          <Label htmlFor="responseStatusCode" value="Response Status Code" />
+        </div>
+        <TextInput
+          sizing="sm"
+          id="name"
+          type="number"
+          {...register("responseStatusCode")}
+          autoComplete="none"
+        />
+        {errors.responseStatusCode && (
+          <span>{errors.responseStatusCode.message}</span>
+        )}
       </div>
       <div className="mb-5 mt-3">
         <label

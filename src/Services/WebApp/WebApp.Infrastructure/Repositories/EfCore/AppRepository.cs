@@ -20,6 +20,11 @@ public class AppRepository(AppDbContext dbContext) : IAppRepository
         throw new NotImplementedException();
     }
 
+    public async Task<App> FindByAppId(int id)
+    {
+        return await _dbContext.Apps.FirstOrDefaultAsync(a => a.Id == id);
+    }
+
     public Task<App> FindByUserIdAndAppName(string userId, string name)
     {
         throw new NotImplementedException();

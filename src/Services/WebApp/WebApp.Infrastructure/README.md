@@ -5,7 +5,7 @@ dotnet ef migrations add <MigrationName> -s ../WebApp.Api.Rest/WebApp.Api.Rest.c
 ```
 Example:
 ```
-dotnet ef migrations add AddLog -s ../WebApp.Api.Rest/WebApp.Api.Rest.csproj -o Repositories/EfCore/Migrations
+dotnet ef migrations add AddResponseStatusCode -s ../WebApp.Api.Rest/WebApp.Api.Rest.csproj -o Repositories/EfCore/Migrations
 ```
 
 #### 2. Remove migration

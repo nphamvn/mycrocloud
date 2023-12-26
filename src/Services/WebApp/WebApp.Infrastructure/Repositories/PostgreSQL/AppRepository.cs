@@ -50,6 +50,11 @@ values
         });
     }
 
+    public Task<App> FindByAppId(int id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<App> FindByUserIdAndAppName(string userId, string name)
     {
         const string sql =

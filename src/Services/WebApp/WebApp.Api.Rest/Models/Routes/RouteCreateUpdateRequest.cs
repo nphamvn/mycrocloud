@@ -6,6 +6,7 @@ public class RouteCreateUpdateRequest
     public string Name { get; set; }
     public string Method { get; set; }
     public string Path { get; set; }
+    public int ResponseStatusCode { get; set; }
     public string ResponseText { get; set; }
     public Route ToEntity()
     {
@@ -13,6 +14,7 @@ public class RouteCreateUpdateRequest
             Name = Name,
             Method = Method,
             Path = Path,
+            ResponseStatusCode = ResponseStatusCode,
             ResponseText = ResponseText
         };
     }

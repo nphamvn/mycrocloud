@@ -1,6 +1,12 @@
 @HostAddress = http://localhost:5010
 
-##
+###
 GET {{HostAddress}}/foo
 X-AppId:App-1
-###
+### 
+GET {{HostAddress}}/books/1
+X-AppId:App-1
+
+### 
+GET {{HostAddress}}/bar
+X-AppId:App-1
