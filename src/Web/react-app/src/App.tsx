@@ -12,6 +12,7 @@ import AppLogs from "./components/apps/AppLog";
 import AppOverview from "./components/apps/AppOverview";
 import RouteIndex from "./components/routes/RouteIndex";
 import { useEffect } from "react";
+import RouteLogs from "./components/routes/RouteLogs";
 
 function App() {
   useEffect(() => {
@@ -40,6 +41,7 @@ function App() {
               <Route path="routes" Component={RouteIndex}>
                 <Route path=":routeId" Component={RouteIndex} />
                 <Route path="new" Component={RouteIndex} />
+                <Route path=":routeId/logs" Component={RouteLogs} />
               </Route>
               <Route path="logs" Component={AppLogs} />
             </Route>

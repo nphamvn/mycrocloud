@@ -5,5 +5,5 @@ namespace WebApp.Domain.Repositories;
 public interface ILogRepository
 {
     Task Add(Log log);
-    Task<IEnumerable<Log>> Search(int appId);
+    Task<IQueryable<Log>> Search(int appId);
 }

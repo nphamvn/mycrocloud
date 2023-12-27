@@ -1,5 +1,4 @@
-import { useContext, useEffect } from "react";
-import routes from "../../data/routes.json";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, Label, Select, TextInput } from "flowbite-react";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -8,6 +7,9 @@ import { AppContext } from "../apps/AppContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import { toast } from "react-toastify";
 import Route from "./Route";
+import { useNavigate } from "react-router-dom";
+import ILog from "../apps/Log";
+import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 
 type Inputs = {
   name: string;
@@ -27,6 +29,7 @@ export default function RouteCreateUpdate({
   const isEditMode = routeId !== undefined;
   const app = useContext(AppContext)!;
   const { getAccessTokenSilently } = useAuth0();
+  const navigate = useNavigate();
   const schema = yup.object({
     name: yup.string().required(),
     path: yup.string().required(),
@@ -42,10 +45,36 @@ export default function RouteCreateUpdate({
     handleSubmit,
     formState: { errors },
     setValue,
+    getValues,
   } = useForm<Inputs>({
     resolver: yupResolver(schema),
   });
+  const [logs, setLogs] = useState<ILog[]>([]);
+  const [editor, setEditor] =
+    useState<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const monacoEl = useRef(null);
   useEffect(() => {
+    if (monacoEl) {
+      setEditor((editor) => {
+        if (editor) return editor;
+
+        const instance = monaco.editor.create(monacoEl.current!, {
+          language: "json",
+        });
+
+        instance.onDidChangeModelContent(() => {
+          console.log(instance.getValue());
+          setValue("responseText", instance.getValue());
+        });
+        return instance;
+      });
+    }
+    return () => editor?.dispose();
+  }, [monacoEl.current]);
+  useEffect(() => {
+    if (!editor) {
+      return;
+    }
     const getRoute = async (id: number) => {
       const accessToken = await getAccessTokenSilently();
       const route = (await (
@@ -60,11 +89,24 @@ export default function RouteCreateUpdate({
       setValue("path", route.path);
       setValue("responseStatusCode", route.responseStatusCode);
       setValue("responseText", route.responseText);
+      editor.setValue(route.responseText);
+    };
+    const getLogs = async (id: number) => {
+      const accessToken = await getAccessTokenSilently();
+      const logs = (await (
+        await fetch(`/api/apps/${app.id}/logs?routeId=${id}`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+      ).json()) as ILog[];
+      setLogs(logs);
     };
     if (isEditMode) {
       getRoute(routeId);
+      getLogs(routeId);
     }
-  }, []);
+  }, [editor]);
 
   const onSubmit = async (data: Inputs) => {
     const accessToken = await getAccessTokenSilently();
@@ -83,87 +125,108 @@ export default function RouteCreateUpdate({
     );
     if (res.ok) {
       toast("Created route");
+      const routeId = 1;
+      if (!isEditMode) {
+        navigate(`apps/${app.id}/routes/${routeId}`);
+      }
     }
   };
   return (
-    <form className="p-2" onSubmit={handleSubmit(onSubmit)}>
-      <div>
-        <div className="mb-1 block">
-          <Label htmlFor="name" value="Name" />
-        </div>
-        <TextInput
-          sizing="sm"
-          id="name"
-          type="text"
-          {...register("name")}
-          autoComplete="none"
-        />
-        {errors.name && <span>{errors.name.message}</span>}
-      </div>
-      <div className="mt-2">
-        <div className="mb-1 block">
-          <Label htmlFor="path" value="Method and Path" />
-        </div>
-        <div className="flex">
-          <Select
-            sizing="sm"
-            id="countries"
-            className="w-24"
-            {...register("method")}
-          >
-            {methods.map((m) => (
-              <option key={m} value={m.toUpperCase()}>
-                {m}
-              </option>
-            ))}
-          </Select>
+    <div>
+      <form className="p-2" onSubmit={handleSubmit(onSubmit)}>
+        <div>
+          <div className="mb-1 block">
+            <Label htmlFor="name" value="Name" />
+          </div>
           <TextInput
-            id="path"
-            type="text"
-            className="w-full"
             sizing="sm"
-            {...register("path")}
+            id="name"
+            type="text"
+            {...register("name")}
+            autoComplete="none"
           />
+          {errors.name && <span>{errors.name.message}</span>}
         </div>
-        {errors.method && <span>{errors.method.message}</span>}
-        {errors.path && <span>{errors.path.message}</span>}
-      </div>
+        <div className="mt-2">
+          <div className="mb-1 block">
+            <Label htmlFor="path" value="Method and Path" />
+          </div>
+          <div className="flex">
+            <Select
+              sizing="sm"
+              id="countries"
+              className="w-24"
+              {...register("method")}
+            >
+              {methods.map((m) => (
+                <option key={m} value={m.toUpperCase()}>
+                  {m}
+                </option>
+              ))}
+            </Select>
+            <TextInput
+              id="path"
+              type="text"
+              className="w-full"
+              sizing="sm"
+              {...register("path")}
+            />
+          </div>
+          {errors.method && <span>{errors.method.message}</span>}
+          {errors.path && <span>{errors.path.message}</span>}
+        </div>
+        <div>
+          <div className="mb-1 block">
+            <Label htmlFor="responseStatusCode" value="Response Status Code" />
+          </div>
+          <TextInput
+            sizing="sm"
+            id="name"
+            type="number"
+            {...register("responseStatusCode")}
+            autoComplete="none"
+          />
+          {errors.responseStatusCode && (
+            <span>{errors.responseStatusCode.message}</span>
+          )}
+        </div>
+        <div className="mb-5 mt-3">
+          <label
+            htmlFor="responseText"
+            className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+          >
+            Response Text
+          </label>
+          {/* <textarea
+            id="responseText"
+            rows={4}
+            {...register("responseText")}
+            spellCheck={false}
+            className="block w-full border border-gray-300 bg-gray-50 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-cyan-500 dark:focus:ring-cyan-500"
+          ></textarea> */}
+          <div style={{ height: "120px" }} className="border">
+            <div ref={monacoEl} style={{ width: "80%", height: "100%" }}></div>
+          </div>
+          {errors.responseText && (
+            <p className="text-red-500">{errors.responseText.message}</p>
+          )}
+        </div>
+        <Button type="submit" size="sm" className="mt-2">
+          Save
+        </Button>
+      </form>
       <div>
-        <div className="mb-1 block">
-          <Label htmlFor="responseStatusCode" value="Response Status Code" />
-        </div>
-        <TextInput
-          sizing="sm"
-          id="name"
-          type="number"
-          {...register("responseStatusCode")}
-          autoComplete="none"
-        />
-        {errors.responseStatusCode && (
-          <span>{errors.responseStatusCode.message}</span>
-        )}
+        <h1>Logs</h1>
+        <ul>
+          {logs.map((l) => (
+            <li key={l.id}>
+              <div className="text-sm">
+                {new Date(l.timestamp).toUTCString()} {l.method} {l.path}
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
-      <div className="mb-5 mt-3">
-        <label
-          htmlFor="responseText"
-          className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-        >
-          Response Text
-        </label>
-        <textarea
-          id="responseText"
-          rows={4}
-          {...register("responseText")}
-          spellCheck={false}
-          className="block w-full border border-gray-300 bg-gray-50 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-cyan-500 dark:focus:ring-cyan-500"
-        ></textarea>
-        {errors.responseText && (
-          <p className="text-red-500">{errors.responseText.message}</p>
-        )}
-      </div>
-      <Button type="submit" size="sm" className="mt-2">
-        Save
-      </Button>
-    </form>
+    </div>
   );
 }

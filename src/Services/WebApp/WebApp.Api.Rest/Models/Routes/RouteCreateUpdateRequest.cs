@@ -23,6 +23,7 @@ public class RouteCreateUpdateRequest
         route.Name = Name;
         route.Method = Method;
         route.Path = Path;
+        route.ResponseStatusCode = ResponseStatusCode;
         route.ResponseText = ResponseText;
     }
 }

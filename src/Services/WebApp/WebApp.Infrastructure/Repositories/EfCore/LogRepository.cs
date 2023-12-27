@@ -18,8 +18,8 @@ public class LogRepository : ILogRepository
         await _appDbContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<Log>> Search(int appId)
+    public async Task<IQueryable<Log>> Search(int appId)
     {
-        return await _appDbContext.Logs.Where(l => l.AppId == appId).ToListAsync();
+        return _appDbContext.Logs.Where(l => l.AppId == appId);
     }
 }

@@ -45,6 +45,7 @@ public class RoutesController : BaseController
             route.Name,
             route.Method,
             route.Path,
+            route.ResponseStatusCode,
             route.ResponseText
         });
     }

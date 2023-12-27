@@ -92,10 +92,8 @@ app.Run(async context => {
     {
         context.Response.StatusCode = route.ResponseStatusCode;
     }
-    await context.Response.WriteAsJsonAsync(new {
-        Route = route,
-        RouteValues = routeValues
-    });
+    context.Response.ContentType = "application/json; charset=utf-8";
+    await context.Response.WriteAsync(route.ResponseText);
 });
 
 app.Run();

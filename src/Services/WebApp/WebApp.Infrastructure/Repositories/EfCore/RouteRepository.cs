@@ -50,8 +50,9 @@ public class RouteRepository : IRouteRepository
         return await _dbContext.Routes.Where(r => r.AppId == appId).ToListAsync();
     }
 
-    public Task Update(int id, Route route)
+    public async Task Update(int id, Route route)
     {
-        throw new NotImplementedException();
+        _dbContext.Routes.Update(route);
+        await _dbContext.SaveChangesAsync();
     }
 }

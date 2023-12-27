@@ -37,7 +37,14 @@ export default function RouteIndex() {
     const childPath = pathname.split("/")[4];
     if (childPath === "new") {
       setRoutes([
-        { id: 0, name: "", method: "GET", path: "", responseText: "" },
+        {
+          id: 0,
+          name: "",
+          method: "GET",
+          path: "",
+          responseStatusCode: 200,
+          responseText: "",
+        },
         ...routes,
       ]);
     }
