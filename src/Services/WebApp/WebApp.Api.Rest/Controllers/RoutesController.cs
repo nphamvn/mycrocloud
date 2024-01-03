@@ -29,7 +29,8 @@ public class RoutesController : BaseController
             r.Method,
             r.Path,
             r.Description,
-            r.ResponseText,
+            r.ResponseBody,
+            //r.ResponseBodyLanguage,
             r.CreatedAt,
             r.UpdatedAt
         }));
@@ -46,14 +47,19 @@ public class RoutesController : BaseController
             route.Method,
             route.Path,
             route.ResponseStatusCode,
-            route.ResponseText
+            route.ResponseBody,
+            //route.ResponseBodyLanguage,
+            route.CreatedAt,
+            route.UpdatedAt
         });
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(int appId, RouteCreateUpdateRequest route)
     {
-        return Ok(await _routeService.Create(appId, route.ToEntity()));
+        var entity = route.ToEntity();
+        await _routeService.Create(appId, entity);
+        return Created("", entity);
     }
     
     [HttpPut("{id:int}")]
@@ -68,6 +74,7 @@ public class RoutesController : BaseController
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        return Ok();
+        await _routeService.Delete(id);
+        return NoContent();
     }
 }

@@ -4,5 +4,6 @@ export default interface Route {
   path: string;
   method: string;
   responseStatusCode: number;
-  responseText: string;
+  responseBodyLanguage: string;
+  responseBody: string;
 }

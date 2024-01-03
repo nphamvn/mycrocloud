@@ -14,7 +14,8 @@ public class Route : BaseEntity
     public string Path { get; set; }
     public string Description { get; set; }
     public int ResponseStatusCode { get; set; }
-    public string ResponseText { get; set; }
+    public string ResponseBody { get; set; }
+    public string ResponseBodyLanguage { get; set; }
 }
 public class MatchMethodCollection : List<string>
 {

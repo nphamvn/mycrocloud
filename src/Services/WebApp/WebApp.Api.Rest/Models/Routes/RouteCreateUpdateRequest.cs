@@ -7,7 +7,8 @@ public class RouteCreateUpdateRequest
     public string Method { get; set; }
     public string Path { get; set; }
     public int ResponseStatusCode { get; set; }
-    public string ResponseText { get; set; }
+    public string ResponseBody { get; set; }
+    public string ResponseBodyLanguage { get; set; }
     public Route ToEntity()
     {
         return new Route() {
@@ -15,7 +16,8 @@ public class RouteCreateUpdateRequest
             Method = Method,
             Path = Path,
             ResponseStatusCode = ResponseStatusCode,
-            ResponseText = ResponseText
+            ResponseBody = ResponseBody,
+            ResponseBodyLanguage = ResponseBodyLanguage,
         };
     }
     public void ToEntity(Route route)
@@ -24,6 +26,7 @@ public class RouteCreateUpdateRequest
         route.Method = Method;
         route.Path = Path;
         route.ResponseStatusCode = ResponseStatusCode;
-        route.ResponseText = ResponseText;
+        route.ResponseBody = ResponseBody;
+        route.ResponseBodyLanguage = ResponseBodyLanguage;
     }
 }

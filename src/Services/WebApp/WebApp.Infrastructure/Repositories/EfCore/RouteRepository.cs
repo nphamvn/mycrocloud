@@ -25,9 +25,11 @@ public class RouteRepository : IRouteRepository
         throw new NotImplementedException();
     }
 
-    public Task Delete(int id)
+    public async Task Delete(int id)
     {
-        throw new NotImplementedException();
+        var route = await _dbContext.Routes.FirstOrDefaultAsync(r => r.Id == id);
+        _dbContext.Routes.Remove(route);
+        await _dbContext.SaveChangesAsync();
     }
 
     public async Task<Route> Find(int appId, string method, string path)

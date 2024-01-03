@@ -16,7 +16,8 @@ type Inputs = {
   path: string;
   method: string;
   responseStatusCode: number;
-  responseText: string;
+  responseBodyLanguage: string;
+  responseBody: string;
 };
 
 export default function RouteCreateUpdate({
@@ -35,7 +36,8 @@ export default function RouteCreateUpdate({
     path: yup.string().required(),
     method: yup.string().required(),
     responseStatusCode: yup.number().required(),
-    responseText: yup
+    responseBodyLanguage: yup.string().required(),
+    responseBody: yup
       .string()
       .required()
       .max(400, "Response text must be at most 400 characters"),
@@ -45,7 +47,6 @@ export default function RouteCreateUpdate({
     handleSubmit,
     formState: { errors },
     setValue,
-    getValues,
   } = useForm<Inputs>({
     resolver: yupResolver(schema),
   });
@@ -63,8 +64,8 @@ export default function RouteCreateUpdate({
         });
 
         instance.onDidChangeModelContent(() => {
-          console.log(instance.getValue());
-          setValue("responseText", instance.getValue());
+          console.log("onDidChangeModelContent");
+          setValue("responseBody", instance.getValue());
         });
         return instance;
       });
@@ -88,8 +89,8 @@ export default function RouteCreateUpdate({
       setValue("method", route.method.toUpperCase());
       setValue("path", route.path);
       setValue("responseStatusCode", route.responseStatusCode);
-      setValue("responseText", route.responseText);
-      editor.setValue(route.responseText);
+      setValue("responseBodyLanguage", route.responseBodyLanguage);
+      editor.setValue(route.responseBody);
     };
     const getLogs = async (id: number) => {
       const accessToken = await getAccessTokenSilently();
@@ -131,6 +132,7 @@ export default function RouteCreateUpdate({
       }
     }
   };
+  const bodyLanguages = ["json", "plaintext"];
   return (
     <div>
       <form className="p-2" onSubmit={handleSubmit(onSubmit)}>
@@ -147,6 +149,7 @@ export default function RouteCreateUpdate({
           />
           {errors.name && <span>{errors.name.message}</span>}
         </div>
+        <h6 className="mt-3 border-l-2 border-cyan-600 pl-1">Request</h6>
         <div className="mt-2">
           <div className="mb-1 block">
             <Label htmlFor="path" value="Method and Path" />
@@ -175,9 +178,10 @@ export default function RouteCreateUpdate({
           {errors.method && <span>{errors.method.message}</span>}
           {errors.path && <span>{errors.path.message}</span>}
         </div>
+        <h6 className="mt-3 border-l-2 border-cyan-600 pl-1">Response</h6>
         <div>
           <div className="mb-1 block">
-            <Label htmlFor="responseStatusCode" value="Response Status Code" />
+            <Label htmlFor="responseStatusCode" value="Status Code" />
           </div>
           <TextInput
             sizing="sm"
@@ -192,23 +196,24 @@ export default function RouteCreateUpdate({
         </div>
         <div className="mb-5 mt-3">
           <label
-            htmlFor="responseText"
+            htmlFor="responseBody"
             className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
           >
-            Response Text
+            Body
           </label>
-          {/* <textarea
-            id="responseText"
-            rows={4}
-            {...register("responseText")}
-            spellCheck={false}
-            className="block w-full border border-gray-300 bg-gray-50 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-cyan-500 dark:focus:ring-cyan-500"
-          ></textarea> */}
+          <div>
+            <label htmlFor="responseBodyLanguage">Language</label>
+            <select {...register("responseBodyLanguage")}>
+              {bodyLanguages.map((l) => (
+                <option key={l}>{l}</option>
+              ))}
+            </select>
+          </div>
           <div style={{ height: "120px" }} className="border">
             <div ref={monacoEl} style={{ width: "80%", height: "100%" }}></div>
           </div>
-          {errors.responseText && (
-            <p className="text-red-500">{errors.responseText.message}</p>
+          {errors.responseBody && (
+            <p className="text-red-500">{errors.responseBody.message}</p>
           )}
         </div>
         <Button type="submit" size="sm" className="mt-2">

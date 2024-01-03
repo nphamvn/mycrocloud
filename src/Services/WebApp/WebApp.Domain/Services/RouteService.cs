@@ -6,6 +6,7 @@ namespace WebApp.Domain.Services;
 public interface IRouteService
 {
     Task<int> Create(int appId, Route route);
+    Task Delete(int id);
     Task Update(int id, Route route);
 }
 public class RouteService : IRouteService
@@ -20,6 +21,11 @@ public class RouteService : IRouteService
     {
         route.AppId = appId;
         return await _routeRepository.Add(appId, route);
+    }
+
+    public async Task Delete(int id)
+    {
+        await _routeRepository.Delete(id);
     }
 
     public async Task Update(int id, Route route)

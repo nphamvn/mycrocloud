@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WebApp.Domain.Entities;
+﻿using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
 
 namespace WebApp.Infrastructure.Repositories.EfCore;

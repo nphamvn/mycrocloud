@@ -1,10 +1,16 @@
 version: '3.8'
 services:
-  app-rest-api:
+  restapi:
     build:
       dockerfile: WebApp.Api.Rest/Dockerfile
     ports:
       - "8080:8080"
+      
+  apigateway:
+    build: 
+      dockerfile: WebApp.MiniApiGateway/Dockerfile
+    ports:
+      - "8180:8080"
 
   seq:
     image: datalust/seq

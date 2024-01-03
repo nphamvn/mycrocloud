@@ -13,9 +13,10 @@ public class LogsController : BaseController
     {
         _logRepository = logRepository;
     }
-    public async Task<IActionResult> Search(int appId, int? routeId) {
+    public async Task<IActionResult> Search(int appId, int? routeId, DateTime? accessDate) {
         var logs = await _logRepository.Search(appId);
         if (routeId is not null) logs = logs.Where(l => l.RouteId == routeId);
+        if (accessDate is not null) logs = logs.Where(l => l.CreatedAt.Date == accessDate.Value.Date);
         return Ok(logs.Select(l => new {
             l.Id,
             Timestamp = l.CreatedAt,

@@ -2,7 +2,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import Route from "./Route";
 import { AppContext } from "../apps/AppContext";
-import { Dropdown } from "flowbite-react";
+import { Button, Dropdown } from "flowbite-react";
 import RouteCreateUpdate from "./RouteCreateUpdate";
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -43,13 +43,28 @@ export default function RouteIndex() {
           method: "GET",
           path: "",
           responseStatusCode: 200,
-          responseText: "",
+          responseBodyLanguage: "json",
+          responseBody: "",
         },
         ...routes,
       ]);
     }
   }, [pathname]);
   const handleNewFolderClick = () => {};
+  const handleDeleteRouteClick = async (id: number) => {
+    if (confirm("Are you sure want to delete this route?")) {
+      const accessToken = await getAccessTokenSilently();
+      const res = await fetch(`/api/apps/${app.id}/routes/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      if (res.ok) {
+        navigate(`/apps/${app.id}/routes`);
+      }
+    }
+  };
   return (
     <div className="flex h-full">
       <div className="w-64 border-r p-1">
@@ -75,11 +90,23 @@ export default function RouteIndex() {
       </div>
       <div className="w-full">
         {childPath === "new" || routeId !== undefined ? (
-          <RouteCreateUpdate
-            key={routeId}
-            routeId={routeId}
-            methods={methods}
-          />
+          <>
+            <div>
+              <Button
+                disabled={routeId === undefined}
+                size={"xs"}
+                color="red"
+                onClick={() => handleDeleteRouteClick(routeId!)}
+              >
+                Delete
+              </Button>
+            </div>
+            <RouteCreateUpdate
+              key={routeId}
+              routeId={routeId}
+              methods={methods}
+            />
+          </>
         ) : (
           <div>
             Click New button to create new route or click route to edit.

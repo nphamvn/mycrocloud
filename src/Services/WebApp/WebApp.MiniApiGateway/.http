@@ -1,10 +1,18 @@
-@HostAddress = http://localhost:5010
+@HostAddress = http://localhost:8180
+
+###
+GET {{HostAddress}}/ping
+X-AppId:App-1
 
 ###
 GET {{HostAddress}}/foo
 X-AppId:App-1
 ### 
 GET {{HostAddress}}/books/1
+X-AppId:App-1
+
+###
+POST  {{HostAddress}}/books
 X-AppId:App-1
 
 ### 
