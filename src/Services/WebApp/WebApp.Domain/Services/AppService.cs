@@ -4,6 +4,7 @@ using WebApp.Domain.Repositories;
 namespace WebApp.Domain.Services;
 public interface IAppService {
     Task Create(string userId, App app);
+    Task Delete(int id);
     Task Rename(int id, string name);
 }
 
@@ -18,6 +19,11 @@ public class AppService : IAppService
     public async Task Create(string userId, App app)
     {
         await _appRepository.Add(userId, app);
+    }
+
+    public async Task Delete(int id)
+    {
+        await _appRepository.Delete(id);
     }
 
     public async Task Rename(int id, string name)

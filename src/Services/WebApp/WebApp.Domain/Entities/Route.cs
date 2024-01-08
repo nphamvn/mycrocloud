@@ -13,10 +13,20 @@ public class Route : BaseEntity
     public string Method { get; set; }
     public string Path { get; set; }
     public string Description { get; set; }
-    public int ResponseStatusCode { get; set; }
-    public string ResponseBody { get; set; }
-    public string ResponseBodyLanguage { get; set; }
+    public string ResponseType { get; set; }
+    public int? ResponseStatusCode { get; set; }
+    public List<ResponseHeader>? ResponseHeaders { get; set; }
+    public string? ResponseBody { get; set; }
+    public string? ResponseBodyLanguage { get; set; }
+    public string? FunctionHandler { get; set; }
 }
+
+public class ResponseHeader
+{
+    public string Name { get; set; }
+    public string Value { get; set; }
+}
+
 public class MatchMethodCollection : List<string>
 {
 

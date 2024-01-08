@@ -52,8 +52,8 @@ function Header() {
               label={<Avatar alt="User settings" img={user?.picture} rounded />}
             >
               <Dropdown.Header>
-                <span className="block text-sm">{user?.name}</span>
-                <span className="block truncate text-sm font-medium">
+                <span className="block">{user?.name}</span>
+                <span className="block truncate font-medium">
                   {user?.email}
                 </span>
               </Dropdown.Header>

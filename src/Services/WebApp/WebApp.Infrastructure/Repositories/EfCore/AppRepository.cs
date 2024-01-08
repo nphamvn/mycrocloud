@@ -15,9 +15,11 @@ public class AppRepository(AppDbContext dbContext) : IAppRepository
         await _dbContext.SaveChangesAsync();
     }
 
-    public Task Delete(int appId)
+    public async Task Delete(int appId)
     {
-        throw new NotImplementedException();
+        var app = await _dbContext.Apps.FirstAsync(a => a.Id == appId);
+        _dbContext.Apps.Remove(app);
+        await _dbContext.SaveChangesAsync();
     }
 
     public async Task<App> FindByAppId(int id)

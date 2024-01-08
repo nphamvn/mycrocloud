@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApp.Infrastructure.Repositories.EfCore;
 
@@ -11,9 +12,11 @@ using WebApp.Infrastructure.Repositories.EfCore;
 namespace WebApp.Infrastructure.Repositories.EfCore.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class DbContextModelSnapshot : ModelSnapshot
+    [Migration("20240106121907_AddRouteResponseHeaders")]
+    partial class AddRouteResponseHeaders
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -103,9 +106,6 @@ namespace WebApp.Infrastructure.Repositories.EfCore.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FunctionHandler")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Method")
                         .HasColumnType("nvarchar(max)");
 
@@ -121,11 +121,8 @@ namespace WebApp.Infrastructure.Repositories.EfCore.Migrations
                     b.Property<string>("ResponseBodyLanguage")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ResponseStatusCode")
+                    b.Property<int>("ResponseStatusCode")
                         .HasColumnType("int");
-
-                    b.Property<string>("ResponseType")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -162,22 +159,15 @@ namespace WebApp.Infrastructure.Repositories.EfCore.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsMany("WebApp.Domain.Entities.ResponseHeader", "ResponseHeaders", b1 =>
+                    b.OwnsOne("System.Collections.Generic.List<WebApp.Domain.Entities.ResponseHeader>", "ResponseHeaders", b1 =>
                         {
                             b1.Property<int>("RouteId")
                                 .HasColumnType("int");
 
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
+                            b1.Property<int>("Capacity")
                                 .HasColumnType("int");
 
-                            b1.Property<string>("Name")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Value")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("RouteId", "Id");
+                            b1.HasKey("RouteId");
 
                             b1.ToTable("Routes");
 

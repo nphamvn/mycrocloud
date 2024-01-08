@@ -1,11 +1,11 @@
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Api.Filters;
 using WebApp.Api.Rest;
 using WebApp.Domain.Services;
 using WebApp.Domain.Repositories;
 using WebApp.Infrastructure.Repositories.EfCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,17 +35,15 @@ builder.Services.AddCors(options =>
 });
 
 // 1. Add Authentication Services
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.Authority = builder.Configuration["Authentication:Schemes:Auth0JwtBearer:Authority"];
-    options.Audience = builder.Configuration["Authentication:Schemes:Auth0JwtBearer:Audience"];
-});
+builder.Services.AddAuthentication()
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = builder.Configuration["Authentication:Schemes:Auth0JwtBearer:Authority"];
+                    options.Audience = builder.Configuration["Authentication:Schemes:Auth0JwtBearer:Audience"];
+                });
 builder.Services.AddAuthorization();
-builder.Services.AddDbContext<AppDbContext>(options => {
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
 });
 builder.Services.AddScoped<IAppRepository, AppRepository>();

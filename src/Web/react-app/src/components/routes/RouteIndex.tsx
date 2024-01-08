@@ -1,19 +1,24 @@
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  Outlet,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import Route from "./Route";
 import { AppContext } from "../apps/AppContext";
-import { Button, Dropdown } from "flowbite-react";
-import RouteCreateUpdate from "./RouteCreateUpdate";
+import { Dropdown } from "flowbite-react";
 import { useAuth0 } from "@auth0/auth0-react";
 
 export default function RouteIndex() {
   const app = useContext(AppContext)!;
   const [routes, setRoutes] = useState<Route[]>([]);
-  const [methods, setMethods] = useState<string[]>([]);
   const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const childPath = pathname.split("/")[4];
+  const tab = pathname.split("/")[5] || "edit";
   const params = useParams();
   const routeId = params["routeId"] ? parseInt(params["routeId"]) : undefined;
   useEffect(() => {
@@ -29,9 +34,6 @@ export default function RouteIndex() {
       setRoutes(routes);
     };
     getRoutes();
-    setTimeout(() => {
-      setMethods(["GET", "POST"]);
-    }, 100);
   }, []);
   useEffect(() => {
     const childPath = pathname.split("/")[4];
@@ -42,7 +44,9 @@ export default function RouteIndex() {
           name: "",
           method: "GET",
           path: "",
+          responseType: "static",
           responseStatusCode: 200,
+          responseHeaders: [],
           responseBodyLanguage: "json",
           responseBody: "",
         },
@@ -67,7 +71,7 @@ export default function RouteIndex() {
   };
   return (
     <div className="flex h-full">
-      <div className="w-64 border-r p-1">
+      <div className="w-48 border-r p-1">
         <Dropdown size="xs" label="New">
           <Dropdown.Item onClick={() => navigate("new")}>Route</Dropdown.Item>
           <Dropdown.Item disabled onClick={handleNewFolderClick}>
@@ -88,25 +92,45 @@ export default function RouteIndex() {
           })}
         </ul>
       </div>
-      <div className="w-full">
+      <div className="h-full flex-1">
         {childPath === "new" || routeId !== undefined ? (
-          <>
-            <div>
-              <Button
-                disabled={routeId === undefined}
-                size={"xs"}
-                color="red"
-                onClick={() => handleDeleteRouteClick(routeId!)}
-              >
-                Delete
-              </Button>
+          <div>
+            {routeId !== undefined && (
+              <div className="mb-1 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex">
+                  <Link
+                    to={`${routeId}`}
+                    className={`border px-3 py-0.5 ${
+                      tab === "edit"
+                        ? "text-primary border-t-primary border-b-0 border-t-2"
+                        : ""
+                    }`}
+                  >
+                    Edit
+                  </Link>
+                  <Link
+                    to={`${routeId}/logs`}
+                    className={`border px-3 py-0.5 ${
+                      tab === "logs"
+                        ? "text-primary border-t-primary border-b-0 border-t-2"
+                        : ""
+                    }`}
+                  >
+                    Logs
+                  </Link>
+                  <button
+                    onClick={() => handleDeleteRouteClick(routeId)}
+                    className="me-1 ms-auto text-sm text-red-600"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            )}
+            <div className="h-full overflow-y-auto">
+              <Outlet key={routeId} />
             </div>
-            <RouteCreateUpdate
-              key={routeId}
-              routeId={routeId}
-              methods={methods}
-            />
-          </>
+          </div>
         ) : (
           <div>
             Click New button to create new route or click route to edit.
@@ -120,6 +144,9 @@ function RouteItem({ route }: { route: Route }) {
   const methodTextColors = new Map<string, string>([
     ["GET", "text-sky-400"],
     ["POST", "text-orange-400"],
+    ["PUT", "text-rose-400"],
+    ["DELETE", "text-red-400"],
+    ["PATCH", "text-yellow-400"],
   ]);
   return (
     <div className="flex items-center p-0.5" style={{ cursor: "pointer" }}>

@@ -23,13 +23,13 @@ export default function AppList() {
   return (
     <div className="mx-auto mt-2 max-w-4xl p-2">
       <div className="flex items-center">
-        <h1 className="font-semibold">Your Apps</h1>
+        <h1 className="font-semibold">Apps</h1>
         <button
           type="button"
           className="group relative ms-auto flex items-center justify-center border border-transparent bg-cyan-700 p-0.5 text-center font-medium text-white focus:z-10 focus:outline-none focus:ring-2 focus:ring-cyan-300 enabled:hover:bg-cyan-800 dark:bg-cyan-600 dark:focus:ring-cyan-800 dark:enabled:hover:bg-cyan-700"
           onClick={() => location("/apps/new")}
         >
-          <span className="flex items-center rounded-md px-3 py-1.5 text-sm transition-all duration-200">
+          <span className="flex items-center rounded-md px-3 py-1 text-sm transition-all duration-200">
             New
           </span>
         </button>
@@ -44,7 +44,8 @@ export default function AppList() {
         <input
           type="text"
           id="search-input"
-          className="block w-full border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+          placeholder="Search..."
+          className="block w-full border border-gray-300 bg-gray-50 p-1.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
         />
       </form>
       <ul className="mt-3 divide-y">

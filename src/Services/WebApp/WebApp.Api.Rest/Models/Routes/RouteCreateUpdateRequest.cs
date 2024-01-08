@@ -6,18 +6,25 @@ public class RouteCreateUpdateRequest
     public string Name { get; set; }
     public string Method { get; set; }
     public string Path { get; set; }
-    public int ResponseStatusCode { get; set; }
-    public string ResponseBody { get; set; }
-    public string ResponseBodyLanguage { get; set; }
+    public string ResponseType { get; set; }
+    public int? ResponseStatusCode { get; set; }
+    public List<ResponseHeader> ResponseHeaders { get; set; } = [];
+    public string? ResponseBody { get; set; }
+    public string? ResponseBodyLanguage { get; set; }
+    public string? FunctionHandler { get; set; }
+
     public Route ToEntity()
     {
         return new Route() {
             Name = Name,
             Method = Method,
             Path = Path,
+            ResponseType = ResponseType,
             ResponseStatusCode = ResponseStatusCode,
-            ResponseBody = ResponseBody,
+            ResponseHeaders = ResponseHeaders.Select(h => h.ToEntity()).ToList(),
             ResponseBodyLanguage = ResponseBodyLanguage,
+            ResponseBody = ResponseBody,
+            FunctionHandler = FunctionHandler,
         };
     }
     public void ToEntity(Route route)
@@ -25,8 +32,25 @@ public class RouteCreateUpdateRequest
         route.Name = Name;
         route.Method = Method;
         route.Path = Path;
+        route.ResponseType = ResponseType;
         route.ResponseStatusCode = ResponseStatusCode;
-        route.ResponseBody = ResponseBody;
+        route.ResponseHeaders = ResponseHeaders?.Select(h => h.ToEntity()).ToList();
         route.ResponseBodyLanguage = ResponseBodyLanguage;
+        route.ResponseBody = ResponseBody;
+        route.FunctionHandler = FunctionHandler;
+    }
+}
+
+public class ResponseHeader
+{
+    public string Name { get; set; }
+    public string Value { get; set; }
+
+    public Domain.Entities.ResponseHeader ToEntity()
+    {
+        return new Domain.Entities.ResponseHeader() {
+            Name = Name,
+            Value = Value
+        };
     }
 }

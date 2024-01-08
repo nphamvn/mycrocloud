@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Api.Models;
+using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
 using WebApp.Domain.Services;
 
@@ -28,9 +29,6 @@ public class RoutesController : BaseController
             r.Name,
             r.Method,
             r.Path,
-            r.Description,
-            r.ResponseBody,
-            //r.ResponseBodyLanguage,
             r.CreatedAt,
             r.UpdatedAt
         }));
@@ -46,9 +44,15 @@ public class RoutesController : BaseController
             route.Name,
             route.Method,
             route.Path,
+            route.ResponseType,
             route.ResponseStatusCode,
+            ResponseHeaders = (route.ResponseHeaders ?? []).Select(h => new {
+                h.Name,
+                h.Value
+            }),
             route.ResponseBody,
-            //route.ResponseBodyLanguage,
+            route.ResponseBodyLanguage,
+            route.FunctionHandler,
             route.CreatedAt,
             route.UpdatedAt
         });

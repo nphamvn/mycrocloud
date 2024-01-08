@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApp.Infrastructure.Repositories.EfCore;
 
@@ -11,9 +12,11 @@ using WebApp.Infrastructure.Repositories.EfCore;
 namespace WebApp.Infrastructure.Repositories.EfCore.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class DbContextModelSnapshot : ModelSnapshot
+    [Migration("20240107080415_AddResponseBodyRenderEngine")]
+    partial class AddResponseBodyRenderEngine
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -103,9 +106,6 @@ namespace WebApp.Infrastructure.Repositories.EfCore.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FunctionHandler")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Method")
                         .HasColumnType("nvarchar(max)");
 
@@ -118,14 +118,17 @@ namespace WebApp.Infrastructure.Repositories.EfCore.Migrations
                     b.Property<string>("ResponseBody")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("ResponseBodyDynamic")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ResponseBodyLanguage")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ResponseStatusCode")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ResponseType")
+                    b.Property<string>("ResponseBodyRenderEngine")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ResponseStatusCode")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");

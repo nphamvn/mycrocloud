@@ -59,30 +59,28 @@ export default function AppIndex() {
           </Breadcrumb.Item>
           <Breadcrumb.Item>{app.name}</Breadcrumb.Item>
         </Breadcrumb>
-        <div className="flex min-h-screen flex-row border">
-          <div className="flex w-32 flex-col space-y-0.5 border-r p-1">
+        <div className="flex min-h-screen border">
+          <div className="flex w-24 flex-col space-y-0.5 border-r p-1">
             <Link
               to="overview"
-              className={`${
-                path === "overview" ? "text-cyan-700" : ""
-              } text-sm`}
+              className={`${path === "overview" ? "text-cyan-700" : ""}`}
             >
               Overview
             </Link>
             <Link
               to="routes"
-              className={`${path === "routes" ? "text-cyan-700" : ""} text-sm`}
+              className={`${path === "routes" ? "text-cyan-700" : ""}`}
             >
               Routes
             </Link>
             <Link
               to="logs"
-              className={`${path === "logs" ? "text-cyan-700" : ""} text-sm`}
+              className={`${path === "logs" ? "text-cyan-700" : ""}`}
             >
               Logs
             </Link>
           </div>
-          <div className="w-full">
+          <div className="flex-1">
             <Outlet />
           </div>
         </div>

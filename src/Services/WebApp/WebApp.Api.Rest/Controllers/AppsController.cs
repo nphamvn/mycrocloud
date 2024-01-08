@@ -60,6 +60,7 @@ public class AppsController : BaseController
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
+        await _appService.Delete(id);
         return NoContent();
     }
 }

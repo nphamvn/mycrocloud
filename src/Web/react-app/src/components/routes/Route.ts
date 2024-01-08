@@ -1,9 +1,17 @@
 export default interface Route {
-  id: number | undefined;
+  id: number;
   name: string;
   path: string;
   method: string;
-  responseStatusCode: number;
-  responseBodyLanguage: string;
-  responseBody: string;
+  responseType: string;
+  responseStatusCode?: number;
+  responseHeaders?: Header[];
+  responseBodyLanguage?: string;
+  responseBody?: string;
+  functionHandler?: string;
+}
+
+interface Header {
+  name: string;
+  value: string;
 }

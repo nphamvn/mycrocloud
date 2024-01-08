@@ -12,6 +12,13 @@ public class AppDbContext : DbContext
     {
 
     }
+    override protected void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Route>().OwnsMany(route => route.ResponseHeaders, ownednavigationBuilder =>
+        {
+            ownednavigationBuilder.ToJson();
+        });
+    }
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         AddTimestamps();
