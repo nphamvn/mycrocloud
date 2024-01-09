@@ -1,7 +1,9 @@
+using System.Diagnostics;
 using System.Text.Json;
 using Jint;
 using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.EntityFrameworkCore;
+using WebApp.Domain;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
 using WebApp.Infrastructure.Repositories.EfCore;
@@ -78,13 +80,17 @@ app.Use(async (context, next) =>
 
     await next(context);
 
+    var functionExecutionResult = context.Items["_FunctionExecutionResult"] as FunctionExecutionResult;
+
     await logRepository.Add(new Log
     {
         App = app,
         Route = route,
         Method = context.Request.Method,
         Path = context.Request.Path,
-        StatusCode = context.Response.StatusCode
+        StatusCode = context.Response.StatusCode,
+        AdditionalLogMessage = functionExecutionResult?.AdditionalLogMessage,
+        FunctionExecutionDuration = functionExecutionResult?.Duration
     });
 });
 
@@ -123,27 +129,91 @@ app.Run(async context =>
             headers = context.Request.Headers.ToDictionary(x => x.Key, x => x.Value.ToString()),
             body = reqBody
         };
+        //Start measuring time for function execution
+        var stopwatch = Stopwatch.StartNew();
+
         var engine = new Engine()
                         .Execute(route.FunctionHandler ?? throw new InvalidOperationException("FunctionHandler is null"));
         var handler = engine.GetValue("handler");
         if (route.FunctionHandler == "AwsLamda")
         {
-            
+
         }
         else
         {
-            var res = new ExpressJsHandlerTemplateResponse();
-            engine.Invoke(handler, req, res);
-            context.Response.StatusCode = res.statusCode ?? 200;
-            if (res.headers is not null)
+            //Execute function and get response
+            var result = new FunctionExecutionResult();
+            var jsResult = engine.Invoke(handler, req);
+            stopwatch.Stop();
+            result.Duration = stopwatch.Elapsed;
+            var statusCode = jsResult.Get("statusCode");
+            if (!statusCode.IsNull())
             {
-                var headers = JsonSerializer.Deserialize<Dictionary<string, string>>(JsonSerializer.Serialize(res.headers)) ?? [];
-                foreach (var (key, value) in headers)
+                result.StatusCode = (int)statusCode.AsNumber();
+            }
+            var headers = jsResult.Get("headers");
+            if (!headers.IsNull())
+            {
+                var headersObject = headers.AsObject();
+                var headersObjectProperties = headersObject.GetOwnProperties();
+                foreach (var (k, v) in headersObjectProperties)
                 {
-                    context.Response.Headers.Append(key, value);
+                    var headerName = k.AsString();
+                    string headerValue;
+
+                    if (headerName is null)
+                    {
+                        continue;
+                    }
+
+                    var value = v.Value;
+
+                    if (value.IsNull())
+                    {
+                        continue;
+                    }
+                    if (value.IsNumber())
+                    {
+                        headerValue = value.AsNumber().ToString();
+                    }
+                    else if (value.IsString())
+                    {
+                        headerValue = value.AsString();
+                    }
+                    else if (value.IsBoolean())
+                    {
+                        headerValue = value.AsBoolean().ToString();
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                    if (!result.Headers.TryAdd(headerName, headerValue))
+                    {
+                        result.Headers[headerName] = headerValue;
+                    }
                 }
             }
-            await context.Response.WriteAsync(res.body ?? "");
+            var body = jsResult.Get("body");
+            if (!body.IsNull())
+            {
+                result.Body = body.AsString();
+            }
+            var additionalLogMessage = jsResult.Get("additionalLogMessage");
+            if (!additionalLogMessage.IsNull())
+            {
+                result.AdditionalLogMessage = additionalLogMessage.AsString();
+            }
+
+            //Write response
+            context.Response.StatusCode = result.StatusCode ?? 200;
+            foreach (var (key, value) in result.Headers)
+            {
+                context.Response.Headers.Append(key, value);
+            }
+            await context.Response.WriteAsync(result.Body ?? "");
+            context.Items["_FunctionExecutionResult"] = result;
         }
 
         return;
@@ -153,13 +223,11 @@ app.Run(async context =>
 
 app.Run();
 
-class Response
+class FunctionExecutionResult
 {
-
-}
-class ExpressJsHandlerTemplateResponse : Response
-{
-    public int? statusCode { get; set; }
-    public object? headers { get; set; }
-    public string? body { get; set; }
+    public int? StatusCode { get; set; }
+    public Dictionary<string, string> Headers { get; set; } = [];
+    public string? Body { get; set; }
+    public string? AdditionalLogMessage { get; set; }
+    public TimeSpan Duration { get; set; }
 }

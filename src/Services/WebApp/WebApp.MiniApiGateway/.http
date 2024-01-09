@@ -23,3 +23,7 @@ X-AppId:App-1
 ###
 GET {{HostAddress}}/hi?name=Nam
 X-AppId:App-5
+
+###
+GET {{HostAddress}}/now
+X-AppId:App-5

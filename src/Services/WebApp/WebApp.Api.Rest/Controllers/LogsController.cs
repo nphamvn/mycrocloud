@@ -33,7 +33,9 @@ public class LogsController : BaseController
             l.RouteId,
             l.Method,
             l.Path,
-            l.StatusCode
+            l.StatusCode,
+            l.FunctionExecutionDuration,
+            l.AdditionalLogMessage
         }));
     }
 }

@@ -10,4 +10,6 @@ public class Log : BaseEntity
     public string Method { get; set; }
     public string Path { get; set; }
     public int StatusCode { get; set; }
+    public string? AdditionalLogMessage { get; set; }
+    public TimeSpan? FunctionExecutionDuration { get; set; }
 }

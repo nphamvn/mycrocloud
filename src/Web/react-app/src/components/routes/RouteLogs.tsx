@@ -29,7 +29,9 @@ export default function RouteLogs() {
         {logs.map((l) => (
           <li key={l.id}>
             <div className="text-sm">
-              {new Date(l.timestamp).toUTCString()} {l.method} {l.path}
+              {new Date(l.timestamp).toUTCString()} {l.method} {l.path}{" "}
+              {l.statusCode} {l.functionExecutionDuration || "-"}ms{" "}
+              {l.additionalLogMessage}
             </div>
           </li>
         ))}

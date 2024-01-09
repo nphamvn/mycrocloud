@@ -71,7 +71,7 @@ export default function AppLogs() {
         <div className="flex">
           <button
             type="submit"
-            className="bg-primary ms-auto px-2 py-0.5 text-white"
+            className="ms-auto bg-primary px-2 py-0.5 text-white"
           >
             Filter
           </button>
@@ -82,7 +82,9 @@ export default function AppLogs() {
         {logs.map((l) => (
           <li key={l.id}>
             <div className="text-sm">
-              {new Date(l.timestamp).toUTCString()} {l.method} {l.path}
+              {new Date(l.timestamp).toUTCString()} {l.method} {l.path}{" "}
+              {l.statusCode} {l.functionExecutionDuration}ms{" "}
+              {l.additionalLogMessage}
             </div>
           </li>
         ))}

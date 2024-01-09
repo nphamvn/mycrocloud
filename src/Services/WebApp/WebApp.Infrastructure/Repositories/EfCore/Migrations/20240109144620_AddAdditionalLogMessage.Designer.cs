@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApp.Infrastructure.Repositories.EfCore;
 
@@ -11,9 +12,11 @@ using WebApp.Infrastructure.Repositories.EfCore;
 namespace WebApp.Infrastructure.Repositories.EfCore.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class DbContextModelSnapshot : ModelSnapshot
+    [Migration("20240109144620_AddAdditionalLogMessage")]
+    partial class AddAdditionalLogMessage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -64,9 +67,6 @@ namespace WebApp.Infrastructure.Repositories.EfCore.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<TimeSpan?>("FunctionExecutionDuration")
-                        .HasColumnType("time");
 
                     b.Property<string>("Method")
                         .HasColumnType("nvarchar(max)");

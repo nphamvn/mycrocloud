@@ -341,10 +341,11 @@ function FunctionHandler() {
     formState: { errors },
     setValue,
     getValues,
-    watch
+    watch,
   } = useFormContext<Inputs>();
   const handlerEditorRef = useRef(null);
-  const [handlerEditor, setHandlerEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
+  const [handlerEditor, setHandlerEditor] =
+    useState<monaco.editor.IStandaloneCodeEditor>();
 
   useEffect(() => {
     let isMounted = true;
@@ -370,26 +371,16 @@ function FunctionHandler() {
       isMounted = false;
     };
   }, [handlerEditorRef.current]);
-  const functionHandlerTemplate = watch('functionHandlerTemplate');
+  const functionHandlerTemplate = watch("functionHandlerTemplate");
   useEffect(() => {
     if (functionHandlerTemplate && handlerEditor) {
-      let template = '';
-      switch (functionHandlerTemplate) {
-        case 'expressjs':
-          template = `function handler(req, res) {\n}`;
-          break;
-        default:
-          template = `function handler(req) {\n}`;
-          break;
-      }
-      handlerEditor.getModel()?.setValue(template);
     }
   }, [functionHandlerTemplate]);
   return (
     <>
       <div className="mt-1">
         <label className="block">Template</label>
-        <select {...register('functionHandlerTemplate')}>
+        <select {...register("functionHandlerTemplate")}>
           <option value={"expressjs"}>ExpressJs</option>
           <option value={"awslamda"}>Aws Lamda</option>
         </select>
@@ -398,7 +389,7 @@ function FunctionHandler() {
         <label>Handler</label>
         <div
           ref={handlerEditorRef}
-          style={{ width: "100%", height: "600px" }}
+          style={{ width: "100%", height: "200px" }}
         ></div>
         {errors.functionHandler && (
           <p className="text-red-500">{errors.functionHandler.message}</p>
