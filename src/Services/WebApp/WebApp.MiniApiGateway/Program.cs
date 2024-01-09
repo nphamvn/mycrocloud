@@ -123,21 +123,29 @@ app.Run(async context =>
             headers = context.Request.Headers.ToDictionary(x => x.Key, x => x.Value.ToString()),
             body = reqBody
         };
-        var res = new Response();
         var engine = new Engine()
                         .Execute(route.FunctionHandler ?? throw new InvalidOperationException("FunctionHandler is null"));
         var handler = engine.GetValue("handler");
-        engine.Invoke(handler, req, res);
-        context.Response.StatusCode = res.status ?? 200;
-        if (res.headers is not null)
+        if (route.FunctionHandler == "AwsLamda")
         {
-            var headers = JsonSerializer.Deserialize<Dictionary<string, string>>(JsonSerializer.Serialize(res.headers)) ?? [];
-            foreach (var (key, value) in headers)
-            {
-                context.Response.Headers.Append(key, value);
-            }
+            
         }
-        await context.Response.WriteAsync(res.body ?? "");
+        else
+        {
+            var res = new ExpressJsHandlerTemplateResponse();
+            engine.Invoke(handler, req, res);
+            context.Response.StatusCode = res.statusCode ?? 200;
+            if (res.headers is not null)
+            {
+                var headers = JsonSerializer.Deserialize<Dictionary<string, string>>(JsonSerializer.Serialize(res.headers)) ?? [];
+                foreach (var (key, value) in headers)
+                {
+                    context.Response.Headers.Append(key, value);
+                }
+            }
+            await context.Response.WriteAsync(res.body ?? "");
+        }
+
         return;
     }
     throw new NotImplementedException();
@@ -147,7 +155,11 @@ app.Run();
 
 class Response
 {
-    public int? status { get; set; }
+
+}
+class ExpressJsHandlerTemplateResponse : Response
+{
+    public int? statusCode { get; set; }
     public object? headers { get; set; }
     public string? body { get; set; }
 }

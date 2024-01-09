@@ -5,15 +5,17 @@ dotnet ef migrations add <MigrationName> -s ../WebApp.Api.Rest/WebApp.Api.Rest.c
 ```
 Example:
 ```
-dotnet ef migrations add AlterRoute -s ../WebApp.Api.Rest/WebApp.Api.Rest.csproj -o Repositories/EfCore/Migrations
-```
+dotnet ef migrations add AddFunctionHandlerTemplate -s ../WebApp.Api.Rest/WebApp.Api.Rest.csproj -o Repositories/EfCore/Migrations
 
-#### 2. Remove migration
 ```
-dotnet ef migrations remove -s ../WebApp.Api.Rest/WebApp.Api.Rest.csproj
-```
-
 #### 2. Update database
 ```
 dotnet ef database update -s ../WebApp.Api.Rest/WebApp.Api.Rest.csproj
 ```
+
+# Others
+#### 1. Remove migration
+```
+dotnet ef migrations remove -s ../WebApp.Api.Rest/WebApp.Api.Rest.csproj
+```
+

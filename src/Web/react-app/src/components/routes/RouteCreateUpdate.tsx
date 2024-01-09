@@ -25,6 +25,7 @@ type Inputs = {
   responseBodyLanguage?: string;
   responseBody?: string;
   functionHandler?: string;
+  functionHandlerTemplate?: string;
 };
 
 interface HeaderInput {
@@ -142,7 +143,7 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
           {errors.name && <span>{errors.name.message}</span>}
         </div>
         <section>
-          <h3 className="border-primary mt-3 border-l-2 px-1 font-semibold">
+          <h3 className="mt-3 border-l-2 border-primary px-1 font-semibold">
             Request
           </h3>
           <div className="mt-2">
@@ -170,7 +171,7 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
           </div>
         </section>
         <section>
-          <h3 className="border-primary mt-3 border-l-2 pl-1 font-semibold">
+          <h3 className="mt-3 border-l-2 border-primary pl-1 font-semibold">
             Response
           </h3>
           <div className="mt-1">
@@ -336,12 +337,14 @@ function StaticResponse() {
 
 function FunctionHandler() {
   const {
+    register,
     formState: { errors },
     setValue,
     getValues,
+    watch
   } = useFormContext<Inputs>();
   const handlerEditorRef = useRef(null);
-  const [, setHandlerEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
+  const [handlerEditor, setHandlerEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
 
   useEffect(() => {
     let isMounted = true;
@@ -367,17 +370,40 @@ function FunctionHandler() {
       isMounted = false;
     };
   }, [handlerEditorRef.current]);
-
+  const functionHandlerTemplate = watch('functionHandlerTemplate');
+  useEffect(() => {
+    if (functionHandlerTemplate && handlerEditor) {
+      let template = '';
+      switch (functionHandlerTemplate) {
+        case 'expressjs':
+          template = `function handler(req, res) {\n}`;
+          break;
+        default:
+          template = `function handler(req) {\n}`;
+          break;
+      }
+      handlerEditor.getModel()?.setValue(template);
+    }
+  }, [functionHandlerTemplate]);
   return (
-    <div className="mt-1">
-      <label>Handler</label>
-      <div
-        ref={handlerEditorRef}
-        style={{ width: "100%", height: "600px" }}
-      ></div>
-      {errors.functionHandler && (
-        <p className="text-red-500">{errors.functionHandler.message}</p>
-      )}
-    </div>
+    <>
+      <div className="mt-1">
+        <label className="block">Template</label>
+        <select {...register('functionHandlerTemplate')}>
+          <option value={"expressjs"}>ExpressJs</option>
+          <option value={"awslamda"}>Aws Lamda</option>
+        </select>
+      </div>
+      <div className="mt-1">
+        <label>Handler</label>
+        <div
+          ref={handlerEditorRef}
+          style={{ width: "100%", height: "600px" }}
+        ></div>
+        {errors.functionHandler && (
+          <p className="text-red-500">{errors.functionHandler.message}</p>
+        )}
+      </div>
+    </>
   );
 }
