@@ -20,8 +20,22 @@ public class Route : BaseEntity
     public string? ResponseBodyLanguage { get; set; }
     public string? FunctionHandler { get; set; }
     public string? FunctionHandlerTemplate { get; set; }
+    public List<RouteValidation>? Validations { get; set; }
 }
 
+public class RouteValidation
+{
+    public int Id { get; set; }
+    public int RouteId { get; set; }
+    public Route Route { get; set; }
+    public string Source { get; set; }
+    public string Name { get; set; }
+    /// <summary>
+    /// Key: Rule name e.g. required, Value: Rule details
+    /// </summary>
+    public Dictionary<string, object> Rules { get; set; }
+    public List<string>? Expressions { get; set; }
+}
 public class ResponseHeader
 {
     public string Name { get; set; }
@@ -39,12 +53,7 @@ public class RouteAuthorization
     public List<int> AuthenticationSchemeIds { get; set; }
     public Dictionary<string, object> Claims { get; set; }
 }
-public class RouteValidation
-{
-    public ICollection<QueryParameterValidationItem> QueryParameters { get; set; }
-    public ICollection<HeaderValidationItem> Headers { get; set; }
-    public ICollection<BodyValidationItem> Body { get; set; }
-}
+
 public class QueryParameterValidationItem
 {
     public string Name { get; set; }

@@ -16,4 +16,16 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
     <PackageReference Include="Npgsql" Version="8.0.1" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Repositories\PostgreSQL\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Repositories\PostgreSQL\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Repositories\PostgreSQL\**" />
+  </ItemGroup>
 </Project>

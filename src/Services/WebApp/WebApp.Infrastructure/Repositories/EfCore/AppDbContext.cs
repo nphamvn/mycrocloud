@@ -1,23 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
 
 namespace WebApp.Infrastructure.Repositories.EfCore;
 
-public class AppDbContext : DbContext
+public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<App> Apps { get; set; }
     public DbSet<Route> Routes { get; set; }
+    public DbSet<RouteValidation> RouteValidations { get; set; }
     public DbSet<Log> Logs { get; set; }
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
 
-    }
-    override protected void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Route>().OwnsMany(route => route.ResponseHeaders, ownednavigationBuilder =>
-        {
-            ownednavigationBuilder.ToJson();
-        });
+        modelBuilder.Entity<Route>().OwnsMany(route => route.ResponseHeaders,
+            ownedNavigationBuilder => { ownedNavigationBuilder.ToJson(); });
+        modelBuilder.Entity<RouteValidation>()
+            .Property(p => p.Rules)
+            .HasConversion(v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, new JsonSerializerOptions()));
     }
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
@@ -30,8 +31,8 @@ public class AppDbContext : DbContext
         var entries = ChangeTracker
             .Entries()
             .Where(e => e.Entity is BaseEntity && (
-                    e.State == EntityState.Added
-                    || e.State == EntityState.Modified));
+                e.State == EntityState.Added
+                || e.State == EntityState.Modified));
         foreach (var entityEntry in entries)
         {
             if (entityEntry.State == EntityState.Added)

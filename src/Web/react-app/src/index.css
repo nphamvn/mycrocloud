@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 body {
-  @apply overflow-hidden text-sm text-slate-900;
+  @apply text-sm text-slate-900;
 }

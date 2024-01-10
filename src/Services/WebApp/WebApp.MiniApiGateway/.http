@@ -1,4 +1,4 @@
-@HostAddress = http://localhost:5010
+@HostAddress = http://app-5.mycrocloud.local:5010
 
 ###
 GET {{HostAddress}}/ping
@@ -14,7 +14,7 @@ X-AppId:App-1
 
 ###
 POST  {{HostAddress}}/books?foo=bar
-X-AppId:App-1
+
 
 {
     "title": "Book 5"
@@ -26,4 +26,4 @@ X-AppId:App-5
 
 ###
 GET {{HostAddress}}/now
-X-AppId:App-5
+Content-Type: text/plain

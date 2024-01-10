@@ -5,7 +5,7 @@ dotnet ef migrations add <MigrationName> -s ../WebApp.Api.Rest/WebApp.Api.Rest.c
 ```
 Example:
 ```
-dotnet ef migrations add EditFunctionExecutionDuration -s ../WebApp.Api.Rest/WebApp.Api.Rest.csproj -o Repositories/EfCore/Migrations
+dotnet ef migrations add EditRouteValidation2 -s ../WebApp.Api.Rest/WebApp.Api.Rest.csproj -o Repositories/EfCore/Migrations
 
 ```
 #### 2. Update database

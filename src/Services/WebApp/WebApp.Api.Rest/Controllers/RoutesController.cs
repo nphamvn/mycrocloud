@@ -70,6 +70,18 @@ public class RoutesController : BaseController
     public async Task<IActionResult> Edit(int id, RouteCreateUpdateRequest route)
     {
         var currentRoute = await _routeRepository.GetById(id);
+        currentRoute.Validations = new List<RouteValidation>()
+        {
+            new ()
+            {
+                Source = "header",
+                Name = "content-type",
+                Rules = new Dictionary<string, object>
+                {
+                    { "required", true }
+                }
+            }
+        };
         route.ToEntity(currentRoute);
         await _routeService.Update(id, currentRoute);
         return NoContent();

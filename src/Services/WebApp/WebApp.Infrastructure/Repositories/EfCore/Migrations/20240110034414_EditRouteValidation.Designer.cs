@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApp.Infrastructure.Repositories.EfCore;
 
@@ -11,9 +12,11 @@ using WebApp.Infrastructure.Repositories.EfCore;
 namespace WebApp.Infrastructure.Repositories.EfCore.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class DbContextModelSnapshot : ModelSnapshot
+    [Migration("20240110034414_EditRouteValidation")]
+    partial class EditRouteValidation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -236,7 +239,7 @@ namespace WebApp.Infrastructure.Repositories.EfCore.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("WebApp.Domain.Entities.RouteValidationRuleCollection", "Rules", b1 =>
+                    b.OwnsOne("System.Collections.Generic.Dictionary<string, object>", "Rules", b1 =>
                         {
                             b1.Property<int>("RouteValidationId")
                                 .HasColumnType("int");

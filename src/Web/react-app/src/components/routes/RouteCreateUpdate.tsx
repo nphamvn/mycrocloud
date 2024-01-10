@@ -19,6 +19,8 @@ type Inputs = {
   name: string;
   path: string;
   method: string;
+  requestValidationJson?: string;
+  requestValidationExpressions?: string[];
   responseType: string;
   responseStatusCode?: number;
   responseHeaders?: HeaderInput[];
@@ -129,78 +131,160 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
     return <div className="w-full">Loading...</div>;
   }
   return (
-    <form className="h-full p-2" onSubmit={handleSubmit(onSubmit)}>
-      <div className="overflow-y-auto">
-        <div>
-          <label htmlFor="name">Name</label>
-          <input
-            id="name"
-            type="text"
-            {...register("name")}
-            autoComplete="none"
-            className="inline-block w-full border border-gray-200 px-2 py-1"
-          />
-          {errors.name && <span>{errors.name.message}</span>}
-        </div>
-        <section>
-          <h3 className="mt-3 border-l-2 border-primary px-1 font-semibold">
-            Request
-          </h3>
-          <div className="mt-2">
-            <label>Method and Path</label>
-            <div className="flex">
-              <select
-                className="w-24 border border-gray-200"
-                {...register("method")}
-              >
-                {methods.map((m) => (
-                  <option key={m} value={m.toUpperCase()}>
-                    {m.toUpperCase()}
-                  </option>
-                ))}
-              </select>
-              <input
-                autoComplete="none"
-                type="text"
-                className="inline-block flex-1 border border-gray-200 px-2 py-1"
-                {...register("path")}
-              />
+    <FormProvider {...forms}>
+      <form className="h-full p-2" onSubmit={handleSubmit(onSubmit)}>
+        <div className="overflow-y-auto">
+          <div>
+            <label htmlFor="name">Name</label>
+            <input
+              id="name"
+              type="text"
+              {...register("name")}
+              autoComplete="none"
+              className="inline-block w-full border border-gray-200 px-2 py-1"
+            />
+            {errors.name && <span>{errors.name.message}</span>}
+          </div>
+          <section>
+            <h3 className="mt-3 border-l-2 border-primary px-1 font-semibold">
+              Request
+            </h3>
+            <div className="mt-2">
+              <label>Method and Path</label>
+              <div className="flex">
+                <select
+                  className="w-24 border border-gray-200"
+                  {...register("method")}
+                >
+                  {methods.map((m) => (
+                    <option key={m} value={m.toUpperCase()}>
+                      {m.toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  autoComplete="none"
+                  type="text"
+                  className="inline-block flex-1 border border-gray-200 px-2 py-1"
+                  {...register("path")}
+                />
+              </div>
+              {errors.method && <span>{errors.method.message}</span>}
+              {errors.path && <span>{errors.path.message}</span>}
             </div>
-            {errors.method && <span>{errors.method.message}</span>}
-            {errors.path && <span>{errors.path.message}</span>}
-          </div>
-        </section>
-        <section>
-          <h3 className="mt-3 border-l-2 border-primary pl-1 font-semibold">
-            Response
-          </h3>
-          <div className="mt-1">
-            <label className="me-1">Type</label>
-            <select {...register("responseType")}>
-              <option value="static">static</option>
-              <option value="function">function</option>
-            </select>
-          </div>
-          <FormProvider {...forms}>
+            <Validation />
+          </section>
+          <section>
+            <h3 className="mt-3 border-l-2 border-primary pl-1 font-semibold">
+              Response
+            </h3>
+            <div className="mt-1">
+              <label className="me-1">Type</label>
+              <select {...register("responseType")}>
+                <option value="static">static</option>
+                <option value="function">function</option>
+              </select>
+            </div>
+
             <div>
               {responseType === "static" && <StaticResponse />}
               {responseType === "function" && <FunctionHandler />}
             </div>
-          </FormProvider>
-        </section>
-      </div>
-      <div className="sticky bottom-0 mt-2">
-        <button
-          type="submit"
-          className="border border-transparent bg-cyan-700 px-3 py-1 text-center font-medium text-white focus:z-10 focus:outline-none focus:ring-2 focus:ring-cyan-300 enabled:hover:bg-cyan-800"
-        >
-          Save
-        </button>
-      </div>
-    </form>
+          </section>
+        </div>
+        <div className="sticky bottom-0 mt-2">
+          <button
+            type="submit"
+            className="border border-transparent bg-cyan-700 px-3 py-1 text-center font-medium text-white focus:z-10 focus:outline-none focus:ring-2 focus:ring-cyan-300 enabled:hover:bg-cyan-800"
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    </FormProvider>
   );
 }
+function Validation() {
+  const editorRef = useRef(null);
+  const viewStateRef = useRef();
+  const modelRef = useRef();
+  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
+  const [display, setDisplay] = useState(true);
 
+  const {
+    formState: { errors },
+    setValue,
+    getValues,
+  } = useFormContext<Inputs>();
+
+  useEffect(() => {
+    let isMounted = true;
+    if (editorRef.current && isMounted) {
+      setEditor((editor) => {
+        if (editor) {
+          return;
+        }
+        const instance = monaco.editor.create(editorRef.current!, {
+          language: "json",
+          value: getValues("requestValidationJson") || "",
+          minimap: {
+            enabled: false,
+          },
+        });
+        instance.onDidChangeModelContent(() => {
+          setValue("requestValidationJson", instance.getValue());
+        });
+        return instance;
+      });
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [editorRef.current]);
+
+
+  const handleDisplayToggle = () => {
+    if (display) {
+      viewStateRef.current = editor?.saveViewState();
+      modelRef.current = editor?.getModel();
+      editor?.setModel(null);
+    } else {
+      if (modelRef.current) {
+        editor?.setModel(modelRef.current);
+      }
+      if (viewStateRef.current) {
+        editor?.restoreViewState(viewStateRef.current);
+      }
+    }
+    setDisplay(!display);
+  };
+  return (
+    <div className="mt-1">
+      <div>
+        <label>Validation</label>
+        <button
+          type="button"
+          onClick={handleDisplayToggle}
+          className="ms-2 text-blue-500 hover:underline"
+        >
+          {display ? "Hide" : "Show"}
+        </button>
+      </div>
+      <label>Schema</label>
+      <div
+        ref={editorRef}
+        style={{
+          width: "100%",
+          height: "150px",
+          display: display ? "block" : "none",
+        }}
+      ></div>
+      {errors.requestValidationJson && (
+        <p className="text-red-500">{errors.requestValidationJson.message}</p>
+      )}
+    </div>
+  );
+}
 function StaticResponse() {
   const {
     control,

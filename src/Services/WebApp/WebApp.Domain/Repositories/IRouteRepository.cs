@@ -12,4 +12,5 @@ public interface IRouteRepository
     Task Delete(int id);
     Task<RouteMockResponse> GetMockResponse(int routeId);
     Task AddMatchMethods(int id, List<string> list);
+    Task<List<RouteValidation>> GetValidations(int routeId);
 }
