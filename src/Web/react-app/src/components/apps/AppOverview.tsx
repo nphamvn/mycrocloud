@@ -31,7 +31,9 @@ export default function AppOverview() {
         </tbody>
       </table>
       <hr className="mb-2" />
-      <Settings />
+      <RenameComponent />
+      <ChangeModeComponent />
+      <DeleteComponent />
     </div>
   );
 }
@@ -39,10 +41,10 @@ export default function AppOverview() {
 type RenameFormInput = {
   name: string;
 };
-function Settings() {
+function RenameComponent() {
   const app = useContext(AppContext)!;
   const { getAccessTokenSilently } = useAuth0();
-  const navigate = useNavigate();
+
   const { register, handleSubmit } = useForm<RenameFormInput>({
     defaultValues: {
       name: app.name,
@@ -67,6 +69,20 @@ function Settings() {
     }
   };
 
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input type="text" {...register("name")} className="border px-1 py-0.5" />
+      <button type="submit" className="ms-2 text-primary">
+        Rename
+      </button>
+    </form>
+  );
+}
+
+function DeleteComponent() {
+  const app = useContext(AppContext)!;
+  const { getAccessTokenSilently } = useAuth0();
+  const navigate = useNavigate();
   const handleDeleteClick = async () => {
     if (confirm("Are you sure want to delete this app?")) {
       const accessToken = await getAccessTokenSilently();
@@ -83,26 +99,46 @@ function Settings() {
     }
   };
   return (
-    <div>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <input
-          type="text"
-          {...register("name")}
-          className="border px-1 py-0.5"
-        />
-        <button type="submit" className="text-primary ms-2">
-          Rename
-        </button>
-      </form>
-      <div className="mt-2">
-        <button
-          type="button"
-          className="text-red-600"
-          onClick={handleDeleteClick}
-        >
-          Delete
-        </button>
-      </div>
+    <div className="mt-2">
+      <button
+        type="button"
+        className="text-red-600"
+        onClick={handleDeleteClick}
+      >
+        Delete
+      </button>
+    </div>
+  );
+}
+function ChangeModeComponent() {
+  const app = useContext(AppContext)!;
+  const { getAccessTokenSilently } = useAuth0();
+  const navigate = useNavigate();
+  const handleChangeModeClick = async () => {
+    if (confirm("Are you sure want to change mode?")) {
+      const accessToken = await getAccessTokenSilently();
+      const res = await fetch(`/api/apps/${app.id}/mode`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      if (res.ok) {
+        toast("Changed mode");
+        navigate("/apps");
+      }
+    }
+  };
+  return (
+    <div className="mt-2">
+      <div>Mode: {app.status}</div>
+      <button
+        type="button"
+        className="text-secondary"
+        onClick={handleChangeModeClick}
+      >
+        Change
+      </button>
     </div>
   );
 }

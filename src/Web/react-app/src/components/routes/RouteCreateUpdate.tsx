@@ -14,6 +14,7 @@ import Route from "./Route";
 import { useNavigate } from "react-router-dom";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import { bodyLanguages, methods } from "./constants";
+import { HTTPSnippet } from "httpsnippet";
 
 type Inputs = {
   name: string;
@@ -127,6 +128,18 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
       }
     }
   };
+
+  const handleCodeShowClick = () => {
+    const snippet = new HTTPSnippet({
+      method: "GET",
+      url: "http://mockbin.com/request",
+      postData: {},
+    });
+
+    const options = { indent: "\t" };
+    const output = snippet.convert("shell", "curl", options);
+    console.log(output);
+  };
   if (isLoading) {
     return <div className="w-full">Loading...</div>;
   }
@@ -146,9 +159,18 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
             {errors.name && <span>{errors.name.message}</span>}
           </div>
           <section>
-            <h3 className="mt-3 border-l-2 border-primary px-1 font-semibold">
-              Request
-            </h3>
+            <div className="flex">
+              <h3 className="mt-3 border-l-2 border-primary px-1 font-semibold">
+                Request
+              </h3>
+              <button
+                type="button"
+                onClick={handleCodeShowClick}
+                className="ms-auto px-3 py-0.5 text-secondary"
+              >
+                Code
+              </button>
+            </div>
             <div className="mt-2">
               <label>Method and Path</label>
               <div className="flex">
@@ -172,7 +194,7 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
               {errors.method && <span>{errors.method.message}</span>}
               {errors.path && <span>{errors.path.message}</span>}
             </div>
-            <Validation />
+            {false && <Validation />}
           </section>
           <section>
             <h3 className="mt-3 border-l-2 border-primary pl-1 font-semibold">
@@ -241,7 +263,6 @@ function Validation() {
       isMounted = false;
     };
   }, [editorRef.current]);
-
 
   const handleDisplayToggle = () => {
     if (display) {

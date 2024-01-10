@@ -13,7 +13,7 @@ export default function RouteLogs() {
     const getLogs = async () => {
       const accessToken = await getAccessTokenSilently();
       const logs = (await (
-        await fetch(`/api/apps/${app.id}/logs?routeId=${routeId}`, {
+        await fetch(`/api/apps/${app.id}/logs?routeIds=${routeId}`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -24,18 +24,29 @@ export default function RouteLogs() {
     getLogs();
   }, []);
   return (
-    <div className="p-2">
-      <ul>
+    <table className="w-full">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Method</th>
+          <th>Path</th>
+          <th>Status Code</th>
+          <th>Function Execution Duration (ms)</th>
+          <th>Additional Log Message</th>
+        </tr>
+      </thead>
+      <tbody>
         {logs.map((l) => (
-          <li key={l.id}>
-            <div className="text-sm">
-              {new Date(l.timestamp).toUTCString()} {l.method} {l.path}{" "}
-              {l.statusCode} {l.functionExecutionDuration || "-"}ms{" "}
-              {l.additionalLogMessage}
-            </div>
-          </li>
+          <tr key={l.id} className="border">
+            <td>{new Date(l.timestamp).toLocaleString()}</td>
+            <td>{l.method}</td>
+            <td>{l.path}</td>
+            <td>{l.statusCode}</td>
+            <td>{l.functionExecutionDuration || "-"}</td>
+            <td>{l.additionalLogMessage}</td>
+          </tr>
         ))}
-      </ul>
-    </div>
+      </tbody>
+    </table>
   );
 }

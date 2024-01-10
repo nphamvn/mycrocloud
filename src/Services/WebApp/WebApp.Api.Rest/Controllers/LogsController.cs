@@ -13,7 +13,7 @@ public class LogsController : BaseController
     {
         _logRepository = logRepository;
     }
-    public async Task<IActionResult> Search(int appId, List<int>? routeIds, DateTime? accessDateFrom,
+    public async Task<IActionResult> Search(int appId, [FromQuery]List<int>? routeIds, DateTime? accessDateFrom,
      DateTime? accessDateTo, int page = 1, int pageSize = 50, string? sort = null) {
         var logs = await _logRepository.Search(appId);
         if (routeIds?.Count > 0) logs = logs.Where(l => l.RouteId != null && routeIds.Contains(l.RouteId.Value));

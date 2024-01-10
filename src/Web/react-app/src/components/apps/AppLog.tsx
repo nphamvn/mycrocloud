@@ -17,17 +17,22 @@ export default function AppLogs() {
   const { register, handleSubmit, setValue } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const accessToken = await getAccessTokenSilently();
-    var query = Object.keys(data)
-      .map((key) => {
-        const value = data[key as keyof typeof data];
-        if (value) {
-          if (Array.isArray(value)) {
-            return `${key}=${value.join(",")}`;
-          }
-          return `${key}=${encodeURIComponent(value as string)}`;
-        }
-      })
-      .join("&");
+    let query = "";
+    const conditions = [];
+    if (data.accessDateFrom) {
+      conditions.push(`accessDateFrom=${data.accessDateFrom}`);
+    }
+    if (data.accessDateTo) {
+      conditions.push(`accessDateTo=${data.accessDateTo}`);
+    }
+    if (data.routeIds.length > 0) {
+      data.routeIds.forEach((id) => {
+        conditions.push(`routeIds=${id}`);
+      });
+    }
+    if (conditions.length > 0) {
+      query += `&${conditions.join("&")}`;
+    }
     console.log(query);
     const logs = (await (
       await fetch(`/api/apps/${app.id}/logs?${query}`, {
@@ -52,7 +57,7 @@ export default function AppLogs() {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} className="p-2">
+      <form onSubmit={handleSubmit(onSubmit)} className="border p-2">
         <div>
           <label className="me-2">Access Date</label>
           <input type="date" {...register("accessDateFrom")} />
@@ -78,17 +83,32 @@ export default function AppLogs() {
         </div>
       </form>
       <hr />
-      <ul>
-        {logs.map((l) => (
-          <li key={l.id}>
-            <div className="text-sm">
-              {new Date(l.timestamp).toUTCString()} {l.method} {l.path}{" "}
-              {l.statusCode} {l.functionExecutionDuration}ms{" "}
-              {l.additionalLogMessage}
-            </div>
-          </li>
-        ))}
-      </ul>
+      <table className="w-full">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Route Id</th>
+            <th>Method</th>
+            <th>Path</th>
+            <th>Status Code</th>
+            <th>Function Execution Duration (ms)</th>
+            <th>Additional Log Message</th>
+          </tr>
+        </thead>
+        <tbody>
+          {logs.map((l) => (
+            <tr key={l.id} className="border">
+              <td>{new Date(l.timestamp).toLocaleString()}</td>
+              <td>{l.routeId || "-"}</td>
+              <td>{l.method}</td>
+              <td>{l.path}</td>
+              <td>{l.statusCode}</td>
+              <td>{l.functionExecutionDuration || "-"}</td>
+              <td>{l.additionalLogMessage}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </>
   );
 }

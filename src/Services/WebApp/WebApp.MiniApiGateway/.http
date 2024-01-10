@@ -27,3 +27,6 @@ X-AppId:App-5
 ###
 GET {{HostAddress}}/now
 Content-Type: text/plain
+
+###
+GET {{HostAddress}}/hello-world

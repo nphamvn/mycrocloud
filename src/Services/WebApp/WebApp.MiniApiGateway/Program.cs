@@ -106,7 +106,6 @@ app.Use(async (context, next) =>
     {
         // ignored
     }
-
     var request = new
     {
         method = context.Request.Method,

@@ -102,7 +102,7 @@ export default function RouteIndex() {
                     to={`${routeId}`}
                     className={`border px-3 py-0.5 ${
                       tab === "edit"
-                        ? "text-primary border-t-primary border-b-0 border-t-2"
+                        ? "border-b-0 border-t-2 border-t-primary text-primary"
                         : ""
                     }`}
                   >
@@ -112,18 +112,24 @@ export default function RouteIndex() {
                     to={`${routeId}/logs`}
                     className={`border px-3 py-0.5 ${
                       tab === "logs"
-                        ? "text-primary border-t-primary border-b-0 border-t-2"
+                        ? "border-b-0 border-t-2 border-t-primary text-primary"
                         : ""
                     }`}
                   >
                     Logs
                   </Link>
-                  <button
-                    onClick={() => handleDeleteRouteClick(routeId)}
-                    className="me-1 ms-auto text-sm text-red-600"
-                  >
-                    Delete
-                  </button>
+                  <div className="ms-auto">
+                    {/* <button className="border px-3 py-0.5">Test</button> */}
+                    {/* <button className="border px-3 py-0.5">Share</button>
+                    <button className="border px-3 py-0.5">History</button>
+                    <button className="border px-3 py-0.5">Settings</button> */}
+                    <button
+                      onClick={() => handleDeleteRouteClick(routeId)}
+                      className="me-1 ms-auto text-sm text-red-600"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
