@@ -9,6 +9,7 @@ export default interface Route {
   responseBodyLanguage?: string;
   responseBody?: string;
   functionHandler?: string;
+  functionHandlerDependencies?: string[];
 }
 
 interface Header {

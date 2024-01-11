@@ -12,10 +12,12 @@ public class RouteCreateUpdateRequest
     public string? ResponseBody { get; set; }
     public string? ResponseBodyLanguage { get; set; }
     public string? FunctionHandler { get; set; }
+    public List<string>? FunctionHandlerDependencies { get; set; }
 
     public Route ToEntity()
     {
-        return new Route() {
+        return new Route
+        {
             Name = Name,
             Method = Method,
             Path = Path,
@@ -25,6 +27,7 @@ public class RouteCreateUpdateRequest
             ResponseBodyLanguage = ResponseBodyLanguage,
             ResponseBody = ResponseBody,
             FunctionHandler = FunctionHandler,
+            FunctionHandlerDependencies = FunctionHandlerDependencies
         };
     }
     public void ToEntity(Route route)
@@ -38,6 +41,7 @@ public class RouteCreateUpdateRequest
         route.ResponseBodyLanguage = ResponseBodyLanguage;
         route.ResponseBody = ResponseBody;
         route.FunctionHandler = FunctionHandler;
+        route.FunctionHandlerDependencies = FunctionHandlerDependencies;
     }
 }
 

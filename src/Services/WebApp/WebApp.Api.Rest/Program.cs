@@ -44,7 +44,8 @@ builder.Services.AddAuthentication()
 builder.Services.AddAuthorization();
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
+    //options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL"));
 });
 builder.Services.AddScoped<IAppRepository, AppRepository>();
 builder.Services.AddScoped<IAppService, AppService>();

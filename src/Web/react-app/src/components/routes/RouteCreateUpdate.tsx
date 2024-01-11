@@ -14,7 +14,8 @@ import Route from "./Route";
 import { useNavigate } from "react-router-dom";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import { bodyLanguages, methods } from "./constants";
-import { HTTPSnippet } from "httpsnippet";
+const apiGatewayDomain = import.meta.env
+  .VITE_WEBAPP_APIGATEWAY_DOMAIN as string;
 
 type Inputs = {
   name: string;
@@ -28,7 +29,7 @@ type Inputs = {
   responseBodyLanguage?: string;
   responseBody?: string;
   functionHandler?: string;
-  functionHandlerTemplate?: string;
+  functionHandlerDependencies?: string[];
 };
 
 interface HeaderInput {
@@ -46,6 +47,8 @@ const schema = yup.object({
 export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
   const isEditMode = routeId !== undefined;
   const app = useContext(AppContext)!;
+  const appDomain = apiGatewayDomain.replace("__app_id__", app.id.toString());
+
   const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -97,6 +100,10 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
         setValue("responseBody", route.responseBody!);
       } else {
         setValue("functionHandler", route.functionHandler!);
+        setValue(
+          "functionHandlerDependencies",
+          route.functionHandlerDependencies,
+        );
       }
       setIsLoading(false);
     };
@@ -129,17 +136,14 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
     }
   };
 
-  const handleCodeShowClick = () => {
-    const snippet = new HTTPSnippet({
-      method: "GET",
-      url: "http://mockbin.com/request",
-      postData: {},
-    });
+  const [showCodeSnippet, setShowCodeSnippet] = useState(false);
+  const path = watch("path");
+  const [url, setUrl] = useState("");
+  useEffect(() => {
+    setUrl(appDomain + path);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [path]);
 
-    const options = { indent: "\t" };
-    const output = snippet.convert("shell", "curl", options);
-    console.log(output);
-  };
   if (isLoading) {
     return <div className="w-full">Loading...</div>;
   }
@@ -163,13 +167,43 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
               <h3 className="mt-3 border-l-2 border-primary px-1 font-semibold">
                 Request
               </h3>
-              <button
-                type="button"
-                onClick={handleCodeShowClick}
-                className="ms-auto px-3 py-0.5 text-secondary"
+              <div
+                className="ms-auto"
+                style={{ position: "relative", display: "inline-block" }}
               >
-                Code
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCodeSnippet(true)}
+                  className="ms-auto px-3 py-0.5 text-secondary"
+                >
+                  Code
+                </button>
+                <div
+                  style={{
+                    display: showCodeSnippet ? "block" : "none",
+                    backgroundColor: "#f9f9f9",
+                    boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)",
+                  }}
+                  className="absolute right-2 z-[1] p-2"
+                >
+                  <div className="h-[400px] w-[300px]"></div>
+                  <div className="flex space-x-2">
+                    <button
+                      type="button"
+                      className="me-auto text-blue-500 hover:underline"
+                    >
+                      Copy
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowCodeSnippet(false)}
+                      className="text-secondary"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="mt-2">
               <label>Method and Path</label>
@@ -193,6 +227,19 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
               </div>
               {errors.method && <span>{errors.method.message}</span>}
               {errors.path && <span>{errors.path.message}</span>}
+              <div className="mt-1">
+                <small className="me-2">URL:</small>
+                <a className="text-blue-500 hover:underline" href={url}>
+                  <small>{url}</small>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => navigator.clipboard.writeText(url)}
+                  className="ms-3 text-blue-500 hover:underline"
+                >
+                  <small>Copy</small>
+                </button>
+              </div>
             </div>
             {false && <Validation />}
           </section>
@@ -429,7 +476,7 @@ function StaticResponse() {
         <div>
           <div
             ref={bodyEditorRef}
-            style={{ width: "100%", height: "120px" }}
+            style={{ width: "100%", height: "300px" }}
           ></div>
           {errors.responseBody && (
             <p className="text-red-500">{errors.responseBody.message}</p>
@@ -442,15 +489,12 @@ function StaticResponse() {
 
 function FunctionHandler() {
   const {
-    register,
     formState: { errors },
     setValue,
     getValues,
-    watch,
   } = useFormContext<Inputs>();
   const handlerEditorRef = useRef(null);
-  const [handlerEditor, setHandlerEditor] =
-    useState<monaco.editor.IStandaloneCodeEditor>();
+  const [, setHandlerEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
 
   useEffect(() => {
     let isMounted = true;
@@ -476,19 +520,50 @@ function FunctionHandler() {
       isMounted = false;
     };
   }, [handlerEditorRef.current]);
-  const functionHandlerTemplate = watch("functionHandlerTemplate");
+
+  const [depsInputValue, setDepsInputValue] = useState(
+    getValues("functionHandlerDependencies")?.join(",") || "",
+  );
   useEffect(() => {
-    if (functionHandlerTemplate && handlerEditor) {
-    }
-  }, [functionHandlerTemplate]);
+    setValue("functionHandlerDependencies", depsInputValue?.split(",") || []);
+  }, [depsInputValue]);
+
   return (
     <>
       <div className="mt-1">
-        <label className="block">Template</label>
-        <select {...register("functionHandlerTemplate")}>
-          <option value={"expressjs"}>ExpressJs</option>
-          <option value={"awslamda"}>Aws Lamda</option>
-        </select>
+        <label htmlFor="depsInput" className="block">
+          Dependencies
+          <div className="inline-block">
+            <button
+              type="button"
+              className="ms-2 text-blue-500 hover:underline"
+            >
+              info
+            </button>
+            <div style={{ display: "none" }}>
+              <p>Available packages</p>
+              <ul>
+                {[
+                  "lotash",
+                  "underscore",
+                  "handlebars",
+                  "mustache",
+                  "faker",
+                ].map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </label>
+        <input
+          id="depsInput"
+          type="text"
+          value={depsInputValue}
+          onChange={(e) => setDepsInputValue(e.target.value)}
+          autoComplete="none"
+          className="inline-block w-full border border-gray-200 px-2 py-1"
+        />
       </div>
       <div className="mt-1">
         <label>Handler</label>

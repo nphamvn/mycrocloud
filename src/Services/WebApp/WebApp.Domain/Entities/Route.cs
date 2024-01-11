@@ -19,7 +19,7 @@ public class Route : BaseEntity
     public string? ResponseBody { get; set; }
     public string? ResponseBodyLanguage { get; set; }
     public string? FunctionHandler { get; set; }
-    public string? FunctionHandlerTemplate { get; set; }
+    public List<string>? FunctionHandlerDependencies { get; set; }
     public List<RouteValidation>? Validations { get; set; }
 }
 

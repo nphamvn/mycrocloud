@@ -53,6 +53,7 @@ public class RoutesController : BaseController
             route.ResponseBody,
             route.ResponseBodyLanguage,
             route.FunctionHandler,
+            route.FunctionHandlerDependencies,
             route.CreatedAt,
             route.UpdatedAt
         });

@@ -5,9 +5,13 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
+const apiGatewayDomain = import.meta.env
+  .VITE_WEBAPP_APIGATEWAY_DOMAIN as string;
+
 export default function AppOverview() {
   const app = useContext(AppContext)!;
-  const domain = `https://app-${app.id}.app.mycrocloud.com`;
+  const domain = apiGatewayDomain.replace("__app_id__", app.id.toString());
+  
   return (
     <div className="p-2">
       <table>
@@ -33,6 +37,18 @@ export default function AppOverview() {
       <hr className="mb-2" />
       <RenameComponent />
       <ChangeModeComponent />
+      <div>
+        <h3>Customer Handlers</h3>
+        <div>Route Not Found</div>
+        <select>
+          <option>Default handler</option>
+          <option>Redirect to </option>
+        </select>
+        <select>
+          <option>Route 1</option>
+          <option>Route 2</option>
+        </select>
+      </div>
       <DeleteComponent />
     </div>
   );
