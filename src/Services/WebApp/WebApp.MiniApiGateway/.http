@@ -30,3 +30,6 @@ Content-Type: text/plain
 
 ###
 GET {{HostAddress}}/hello-world
+
+###
+GET http://app-1.mycrocloud.local:5010/db

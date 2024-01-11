@@ -10,7 +10,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Route> Routes { get; set; }
     public DbSet<RouteValidation> RouteValidations { get; set; }
     public DbSet<Log> Logs { get; set; }
-
+    
+    public DbSet<Server> Servers { get; set; }
+    public DbSet<Database> Databases { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Route>().OwnsMany(route => route.ResponseHeaders,
@@ -19,6 +22,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .Property(p => p.Rules)
             .HasConversion(v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
                 v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, new JsonSerializerOptions()));
+        
+        modelBuilder.Entity<Database>()
+            .Property(p => p.Data)
+            .HasConversion(v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                v => JsonSerializer.Deserialize<object>(v, new JsonSerializerOptions()));
+        modelBuilder.Entity<Database>()
+            .Property(p => p.Schema)
+            .HasConversion(v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                v => JsonSerializer.Deserialize<object>(v, new JsonSerializerOptions()));
     }
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

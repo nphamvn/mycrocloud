@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using Jint;
+using Jint.Runtime.Interop;
 using Route = WebApp.Domain.Entities.Route;
 
 namespace WebApp.MiniApiGateway;
@@ -16,6 +17,8 @@ public static class FunctionHandler
         var stopwatch = Stopwatch.StartNew();
 
         var engine = new Engine();
+        engine.SetValue(nameof(DbConnection), TypeReference.CreateTypeReference<DbConnection>(engine));
+        engine.Execute(await File.ReadAllTextAsync("Scripts/MycroCloudDb.js"));
         foreach (var dependency in route.FunctionHandlerDependencies ?? [])
         {
             if (scripts.TryGetValue(dependency, out var script))
