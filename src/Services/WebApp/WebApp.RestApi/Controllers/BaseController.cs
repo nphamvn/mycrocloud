@@ -8,8 +8,5 @@ namespace WebApp.Api.Controllers;
 [Authorize]
 public class BaseController : ControllerBase
 {
-    // [Route("/api/whoami")]
-    // public IActionResult WhoAmI() {
-    //     return Ok(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-    // }
+
 }

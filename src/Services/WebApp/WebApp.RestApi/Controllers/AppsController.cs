@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Api.Models;
-using WebApp.Api.Rest;
+using WebApp.RestApi;
 using WebApp.Domain.Services;
 using WebApp.Domain.Repositories;
+using WebApp.RestApi.Extensions;
 
 namespace WebApp.Api.Controllers;
 

@@ -1,8 +1,8 @@
 ﻿using System.Security.Claims;
 
-namespace WebApp.Api.Rest;
+namespace WebApp.RestApi.Extensions;
 
-public static class ClaimsPrincipalExtentions
+public static class ClaimsPrincipalExtensions
 {
     public static string GetUserId(this ClaimsPrincipal principal) {
         return principal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;

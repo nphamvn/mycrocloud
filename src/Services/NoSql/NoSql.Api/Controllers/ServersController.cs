@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WebApp.Api.Controllers;
-using WebApp.Domain.Entities;
-using WebApp.Infrastructure.Repositories.EfCore;
+using NoSql.Api.Extensions;
+using NoSql.Core.Data;
+using NoSql.Core.Entities;
 
-namespace WebApp.Api.Rest.Controllers;
+namespace NoSql.Api.Controllers;
 
-public class DatabaseServersController(AppDbContext dbContext) : BaseController
+public class ServersController(AppDbContext dbContext) : BaseController
 {
     [HttpGet]
     public async Task<IActionResult> List()
@@ -44,28 +44,5 @@ public class DatabaseServersController(AppDbContext dbContext) : BaseController
             server.UpdatedAt,
             DatabaseCount = server.Databases?.Count ?? 0
         });
-    }
-    
-    [HttpGet("{id:int}/Databases")]
-    public async Task<IActionResult> GetDatabases(int id)
-    {
-        var dbs = await dbContext.Databases.Where(db => db.ServerId == id).ToListAsync();
-        return Ok(dbs.Select(db => new
-        {
-            db.Id,
-            db.Name,
-            db.CreatedAt,
-            db.UpdatedAt
-        }));
-    }
-    
-    [HttpPost("{id:int}/Databases")]
-    public async Task<IActionResult> CreateDatabase(int id, Database database)
-    {
-        var server = await dbContext.Servers.SingleAsync(s => s.Id == id);
-        database.Server = server;
-        await dbContext.Databases.AddAsync(database);
-        await dbContext.SaveChangesAsync();
-        return Created();
     }
 }

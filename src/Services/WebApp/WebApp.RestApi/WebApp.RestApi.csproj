@@ -6,9 +6,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <LangVersion>preview</LangVersion>
-        <AssemblyName>WebApp.Api.Rest</AssemblyName>
-        <RootNamespace>WebApp.Api.Rest</RootNamespace>
       <UserSecretsId>a4598101-49be-4c74-beb9-9e2dd3b8d09c</UserSecretsId>
+      <PackageId>WebApp.RestApi</PackageId>
   </PropertyGroup>
 
     <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />

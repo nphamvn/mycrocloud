@@ -2,7 +2,7 @@
 using WebApp.Api.Controllers;
 using WebApp.Domain.Repositories;
 
-namespace WebApp.Api.Rest;
+namespace WebApp.RestApi;
 
 [Route("/api/apps/{appId:int}/logs")]
 public class LogsController : BaseController

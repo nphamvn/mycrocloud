@@ -17,7 +17,11 @@ public static class FunctionHandler
         var stopwatch = Stopwatch.StartNew();
 
         var engine = new Engine();
-        engine.SetValue(nameof(DbConnection), TypeReference.CreateTypeReference<DbConnection>(engine));
+        var useDb = true;
+        if (useDb)
+        {
+            engine.SetValue(nameof(NoSqlDbConnection), TypeReference.CreateTypeReference<NoSqlDbConnection>(engine));
+        }
         engine.Execute(await File.ReadAllTextAsync("Scripts/MycroCloudDb.js"));
         foreach (var dependency in route.FunctionHandlerDependencies ?? [])
         {

@@ -1,11 +1,12 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Api.Filters;
-using WebApp.Api.Rest;
+using WebApp.RestApi;
 using WebApp.Domain.Services;
 using WebApp.Domain.Repositories;
 using WebApp.Infrastructure.Repositories.EfCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using WebApp.RestApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

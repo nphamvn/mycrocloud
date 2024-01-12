@@ -1,4 +1,4 @@
-namespace WebApp.Domain.Entities;
+namespace NoSql.Core.Entities;
 
 public class Server : BaseEntity
 {
