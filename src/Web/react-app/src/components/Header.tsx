@@ -2,6 +2,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
+const mode = import.meta.env.MODE;
 
 function Header() {
   const {
@@ -9,7 +10,7 @@ function Header() {
     error,
     isAuthenticated,
     user,
-    loginWithPopup,
+    loginWithRedirect,
     logout,
     getAccessTokenSilently,
   } = useAuth0();
@@ -29,6 +30,11 @@ function Header() {
       getUserInfo();
     }
   }, [isLoading]);
+
+  const handleCopyAccessTokenClick = async () => {
+    const accessToken = await getAccessTokenSilently();
+    navigator.clipboard.writeText(accessToken);
+  };
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -60,6 +66,11 @@ function Header() {
               <Dropdown.Item disabled>Settings</Dropdown.Item>
               <Dropdown.Divider />
               <Dropdown.Item onClick={() => logout()}>Log out</Dropdown.Item>
+              {mode === "development" && (
+                <Dropdown.Item onClick={handleCopyAccessTokenClick}>
+                  Copy access token
+                </Dropdown.Item>
+              )}
             </Dropdown>
             <Navbar.Toggle />
           </div>
@@ -72,18 +83,10 @@ function Header() {
                 Apps
               </Link>
             </li>
-            <li>
-              <Link
-                className="block border-b border-gray-100 py-2 pl-3 pr-4 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:border-0 md:p-0 md:hover:bg-transparent md:hover:text-cyan-700 md:dark:hover:bg-transparent md:dark:hover:text-white"
-                to="dbservers"
-              >
-                Databases
-              </Link>
-            </li>
           </Navbar.Collapse>
         </>
       ) : (
-        <Button size="sm" onClick={() => loginWithPopup()}>
+        <Button size="sm" onClick={() => loginWithRedirect()}>
           Log in
         </Button>
       )}

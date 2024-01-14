@@ -30,6 +30,7 @@ type Inputs = {
   responseBody?: string;
   functionHandler?: string;
   functionHandlerDependencies?: string[];
+  requireAuthorization: boolean;
 };
 
 interface HeaderInput {
@@ -48,6 +49,7 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
   const isEditMode = routeId !== undefined;
   const app = useContext(AppContext)!;
   const appDomain = apiGatewayDomain.replace("__app_id__", app.id.toString());
+  const routeRef = useRef<Route>();
 
   const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
@@ -55,10 +57,17 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
   const forms = useForm<Inputs>({
     resolver: yupResolver(schema),
     defaultValues: {
+      name: "",
+      path: "/",
+      method: "GET",
       responseType: "static",
       responseStatusCode: 200,
       responseHeaders: [{ name: "content-type", value: "text/plain" }],
       responseBodyLanguage: "plaintext",
+      responseBody: "",
+      functionHandler: "",
+      functionHandlerDependencies: [],
+      requireAuthorization: false,
     },
   });
   const {
@@ -85,6 +94,7 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
       setValue("method", route.method.toUpperCase());
       setValue("path", route.path);
       setValue("responseType", route.responseType);
+      setValue("requireAuthorization", route.requireAuthorization);
       if (route.responseType === "static") {
         setValue("responseStatusCode", route.responseStatusCode!);
         setValue(
@@ -105,6 +115,7 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
           route.functionHandlerDependencies,
         );
       }
+      routeRef.current = route;
       setIsLoading(false);
     };
     if (isEditMode) {
@@ -128,21 +139,17 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
       },
     );
     if (res.ok) {
-      toast("Created route");
-      const routeId = 1;
+      toast(isEditMode ? "Route updated" : "Route created");
       if (!isEditMode) {
-        navigate(`apps/${app.id}/routes/${routeId}`);
+        const routeId = ((await res.json()) as Route).id;
+        navigate(`../${routeId}`);
       }
     }
   };
 
   const [showCodeSnippet, setShowCodeSnippet] = useState(false);
   const path = watch("path");
-  const [url, setUrl] = useState("");
-  useEffect(() => {
-    setUrl(appDomain + path);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [path]);
+  const url = appDomain + path;
 
   if (isLoading) {
     return <div className="w-full">Loading...</div>;
@@ -150,6 +157,14 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
   return (
     <FormProvider {...forms}>
       <form className="h-full p-2" onSubmit={handleSubmit(onSubmit)}>
+        {routeRef.current?.status === "Blocked" && (
+          <div className="border border-red-200 bg-red-50 p-2 text-red-700">
+            <p>
+              This route is blocked because of some reason. Your route will be
+              reviewed by our team.
+            </p>
+          </div>
+        )}
         <div className="overflow-y-auto">
           <div>
             <label htmlFor="name">Name</label>
@@ -241,6 +256,14 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
                 </button>
               </div>
             </div>
+            <div className="mt-1">
+              <input
+                type="checkbox"
+                {...register("requireAuthorization")}
+                className="inline-block border border-gray-200 px-2 py-1"
+              />
+              <label className="mt-2">Require Authorization</label>
+            </div>
             {false && <Validation />}
           </section>
           <section>
@@ -265,6 +288,7 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
           <button
             type="submit"
             className="border border-transparent bg-cyan-700 px-3 py-1 text-center font-medium text-white focus:z-10 focus:outline-none focus:ring-2 focus:ring-cyan-300 enabled:hover:bg-cyan-800"
+            disabled={isLoading || routeRef.current?.status === "Blocked"}
           >
             Save
           </button>

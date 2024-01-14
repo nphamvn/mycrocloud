@@ -40,6 +40,9 @@ namespace WebApp.Infrastructure.Repositories.EfCore.PostgreSQLMigrations
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -51,7 +54,7 @@ namespace WebApp.Infrastructure.Repositories.EfCore.PostgreSQLMigrations
                     b.ToTable("Apps");
                 });
 
-            modelBuilder.Entity("WebApp.Domain.Entities.Database", b =>
+            modelBuilder.Entity("WebApp.Domain.Entities.AuthenticationScheme", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -59,19 +62,31 @@ namespace WebApp.Infrastructure.Repositories.EfCore.PostgreSQLMigrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AppId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Data")
+                    b.Property<string>("Description")
                         .HasColumnType("text");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<string>("Schema")
+                    b.Property<string>("OpenIdConnectAudience")
                         .HasColumnType("text");
 
-                    b.Property<int>("ServerId")
+                    b.Property<string>("OpenIdConnectAuthority")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -79,9 +94,9 @@ namespace WebApp.Infrastructure.Repositories.EfCore.PostgreSQLMigrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ServerId");
+                    b.HasIndex("AppId");
 
-                    b.ToTable("Databases");
+                    b.ToTable("AuthenticationSchemes");
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.Log", b =>
@@ -146,7 +161,7 @@ namespace WebApp.Infrastructure.Repositories.EfCore.PostgreSQLMigrations
                     b.Property<string>("FunctionHandler")
                         .HasColumnType("text");
 
-                    b.Property<List<string>>("FunctionHandlerDependencies")
+                    b.Property<string[]>("FunctionHandlerDependencies")
                         .HasColumnType("text[]");
 
                     b.Property<string>("Method")
@@ -157,6 +172,9 @@ namespace WebApp.Infrastructure.Repositories.EfCore.PostgreSQLMigrations
 
                     b.Property<string>("Path")
                         .HasColumnType("text");
+
+                    b.Property<bool>("RequireAuthorization")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("ResponseBody")
                         .HasColumnType("text");
@@ -169,6 +187,9 @@ namespace WebApp.Infrastructure.Repositories.EfCore.PostgreSQLMigrations
 
                     b.Property<string>("ResponseType")
                         .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -210,52 +231,21 @@ namespace WebApp.Infrastructure.Repositories.EfCore.PostgreSQLMigrations
                     b.ToTable("RouteValidations");
                 });
 
-            modelBuilder.Entity("WebApp.Domain.Entities.Server", b =>
+            modelBuilder.Entity("WebApp.Domain.Entities.AuthenticationScheme", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LoginId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Password")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Servers");
-                });
-
-            modelBuilder.Entity("WebApp.Domain.Entities.Database", b =>
-                {
-                    b.HasOne("WebApp.Domain.Entities.Server", "Server")
-                        .WithMany("Databases")
-                        .HasForeignKey("ServerId")
+                    b.HasOne("WebApp.Domain.Entities.App", "App")
+                        .WithMany()
+                        .HasForeignKey("AppId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Server");
+                    b.Navigation("App");
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.Log", b =>
                 {
                     b.HasOne("WebApp.Domain.Entities.App", "App")
-                        .WithMany()
+                        .WithMany("Logs")
                         .HasForeignKey("AppId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -272,7 +262,7 @@ namespace WebApp.Infrastructure.Repositories.EfCore.PostgreSQLMigrations
             modelBuilder.Entity("WebApp.Domain.Entities.Route", b =>
                 {
                     b.HasOne("WebApp.Domain.Entities.App", "App")
-                        .WithMany()
+                        .WithMany("Routes")
                         .HasForeignKey("AppId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -318,14 +308,16 @@ namespace WebApp.Infrastructure.Repositories.EfCore.PostgreSQLMigrations
                     b.Navigation("Route");
                 });
 
+            modelBuilder.Entity("WebApp.Domain.Entities.App", b =>
+                {
+                    b.Navigation("Logs");
+
+                    b.Navigation("Routes");
+                });
+
             modelBuilder.Entity("WebApp.Domain.Entities.Route", b =>
                 {
                     b.Navigation("Validations");
-                });
-
-            modelBuilder.Entity("WebApp.Domain.Entities.Server", b =>
-                {
-                    b.Navigation("Databases");
                 });
 #pragma warning restore 612, 618
         }

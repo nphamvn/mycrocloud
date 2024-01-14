@@ -1,27 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Api.Models;
-using WebApp.RestApi;
-using WebApp.Domain.Services;
 using WebApp.Domain.Repositories;
+using WebApp.Domain.Services;
 using WebApp.RestApi.Extensions;
 
-namespace WebApp.Api.Controllers;
+namespace WebApp.RestApi.Controllers;
 
-public class AppsController : BaseController
+public class AppsController(IAppService appService, IAppRepository appRepository) : BaseController
 {
-    private readonly IAppService _appService;
-    private readonly IAppRepository _appRepository;
-
-    public AppsController(IAppService appService, IAppRepository appRepository)
-    {
-        _appService = appService;
-        _appRepository = appRepository;
-    }
-
     [HttpGet]
     public async Task<IActionResult> Index([FromQuery] AppSearchRequest request)
     {
-        var apps = await _appRepository.ListByUserId(User.GetUserId(), "", "");
+        var apps = await appRepository.ListByUserId(User.GetUserId(), "", "");
         return Ok(apps.Select(a => new {
             a.Id,
             a.Name,
@@ -34,14 +24,14 @@ public class AppsController : BaseController
     [HttpPost]
     public async Task<IActionResult> Create(AppCreateRequest appCreateRequest)
     {
-        await _appService.Create(User.GetUserId(), appCreateRequest.ToEntity());
+        await appService.Create(User.GetUserId(), appCreateRequest.ToEntity());
         return Created();
     }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(int id)
     {
-        var app = await _appRepository.GetByAppId(id);
+        var app = await appRepository.GetByAppId(id);
         return Ok(new {
             app.Id,
             app.Name,
@@ -54,14 +44,14 @@ public class AppsController : BaseController
     [HttpPatch("{id:int}/Rename")]
     public async Task<IActionResult> Rename(int id, AppRenameRequest renameRequest)
     {
-        await _appService.Rename(id, renameRequest.Name);
+        await appService.Rename(id, renameRequest.Name);
         return NoContent();
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _appService.Delete(id);
+        await appService.Delete(id);
         return NoContent();
     }
 }

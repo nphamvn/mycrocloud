@@ -10,7 +10,9 @@ builder.Services.AddLogging(options => { options.AddSeq(builder.Configuration["L
 builder.Services.AddHttpLogging(o => { });
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL"))
+        .LogTo(Console.WriteLine, LogLevel.Information)
+        .EnableSensitiveDataLogging();
 });
 builder.Services.AddScoped<IAppRepository, AppRepository>();
 builder.Services.AddScoped<IRouteRepository, RouteRepository>();
@@ -18,9 +20,10 @@ builder.Services.AddScoped<ILogRepository, LogRepository>();
 builder.Services.AddSingleton(new ScriptCollection
 {
     { "faker", File.ReadAllText("Scripts/faker.js") },
-    { "handlebars", File.ReadAllText("Scripts/Handlebars.js")},
-    { "lodash", File.ReadAllText("Scripts/lodash.js")}
+    { "handlebars", File.ReadAllText("Scripts/handlebars.min-v4.7.8.js")},
+    { "lodash", File.ReadAllText("Scripts/lodash.min.js")}
 });
+builder.Services.AddSingleton<ICachedOpenIdConnectionSigningKeys, MemoryCachedOpenIdConnectionSigningKeys>();
 
 var app = builder.Build();
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
@@ -36,7 +39,13 @@ if (app.Environment.IsDevelopment())
     {
         //Mock header. In production this header should be set from LB
         var subDomain = context.Request.Host.Host.Split(".")[0];
-        context.Request.Headers.Append("X-AppId", subDomain);
+        var appId = int.Parse(subDomain["App-".Length..]);
+        var source = builder.Configuration["AppIdSource"]!.Split(":")[0];
+        var name = builder.Configuration["AppIdSource"]!.Split(":")[1];
+        if (source == "Header")
+        {
+            context.Request.Headers.Append(name, appId.ToString());
+        }
         return next(context);
     });
 }
@@ -45,10 +54,16 @@ app.UseAppResolverMiddleware();
 
 app.UseRouteResolverMiddleware();
 
+app.UseAuthenticationMiddleware();
+
+app.UseAuthorizationMiddleware();
+
 app.UseValidationMiddleware();
 
-app.MapWhen(context => ((Route)context.Items["_Route"]!).ResponseType == "static",appBuilder => appBuilder.Run(StaticResponseHandler.Handle));
+app.MapWhen(context => ((Route)context.Items["_Route"]!).ResponseType == "static",
+    appBuilder => appBuilder.Run(StaticResponseHandler.Handle));
 
-app.MapWhen(context => ((Route)context.Items["_Route"]!).ResponseType == "function", appBuilder => appBuilder.Run(FunctionHandler.Handle));
+app.MapWhen(context => ((Route)context.Items["_Route"]!).ResponseType == "function", 
+    appBuilder => appBuilder.Run(FunctionHandler.Handle));
 
 app.Run();

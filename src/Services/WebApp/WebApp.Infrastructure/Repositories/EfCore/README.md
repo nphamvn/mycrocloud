@@ -1,21 +1,21 @@
 ### Command
 #### 1. Add migration
 ```
-dotnet ef migrations add <MigrationName> -s ../WebApp.Api.Rest/WebApp.Api.Rest.csproj -o Repositories/EfCore/Migrations
+dotnet ef migrations add <MigrationName> -s ../WebApp.RestApi/WebApp.RestApi.csproj -o Repositories/EfCore/Migrations
 ```
 Example:
 ```
-dotnet ef migrations add UpdateDatabase2 -s ../WebApp.Api.Rest/WebApp.Api.Rest.csproj -o Repositories/EfCore/Migrations
+dotnet ef migrations add AddAppStatus -s ../WebApp.RestApi/WebApp.RestApi.csproj
 
 ```
 #### 2. Update database
 ```
-dotnet ef database update -s ../WebApp.Api.Rest/WebApp.Api.Rest.csproj
+dotnet ef database update -s ../WebApp.RestApi/WebApp.RestApi.csproj
 ```
 
 # Others
 #### 1. Remove migration
 ```
-dotnet ef migrations remove -s ../WebApp.Api.Rest/WebApp.Api.Rest.csproj
+dotnet ef migrations remove -s ../WebApp.RestApi/WebApp.RestApi.csproj
 ```
 

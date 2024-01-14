@@ -10,6 +10,8 @@ export default interface Route {
   responseBody?: string;
   functionHandler?: string;
   functionHandlerDependencies?: string[];
+  requireAuthorization: boolean;
+  status: string;
 }
 
 interface Header {

@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Routing.Template;
 using WebApp.Domain.Entities;
+using WebApp.Domain.Enums;
 using WebApp.Domain.Repositories;
 using Route = WebApp.Domain.Entities.Route;
 
@@ -10,8 +11,8 @@ public class RouteResolverMiddleware(RequestDelegate next)
 {
     public async Task Invoke(HttpContext context, IRouteRepository routeRepository, ILogRepository logRepository)
     {
-            var foundApp = (App)context.Items["_App"]!;
-            var routes = await routeRepository.List(foundApp.Id, "", "");
+            var app = (App)context.Items["_App"]!;
+            var routes = await routeRepository.List(app.Id, "", "");
             var matchedRoutes = new List<Route>();
             foreach (var r in routes)
             {
@@ -36,6 +37,16 @@ public class RouteResolverMiddleware(RequestDelegate next)
         
             var route = matchedRoutes.First();
             context.Items["_Route"] = route;
+            switch (route.Status)
+            {
+                case RouteStatus.Inactive:
+                    context.Response.StatusCode = 404;
+                    return;
+                case RouteStatus.Blocked:
+                    context.Response.StatusCode = 403;
+                    await context.Response.WriteAsync("The request matched a blocked endpoint");
+                    return;
+            }
             object? reqBody = null;
             try
             {

@@ -16,11 +16,10 @@ import RouteLogs from "./components/routes/RouteLogs";
 import RouteEdit from "./components/routes/RouteEdit";
 import RouteCreate from "./components/routes/RouteCreate";
 import DevPage from "./components/DevPage";
-import ServerList from "./components/databases/ServerList";
-import ServerOverview from "./components/databases/ServerOverview";
-import DatabaseList from "./components/databases/DatabaseList";
-import ServerCreate from "./components/databases/ServerCreate";
-import DatabaseCreate from "./components/databases/DatabaseCreate";
+import SchemeList from "./components/authentications/SchemeList";
+import AuthenticationsIndex from "./components/authentications/Authentication";
+import CreateUpdateScheme from "./components/authentications/CreateUpdateScheme";
+import AuthenticationSettings from "./components/authentications/Settings";
 
 function App() {
   useEffect(() => {
@@ -52,13 +51,17 @@ function App() {
                 <Route path=":routeId" Component={RouteEdit} />
                 <Route path=":routeId/logs" Component={RouteLogs} />
               </Route>
+              <Route path="authentications" Component={AuthenticationsIndex}>
+                <Route path="schemes" Component={SchemeList} />
+                <Route path="schemes/new" Component={CreateUpdateScheme} />
+                <Route
+                  path="schemes/:schemeId"
+                  Component={CreateUpdateScheme}
+                />
+                <Route path="settings" Component={AuthenticationSettings} />
+              </Route>
               <Route path="logs" Component={AppLogs} />
             </Route>
-            <Route path="/dbservers" Component={ServerList} />
-            <Route path="/dbservers/new" Component={ServerCreate} />
-            <Route path="/dbservers/:id" Component={ServerOverview} />
-            <Route path="/dbservers/:id/dbs" Component={DatabaseList} />
-            <Route path="/dbservers/:id/dbs/new" Component={DatabaseCreate} />
           </Routes>
         </div>
         <ToastContainer />

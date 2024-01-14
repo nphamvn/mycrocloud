@@ -10,7 +10,8 @@ export default function AppIndex() {
   const appId = parseInt(useParams()["appId"]!.toString());
   const [app, setApp] = useState<App>();
   const { pathname } = useLocation();
-  const path = pathname.split("/")[3];
+  const path3 = pathname.split("/")[3];
+  const path4 = pathname.split("/")[4];
   useEffect(() => {
     const getApp = async () => {
       const accessToken = await getAccessTokenSilently();
@@ -26,9 +27,9 @@ export default function AppIndex() {
     getApp();
   }, []);
   useEffect(() => {
-    const path = pathname.split("/")[3];
+    const path3 = pathname.split("/")[3];
     if (app) {
-      switch (path) {
+      switch (path3) {
         case "overview":
           document.title = app.name + " - Overview";
           break;
@@ -60,22 +61,47 @@ export default function AppIndex() {
           <Breadcrumb.Item>{app.name}</Breadcrumb.Item>
         </Breadcrumb>
         <div className="flex min-h-screen border">
-          <div className="flex w-24 flex-col space-y-0.5 border-r p-1">
+          <div className="flex w-28 flex-col space-y-0.5 border-r p-1">
             <Link
               to="overview"
-              className={`${path === "overview" ? "text-cyan-700" : ""}`}
+              className={`text-xs ${
+                path3 === "overview" ? "text-primary" : ""
+              }`}
             >
               Overview
             </Link>
             <Link
               to="routes"
-              className={`${path === "routes" ? "text-cyan-700" : ""}`}
+              className={`text-xs ${path3 === "routes" ? "text-primary" : ""}`}
             >
               Routes
             </Link>
+            <div className="flex flex-col text-xs">
+              Authentications
+              <Link
+                to="authentications/schemes"
+                className={`ms-2 text-xs ${
+                  path3 === "authentications" && path4 === "schemes"
+                    ? "text-primary"
+                    : ""
+                }`}
+              >
+                Schemes
+              </Link>
+              <Link
+                to="authentications/settings"
+                className={`ms-2 text-xs ${
+                  path3 === "authentications" && path4 === "settings"
+                    ? "text-primary"
+                    : ""
+                }`}
+              >
+                Settings
+              </Link>
+            </div>
             <Link
               to="logs"
-              className={`${path === "logs" ? "text-cyan-700" : ""}`}
+              className={`text-xs ${path3 === "logs" ? "text-primary" : ""}`}
             >
               Logs
             </Link>

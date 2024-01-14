@@ -1,29 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
-using WebApp.Api.Models;
-using WebApp.Domain.Entities;
+using WebApp.Domain.Enums;
 using WebApp.Domain.Repositories;
 using WebApp.Domain.Services;
+using WebApp.RestApi.Models.Routes;
 
-namespace WebApp.Api.Controllers;
+namespace WebApp.RestApi.Controllers;
 
 [Route("api/apps/{appId:int}/routes")]
-public class RoutesController : BaseController
+public class RoutesController(IRouteService routeService,
+    IRouteRepository routeRepository
+    ) : BaseController
 {
-    private readonly IRouteService _routeService;
-    private readonly IRouteRepository _routeRepository;
-
-    public RoutesController(IRouteService routeService, 
-        IRouteRepository routeRepository
-    )
-    {
-        _routeService = routeService;
-        _routeRepository = routeRepository;
-    }
-
     [HttpGet]
     public async Task<IActionResult> Index(int appId, string? SearchTerm, string? Sort)
     {
-        var routes = await _routeRepository.List(appId, SearchTerm, Sort);
+        var routes = await routeRepository.List(appId, SearchTerm, Sort);
         return Ok(routes.Select(r => new {
             r.Id,
             r.Name,
@@ -37,7 +28,7 @@ public class RoutesController : BaseController
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(int id)
     {
-        var route = await _routeRepository.GetById(id);
+        var route = await routeRepository.GetById(id);
         return Ok(new {
             route.Id,
             route.AppId,
@@ -54,6 +45,8 @@ public class RoutesController : BaseController
             route.ResponseBodyLanguage,
             route.FunctionHandler,
             route.FunctionHandlerDependencies,
+            route.RequireAuthorization,
+            Status = route.Status.ToString(),
             route.CreatedAt,
             route.UpdatedAt
         });
@@ -63,23 +56,34 @@ public class RoutesController : BaseController
     public async Task<IActionResult> Create(int appId, RouteCreateUpdateRequest route)
     {
         var entity = route.ToEntity();
-        await _routeService.Create(appId, entity);
+        await routeService.Create(appId, entity);
         return Created("", entity);
     }
     
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Edit(int id, RouteCreateUpdateRequest route)
     {
-        var currentRoute = await _routeRepository.GetById(id);
+        var currentRoute = await routeRepository.GetById(id);
+        if (currentRoute.Status == RouteStatus.Blocked)
+        {
+            // Do not allow editing blocked route
+            return BadRequest();
+        }
         route.ToEntity(currentRoute);
-        await _routeService.Update(id, currentRoute);
+        await routeService.Update(id, currentRoute);
         return NoContent();
     }
     
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _routeService.Delete(id);
+        var route = await routeRepository.GetById(id);
+        if (route.Status == RouteStatus.Blocked)
+        {
+            // Do not allow deleting blocked route
+            return BadRequest();
+        }
+        await routeService.Delete(id);
         return NoContent();
     }
 }

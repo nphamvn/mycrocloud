@@ -1,5 +1,5 @@
 using Route = WebApp.Domain.Entities.Route;
-namespace WebApp.Api.Models;
+namespace WebApp.RestApi.Models.Routes;
 
 public class RouteCreateUpdateRequest
 {
@@ -13,7 +13,7 @@ public class RouteCreateUpdateRequest
     public string? ResponseBodyLanguage { get; set; }
     public string? FunctionHandler { get; set; }
     public List<string>? FunctionHandlerDependencies { get; set; }
-
+    public bool RequireAuthorization { get; set; }
     public Route ToEntity()
     {
         return new Route
@@ -27,7 +27,8 @@ public class RouteCreateUpdateRequest
             ResponseBodyLanguage = ResponseBodyLanguage,
             ResponseBody = ResponseBody,
             FunctionHandler = FunctionHandler,
-            FunctionHandlerDependencies = FunctionHandlerDependencies
+            FunctionHandlerDependencies = FunctionHandlerDependencies,
+            RequireAuthorization = RequireAuthorization
         };
     }
     public void ToEntity(Route route)
@@ -42,6 +43,7 @@ public class RouteCreateUpdateRequest
         route.ResponseBody = ResponseBody;
         route.FunctionHandler = FunctionHandler;
         route.FunctionHandlerDependencies = FunctionHandlerDependencies;
+        route.RequireAuthorization = RequireAuthorization;
     }
 }
 

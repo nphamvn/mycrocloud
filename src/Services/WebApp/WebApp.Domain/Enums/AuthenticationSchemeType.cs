@@ -1,8 +1,8 @@
-namespace WebApp.Authentication;
+namespace WebApp.Domain.Enums;
 
 public enum AuthenticationSchemeType
 {
-    JwtBearer = 1,
+    OpenIdConnect = 1,
     ApiKey = 2,
     Basic = 3
 }

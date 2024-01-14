@@ -10,7 +10,6 @@ public class AppCreateRequest
     public string Name { get; set; }
     [MaxLength(400)]
     public string? Description { get; set; }
-
     public App ToEntity() {
         return new App() {
             Name = Name,

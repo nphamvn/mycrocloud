@@ -1,0 +1,51 @@
+@page "/WebApps"
+@using App = WebApp.Domain.Entities.App
+@using WebApp.Infrastructure.Repositories.EfCore
+@using Microsoft.EntityFrameworkCore
+<h3>WebApps</h3>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Owner</th>
+        <th>Status</th>
+        <th>Route Count</th>
+        <th>Access Count</th>
+        <th>Created At</th>
+        <th>Updated At</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var app in apps)
+    {
+        <tr>
+            <td>
+                <a href="/WebApps/@app.Id">
+                    @app.Name
+                </a>
+            </td>
+            <td>@app.UserId</td>
+            <td>@app.Status.ToString()</td>
+            <td>@app.Routes.Count</td>
+            <td>@app.Logs.Count</td>
+            <td>@app.CreatedAt</td>
+            <td>@app.UpdatedAt</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@code {
+    private List<App> apps = [];
+    [Inject]
+    private AppDbContext AppDbContext { get; set; } = default!;
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        apps = await AppDbContext.Apps
+                .Include(a => a.Routes)
+                .Include(a => a.Logs)
+                .ToListAsync();
+    }
+}

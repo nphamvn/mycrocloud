@@ -1,4 +1,5 @@
 ﻿using WebApp.Domain.Entities;
+using WebApp.Domain.Enums;
 using WebApp.Domain.Repositories;
 using Route = WebApp.Domain.Entities.Route;
 
@@ -6,7 +7,7 @@ namespace WebApp.MiniApiGateway;
 
 public class LoggingMiddleware(RequestDelegate next)
 {
-    public async Task Invoke(HttpContext context, ILogRepository logRepository)
+    public async Task Invoke(HttpContext context, ILogRepository logRepository, IRouteRepository routeRepository)
     {
         await next.Invoke(context);
         if (context.Items["_App"] is App app)
@@ -23,6 +24,15 @@ public class LoggingMiddleware(RequestDelegate next)
                 AdditionalLogMessage = functionExecutionResult?.AdditionalLogMessage,
                 FunctionExecutionDuration = functionExecutionResult?.Duration
             });
+            
+            if (functionExecutionResult?.Exception is { } e)    
+            {
+                if (e is TimeoutException && route is not null)
+                {
+                    route.Status = RouteStatus.Blocked;
+                    await routeRepository.Update(route.Id, route);
+                }
+            }
         }
     }
 }

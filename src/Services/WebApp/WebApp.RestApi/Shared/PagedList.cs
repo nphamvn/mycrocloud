@@ -1,4 +1,4 @@
-namespace WebApp.Api.Shared;
+namespace WebApp.RestApi.Shared;
 
 public class PagedList
 {

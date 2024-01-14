@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 using Jint;
-using Jint.Runtime.Interop;
+using Jint.Native;
 using Route = WebApp.Domain.Entities.Route;
 
 namespace WebApp.MiniApiGateway;
@@ -14,15 +15,12 @@ public static class FunctionHandler
         var request = context.Items["_Request"]!;
         var scripts = context.RequestServices.GetRequiredService<ScriptCollection>();
         //Start measuring time for function execution
-        var stopwatch = Stopwatch.StartNew();
-
-        var engine = new Engine();
-        var useDb = true;
-        if (useDb)
+        
+        var engine = new Engine(options =>
         {
-            engine.SetValue(nameof(NoSqlDbConnection), TypeReference.CreateTypeReference<NoSqlDbConnection>(engine));
-        }
-        engine.Execute(await File.ReadAllTextAsync("Scripts/MycroCloudDb.js"));
+            options.LimitMemory(50 * 1024 * 1024);
+            options.TimeoutInterval(TimeSpan.FromSeconds(30));
+        });
         foreach (var dependency in route.FunctionHandlerDependencies ?? [])
         {
             if (scripts.TryGetValue(dependency, out var script))
@@ -30,22 +28,39 @@ public static class FunctionHandler
                 engine.Execute(script);
             }
         }
-        engine.Execute(route.FunctionHandler ?? throw new InvalidOperationException("FunctionHandler is null"));
-        var handler = engine.GetValue("handler");
-
-        //Execute function and get response
+        var stopwatch = Stopwatch.StartNew();
+        JsValue jsResult;
         var result = new FunctionExecutionResult();
-        var jsResult = engine.Invoke(handler, request);
-        stopwatch.Stop();
+        try
+        {
+            engine.Execute(route.FunctionHandler ?? throw new InvalidOperationException("FunctionHandler is null"));
+            var handler = engine.GetValue("handler");
+            jsResult = engine.Invoke(handler, request);
+        }
+        catch (Exception e)
+        {
+            jsResult = JsValue.FromObject(engine, new
+            {
+                statusCode = 500,
+                body = e.Message,
+                additionalLogMessage = e.Message
+            });
+            result.Exception = e;
+        }
+        finally
+        {
+            stopwatch.Stop();
+        }
+        
         result.Duration = stopwatch.Elapsed;
         var statusCode = jsResult.Get("statusCode");
-        if (!statusCode.IsNull() && !statusCode.IsUndefined())
+        if (statusCode.IsNumber())
         {
             result.StatusCode = (int)statusCode.AsNumber();
         }
 
         var headers = jsResult.Get("headers");
-        if (!headers.IsNull() && !headers.IsUndefined())
+        if (headers.IsObject())
         {
             var headersObject = headers.AsObject();
             var headersObjectProperties = headersObject.GetOwnProperties();
@@ -86,13 +101,13 @@ public static class FunctionHandler
         }
 
         var body = jsResult.Get("body");
-        if (!body.IsNull() && !body.IsUndefined())
+        if (body.IsString())
         {
             result.Body = body.AsString();
         }
 
         var additionalLogMessage = jsResult.Get("additionalLogMessage");
-        if (!additionalLogMessage.IsNull() && !additionalLogMessage.IsUndefined())
+        if (additionalLogMessage.IsString())
         {
             result.AdditionalLogMessage = additionalLogMessage.AsString();
         }

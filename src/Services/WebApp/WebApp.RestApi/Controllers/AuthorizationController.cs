@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Api.Models;
 
-namespace WebApp.Api.Controllers;
+namespace WebApp.RestApi.Controllers;
 
 [Route("apps/{appId:int}/authorization")]
 public class AuthorizationController : BaseController
@@ -13,13 +13,13 @@ public class AuthorizationController : BaseController
     }
 
     [HttpGet("policies/create")]
-    public async Task<IActionResult> PolicyCreate(int WebApplicationId)
+    public async Task<IActionResult> PolicyCreate(int appId)
     {
         return Ok();
     }
 
     [HttpPost("policies/create")]
-    public async Task<IActionResult> PolicyCreate(string WebApplicationName, int WebApplicationId, PolicySaveModel model)
+    public async Task<IActionResult> PolicyCreate(int appId, PolicySaveModel model)
     {
         if (!ModelState.IsValid)
         {
@@ -28,21 +28,16 @@ public class AuthorizationController : BaseController
         return Ok();
     }
 
-    [HttpGet("policies/{PolicyId:int}/edit")]
-    public async Task<IActionResult> PolicyEdit(int PolicyId)
+    [HttpGet("policies/{policyId:int}/edit")]
+    public async Task<IActionResult> PolicyEdit(int appId, int policyId)
     {
         return Ok();
     }
 
-    [HttpPost("policies/{PolicyId:int}/edit")]
-    public async Task<IActionResult> PolicyEdit(string WebApplicationName, int PolicyId, PolicySaveModel model)
+    [HttpPost("policies/{policyId:int}/edit")]
+    public async Task<IActionResult> PolicyEdit(int appId, int policyId, PolicySaveModel model)
     {
         return Ok();
     }
 
-    [HttpPost("policies/{PolicyId:int}/delete")]
-    public async Task<IActionResult> PolictDelete(string WebApplicationName, int PolicyId)
-    {
-        return Ok();
-    }
 }

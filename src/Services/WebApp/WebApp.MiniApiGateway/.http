@@ -1,4 +1,5 @@
 @HostAddress = http://app-5.mycrocloud.local:5010
+@token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InljZVRRa1VITERXXzNqeW5RYzZzWCJ9.eyJpc3MiOiJodHRwczovL2Rldi12enhwaG91ei51cy5hdXRoMC5jb20vIiwic3ViIjoiZ2l0aHVifDY4MTM3MTk0IiwiYXVkIjpbImh0dHBzOi8vbXljcm9jbG91ZC5jb20iLCJodHRwczovL2Rldi12enhwaG91ei51cy5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNzA1MjIyNjI3LCJleHAiOjE3MDUzMDkwMjcsImF6cCI6IjhZRUNLVU1NM0k3ZWpRZ3NWa3k0MGI1TG9vUUIwWUZmIiwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCJ9.n8eIrqYrRjAc04ocMIyASeVBfsNLoxUgq39cZSru8-miYJRPtY76i9fKCzywGKN90GGyupCpcAcwmDGHoqFWzuW4i8wQBiMZ6S3Z--76vChQnEMnAZt4uQ_AEHK90HycjdDGwuan_n0LsCFSNqWcr3s23yaqq_G7tk0PnGQ2V49kymO6I-aScKRjbCeAkM3wsXeb91DQMwCWLLFAf9ps-74q0bkwIGm3JPu7_72QzjLGamTsXHDBgaTQXzow9YVlnUsCcZFyD17ffTLdI6o6Pe0u713Eco6qO-kGo0L6VuXfP3jA9TS3J2UGaaA-2Oji7RmflLB5AE_rmbYCz0lNSQ
 
 ###
 GET {{HostAddress}}/ping
@@ -32,4 +33,5 @@ Content-Type: text/plain
 GET {{HostAddress}}/hello-world
 
 ###
-GET http://app-1.mycrocloud.local:5010/db
+GET http://app-1.mycrocloud.local:5010/json
+Authorization: Bearer {{token}}

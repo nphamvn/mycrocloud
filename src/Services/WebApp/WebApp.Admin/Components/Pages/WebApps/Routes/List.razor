@@ -1,0 +1,58 @@
+@page "/WebApps/{AppId:int}/Routes"
+@using Route = WebApp.Domain.Entities.Route;
+@using WebApp.Infrastructure.Repositories.EfCore;
+@using Microsoft.EntityFrameworkCore;
+
+<h3>Route List</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Response Type</th>
+            <th>Created At</th>
+            <th>Updated At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{ int index = 0;}
+        @foreach (var route in routes)
+        {
+            var routeId = routes[index].Id;
+            <tr>
+                <td>@route.Name</td>
+                <td>@route.Status</td>
+                <td>@route.ResponseType</td>
+                <td>@route.CreatedAt</td>
+                <td>@route.UpdatedAt</td>
+                <td>
+                    <button class="btn text-primary" @onclick="() => Unblock(routeId)" >Unblock</button>
+                </td>
+            </tr>
+            index++;
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public int AppId { get; set; }
+    private IList<Route> routes = [];
+    [Inject]
+    public AppDbContext DbContext { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        routes = await DbContext.Routes.Where(x => x.AppId == AppId)
+        .ToListAsync();
+    }
+    private async Task Unblock(int id)
+    {
+        Console.WriteLine($"Unblocking route with ID {id}");
+        var route = await DbContext.Routes.SingleAsync(x => x.Id == id);
+        route.Status = Domain.Enums.RouteStatus.Active;
+        await DbContext.SaveChangesAsync();
+    }
+}

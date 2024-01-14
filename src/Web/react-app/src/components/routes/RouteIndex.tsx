@@ -49,6 +49,8 @@ export default function RouteIndex() {
           responseHeaders: [],
           responseBodyLanguage: "json",
           responseBody: "",
+          requireAuthorization: false,
+          functionHandler: "",
         },
         ...routes,
       ]);
@@ -65,6 +67,7 @@ export default function RouteIndex() {
         },
       });
       if (res.ok) {
+        setRoutes(routes.filter((route) => route.id !== id));
         navigate(`/apps/${app.id}/routes`);
       }
     }

@@ -49,11 +49,6 @@ public class RouteRepository(AppDbContext dbContext) : IRouteRepository
         return await dbContext.Routes.FirstAsync(r => r.Id == id);
     }
 
-    public Task<RouteMockResponse> GetMockResponse(int routeId)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<IEnumerable<Route>> List(int appId, string searchTerm, string sort)
     {
         return await dbContext.Routes.Where(r => r.AppId == appId).ToListAsync();

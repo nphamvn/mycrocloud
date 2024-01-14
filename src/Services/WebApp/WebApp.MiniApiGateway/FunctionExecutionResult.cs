@@ -7,4 +7,5 @@ public class FunctionExecutionResult
     public string? Body { get; set; }
     public string? AdditionalLogMessage { get; set; }
     public TimeSpan Duration { get; set; }
+    public Exception? Exception { get; set; }
 }

@@ -10,7 +10,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Route> Routes { get; set; }
     public DbSet<RouteValidation> RouteValidations { get; set; }
     public DbSet<Log> Logs { get; set; }
-    
+    public DbSet<AuthenticationScheme> AuthenticationSchemes { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Route>().OwnsMany(route => route.ResponseHeaders,
