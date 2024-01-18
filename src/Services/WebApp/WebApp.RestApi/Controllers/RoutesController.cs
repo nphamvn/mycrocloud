@@ -15,13 +15,14 @@ public class RoutesController(IRouteService routeService,
     public async Task<IActionResult> Index(int appId, string? SearchTerm, string? Sort)
     {
         var routes = await routeRepository.List(appId, SearchTerm, Sort);
-        return Ok(routes.Select(r => new {
-            r.Id,
-            r.Name,
-            r.Method,
-            r.Path,
-            r.CreatedAt,
-            r.UpdatedAt
+        return Ok(routes.Select(route => new {
+            route.Id,
+            route.Name,
+            route.Method,
+            route.Path,
+            Status = route.Status.ToString(),
+            route.CreatedAt,
+            route.UpdatedAt
         }));
     }
 

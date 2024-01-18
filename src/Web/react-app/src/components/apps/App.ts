@@ -3,6 +3,6 @@ export default interface App {
   name: string;
   description?: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
   status: string;
 }

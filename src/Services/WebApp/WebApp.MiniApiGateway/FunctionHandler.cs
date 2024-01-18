@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
-using System.Text;
 using Jint;
 using Jint.Native;
 using Route = WebApp.Domain.Entities.Route;

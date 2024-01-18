@@ -4,14 +4,12 @@ import { useForm } from "react-hook-form";
 import { useAuth0 } from "@auth0/auth0-react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-
-const apiGatewayDomain = import.meta.env
-  .VITE_WEBAPP_APIGATEWAY_DOMAIN as string;
+import { getAppDomain } from "./service";
 
 export default function AppOverview() {
   const app = useContext(AppContext)!;
-  const domain = apiGatewayDomain.replace("__app_id__", app.id.toString());
-  
+  const domain = getAppDomain(app.id);
+
   return (
     <div className="p-2">
       <table>
@@ -29,15 +27,38 @@ export default function AppOverview() {
             <td>{new Date(app.createdAt).toDateString()}</td>
           </tr>
           <tr>
+            <td>Updated at</td>
+            <td>
+              {app.updatedAt ? new Date(app.updatedAt!).toDateString() : "-"}
+            </td>
+          </tr>
+          <tr>
             <td>Domain</td>
-            <td>{domain}</td>
+            <td className="flex">
+              <p className="text-blue-500 hover:underline">{domain}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(domain);
+                }}
+                className="ms-2 text-xs text-blue-500 hover:underline"
+              >
+                Copy
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
-      <hr className="mb-2" />
-      <RenameComponent />
-      <ChangeModeComponent />
-      <div>
+      <hr className="mt-2" />
+      <div className="mt-2">
+        <RenameComponent />
+      </div>
+      <hr className="mt-2" />
+      <div className="mt-2">
+        <ChangeStatusComponent />
+      </div>
+      <hr className="mt-2" />
+      <div className="hidden">
         <h3>Customer Handlers</h3>
         <div>Route Not Found</div>
         <select>
@@ -126,34 +147,68 @@ function DeleteComponent() {
     </div>
   );
 }
-function ChangeModeComponent() {
+function ChangeStatusComponent() {
   const app = useContext(AppContext)!;
   const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
-  const handleChangeModeClick = async () => {
-    if (confirm("Are you sure want to change mode?")) {
-      const accessToken = await getAccessTokenSilently();
-      const res = await fetch(`/api/apps/${app.id}/mode`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      if (res.ok) {
-        toast("Changed mode");
-        navigate("/apps");
-      }
+  const handleChangeStatusClick = async () => {
+    if (
+      app.status === "Active" &&
+      !confirm("Are you sure want to deactivate the app?")
+    ) {
+      return;
+    }
+    const accessToken = await getAccessTokenSilently();
+    const status = app.status === "Active" ? "Inactive" : "Active";
+    const res = await fetch(`/api/apps/${app.id}/status?status=${status}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (res.ok) {
+      //TODO: update app status in context
+      app.status = status;
+      toast("Status changed");
+      navigate(".");
     }
   };
+  function getStatusClass(status: string) {
+    switch (status) {
+      case "Active":
+        return "text-green-500";
+      case "Inactive":
+        return "text-gray-500";
+      case "Blocked":
+        return "text-red-500";
+      default:
+        return "";
+    }
+  }
+  function getChangeStatusButtonClass(status: string) {
+    switch (status) {
+      case "Active":
+        return "text-red-500";
+      case "Inactive":
+        return "text-green-500";
+      case "Blocked":
+        return "text-gray-500";
+      default:
+        return "";
+    }
+  }
   return (
-    <div className="mt-2">
-      <div>Mode: {app.status}</div>
+    <div>
+      <div>
+        Status: <span className={getStatusClass(app.status)}>{app.status}</span>
+      </div>
       <button
         type="button"
-        className="text-secondary"
-        onClick={handleChangeModeClick}
+        className={`${getChangeStatusButtonClass(app.status)}`}
+        disabled={app.status === "Blocked"}
+        onClick={handleChangeStatusClick}
       >
-        Change
+        {app.status === "Active" ? "Deactivate" : "Activate"}
       </button>
     </div>
   );

@@ -168,6 +168,9 @@ function RouteItem({ route }: { route: Route }) {
         {route.method}
       </span>
       <p className="text-sm">{route.name}</p>
+      {route.status === "Blocked" && (
+        <small className="ms-auto text-sm text-red-600">Blocked</small>
+      )}
     </div>
   );
 }

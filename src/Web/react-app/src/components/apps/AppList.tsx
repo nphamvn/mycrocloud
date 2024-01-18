@@ -53,9 +53,20 @@ export default function AppList() {
           return (
             <li key={app.id}>
               <div className="mb-2">
-                <Link to={`/apps/${app.id}`} className="text-slate-900">
-                  {app.name}
-                </Link>
+                <h4>
+                  <Link to={`/apps/${app.id}`} className="text-slate-900">
+                    {app.name}
+                  </Link>
+                  <small
+                    className={`ms-1 ${
+                      app.status === "Active"
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }`}
+                  >
+                    {app.status}
+                  </small>
+                </h4>
                 <p className="text-sm text-slate-600">{app.description}</p>
                 <p className="text-sm text-slate-600">
                   Created: {new Date(app.createdAt).toDateString()}

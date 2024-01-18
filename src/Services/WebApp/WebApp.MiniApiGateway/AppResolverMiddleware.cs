@@ -10,7 +10,7 @@ public class AppResolverMiddleware(RequestDelegate next)
         int? appId = null;
         var source = configuration["AppIdSource"]!.Split(":")[0];
         var name = configuration["AppIdSource"]!.Split(":")[1];
-        if (source == "Header" && context.Request.Headers.TryGetValue(name, out var headerAppId)
+        if (source.Equals("Header", StringComparison.OrdinalIgnoreCase) && context.Request.Headers.TryGetValue(name, out var headerAppId)
             && int.TryParse(headerAppId, out var parsedAppId))
         {
             appId = parsedAppId;
