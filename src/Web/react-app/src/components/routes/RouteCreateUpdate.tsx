@@ -31,6 +31,7 @@ type Inputs = {
   functionHandler?: string;
   functionHandlerDependencies?: string[];
   requireAuthorization: boolean;
+  staticFile?: File;
 };
 
 interface HeaderInput {
@@ -274,12 +275,14 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
               <label className="me-1">Type</label>
               <select {...register("responseType")}>
                 <option value="static">static</option>
+                <option value="staticFile">static file</option>
                 <option value="function">function</option>
               </select>
             </div>
 
-            <div>
+            <div className="mt-1">
               {responseType === "static" && <StaticResponse />}
+              {responseType === "staticFile" && <StaticFileResponse />}
               {responseType === "function" && <FunctionHandler />}
             </div>
           </section>
@@ -511,6 +514,21 @@ function StaticResponse() {
   );
 }
 
+function StaticFileResponse() {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<Inputs>();
+
+  return (
+    <div>
+      <input type="file" {...register("staticFile")} />
+      {errors.staticFile && (
+        <p className="text-red-500">{errors.staticFile.message}</p>
+      )}
+    </div>
+  );
+}
 function FunctionHandler() {
   const {
     formState: { errors },

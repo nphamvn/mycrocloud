@@ -8,6 +8,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddLogging(options => { options.AddSeq(builder.Configuration["Logging:Seq:ServerUrl"]); });
 builder.Services.AddHttpLogging(o => { });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder =>
+    {
+        builder.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL"))
@@ -26,8 +35,7 @@ builder.Services.AddSingleton(new ScriptCollection
 builder.Services.AddSingleton<ICachedOpenIdConnectionSigningKeys, MemoryCachedOpenIdConnectionSigningKeys>();
 
 var app = builder.Build();
-var logger = app.Services.GetRequiredService<ILogger<Program>>();
-logger.LogInformation("Starting up...");
+app.UseCors("CorsPolicy");
 
 app.UseHttpLogging();
 
