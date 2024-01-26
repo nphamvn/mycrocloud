@@ -5,7 +5,7 @@ dotnet ef migrations add <MigrationName> -s ../WebApp.RestApi/WebApp.RestApi.csp
 ```
 Example:
 ```
-dotnet ef migrations add AddAppStatus -s ../WebApp.RestApi/WebApp.RestApi.csproj
+dotnet ef migrations add AddAppSettings -s ../WebApp.RestApi/WebApp.RestApi.csproj
 
 ```
 #### 2. Update database

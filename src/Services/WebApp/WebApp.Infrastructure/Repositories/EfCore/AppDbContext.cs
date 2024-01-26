@@ -13,6 +13,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<AuthenticationScheme> AuthenticationSchemes { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<App>()
+            .OwnsOne(app => app.Settings, ownedNavigationBuilder =>
+            {
+                ownedNavigationBuilder.ToJson();
+            });
         modelBuilder.Entity<Route>().OwnsMany(route => route.ResponseHeaders,
             ownedNavigationBuilder => { ownedNavigationBuilder.ToJson(); });
         modelBuilder.Entity<RouteValidation>()

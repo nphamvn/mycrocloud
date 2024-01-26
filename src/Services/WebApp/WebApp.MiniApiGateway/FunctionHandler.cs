@@ -1,25 +1,79 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
+using System.Text.Json;
 using Jint;
 using Jint.Native;
+using WebApp.Domain.Entities;
 using Route = WebApp.Domain.Entities.Route;
 
 namespace WebApp.MiniApiGateway;
 
+internal class NoSqlConnection(App app, string connectionString, HttpClient httpClient)
+{
+    private string token;
+    
+    public void connect()
+    {
+        var response = httpClient.Send(new HttpRequestMessage()
+        {
+            Method = HttpMethod.Post,
+            RequestUri = new Uri($"http://localhost:5132?appId={app.Id}&connectionString={Uri.EscapeDataString(connectionString)}")
+        });
+
+        if (response.IsSuccessStatusCode)
+        {
+            using var reader = new StreamReader(response.Content.ReadAsStream());
+            var obj = JsonSerializer.Deserialize<ConnectResponse>(reader.ReadToEnd())!;
+            token = obj.Token;
+        }
+        else
+        {
+            throw new Exception();
+        }
+    }
+
+    #region Private
+    
+    private class ConnectResponse
+    {
+        public string Token { get; set; }
+    }
+    
+    #endregion
+}
 public static class FunctionHandler
 {
     public static async Task Handle(HttpContext context)
     {
+        var app = (App)context.Items["_App"]!;
         var route = (Route)context.Items["_Route"]!;
-        var request = context.Items["_Request"]!;
+        var request = await ReadRequest(context.Request);
         var scripts = context.RequestServices.GetRequiredService<ScriptCollection>();
-        //Start measuring time for function execution
         
         var engine = new Engine(options =>
         {
-            options.LimitMemory(50 * 1024 * 1024);
-            options.TimeoutInterval(TimeSpan.FromSeconds(30));
+            if (app.Settings.CheckFunctionExecutionLimitMemory)
+            {
+                options.LimitMemory(app.Settings.FunctionExecutionLimitMemoryBytes ?? 10 * 1024 * 1024);
+            }
+
+            if (app.Settings.CheckFunctionExecutionTimeout)
+            {
+                options.TimeoutInterval(TimeSpan.FromSeconds(app.Settings.FunctionExecutionTimeoutSeconds ?? 15));
+            }
         });
+
+        if (true)
+        {
+            engine.SetValue("useNoSqlConnection", new Func<string, NoSqlConnection>(connectionString =>
+            {
+                //TODO
+                var httpClientFactory = context.RequestServices.GetRequiredService<IHttpClientFactory>();
+                var httpClient = httpClientFactory.CreateClient("FunctionHandlerIOAgent");
+                return new NoSqlConnection(app, connectionString, httpClient);
+            }));
+        }
+        
         foreach (var dependency in route.FunctionHandlerDependencies ?? [])
         {
             if (scripts.TryGetValue(dependency, out var script))
@@ -27,9 +81,10 @@ public static class FunctionHandler
                 engine.Execute(script);
             }
         }
-        var stopwatch = Stopwatch.StartNew();
         JsValue jsResult;
         var result = new FunctionExecutionResult();
+        //Start measuring time for function execution
+        var stopwatch = Stopwatch.StartNew();
         try
         {
             engine.Execute(route.FunctionHandler ?? throw new InvalidOperationException("FunctionHandler is null"));
@@ -120,5 +175,29 @@ public static class FunctionHandler
 
         await context.Response.WriteAsync(result.Body ?? "");
         context.Items["_FunctionExecutionResult"] = result;
+    }
+
+    private static async Task<object> ReadRequest(HttpRequest request)
+    {
+        object? reqBody = null;
+        try
+        {
+            //TODO:
+            reqBody = JsonSerializer.Deserialize<Dictionary<string, object>>(
+                await new StreamReader(request.Body).ReadToEndAsync());
+        }
+        catch (Exception)
+        {
+            // ignored
+        }
+        return new
+        {
+            method = request.Method,
+            path = request.Path.Value,
+            @params = request.RouteValues.ToDictionary(x => x.Key, x => x.Value?.ToString()),
+            query = request.Query.ToDictionary(x => x.Key, x => x.Value.ToString()),
+            headers = request.Headers.ToDictionary(x => x.Key, x => x.Value.ToString()),
+            body = reqBody
+        };
     }
 }

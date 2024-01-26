@@ -231,6 +231,38 @@ namespace WebApp.Infrastructure.Repositories.EfCore.PostgreSQLMigrations
                     b.ToTable("RouteValidations");
                 });
 
+            modelBuilder.Entity("WebApp.Domain.Entities.App", b =>
+                {
+                    b.OwnsOne("WebApp.Domain.Entities.AppSettings", "Settings", b1 =>
+                        {
+                            b1.Property<int>("AppId")
+                                .HasColumnType("integer");
+
+                            b1.Property<bool>("CheckFunctionExecutionLimitMemory")
+                                .HasColumnType("boolean");
+
+                            b1.Property<bool>("CheckFunctionExecutionTimeout")
+                                .HasColumnType("boolean");
+
+                            b1.Property<long?>("FunctionExecutionLimitMemoryBytes")
+                                .HasColumnType("bigint");
+
+                            b1.Property<int?>("FunctionExecutionTimeoutSeconds")
+                                .HasColumnType("integer");
+
+                            b1.HasKey("AppId");
+
+                            b1.ToTable("Apps");
+
+                            b1.ToJson("Settings");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AppId");
+                        });
+
+                    b.Navigation("Settings");
+                });
+
             modelBuilder.Entity("WebApp.Domain.Entities.AuthenticationScheme", b =>
                 {
                     b.HasOne("WebApp.Domain.Entities.App", "App")

@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Microsoft.AspNetCore.Routing.Template;
+﻿using Microsoft.AspNetCore.Routing.Template;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Enums;
 using WebApp.Domain.Repositories;
@@ -36,7 +35,6 @@ public class RouteResolverMiddleware(RequestDelegate next)
             }
         
             var route = matchedRoutes.First();
-            context.Items["_Route"] = route;
             switch (route.Status)
             {
                 case RouteStatus.Inactive:
@@ -47,27 +45,7 @@ public class RouteResolverMiddleware(RequestDelegate next)
                     await context.Response.WriteAsync("The request matched a blocked endpoint");
                     return;
             }
-            object? reqBody = null;
-            try
-            {
-                //TODO:
-                reqBody = JsonSerializer.Deserialize<Dictionary<string, object>>(
-                    await new StreamReader(context.Request.Body).ReadToEndAsync());
-            }
-            catch (Exception)
-            {
-                // ignored
-            }
-            var request = new
-            {
-                method = context.Request.Method,
-                path = context.Request.Path.Value,
-                @params = context.Request.RouteValues.ToDictionary(x => x.Key, x => x.Value?.ToString()),
-                query = context.Request.Query.ToDictionary(x => x.Key, x => x.Value.ToString()),
-                headers = context.Request.Headers.ToDictionary(x => x.Key, x => x.Value.ToString()),
-                body = reqBody
-            };
-            context.Items["_Request"] = request;
+            context.Items["_Route"] = route;
             await next(context);
     }
 }

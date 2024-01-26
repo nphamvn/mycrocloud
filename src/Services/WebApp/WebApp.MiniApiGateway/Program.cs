@@ -33,6 +33,10 @@ builder.Services.AddSingleton(new ScriptCollection
     { "lodash", File.ReadAllText("Scripts/lodash.min.js")}
 });
 builder.Services.AddSingleton<ICachedOpenIdConnectionSigningKeys, MemoryCachedOpenIdConnectionSigningKeys>();
+builder.Services.AddHttpClient("FunctionHandlerIOAgent", options =>
+{
+    options.BaseAddress = new Uri("http://localhost:5132");
+});
 
 var app = builder.Build();
 app.UseCors("CorsPolicy");
