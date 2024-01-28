@@ -21,6 +21,7 @@ public class Route : BaseEntity
     public IList<RouteValidation> Validations { get; set; }
     public bool RequireAuthorization { get; set; }
     public RouteStatus Status { get; set; } = RouteStatus.Active;
+    public bool UseDynamicResponse { get; set; }
 }
 
 public class RouteValidation

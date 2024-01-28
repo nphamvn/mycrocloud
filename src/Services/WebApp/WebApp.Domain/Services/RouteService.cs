@@ -5,31 +5,35 @@ namespace WebApp.Domain.Services;
 
 public interface IRouteService
 {
+    Task<int> Clone(int id);
     Task<int> Create(int appId, Route route);
     Task Delete(int id);
     Task Update(int id, Route route);
 }
-public class RouteService : IRouteService
+public class RouteService(IRouteRepository routeRepository, ILogRepository logRepository) : IRouteService
 {
-    private readonly IRouteRepository _routeRepository;
-
-    public RouteService(IRouteRepository routeRepository)
+    public async Task<int> Clone(int id)
     {
-        _routeRepository = routeRepository;
+        var route = await routeRepository.GetByIdAsNoTracking(id);
+        route.Id = 0;
+        route.Name += " - Copy";
+        return await Create(route.AppId, route);
     }
+
     public async Task<int> Create(int appId, Route route)
     {
         route.AppId = appId;
-        return await _routeRepository.Add(appId, route);
+        return await routeRepository.Add(appId, route);
     }
 
     public async Task Delete(int id)
     {
-        await _routeRepository.Delete(id);
+        await logRepository.DeleteByRouteId(id);
+        await routeRepository.Delete(id);
     }
 
     public async Task Update(int id, Route route)
     {
-        await _routeRepository.Update(id, route);
+        await routeRepository.Update(id, route);
     }
 }

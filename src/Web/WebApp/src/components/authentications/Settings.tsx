@@ -6,6 +6,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
 
 type Inputs = {
   schemes: IScheme[];
@@ -85,8 +86,8 @@ export default function AuthenticationSettings() {
   }, []);
   return (
     <form className="p-2" onSubmit={handleSubmit(onSubmit)}>
-      <h1>Settings</h1>
-      <div className="flex w-full">
+      <h1 className="font-bold">Authentication Settings</h1>
+      <div className="mt-3 flex w-full">
         <div className="flex-1 border p-2">
           <h2 className="text-center">Enabled Schemes</h2>
           <DndContext onDragEnd={handleDragEnd}>
@@ -101,7 +102,9 @@ export default function AuthenticationSettings() {
                     />
                   ))
                 ) : (
-                  <div>None</div>
+                  <div>
+                    <span className="text-gray-400">No schemes enabled.</span>
+                  </div>
                 )}
               </div>
             </SortableContext>
@@ -159,7 +162,7 @@ function SortableItem({
         onClick={() => onDisableClick(scheme.id)}
         className="ms-auto p-1"
       >
-        Disable
+        <ArrowRightIcon className="h-4 w-4 text-blue-500" />
       </button>
     </div>
   );
@@ -174,14 +177,14 @@ function AvailableItem({
 }) {
   return (
     <div className="flex py-1">
-      <div className="flex-auto border p-1">{scheme.name}</div>
       <button
         type="button"
         onClick={() => onEnableClick(scheme.id)}
         className="ms-auto p-1"
       >
-        Enable
+        <ArrowLeftIcon className="h-4 w-4 text-blue-500" />
       </button>
+      <div className="flex-auto border p-1">{scheme.name}</div>
     </div>
   );
 }

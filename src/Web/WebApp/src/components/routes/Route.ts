@@ -12,6 +12,7 @@ export default interface Route {
   functionHandlerDependencies?: string[];
   requireAuthorization: boolean;
   status: string;
+  useDynamicResponse: boolean;
 }
 
 interface Header {

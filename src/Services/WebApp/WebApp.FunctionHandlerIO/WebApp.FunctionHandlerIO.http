@@ -1,7 +1,0 @@
-@WebApp.FunctionHandlerIO_HostAddress = http://localhost:5132
-
-###
-POST {{WebApp.FunctionHandlerIO_HostAddress}}/nosqldb/connect?appId=1&connectionString=foo
-
-###
-GET {{WebApp.FunctionHandlerIO_HostAddress}}/nosqldb/collection?token=token&name=items

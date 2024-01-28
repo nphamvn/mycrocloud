@@ -59,4 +59,11 @@ public class RouteRepository(AppDbContext dbContext) : IRouteRepository
         dbContext.Routes.Update(route);
         await dbContext.SaveChangesAsync();
     }
+
+    public async Task<Route> GetByIdAsNoTracking(int id)
+    {
+        return await dbContext.Routes
+                .AsNoTracking()
+                .FirstAsync(r => r.Id == id);
+    }
 }

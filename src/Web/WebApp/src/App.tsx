@@ -11,36 +11,28 @@ import AppIndex from "./components/apps/AppIndex";
 import AppLogs from "./components/apps/AppLog";
 import AppOverview from "./components/apps/AppOverview";
 import RouteIndex from "./components/routes/RouteIndex";
-import { useEffect } from "react";
 import RouteLogs from "./components/routes/RouteLogs";
 import RouteEdit from "./components/routes/RouteEdit";
 import RouteCreate from "./components/routes/RouteCreate";
-import DevPage from "./components/DevPage";
 import SchemeList from "./components/authentications/SchemeList";
 import AuthenticationsIndex from "./components/authentications/Authentication";
 import CreateUpdateScheme from "./components/authentications/CreateUpdateScheme";
 import AuthenticationSettings from "./components/authentications/Settings";
 
 function App() {
-  useEffect(() => {
-    fetch("/api/ping")
-      .then((res) => res.text())
-      .then((msg) => console.log(msg));
-  }, []);
   return (
     <Auth0Provider
       domain={import.meta.env.VITE_AUTH0_DOMAIN}
       clientId={import.meta.env.VITE_AUTH0_CLIENTID}
       authorizationParams={{
         redirect_uri: window.location.origin,
-        audience: "https://mycrocloud.com",
+        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
       }}
     >
       <BrowserRouter>
         <Header />
         <div className="container mx-auto min-h-screen p-2">
           <Routes>
-            <Route path="/dev" Component={DevPage} />
             <Route path="/" Component={Home} />
             <Route path="/apps" Component={AppList} />
             <Route path="/apps/new" Component={AppCreate} />

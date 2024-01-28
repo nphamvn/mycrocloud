@@ -33,5 +33,48 @@ Content-Type: text/plain
 GET {{HostAddress}}/hello-world
 
 ###
-GET http://app-1.mycrocloud.local:5010/json
-Authorization: Bearer {{token}}
+GET http://app-1.mycrocloud.local:5010/hb
+Content-Type: application/json
+
+{
+    "name": "Nam",
+    "skills": ["C#", "Javascript"],
+    "address": {
+        "city": "Ha Tinh",
+        "country": "VN"
+    }
+}
+
+###
+POST http://app-1.mycrocloud.local:5010/handlerbars/each?name=foo
+Content-Type: application/json
+
+{
+    "name": "Nam",
+    "skills": ["C#", "Javascript"],
+    "address": {
+        "city": "Ha Tinh",
+        "country": "VN"
+    }
+}
+
+###
+GET http://app-1.mycrocloud.local:5010/handlebars/people
+Content-Type: application/json
+
+{
+    "people": [
+        {
+            "firstName": "Yehuda",
+            "lastName": "Katz"
+        },
+        {
+            "firstName": "Carl",
+            "lastName": "Lerche"
+        },
+        {
+            "firstName": "Alan",
+            "lastName": "Johnson"
+        }
+    ]
+}

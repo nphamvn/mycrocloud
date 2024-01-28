@@ -42,6 +42,7 @@ public class RoutesController(IRouteService routeService,
                 h.Name,
                 h.Value
             }),
+            route.UseDynamicResponse,
             route.ResponseBody,
             route.ResponseBodyLanguage,
             route.FunctionHandler,
@@ -51,6 +52,14 @@ public class RoutesController(IRouteService routeService,
             route.CreatedAt,
             route.UpdatedAt
         });
+    }
+
+    [HttpPost("{id:int}/Clone")]
+    public async Task<IActionResult> Clone(int id)
+    {
+        var newRouteId = await routeService.Clone(id);
+        var newRoute = await routeRepository.GetById(newRouteId);
+        return Created("", newRoute);
     }
 
     [HttpPost]

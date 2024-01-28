@@ -6,159 +6,78 @@ import {
   useFormContext,
 } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
 import { AppContext } from "../apps/AppContext";
-import { useAuth0 } from "@auth0/auth0-react";
-import { toast } from "react-toastify";
 import Route from "./Route";
-import { useNavigate } from "react-router-dom";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import { bodyLanguages, methods } from "./constants";
+import {
+  RouteCreateUpdateInputs,
+  routeCreateUpdateInputsSchema,
+} from "./RouteCreateUpdateInputs";
+import { useRoutesContext } from "./RoutesContext";
 const apiGatewayDomain = import.meta.env
   .VITE_WEBAPP_APIGATEWAY_DOMAIN as string;
 
-type Inputs = {
-  name: string;
-  path: string;
-  method: string;
-  requestValidationJson?: string;
-  requestValidationExpressions?: string[];
-  responseType: string;
-  responseStatusCode?: number;
-  responseHeaders?: HeaderInput[];
-  responseBodyLanguage?: string;
-  responseBody?: string;
-  functionHandler?: string;
-  functionHandlerDependencies?: string[];
-  requireAuthorization: boolean;
-  staticFile?: File;
-};
-
-interface HeaderInput {
-  name: string;
-  value: string;
-}
-
-const schema = yup.object({
-  name: yup.string().required(),
-  path: yup.string().required(),
-  method: yup.string().required(),
-  responseType: yup.string().required(),
-});
-
-export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
-  const isEditMode = routeId !== undefined;
+export default function RouteCreateUpdate({
+  route,
+  onSubmit,
+}: {
+  route: Route;
+  onSubmit: (data: RouteCreateUpdateInputs) => void;
+}) {
   const app = useContext(AppContext)!;
   const appDomain = apiGatewayDomain.replace("__app_id__", app.id.toString());
-  const routeRef = useRef<Route>();
+  const { dispatch } = useRoutesContext();
 
-  const { getAccessTokenSilently } = useAuth0();
-  const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const forms = useForm<Inputs>({
-    resolver: yupResolver(schema),
+  const forms = useForm<RouteCreateUpdateInputs>({
+    resolver: yupResolver(routeCreateUpdateInputsSchema),
     defaultValues: {
-      name: "",
-      path: "/",
-      method: "GET",
-      responseType: "static",
-      responseStatusCode: 200,
-      responseHeaders: [{ name: "content-type", value: "text/plain" }],
-      responseBodyLanguage: "plaintext",
-      responseBody: "",
-      functionHandler: "",
-      functionHandlerDependencies: [],
-      requireAuthorization: false,
+      name: route.name,
+      path: route.path,
+      method: route.method,
+      responseType: route.responseType,
+      responseStatusCode: route.responseStatusCode,
+      responseHeaders: route.responseHeaders!.map((h) => {
+        return {
+          name: h.name,
+          value: h.value,
+        };
+      }),
+      responseBodyLanguage: route.responseBodyLanguage,
+      responseBody: route.responseBody,
+      functionHandler: route.functionHandler,
+      functionHandlerDependencies: route.functionHandlerDependencies,
+      requireAuthorization: route.requireAuthorization,
+      useDynamicResponse: route.useDynamicResponse,
     },
   });
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
     watch,
+    getValues,
   } = forms;
   const responseType = watch("responseType");
 
+  const watchs = watch(["name", "method", "path"]);
+  const url = appDomain + getValues("path");
   useEffect(() => {
-    const getRoute = async (id: number) => {
-      setIsLoading(true);
-      const accessToken = await getAccessTokenSilently();
-      const route = (await (
-        await fetch(`/api/apps/${app.id}/routes/${id}`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        })
-      ).json()) as Route;
-      setValue("name", route.name);
-      setValue("method", route.method.toUpperCase());
-      setValue("path", route.path);
-      setValue("responseType", route.responseType);
-      setValue("requireAuthorization", route.requireAuthorization);
-      if (route.responseType === "static") {
-        setValue("responseStatusCode", route.responseStatusCode!);
-        setValue(
-          "responseHeaders",
-          route.responseHeaders!.map((h) => {
-            return {
-              name: h.name,
-              value: h.value,
-            };
-          }),
-        );
-        setValue("responseBodyLanguage", route.responseBodyLanguage!);
-        setValue("responseBody", route.responseBody!);
-      } else {
-        setValue("functionHandler", route.functionHandler!);
-        setValue(
-          "functionHandlerDependencies",
-          route.functionHandlerDependencies,
-        );
-      }
-      routeRef.current = route;
-      setIsLoading(false);
-    };
-    if (isEditMode) {
-      getRoute(routeId);
-    }
-  }, []);
-
-  const onSubmit = async (data: Inputs) => {
-    const accessToken = await getAccessTokenSilently();
-    const res = await fetch(
-      isEditMode
-        ? `/api/apps/${app.id}/routes/${routeId}`
-        : `/api/apps/${app.id}/routes`,
-      {
-        method: isEditMode ? "PUT" : "POST",
-        headers: {
-          "content-type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(data),
-      },
-    );
-    if (res.ok) {
-      toast(isEditMode ? "Route updated" : "Route created");
-      if (!isEditMode) {
-        const routeId = ((await res.json()) as Route).id;
-        navigate(`../${routeId}`);
-      }
-    }
-  };
-
-  const [showCodeSnippet, setShowCodeSnippet] = useState(false);
-  const path = watch("path");
-  const url = appDomain + path;
-
-  if (isLoading) {
-    return <div className="w-full">Loading...</div>;
-  }
+    // dispatch({
+    //   type: "UPDATE_ROUTE",
+    //   payload: {
+    //     ...route,
+    //     name: getValues("name"),
+    //     method: getValues("method"),
+    //     path: getValues("path"),
+    //   },
+    // });
+    console.log("watchs", watchs);
+  }, [watchs]);
   return (
     <FormProvider {...forms}>
       <form className="h-full p-2" onSubmit={handleSubmit(onSubmit)}>
-        {routeRef.current?.status === "Blocked" && (
+        {route.status === "Blocked" && (
           <div className="border border-red-200 bg-red-50 p-2 text-red-700">
             <p>
               This route is blocked because of some reason. Your route will be
@@ -176,50 +95,15 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
               autoComplete="none"
               className="inline-block w-full border border-gray-200 px-2 py-1"
             />
-            {errors.name && <span>{errors.name.message}</span>}
+            {errors.name && (
+              <span className="text-red-500">{errors.name.message}</span>
+            )}
           </div>
           <section>
             <div className="flex">
               <h3 className="mt-3 border-l-2 border-primary px-1 font-semibold">
                 Request
               </h3>
-              <div
-                className="ms-auto"
-                style={{ position: "relative", display: "inline-block" }}
-              >
-                <button
-                  type="button"
-                  onClick={() => setShowCodeSnippet(true)}
-                  className="ms-auto px-3 py-0.5 text-secondary"
-                >
-                  Code
-                </button>
-                <div
-                  style={{
-                    display: showCodeSnippet ? "block" : "none",
-                    backgroundColor: "#f9f9f9",
-                    boxShadow: "0px 8px 16px 0px rgba(0,0,0,0.2)",
-                  }}
-                  className="absolute right-2 z-[1] p-2"
-                >
-                  <div className="h-[400px] w-[300px]"></div>
-                  <div className="flex space-x-2">
-                    <button
-                      type="button"
-                      className="me-auto text-blue-500 hover:underline"
-                    >
-                      Copy
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowCodeSnippet(false)}
-                      className="text-secondary"
-                    >
-                      Close
-                    </button>
-                  </div>
-                </div>
-              </div>
             </div>
             <div className="mt-2">
               <label>Method and Path</label>
@@ -241,8 +125,12 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
                   {...register("path")}
                 />
               </div>
-              {errors.method && <span>{errors.method.message}</span>}
-              {errors.path && <span>{errors.path.message}</span>}
+              {errors.method && (
+                <span className="text-red-500">{errors.method.message}</span>
+              )}
+              {errors.path && (
+                <span className="text-red-500">{errors.path.message}</span>
+              )}
               <div className="mt-1">
                 <small className="me-2">URL:</small>
                 <a className="text-blue-500 hover:underline" href={url}>
@@ -258,14 +146,20 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
               </div>
             </div>
             <div className="mt-1">
-              <input
-                type="checkbox"
-                {...register("requireAuthorization")}
-                className="inline-block border border-gray-200 px-2 py-1"
-              />
-              <label className="mt-2">Require Authorization</label>
+              <div>
+                <input
+                  type="checkbox"
+                  {...register("requireAuthorization")}
+                  className="inline-block border border-gray-200 px-2 py-1"
+                />
+                <label className="mt-2">Require Authorization</label>
+              </div>
+              {errors.requireAuthorization && (
+                <span className="text-red-500">
+                  {errors.requireAuthorization.message}
+                </span>
+              )}
             </div>
-            {false && <Validation />}
           </section>
           <section>
             <h3 className="mt-3 border-l-2 border-primary pl-1 font-semibold">
@@ -291,7 +185,7 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
           <button
             type="submit"
             className="border border-transparent bg-cyan-700 px-3 py-1 text-center font-medium text-white focus:z-10 focus:outline-none focus:ring-2 focus:ring-cyan-300 enabled:hover:bg-cyan-800"
-            disabled={isLoading || routeRef.current?.status === "Blocked"}
+            disabled={route.status === "Blocked"}
           >
             Save
           </button>
@@ -300,86 +194,7 @@ export default function RouteCreateUpdate({ routeId }: { routeId?: number }) {
     </FormProvider>
   );
 }
-function Validation() {
-  const editorRef = useRef(null);
-  const viewStateRef = useRef();
-  const modelRef = useRef();
-  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
-  const [display, setDisplay] = useState(true);
 
-  const {
-    formState: { errors },
-    setValue,
-    getValues,
-  } = useFormContext<Inputs>();
-
-  useEffect(() => {
-    let isMounted = true;
-    if (editorRef.current && isMounted) {
-      setEditor((editor) => {
-        if (editor) {
-          return;
-        }
-        const instance = monaco.editor.create(editorRef.current!, {
-          language: "json",
-          value: getValues("requestValidationJson") || "",
-          minimap: {
-            enabled: false,
-          },
-        });
-        instance.onDidChangeModelContent(() => {
-          setValue("requestValidationJson", instance.getValue());
-        });
-        return instance;
-      });
-    }
-    return () => {
-      isMounted = false;
-    };
-  }, [editorRef.current]);
-
-  const handleDisplayToggle = () => {
-    if (display) {
-      viewStateRef.current = editor?.saveViewState();
-      modelRef.current = editor?.getModel();
-      editor?.setModel(null);
-    } else {
-      if (modelRef.current) {
-        editor?.setModel(modelRef.current);
-      }
-      if (viewStateRef.current) {
-        editor?.restoreViewState(viewStateRef.current);
-      }
-    }
-    setDisplay(!display);
-  };
-  return (
-    <div className="mt-1">
-      <div>
-        <label>Validation</label>
-        <button
-          type="button"
-          onClick={handleDisplayToggle}
-          className="ms-2 text-blue-500 hover:underline"
-        >
-          {display ? "Hide" : "Show"}
-        </button>
-      </div>
-      <label>Schema</label>
-      <div
-        ref={editorRef}
-        style={{
-          width: "100%",
-          height: "150px",
-          display: display ? "block" : "none",
-        }}
-      ></div>
-      {errors.requestValidationJson && (
-        <p className="text-red-500">{errors.requestValidationJson.message}</p>
-      )}
-    </div>
-  );
-}
 function StaticResponse() {
   const {
     control,
@@ -388,7 +203,7 @@ function StaticResponse() {
     setValue,
     getValues,
     watch,
-  } = useFormContext<Inputs>();
+  } = useFormContext<RouteCreateUpdateInputs>();
   const {
     fields: responseHeaders,
     append: addResponseHeaders,
@@ -489,8 +304,16 @@ function StaticResponse() {
         </button>
       </div>
       <div className="mt-2">
-        <div className="flex">
-          <label className="block">Body</label>
+        <label className="block">Body</label>
+        <div className="mt-1 flex">
+          <div>
+            <input
+              type="checkbox"
+              {...register("useDynamicResponse")}
+              className="inline-block border border-gray-200 px-2 py-1"
+            />
+            <label className="mt-2">Use dynamic response</label>
+          </div>
           <div className="ms-auto">
             <label htmlFor="responseBodyLanguage">Editor format</label>
             <select {...register("responseBodyLanguage")}>
@@ -500,7 +323,7 @@ function StaticResponse() {
             </select>
           </div>
         </div>
-        <div>
+        <div className="mt-1">
           <div
             ref={bodyEditorRef}
             style={{ width: "100%", height: "300px" }}
@@ -518,7 +341,7 @@ function StaticFileResponse() {
   const {
     register,
     formState: { errors },
-  } = useFormContext<Inputs>();
+  } = useFormContext<RouteCreateUpdateInputs>();
 
   return (
     <div>
@@ -534,7 +357,7 @@ function FunctionHandler() {
     formState: { errors },
     setValue,
     getValues,
-  } = useFormContext<Inputs>();
+  } = useFormContext<RouteCreateUpdateInputs>();
   const handlerEditorRef = useRef(null);
   const [, setHandlerEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
 

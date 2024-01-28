@@ -44,7 +44,16 @@ public class AppRepository(AppDbContext dbContext) : IAppRepository
 
     public async Task<IEnumerable<App>> ListByUserId(string userId, string query, string sort)
     {
-        return await dbContext.Apps.Where(a => a.UserId == userId).ToListAsync();
+        var apps = dbContext.Apps.Where(a => a.UserId == userId);
+        if (!string.IsNullOrEmpty(query))
+        {
+            apps = apps.Where(a => a.Name.Contains(query) || a.Description.Contains(query));
+        }
+        if (!string.IsNullOrEmpty(sort))
+        {
+            //TODO: Implement sorting
+        }
+        return await apps.ToListAsync();
     }
 
     public async Task Update(int id, App app)

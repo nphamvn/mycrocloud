@@ -10,9 +10,9 @@ namespace WebApp.RestApi.Controllers;
 public class AppsController(IAppService appService, IAppRepository appRepository) : BaseController
 {
     [HttpGet]
-    public async Task<IActionResult> Index([FromQuery] AppSearchRequest request)
+    public async Task<IActionResult> Index(string? term)
     {
-        var apps = await appRepository.ListByUserId(User.GetUserId(), "", "");
+        var apps = await appRepository.ListByUserId(User.GetUserId(), term, "");
         return Ok(apps.Select(app => new {
             app.Id,
             app.Name,

@@ -7,40 +7,6 @@ using WebApp.Domain.Entities;
 using Route = WebApp.Domain.Entities.Route;
 
 namespace WebApp.MiniApiGateway;
-
-internal class NoSqlConnection(App app, string connectionString, HttpClient httpClient)
-{
-    private string token;
-    
-    public void connect()
-    {
-        var response = httpClient.Send(new HttpRequestMessage()
-        {
-            Method = HttpMethod.Post,
-            RequestUri = new Uri($"http://localhost:5132?appId={app.Id}&connectionString={Uri.EscapeDataString(connectionString)}")
-        });
-
-        if (response.IsSuccessStatusCode)
-        {
-            using var reader = new StreamReader(response.Content.ReadAsStream());
-            var obj = JsonSerializer.Deserialize<ConnectResponse>(reader.ReadToEnd())!;
-            token = obj.Token;
-        }
-        else
-        {
-            throw new Exception();
-        }
-    }
-
-    #region Private
-    
-    private class ConnectResponse
-    {
-        public string Token { get; set; }
-    }
-    
-    #endregion
-}
 public static class FunctionHandler
 {
     public static async Task Handle(HttpContext context)
@@ -62,17 +28,6 @@ public static class FunctionHandler
                 options.TimeoutInterval(TimeSpan.FromSeconds(app.Settings.FunctionExecutionTimeoutSeconds ?? 15));
             }
         });
-
-        if (true)
-        {
-            engine.SetValue("useNoSqlConnection", new Func<string, NoSqlConnection>(connectionString =>
-            {
-                //TODO
-                var httpClientFactory = context.RequestServices.GetRequiredService<IHttpClientFactory>();
-                var httpClient = httpClientFactory.CreateClient("FunctionHandlerIOAgent");
-                return new NoSqlConnection(app, connectionString, httpClient);
-            }));
-        }
         
         foreach (var dependency in route.FunctionHandlerDependencies ?? [])
         {

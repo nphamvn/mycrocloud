@@ -91,8 +91,6 @@ export default function AppLogs() {
             <th>Method</th>
             <th>Path</th>
             <th>Status Code</th>
-            <th>Function Execution Duration (ms)</th>
-            <th>Additional Log Message</th>
           </tr>
         </thead>
         <tbody>
@@ -103,8 +101,6 @@ export default function AppLogs() {
               <td>{l.method}</td>
               <td>{l.path}</td>
               <td>{l.statusCode}</td>
-              <td>{l.functionExecutionDuration || "-"}</td>
-              <td>{l.additionalLogMessage}</td>
             </tr>
           ))}
         </tbody>

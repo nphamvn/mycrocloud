@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../apps/AppContext";
 import { useAuth0 } from "@auth0/auth0-react";
 import ILog from "../apps/Log";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 export default function RouteLogs() {
   const app = useContext(AppContext)!;
@@ -29,10 +29,13 @@ export default function RouteLogs() {
   };
   return (
     <div className="p-2">
-      <div>
+      <div className="flex">
+        <Link to={`../${routeId}`} className="text-gray-600">
+          Back
+        </Link>
         <button
           type="button"
-          className="text-primary"
+          className="ms-auto text-primary"
           onClick={handleRefreshClick}
         >
           Refresh
@@ -42,22 +45,16 @@ export default function RouteLogs() {
         <thead>
           <tr>
             <th>Timestamp</th>
-            <th>Method</th>
             <th>Path</th>
             <th>Status Code</th>
-            <th>Function Execution Duration (ms)</th>
-            <th>Additional Log Message</th>
           </tr>
         </thead>
         <tbody>
           {logs.map((l) => (
             <tr key={l.id} className="border">
               <td>{new Date(l.timestamp).toLocaleString()}</td>
-              <td>{l.method}</td>
               <td>{l.path}</td>
               <td>{l.statusCode}</td>
-              <td>{l.functionExecutionDuration || "-"}</td>
-              <td>{l.additionalLogMessage}</td>
             </tr>
           ))}
         </tbody>

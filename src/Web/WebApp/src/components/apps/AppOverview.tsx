@@ -5,6 +5,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { getAppDomain } from "./service";
+import { PlayCircleIcon, StopCircleIcon } from "@heroicons/react/24/solid";
 
 export default function AppOverview() {
   const app = useContext(AppContext)!;
@@ -21,6 +22,17 @@ export default function AppOverview() {
           <tr>
             <td>Description</td>
             <td>{app.description}</td>
+          </tr>
+          <tr>
+            <td>Status</td>
+            <td className="inline-flex">
+              {app.status === "Active" ? (
+                <PlayCircleIcon className="h-4 w-4 text-green-500" />
+              ) : (
+                <StopCircleIcon className="h-4 w-4 text-red-500" />
+              )}
+              {app.status}
+            </td>
           </tr>
           <tr>
             <td>Created at</td>
@@ -173,18 +185,6 @@ function ChangeStatusComponent() {
       navigate(".");
     }
   };
-  function getStatusClass(status: string) {
-    switch (status) {
-      case "Active":
-        return "text-green-500";
-      case "Inactive":
-        return "text-gray-500";
-      case "Blocked":
-        return "text-red-500";
-      default:
-        return "";
-    }
-  }
   function getChangeStatusButtonClass(status: string) {
     switch (status) {
       case "Active":
@@ -199,12 +199,9 @@ function ChangeStatusComponent() {
   }
   return (
     <div>
-      <div>
-        Status: <span className={getStatusClass(app.status)}>{app.status}</span>
-      </div>
       <button
         type="button"
-        className={`${getChangeStatusButtonClass(app.status)}`}
+        className={`${getChangeStatusButtonClass(app.status)} border px-2 py-1`}
         disabled={app.status === "Blocked"}
         onClick={handleChangeStatusClick}
       >

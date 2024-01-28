@@ -10,4 +10,5 @@ export const bodyLanguages = [
   "yaml",
   "markdown",
   "css",
+  "handlebars",
 ];

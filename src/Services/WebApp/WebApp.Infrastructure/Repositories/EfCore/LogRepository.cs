@@ -3,22 +3,23 @@ using WebApp.Domain.Repositories;
 
 namespace WebApp.Infrastructure.Repositories.EfCore;
 
-public class LogRepository : ILogRepository
+public class LogRepository(AppDbContext appDbContext) : ILogRepository
 {
-    private readonly AppDbContext _appDbContext;
-
-    public LogRepository(AppDbContext appDbContext)
-    {
-        _appDbContext = appDbContext;
-    }
     public async Task Add(Log log)
     {
-        await _appDbContext.Logs.AddAsync(log);
-        await _appDbContext.SaveChangesAsync();
+        await appDbContext.Logs.AddAsync(log);
+        await appDbContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteByRouteId(int id)
+    {
+        var logs = appDbContext.Logs.Where(l => l.RouteId == id);
+        appDbContext.Logs.RemoveRange(logs);
+        await appDbContext.SaveChangesAsync();
     }
 
     public async Task<IQueryable<Log>> Search(int appId)
     {
-        return _appDbContext.Logs.Where(l => l.AppId == appId);
+        return appDbContext.Logs.Where(l => l.AppId == appId);
     }
 }
