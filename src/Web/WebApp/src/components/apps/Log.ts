@@ -3,6 +3,7 @@ export default interface ILog {
   timestamp: string;
   appId: number;
   routeId?: number;
+  routeName?: string;
   method: string;
   path: string;
   statusCode: number;

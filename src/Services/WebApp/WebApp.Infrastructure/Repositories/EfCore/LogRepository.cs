@@ -1,4 +1,5 @@
-﻿using WebApp.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
 
 namespace WebApp.Infrastructure.Repositories.EfCore;
@@ -20,6 +21,8 @@ public class LogRepository(AppDbContext appDbContext) : ILogRepository
 
     public async Task<IQueryable<Log>> Search(int appId)
     {
-        return appDbContext.Logs.Where(l => l.AppId == appId);
+        return appDbContext.Logs
+            .Include(l => l.Route)
+            .Where(l => l.AppId == appId);
     }
 }

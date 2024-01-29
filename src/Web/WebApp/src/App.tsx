@@ -18,6 +18,7 @@ import SchemeList from "./components/authentications/SchemeList";
 import AuthenticationsIndex from "./components/authentications/Authentication";
 import CreateUpdateScheme from "./components/authentications/CreateUpdateScheme";
 import AuthenticationSettings from "./components/authentications/Settings";
+import AppVariables from "./components/apps/AppVariables";
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
                 <Route path="settings" Component={AuthenticationSettings} />
               </Route>
               <Route path="logs" Component={AppLogs} />
+              <Route path="variables" Component={AppVariables} />
             </Route>
           </Routes>
         </div>

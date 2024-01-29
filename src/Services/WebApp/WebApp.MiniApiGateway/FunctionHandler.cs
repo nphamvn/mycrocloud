@@ -15,7 +15,7 @@ public static class FunctionHandler
         var route = (Route)context.Items["_Route"]!;
         var request = await ReadRequest(context.Request);
         var scripts = context.RequestServices.GetRequiredService<ScriptCollection>();
-        
+
         var engine = new Engine(options =>
         {
             if (app.Settings.CheckFunctionExecutionLimitMemory)
@@ -28,7 +28,16 @@ public static class FunctionHandler
                 options.TimeoutInterval(TimeSpan.FromSeconds(app.Settings.FunctionExecutionTimeoutSeconds ?? 15));
             }
         });
-        
+
+        //Inject global variables
+        engine.SetValue("env", JsValue.FromObject(engine, new
+        {
+            CONNECTION_STRING = "Data Source=app.db;",
+            APP_NAME = app.Name,
+            APP_ID = app.Id,
+        }));
+
+        //Inject dependencies
         foreach (var dependency in route.FunctionHandlerDependencies ?? [])
         {
             if (scripts.TryGetValue(dependency, out var script))
@@ -60,7 +69,7 @@ public static class FunctionHandler
         {
             stopwatch.Stop();
         }
-        
+
         result.Duration = stopwatch.Elapsed;
         var statusCode = jsResult.Get("statusCode");
         if (statusCode.IsNumber())
@@ -84,7 +93,7 @@ public static class FunctionHandler
                 {
                     continue;
                 }
-                
+
                 if (value.IsNumber())
                 {
                     headerValue = value.AsNumber().ToString(CultureInfo.InvariantCulture);

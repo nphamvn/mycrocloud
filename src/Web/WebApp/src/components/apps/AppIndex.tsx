@@ -105,6 +105,14 @@ export default function AppIndex() {
             >
               Logs
             </Link>
+            <Link
+              to="variables"
+              className={`text-xs ${
+                path3 === "variables" ? "text-primary" : ""
+              }`}
+            >
+              Variables
+            </Link>
           </div>
           <div className="flex-1">
             <Outlet />

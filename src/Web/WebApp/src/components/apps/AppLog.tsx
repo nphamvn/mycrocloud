@@ -97,7 +97,12 @@ export default function AppLogs() {
           {logs.map((l) => (
             <tr key={l.id} className="border">
               <td>{new Date(l.timestamp).toLocaleString()}</td>
-              <td>{l.routeId || "-"}</td>
+              <td className="tooltip">
+                {l.routeId || "-"}
+                <span className="tooltiptext">
+                  {l.routeName || "NOT FOUND"}
+                </span>
+              </td>
               <td>{l.method}</td>
               <td>{l.path}</td>
               <td>{l.statusCode}</td>
