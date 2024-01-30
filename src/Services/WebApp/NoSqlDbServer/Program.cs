@@ -11,6 +11,10 @@ builder.Services.AddAuthentication()
                 .AddScheme<ConnectionStringAuthenticationSchemOptions, ConnectionStringAuthenticationHandler>("ConnectionStringAuthentication", null);
 
 builder.Services.AddAuthorization();
+builder.Services.AddHttpClient("NoSqlDbServer", c =>
+{
+    c.BaseAddress = new Uri("http://localhost:5148");
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -23,9 +27,17 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("_docs", (string name, ClaimsPrincipal user) =>
+app.MapGet("_docs", async (string name, ClaimsPrincipal user) =>
 {
-    return "Hello World!" + user.Claims.FirstOrDefault(c => c.Type == "DatabaseId")?.Value;
+    var text = await File.ReadAllTextAsync(name + ".json");
+    return text;
+}).RequireAuthorization();
+
+app.MapPost("_docs", async (string name, ClaimsPrincipal user, HttpContext context) =>
+{
+    var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
+    File.WriteAllText(name + ".json", body);
+    return Results.Ok();
 }).RequireAuthorization();
 
 app.Run();

@@ -45,6 +45,14 @@ public static class FunctionHandler
                 engine.Execute(script);
             }
         }
+        //Inject plugins
+        engine.SetValue("useNoSqlDatabase", new Func<string, NoSqlDatabaseConnection>((connectionString) => {
+            var httpClientFactory = context.RequestServices.GetRequiredService<IHttpClientFactory>();
+            var httpClient = httpClientFactory.CreateClient("NoSqlDbServer");
+            var connection = new NoSqlDatabaseConnection(connectionString, httpClient, engine);
+            return connection;
+        }));
+
         JsValue jsResult;
         var result = new FunctionExecutionResult();
         //Start measuring time for function execution
@@ -143,17 +151,7 @@ public static class FunctionHandler
 
     private static async Task<object> ReadRequest(HttpRequest request)
     {
-        object? reqBody = null;
-        try
-        {
-            //TODO:
-            reqBody = JsonSerializer.Deserialize<Dictionary<string, object>>(
-                await new StreamReader(request.Body).ReadToEndAsync());
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
+        var bodyString = await new StreamReader(request.Body).ReadToEndAsync();
         return new
         {
             method = request.Method,
@@ -161,7 +159,7 @@ public static class FunctionHandler
             @params = request.RouteValues.ToDictionary(x => x.Key, x => x.Value?.ToString()),
             query = request.Query.ToDictionary(x => x.Key, x => x.Value.ToString()),
             headers = request.Headers.ToDictionary(x => x.Key, x => x.Value.ToString()),
-            body = reqBody
+            body = !string.IsNullOrEmpty(bodyString) ? JsonSerializer.Deserialize<dynamic>(bodyString) : null
         };
     }
 }
