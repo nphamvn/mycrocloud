@@ -3,7 +3,7 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 
-namespace NoSqlDbServer;
+namespace TextStorageProvider;
 
 public class ConnectionStringAuthenticationHandler
     (IOptionsMonitor<ConnectionStringAuthenticationSchemOptions> options,
@@ -20,8 +20,7 @@ public class ConnectionStringAuthenticationHandler
             return AuthenticateResult.Fail("Missing X-Connection-String header");
         }
         //TODO: validate connection string
-        const int databaseId = 1;
-        var claims = new[] { new Claim("DataSource", databaseId.ToString()) };
+        var claims = new[] { new Claim("Name", "Name") };
         var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, Scheme.Name));
         var ticket = new AuthenticationTicket(principal, Scheme.Name);
         return AuthenticateResult.Success(ticket);

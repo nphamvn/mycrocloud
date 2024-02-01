@@ -61,4 +61,10 @@ public class AppRepository(AppDbContext dbContext) : IAppRepository
         dbContext.Apps.Update(app);
         await dbContext.SaveChangesAsync();
     }
+
+    public async Task<List<Variable>> GetVariables(int appId)
+    {
+        return await dbContext.Variables.Where(v => v.AppId == appId).ToListAsync();
+    }
+
 }

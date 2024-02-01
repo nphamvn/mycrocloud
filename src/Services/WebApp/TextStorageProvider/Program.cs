@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using NoSqlDbServer;
+using TextStorageProvider;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +11,7 @@ builder.Services.AddAuthentication()
                 .AddScheme<ConnectionStringAuthenticationSchemOptions, ConnectionStringAuthenticationHandler>("ConnectionStringAuthentication", null);
 
 builder.Services.AddAuthorization();
-builder.Services.AddHttpClient("NoSqlDbServer", c =>
+builder.Services.AddHttpClient("TextStorageProvider", c =>
 {
     c.BaseAddress = new Uri("http://localhost:5148");
 });
@@ -27,16 +27,18 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("_docs", async (string name, ClaimsPrincipal user) =>
+app.MapGet("/", async (ClaimsPrincipal user) =>
 {
-    var text = await File.ReadAllTextAsync(name + ".json");
+    var name = user.Claims.First(c => c.Type == "Name").Value;
+    var text = await File.ReadAllTextAsync(name);
     return text;
 }).RequireAuthorization();
 
-app.MapPost("_docs", async (string name, ClaimsPrincipal user, HttpContext context) =>
+app.MapPost("/", async (ClaimsPrincipal user, HttpContext context) =>
 {
     var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
-    File.WriteAllText(name + ".json", body);
+    var name = user.Claims.First(c => c.Type == "Name").Value;
+    File.WriteAllText(name, body);
     return Results.Ok();
 }).RequireAuthorization();
 

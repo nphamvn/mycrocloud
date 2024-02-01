@@ -10,4 +10,5 @@ public interface IAppRepository
     Task Update(int id, App app);
     Task Delete(int appId);
     Task<List<AuthenticationScheme>> GetAuthenticationSchemes(int appId);
+    Task<List<Variable>> GetVariables(int appId);
 }

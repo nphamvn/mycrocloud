@@ -1,7 +1,9 @@
 export default interface IVariable {
   id: number;
   name: string;
-  value: string;
+  valueType: string;
+  stringValue?: string;
+  isSecret: boolean;
   createdAt: string;
   updatedAt?: string;
 }

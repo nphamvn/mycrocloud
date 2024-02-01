@@ -13,9 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.RestApi", "WebApp.Re
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.Admin", "WebApp.Admin\WebApp.Admin.csproj", "{DB035357-3FFD-4803-82A8-52454CC9F2C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject2", "TestProject2\TestProject2.csproj", "{F2E289E2-3BAD-4B93-826C-3BD86F1953F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.UnitTest", "WebApp.UnitTest\WebApp.UnitTest.csproj", "{F2E289E2-3BAD-4B93-826C-3BD86F1953F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoSqlDbServer", "NoSqlDbServer\NoSqlDbServer.csproj", "{DE2480D7-DD60-493D-8907-B8910E6B9B21}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextStorageProvider", "TextStorageProvider\TextStorageProvider.csproj", "{DE2480D7-DD60-493D-8907-B8910E6B9B21}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

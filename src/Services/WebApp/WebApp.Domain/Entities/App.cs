@@ -12,4 +12,5 @@ public class App : BaseEntity
     public ICollection<Route> Routes { get; set; }
     public ICollection<Log> Logs { get; set; }
     public AppSettings Settings { get; set; }
+    public ICollection<Variable> Variables { get; set; }
 }

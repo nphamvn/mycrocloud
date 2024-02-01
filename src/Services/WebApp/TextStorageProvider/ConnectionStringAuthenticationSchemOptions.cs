@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 
-namespace NoSqlDbServer;
+namespace TextStorageProvider;
 
 public class ConnectionStringAuthenticationSchemOptions : AuthenticationSchemeOptions
 {

@@ -5,7 +5,7 @@ using WebApp.Infrastructure.Repositories.EfCore;
 
 namespace WebApp.RestApi.Controllers;
 
-[Route("api/apps/{appId:int}/authentications")]
+[Route("api/apps/{appId:int}/[controller]")]
 public class AuthenticationsController(AppDbContext dbContext): BaseController
 {
     [HttpGet("schemes")]

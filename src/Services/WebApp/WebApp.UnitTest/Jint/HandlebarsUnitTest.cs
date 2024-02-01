@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Jint;
 
-namespace TestProject2;
+namespace WebApp.UnitTest.Jint;
 
 public class Tests
 {
@@ -150,6 +150,6 @@ public class Tests
                       """)
             .AsString();
         
-        Assert.AreEqual("My name is Nam.", result);
+        Assert.AreEqual("My name is Nam. I know C# and Javascript. I live in HCM, VN", result);
     }
 }

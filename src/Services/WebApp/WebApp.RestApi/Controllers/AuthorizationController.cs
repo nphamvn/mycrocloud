@@ -3,7 +3,7 @@ using WebApp.Api.Models;
 
 namespace WebApp.RestApi.Controllers;
 
-[Route("apps/{appId:int}/authorization")]
+[Route("apps/{appId:int}/[controller]")]
 public class AuthorizationController : BaseController
 {
     [HttpGet("policies")]

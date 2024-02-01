@@ -4,6 +4,7 @@ using System.Text.Json;
 using Jint;
 using Jint.Native;
 using WebApp.Domain.Entities;
+using WebApp.Domain.Repositories;
 using Route = WebApp.Domain.Entities.Route;
 
 namespace WebApp.MiniApiGateway;
@@ -15,6 +16,7 @@ public static class FunctionHandler
         var route = (Route)context.Items["_Route"]!;
         var request = await ReadRequest(context.Request);
         var scripts = context.RequestServices.GetRequiredService<ScriptCollection>();
+        var appRepository = context.RequestServices.GetRequiredService<IAppRepository>();
 
         var engine = new Engine(options =>
         {
@@ -30,12 +32,21 @@ public static class FunctionHandler
         });
 
         //Inject global variables
-        engine.SetValue("env", JsValue.FromObject(engine, new
+        var variables = new Dictionary<string, object?>();
+        var appVariables = await appRepository.GetVariables(app.Id);
+        foreach (var variable in appVariables)
         {
-            CONNECTION_STRING = "Data Source=app.db;",
-            APP_NAME = app.Name,
-            APP_ID = app.Id,
-        }));
+            object? value = variable.ValueType switch
+            {
+                VariableValueType.String => variable.StringValue,
+                VariableValueType.Number => int.Parse(variable.StringValue),
+                VariableValueType.Boolean => bool.Parse(variable.StringValue),
+                VariableValueType.Null => null,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            variables[variable.Name] = value;
+        }
+        engine.SetValue("env", variables);
 
         //Inject dependencies
         foreach (var dependency in route.FunctionHandlerDependencies ?? [])
@@ -46,11 +57,11 @@ public static class FunctionHandler
             }
         }
         //Inject plugins
-        engine.SetValue("useNoSqlDatabase", new Func<string, NoSqlDatabaseConnection>((connectionString) => {
+        engine.SetValue("useTextStorage", new Func<string, TextStorageAdapter>((connectionString) => {
             var httpClientFactory = context.RequestServices.GetRequiredService<IHttpClientFactory>();
-            var httpClient = httpClientFactory.CreateClient("NoSqlDbServer");
-            var connection = new NoSqlDatabaseConnection(connectionString, httpClient, engine);
-            return connection;
+            var httpClient = httpClientFactory.CreateClient("TextStorageProvider");
+            var adapter = new TextStorageAdapter(connectionString, httpClient);
+            return adapter;
         }));
 
         JsValue jsResult;
