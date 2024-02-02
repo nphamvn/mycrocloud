@@ -33,6 +33,7 @@ export default function AddUpdateVariables() {
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
   } = useForm<Inputs>({
     resolver: yupResolver(schema),
   });
@@ -59,24 +60,26 @@ export default function AddUpdateVariables() {
 
   useEffect(() => {
     if (variableId) {
-      const getVariable = async() => {
+      const getVariable = async () => {
         const accessToken = await getAccessTokenSilently();
         const res = await fetch(`/api/apps/${app.id}/variables/${variableId}`, {
           headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
+            Authorization: `Bearer ${accessToken}`,
+          },
         });
-        const variable = await res.json() as IVariable;
+        const variable = (await res.json()) as IVariable;
 
-        setValue('isSecret', variable.isSecret);
-        setValue('name', variable.name);
-        setValue('stringValue', variable.stringValue);
-        setValue('valueType', variable.valueType);
+        setValue("isSecret", variable.isSecret);
+        setValue("name", variable.name);
+        setValue("stringValue", variable.stringValue);
+        setValue("valueType", variable.valueType);
       };
 
       getVariable();
     }
-  }, [])
+  }, []);
+
+  const valueType = watch("valueType");
   return (
     <div className="p-3">
       <h1 className="font-bold">
@@ -104,17 +107,6 @@ export default function AddUpdateVariables() {
           )}
         </div>
         <div className="mt-2">
-          <label className="block">Value</label>
-          <input
-            type="text"
-            {...register("stringValue")}
-            className="block w-full border px-2 py-1"
-          />
-          {errors.stringValue && (
-            <span className="text-red-500">{errors.stringValue.message}</span>
-          )}
-        </div>
-        <div className="mt-2">
           <label className="block">Value Type</label>
           <select {...register("valueType")}>
             <option value="String">String</option>
@@ -124,6 +116,18 @@ export default function AddUpdateVariables() {
           </select>
           {errors.valueType && (
             <span className="text-red-500">{errors.valueType.message}</span>
+          )}
+        </div>
+        <div className="mt-2">
+          <label className="block">Value</label>
+          <input
+            type="text"
+            {...register("stringValue")}
+            className="block w-full border px-2 py-1"
+            disabled={valueType === "Null"}
+          />
+          {errors.stringValue && (
+            <span className="text-red-500">{errors.stringValue.message}</span>
           )}
         </div>
         <div className="mt-3 flex">

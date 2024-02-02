@@ -1,7 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import RouteCreateUpdate from "./RouteCreateUpdate";
 import { RouteCreateUpdateInputs } from "./RouteCreateUpdateInputs";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { AppContext } from "../apps/AppContext";
 import { toast } from "react-toastify";
 import Route from "./Route";
@@ -37,13 +37,10 @@ export default function RouteCreate() {
       body: JSON.stringify(data),
     });
     if (res.ok) {
+      const newRoute = (await res.json()) as Route;
+      dispatch({ type: "ADD_ROUTE", payload: newRoute });
       toast("Route created");
     }
   };
-  useEffect(() => {
-    console.log("adding new route");
-    dispatch({ type: "ADD_ROUTE", payload: newRoute });
-    //dispatch({ type: "SET_ACTIVE_ROUTE", payload: newRoute });
-  }, []);
   return <RouteCreateUpdate route={newRoute} onSubmit={onSubmit} />;
 }

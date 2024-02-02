@@ -19,7 +19,7 @@ import AuthenticationsIndex from "./components/authentications/Authentication";
 import CreateUpdateScheme from "./components/authentications/CreateUpdateScheme";
 import AuthenticationSettings from "./components/authentications/Settings";
 import AppVariables from "./components/variables/AppVariables";
-import AddUpdateVariables from "./components/variables/AddUpdateVariables";
+import AddUpdateVariables from "./components/variables/CreateUpdateVariables";
 
 function App() {
   return (
