@@ -8,26 +8,12 @@ body {
 
 /* Tooltip container */
 .tooltip {
-  position: relative;
-  display: inline-block;
+  @apply relative inline-block;
 }
 
 /* Tooltip text */
 .tooltip .tooltiptext {
-  visibility: hidden;
-  width: 120px;
-  background-color: #ccc;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-  
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-  bottom: 100%;
-  left: 50%;
-  margin-left: -60px;
+  @apply absolute bottom-full left-1/2 hidden w-[120] border;
 }
 
 /* Show the tooltip text when mouse over the tooltip container */

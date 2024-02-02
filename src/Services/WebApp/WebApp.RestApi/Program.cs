@@ -5,7 +5,6 @@ using WebApp.RestApi;
 using WebApp.Domain.Services;
 using WebApp.Domain.Repositories;
 using WebApp.Infrastructure.Repositories.EfCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using WebApp.RestApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add(typeof(GlobalExceptionFilter));
+    options.InputFormatters.Insert(options.InputFormatters.Count, new TextPlainInputFormatter());
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

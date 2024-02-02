@@ -12,6 +12,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Log> Logs { get; set; }
     public DbSet<AuthenticationScheme> AuthenticationSchemes { get; set; }
     public DbSet<Variable> Variables { get; set; }
+    public DbSet<TextStorage> TextStorages { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<App>()

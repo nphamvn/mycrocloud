@@ -32,7 +32,7 @@ export default function AppVariables() {
         >
           Add
         </Link>
-        <table className="mt-2">
+        <table className="mt-2 table-auto w-full">
           <thead>
             <tr>
               <th>Name</th>

@@ -7,7 +7,7 @@ import Header from "./components/Header";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import AppIndex from "./components/apps/AppIndex";
+import AppLayout from "./components/apps/AppLayout";
 import AppLogs from "./components/apps/AppLog";
 import AppOverview from "./components/apps/AppOverview";
 import RouteIndex from "./components/routes/RouteIndex";
@@ -18,8 +18,13 @@ import SchemeList from "./components/authentications/SchemeList";
 import AuthenticationsIndex from "./components/authentications/Authentication";
 import CreateUpdateScheme from "./components/authentications/CreateUpdateScheme";
 import AuthenticationSettings from "./components/authentications/Settings";
-import AppVariables from "./components/variables/AppVariables";
-import AddUpdateVariables from "./components/variables/CreateUpdateVariables";
+import AppVariables from "./components/storages/AppVariables";
+import AddUpdateVariables from "./components/storages/CreateUpdateVariables";
+import {
+  CreateUpdateTextStorage,
+  LogonTextStorage,
+  TextStorageList,
+} from "./components/storages/TextStorages";
 
 function App() {
   return (
@@ -38,8 +43,8 @@ function App() {
             <Route path="/" Component={Home} />
             <Route path="/apps" Component={AppList} />
             <Route path="/apps/new" Component={AppCreate} />
-            <Route path="/apps/:appId" Component={AppIndex}>
-              <Route index path="overview" Component={AppOverview} />
+            <Route path="/apps/:appId" Component={AppLayout}>
+              <Route index Component={AppOverview} />
               <Route path="routes" Component={RouteIndex}>
                 <Route path="new" Component={RouteCreate} />
                 <Route path=":routeId" Component={RouteEdit} />
@@ -55,10 +60,24 @@ function App() {
                 <Route path="settings" Component={AuthenticationSettings} />
               </Route>
               <Route path="logs" Component={AppLogs} />
-              <Route path="variables">
-                <Route index Component={AppVariables} />
-                <Route path="new" Component={AddUpdateVariables} />
-                <Route path=":variableId/edit" Component={AddUpdateVariables} />
+              <Route path="storages">
+                <Route path="textstorages">
+                  <Route index Component={TextStorageList} />
+                  <Route path="new" Component={CreateUpdateTextStorage} />
+                  <Route
+                    path=":storageId"
+                    Component={CreateUpdateTextStorage}
+                  />
+                  <Route path=":storageId/logon" Component={LogonTextStorage} />
+                </Route>
+                <Route path="variables">
+                  <Route index Component={AppVariables} />
+                  <Route path="new" Component={AddUpdateVariables} />
+                  <Route
+                    path=":variableId/edit"
+                    Component={AddUpdateVariables}
+                  />
+                </Route>
               </Route>
             </Route>
           </Routes>

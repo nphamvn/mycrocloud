@@ -3,13 +3,17 @@ using System.Globalization;
 using System.Text.Json;
 using Jint;
 using Jint.Native;
+using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
+using WebApp.Infrastructure.Repositories.EfCore;
 using Route = WebApp.Domain.Entities.Route;
 
 namespace WebApp.MiniApiGateway;
 public static class FunctionHandler
 {
+    const string PostgreSQL =  "Host=pgm-0iwyk0293g13e531io.pgsql.japan.rds.aliyuncs.com;Username=nampham;Password=6PUrTq9mebhLep;Database=dev-mycrocloud";
+    
     public static async Task Handle(HttpContext context)
     {
         var app = (App)context.Items["_App"]!;
@@ -57,10 +61,11 @@ public static class FunctionHandler
             }
         }
         //Inject plugins
-        engine.SetValue("useTextStorage", new Func<string, TextStorageAdapter>((connectionString) => {
-            var httpClientFactory = context.RequestServices.GetRequiredService<IHttpClientFactory>();
-            var httpClient = httpClientFactory.CreateClient("TextStorageProvider");
-            var adapter = new TextStorageAdapter(connectionString, httpClient);
+        engine.SetValue("useLocalTextStorage", new Func<string, LocalTextStorageAdapter>((name) => {
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            optionsBuilder.UseNpgsql(PostgreSQL);
+            var appDbContext = new AppDbContext(optionsBuilder.Options);
+            var adapter = new LocalTextStorageAdapter(app, name, appDbContext);
             return adapter;
         }));
 

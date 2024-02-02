@@ -14,7 +14,6 @@ import {
   RouteCreateUpdateInputs,
   routeCreateUpdateInputsSchema,
 } from "./RouteCreateUpdateInputs";
-import { useRoutesContext } from "./RoutesContext";
 const apiGatewayDomain = import.meta.env
   .VITE_WEBAPP_APIGATEWAY_DOMAIN as string;
 
@@ -27,7 +26,6 @@ export default function RouteCreateUpdate({
 }) {
   const app = useContext(AppContext)!;
   const appDomain = apiGatewayDomain.replace("__app_id__", app.id.toString());
-  const { dispatch } = useRoutesContext();
 
   const forms = useForm<RouteCreateUpdateInputs>({
     resolver: yupResolver(routeCreateUpdateInputsSchema),
@@ -60,20 +58,8 @@ export default function RouteCreateUpdate({
   } = forms;
   const responseType = watch("responseType");
 
-  const watchs = watch(["name", "method", "path"]);
+  watch(["method", "path"]);
   const url = appDomain + getValues("path");
-  useEffect(() => {
-    // dispatch({
-    //   type: "UPDATE_ROUTE",
-    //   payload: {
-    //     ...route,
-    //     name: getValues("name"),
-    //     method: getValues("method"),
-    //     path: getValues("path"),
-    //   },
-    // });
-    console.log("watchs", watchs);
-  }, [watchs]);
   return (
     <FormProvider {...forms}>
       <form className="h-full p-2" onSubmit={handleSubmit(onSubmit)}>

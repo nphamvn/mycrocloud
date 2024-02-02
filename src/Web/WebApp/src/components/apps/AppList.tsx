@@ -60,7 +60,7 @@ export default function AppList() {
               <div className="mb-2">
                 <h4>
                   <Link
-                    to={`${app.id}/overview`}
+                    to={`${app.id}`}
                     className="font-semibold text-slate-900"
                   >
                     {app.name}
