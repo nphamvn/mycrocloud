@@ -7,6 +7,7 @@ public interface IAppService {
     Task Create(string userId, App app);
     Task Delete(int id);
     Task Rename(int id, string name);
+    Task SetCorsSettings(int id, CorsSettings settings);
     Task SetStatus(int id, AppStatus status);
 }
 
@@ -33,6 +34,13 @@ public class AppService : IAppService
         var currentApp = await _appRepository.GetByAppId(id);
         currentApp.Name = name;
         await _appRepository.Update(id, currentApp);
+    }
+
+    public async Task SetCorsSettings(int id, CorsSettings settings)
+    {
+        var app = await _appRepository.GetByAppId(id);
+        app.CorsSettings = settings;
+        await _appRepository.Update(id, app);
     }
 
     public async Task SetStatus(int id, AppStatus status)

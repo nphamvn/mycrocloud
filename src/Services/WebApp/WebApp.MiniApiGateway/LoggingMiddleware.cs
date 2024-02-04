@@ -10,7 +10,7 @@ public class LoggingMiddleware(RequestDelegate next)
     public async Task Invoke(HttpContext context, ILogRepository logRepository, IRouteRepository routeRepository)
     {
         await next.Invoke(context);
-        if (context.Items["_App"] is App app)
+        if (context.Items["_App"] is App app && !context.Request.IsPreflightRequest())
         {
             var route = context.Items["_Route"] as Route;
             var functionExecutionResult = context.Items["_FunctionExecutionResult"] as FunctionExecutionResult;
@@ -24,8 +24,8 @@ public class LoggingMiddleware(RequestDelegate next)
                 AdditionalLogMessage = functionExecutionResult?.AdditionalLogMessage,
                 FunctionExecutionDuration = functionExecutionResult?.Duration
             });
-            
-            if (functionExecutionResult?.Exception is { } e)    
+
+            if (functionExecutionResult?.Exception is { } e)
             {
                 if (e is TimeoutException && route is not null)
                 {

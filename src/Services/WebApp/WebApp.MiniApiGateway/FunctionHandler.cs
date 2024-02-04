@@ -12,8 +12,6 @@ using Route = WebApp.Domain.Entities.Route;
 namespace WebApp.MiniApiGateway;
 public static class FunctionHandler
 {
-    const string PostgreSQL =  "Host=pgm-0iwyk0293g13e531io.pgsql.japan.rds.aliyuncs.com;Username=nampham;Password=6PUrTq9mebhLep;Database=dev-mycrocloud";
-    
     public static async Task Handle(HttpContext context)
     {
         var app = (App)context.Items["_App"]!;
@@ -63,7 +61,7 @@ public static class FunctionHandler
         //Inject plugins
         engine.SetValue("useLocalTextStorage", new Func<string, LocalTextStorageAdapter>((name) => {
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseNpgsql(PostgreSQL);
+            optionsBuilder.UseNpgsql(ConfigurationHelper.Configuration!.GetConnectionString("PostgreSQL"));
             var appDbContext = new AppDbContext(optionsBuilder.Options);
             var adapter = new LocalTextStorageAdapter(app, name, appDbContext);
             return adapter;

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Api.Models;
+using WebApp.Domain.Entities;
 using WebApp.Domain.Enums;
 using WebApp.Domain.Repositories;
 using WebApp.Domain.Services;
@@ -63,5 +64,19 @@ public class AppsController(IAppService appService, IAppRepository appRepository
     {
         await appService.Delete(id);
         return NoContent();
+    }
+
+    [HttpPatch("{id:int}/cors")]
+    public async Task<IActionResult> Cors(int id, CorsSettings settings)
+    {
+        await appService.SetCorsSettings(id, settings);
+        return NoContent();
+    }
+
+    [HttpGet("{id:int}/cors")]
+    public async Task<IActionResult> Cors(int id)
+    {
+        var app = await appRepository.GetByAppId(id);
+        return Ok(app.CorsSettings);
     }
 }

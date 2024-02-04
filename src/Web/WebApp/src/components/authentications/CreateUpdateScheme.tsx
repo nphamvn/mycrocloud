@@ -37,6 +37,7 @@ const schema = yup.object({
       name: yup.string().required("Name is required"),
       key: yup.string().required("Key is required"),
       metadata: yup.string(),
+      active: yup.boolean().default(true),
     }),
   ),
 });
@@ -273,7 +274,7 @@ function ApiKey() {
       <button
         type="button"
         onClick={() => {
-          append({ name: "", key: "", metadata: "" });
+          append({ name: "", key: "", metadata: "", active: true });
         }}
       >
         Add

@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { AppContext } from "./AppContext";
 import { useForm } from "react-hook-form";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -6,8 +6,10 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { getAppDomain } from "./service";
 import { PlayCircleIcon, StopCircleIcon } from "@heroicons/react/24/solid";
+import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 
 export default function AppOverview() {
+  console.log("AppOverview");
   const app = useContext(AppContext)!;
   const domain = getAppDomain(app.id);
 
@@ -82,11 +84,84 @@ export default function AppOverview() {
           <option>Route 2</option>
         </select>
       </div>
+      <div className="mt-2">
+        <CorsSettings />
+      </div>
+      <hr />
       <DeleteComponent />
     </div>
   );
 }
 
+function CorsSettings() {
+  const app = useContext(AppContext)!;
+  const editorRef = useRef(null);
+  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
+  const { getAccessTokenSilently } = useAuth0();
+  useEffect(() => {
+    let isMounted = true;
+    if (editorRef.current && isMounted) {
+      const init = async () => {
+        const accessToken = await getAccessTokenSilently();
+        const res = await fetch(`/api/apps/${app.id}/cors`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const json = await res.text();
+        setEditor((editor) => {
+          if (editor) return editor;
+          const instance = monaco.editor.create(editorRef.current!, {
+            language: "json",
+            value: JSON.stringify(JSON.parse(json), null, 2),
+            minimap: {
+              enabled: false,
+            },
+          });
+          return instance;
+        });
+      };
+      init();
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [editorRef.current]);
+  const handleSaveClick = async () => {
+    if (!editor) return;
+    const json = editor.getValue();
+    const accessToken = await getAccessTokenSilently();
+    const res = await fetch(`/api/apps/${app.id}/cors`, {
+      method: "PATCH",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: json,
+    });
+    if (res.ok) {
+      toast("CORS settings saved");
+    }
+  };
+  return (
+    <>
+      <div className="flex">
+        <h3>CORS Settings</h3>
+        <button
+          type="button"
+          onClick={handleSaveClick}
+          className="ms-auto bg-primary px-2 py-1 text-white"
+        >
+          Save
+        </button>
+      </div>
+      <div className="mt-2">
+        <label>JSON</label>
+        <div className="h-[200px] w-full" ref={editorRef}></div>
+      </div>
+    </>
+  );
+}
 type RenameFormInput = {
   name: string;
 };

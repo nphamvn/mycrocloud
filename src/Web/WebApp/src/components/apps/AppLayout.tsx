@@ -62,10 +62,7 @@ export default function AppLayout() {
           <Breadcrumb.Item>
             <Link to="/apps">Apps</Link>
           </Breadcrumb.Item>
-          <Breadcrumb.Item>
-            {app.name}
-            {import.meta.env.DEV ? ` (${location.pathname})` : ""}
-          </Breadcrumb.Item>
+          <Breadcrumb.Item>{app.name}</Breadcrumb.Item>
         </Breadcrumb>
         <div className="flex min-h-screen border">
           <div className="flex w-28 flex-col space-y-0.5 border-r p-1">

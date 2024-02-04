@@ -19,5 +19,7 @@
     <ProjectReference Include="..\WebApp.Domain\WebApp.Domain.csproj" />
     <ProjectReference Include="..\WebApp.Infrastructure\WebApp.Infrastructure.csproj" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Include="Scripts\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

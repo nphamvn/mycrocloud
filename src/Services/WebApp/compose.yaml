@@ -1,12 +1,14 @@
 version: '3.8'
 services:
   restapi:
+    image: webapp-restapi
     build:
-      dockerfile: WebApp.Api.Rest/Dockerfile
+      dockerfile: WebApp.RestApi/Dockerfile
     ports:
       - "8080:8080"
       
   apigateway:
+    image: webapp-apigateway
     build: 
       dockerfile: WebApp.MiniApiGateway/Dockerfile
     ports:

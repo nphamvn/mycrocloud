@@ -20,13 +20,16 @@
 
   <ItemGroup>
     <Compile Remove="Repositories\PostgreSQL\**" />
+    <Compile Remove="Repositories\EfCore\PostgreSQLMigrations\**" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Remove="Repositories\PostgreSQL\**" />
+    <EmbeddedResource Remove="Repositories\EfCore\PostgreSQLMigrations\**" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Repositories\PostgreSQL\**" />
+    <None Remove="Repositories\EfCore\PostgreSQLMigrations\**" />
   </ItemGroup>
 </Project>

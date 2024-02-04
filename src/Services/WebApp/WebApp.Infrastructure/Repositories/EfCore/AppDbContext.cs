@@ -20,9 +20,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             {
                 ownedNavigationBuilder.ToJson();
             });
+        modelBuilder.Entity<App>()
+            .OwnsOne(app => app.CorsSettings, ownedNavigationBuilder =>
+            {
+                ownedNavigationBuilder.ToJson();
+            });
+
         modelBuilder.Entity<Route>().OwnsMany(route => route.ResponseHeaders,
             ownedNavigationBuilder => { ownedNavigationBuilder.ToJson(); });
-        modelBuilder.Entity<RouteValidation>()
+        _ = modelBuilder.Entity<RouteValidation>()
             .Property(p => p.Rules)
             .HasConversion(v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
                 v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, new JsonSerializerOptions()));

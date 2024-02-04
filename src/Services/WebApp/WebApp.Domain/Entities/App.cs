@@ -13,4 +13,5 @@ public class App : BaseEntity
     public ICollection<Log> Logs { get; set; }
     public AppSettings Settings { get; set; }
     public ICollection<Variable> Variables { get; set; }
+    public CorsSettings CorsSettings { get; set; }
 }

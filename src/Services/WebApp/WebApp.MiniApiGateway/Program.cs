@@ -5,23 +5,16 @@ using WebApp.MiniApiGateway;
 using Route = WebApp.Domain.Entities.Route;
 
 var builder = WebApplication.CreateBuilder(args);
-
+ConfigurationHelper.Initialize(builder.Configuration);
 builder.Services.AddLogging(options => { options.AddSeq(builder.Configuration["Logging:Seq:ServerUrl"]); });
 builder.Services.AddHttpLogging(o => { });
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("CorsPolicy", builder =>
-    {
-        builder.AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader();
-    });
-});
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL"))
-        .LogTo(Console.WriteLine, LogLevel.Information)
-        .EnableSensitiveDataLogging();
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+        //.LogTo(Console.WriteLine, LogLevel.Information)
+        //.EnableSensitiveDataLogging()
+        ;
 });
 builder.Services.AddScoped<IAppRepository, AppRepository>();
 builder.Services.AddScoped<IRouteRepository, RouteRepository>();
@@ -33,13 +26,8 @@ builder.Services.AddSingleton(new ScriptCollection
     { "lodash", File.ReadAllText("Scripts/lodash.min.js")}
 });
 builder.Services.AddSingleton<ICachedOpenIdConnectionSigningKeys, MemoryCachedOpenIdConnectionSigningKeys>();
-builder.Services.AddHttpClient("FunctionHandlerIOAgent", options =>
-{
-    options.BaseAddress = new Uri("http://localhost:5132");
-});
 
 var app = builder.Build();
-app.UseCors("CorsPolicy");
 
 app.UseHttpLogging();
 
@@ -63,6 +51,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseAppResolverMiddleware();
+
+app.UseCorsMiddleware();
 
 app.UseRouteResolverMiddleware();
 

@@ -9,7 +9,7 @@ using WebApp.Infrastructure.Repositories.EfCore;
 
 #nullable disable
 
-namespace WebApp.Infrastructure.Repositories.EfCore.PostgreSQLMigrations
+namespace WebApp.Migrations.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -18,7 +18,7 @@ namespace WebApp.Infrastructure.Repositories.EfCore.PostgreSQLMigrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "8.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -340,16 +340,16 @@ namespace WebApp.Infrastructure.Repositories.EfCore.PostgreSQLMigrations
                             b1.Property<int>("AppId")
                                 .HasColumnType("integer");
 
-                            b1.Property<string[]>("AllowedHeaders")
+                            b1.Property<List<string>>("AllowedHeaders")
                                 .HasColumnType("text[]");
 
-                            b1.Property<string[]>("AllowedMethods")
+                            b1.Property<List<string>>("AllowedMethods")
                                 .HasColumnType("text[]");
 
-                            b1.Property<string[]>("AllowedOrigins")
+                            b1.Property<List<string>>("AllowedOrigins")
                                 .HasColumnType("text[]");
 
-                            b1.Property<string[]>("ExposeHeaders")
+                            b1.Property<List<string>>("ExposeHeaders")
                                 .HasColumnType("text[]");
 
                             b1.Property<int?>("MaxAgeSeconds")

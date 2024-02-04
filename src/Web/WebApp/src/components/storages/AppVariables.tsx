@@ -32,13 +32,14 @@ export default function AppVariables() {
         >
           Add
         </Link>
-        <table className="mt-2 table-auto w-full">
+        <table className="mt-2 w-full table-auto">
           <thead>
             <tr>
               <th>Name</th>
               <th>Value Type</th>
               <th>Created at</th>
               <th>Updated at</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -50,8 +51,15 @@ export default function AppVariables() {
                   </Link>
                 </td>
                 <td>{v.valueType}</td>
-                <td>{v.createdAt}</td>
-                <td>{v.updatedAt}</td>
+                <td>{new Date(v.createdAt).toLocaleString()}</td>
+                <td>
+                  {v.updatedAt ? new Date(v.updatedAt).toLocaleString() : "-"}
+                </td>
+                <td className="inline-flex">
+                  <button type="button" className="text-red-500">
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

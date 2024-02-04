@@ -42,6 +42,10 @@ export default function RouteEdit() {
         },
       });
       if (res.ok) {
+        dispatch({
+          type: "DELETE_ROUTE",
+          payload: routes.find((r) => r.id === routeId)!,
+        });
         navigate("../");
       }
     }

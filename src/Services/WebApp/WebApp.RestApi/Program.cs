@@ -29,7 +29,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(builder.Configuration["Cors:AllowedOrigins"]!.Split(','))
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -45,8 +45,7 @@ builder.Services.AddAuthentication()
 builder.Services.AddAuthorization();
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    //options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
-    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 builder.Services.AddScoped<IAppRepository, AppRepository>();
 builder.Services.AddScoped<IAppService, AppService>();

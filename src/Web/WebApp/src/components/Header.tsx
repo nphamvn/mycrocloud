@@ -1,8 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
-const mode = import.meta.env.MODE;
+const isDevMode = import.meta.env.DEV;
 
 function Header() {
   const {
@@ -14,22 +13,6 @@ function Header() {
     logout,
     getAccessTokenSilently,
   } = useAuth0();
-
-  useEffect(() => {
-    const getUserInfo = async () => {
-      const accessToken = await getAccessTokenSilently();
-      const res = await fetch("/api/me", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      const userId = await res.text();
-      console.log(userId);
-    };
-    if (!isLoading && isAuthenticated) {
-      getUserInfo();
-    }
-  }, [isLoading]);
 
   const handleCopyAccessTokenClick = async () => {
     const accessToken = await getAccessTokenSilently();
@@ -66,7 +49,7 @@ function Header() {
               <Dropdown.Item disabled>Settings</Dropdown.Item>
               <Dropdown.Divider />
               <Dropdown.Item onClick={() => logout()}>Log out</Dropdown.Item>
-              {mode === "development" && (
+              {isDevMode && (
                 <Dropdown.Item onClick={handleCopyAccessTokenClick}>
                   Copy access token
                 </Dropdown.Item>

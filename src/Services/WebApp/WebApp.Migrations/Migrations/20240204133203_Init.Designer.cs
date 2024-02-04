@@ -3,22 +3,25 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebApp.Infrastructure.Repositories.EfCore;
 
 #nullable disable
 
-namespace WebApp.Infrastructure.Repositories.EfCore.PostgreSQLMigrations
+namespace WebApp.Migrations.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240204133203_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "8.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -340,16 +343,16 @@ namespace WebApp.Infrastructure.Repositories.EfCore.PostgreSQLMigrations
                             b1.Property<int>("AppId")
                                 .HasColumnType("integer");
 
-                            b1.Property<string[]>("AllowedHeaders")
+                            b1.Property<List<string>>("AllowedHeaders")
                                 .HasColumnType("text[]");
 
-                            b1.Property<string[]>("AllowedMethods")
+                            b1.Property<List<string>>("AllowedMethods")
                                 .HasColumnType("text[]");
 
-                            b1.Property<string[]>("AllowedOrigins")
+                            b1.Property<List<string>>("AllowedOrigins")
                                 .HasColumnType("text[]");
 
-                            b1.Property<string[]>("ExposeHeaders")
+                            b1.Property<List<string>>("ExposeHeaders")
                                 .HasColumnType("text[]");
 
                             b1.Property<int?>("MaxAgeSeconds")
