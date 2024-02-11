@@ -7,7 +7,7 @@ using WebApp.RestApi.Controllers;
 
 namespace WebApp.RestApi;
 
-[Route("api/apps/{appId:int}/[controller]")]
+[Route("apps/{appId:int}/[controller]")]
 public class VariablesController(AppDbContext appDbContext) : BaseController
 {
     [HttpGet]

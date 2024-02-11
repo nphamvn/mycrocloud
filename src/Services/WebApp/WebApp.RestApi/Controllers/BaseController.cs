@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebApp.RestApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 [Authorize]
 public class BaseController : ControllerBase
 {

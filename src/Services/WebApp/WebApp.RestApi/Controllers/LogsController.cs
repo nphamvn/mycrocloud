@@ -3,7 +3,7 @@ using WebApp.Domain.Repositories;
 
 namespace WebApp.RestApi.Controllers;
 
-[Route("/api/apps/{appId:int}/[controller]")]
+[Route("apps/{appId:int}/[controller]")]
 public class LogsController(ILogRepository logRepository) : BaseController
 {
     public async Task<IActionResult> Search(int appId, [FromQuery]List<int>? routeIds, DateTime? accessDateFrom,

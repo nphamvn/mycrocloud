@@ -6,7 +6,7 @@ using WebApp.RestApi.Models.Routes;
 
 namespace WebApp.RestApi.Controllers;
 
-[Route("api/apps/{appId:int}/[controller]")]
+[Route("apps/{appId:int}/[controller]")]
 public class RoutesController(IRouteService routeService,
     IRouteRepository routeRepository
     ) : BaseController

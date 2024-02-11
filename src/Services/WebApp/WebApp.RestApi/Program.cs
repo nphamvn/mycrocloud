@@ -6,6 +6,7 @@ using WebApp.Domain.Services;
 using WebApp.Domain.Repositories;
 using WebApp.Infrastructure.Repositories.EfCore;
 using WebApp.RestApi.Extensions;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,8 +55,7 @@ builder.Services.AddScoped<IRouteService, RouteService>();
 builder.Services.AddScoped<ILogRepository, LogRepository>();
 
 var app = builder.Build();
-app.UseHttpLogging();
-app.MapHealthChecks("/healthz");
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -63,13 +63,23 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+if (!app.Environment.IsDevelopment())
+{
+    app.UseForwardedHeaders(new()
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    });
+}
+
+app.UseHttpLogging();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.Map("api/ping", () => "pong");
-app.Map("api/me", (ClaimsPrincipal user) => user.GetUserId())
+app.MapHealthChecks("/healthz");
+app.Map("ping", () => "pong");
+app.Map("me", (ClaimsPrincipal user) => user.GetUserId())
     .RequireAuthorization();
 
 app.Run();
