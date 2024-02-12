@@ -1,0 +1,28 @@
+name: Build and deploy WebApp to EC2 instance
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        working-directory: src/Web/WebApp
+        run: npm install
+
+      - name: Build
+        working-directory: src/Web/WebApp
+        run: npm run build
+
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: src/Web/WebApp/dist
