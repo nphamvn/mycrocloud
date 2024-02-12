@@ -44,7 +44,7 @@ jobs:
           host: ${{ vars.SSH_HOST }}
           username: ${{ vars.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: artifacts/
+          source: artifacts/*
           target: /var/www/html/mycrocloud.online/
       
       - name: Restart Nginx
