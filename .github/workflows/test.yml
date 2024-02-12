@@ -9,5 +9,4 @@ jobs:
         steps:
             - name: Print Environment Variables
               run: |
-                echo "Environment Variables"
-                print env.SSH_HOST
+                print ${{ env.SSH_HOST }}
