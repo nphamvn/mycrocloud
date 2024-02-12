@@ -27,12 +27,17 @@ export const routeCreateUpdateInputsSchema = yup.object({
   method: yup.string().required(),
   responseType: yup.string().required(),
   responseStatusCode: yup.number(),
-  responseHeaders: yup.array(),
+  responseHeaders: yup.array().of(
+    yup.object({
+      name: yup.string().required(),
+      value: yup.string().required(),
+    }),
+  ),
   responseBodyLanguage: yup.string(),
   responseBody: yup.string(),
   functionHandler: yup.string(),
-  functionHandlerDependencies: yup.array(),
-  requireAuthorization: yup.boolean(),
+  functionHandlerDependencies: yup.array().of(yup.string().required()),
+  requireAuthorization: yup.boolean().required(),
   staticFile: yup.mixed(),
   useDynamicResponse: yup.boolean(),
 });

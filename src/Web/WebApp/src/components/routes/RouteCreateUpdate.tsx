@@ -11,6 +11,7 @@ import Route from "./Route";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import { bodyLanguages, methods } from "./constants";
 import {
+  HeaderInput,
   RouteCreateUpdateInputs,
   routeCreateUpdateInputsSchema,
 } from "./RouteCreateUpdateInputs";
@@ -28,7 +29,6 @@ export default function RouteCreateUpdate({
   const appDomain = apiGatewayDomain.replace("__app_id__", app.id.toString());
 
   const forms = useForm<RouteCreateUpdateInputs>({
-    // @ts-ignore
     resolver: yupResolver(routeCreateUpdateInputsSchema),
     defaultValues: {
       name: route.name,
@@ -40,7 +40,7 @@ export default function RouteCreateUpdate({
         return {
           name: h.name,
           value: h.value,
-        };
+        } as HeaderInput;
       }),
       responseBodyLanguage: route.responseBodyLanguage,
       responseBody: route.responseBody,
