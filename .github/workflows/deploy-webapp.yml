@@ -42,7 +42,7 @@ jobs:
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ env.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
+          username: ${{ env.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: artifacts/
           target: /var/www/html/mycrocloud.online
