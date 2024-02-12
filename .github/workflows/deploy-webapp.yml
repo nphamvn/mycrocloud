@@ -55,3 +55,6 @@ jobs:
           username: ${{ vars.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: sudo systemctl restart nginx
+
+      - name: Remove artifacts
+        run: rm -rf artifacts
