@@ -6,7 +6,10 @@ using Route = WebApp.Domain.Entities.Route;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationHelper.Initialize(builder.Configuration);
-builder.Services.AddLogging(options => { options.AddSeq(builder.Configuration["Logging:Seq:ServerUrl"]); });
+builder.Services.AddLogging(options =>
+{
+    options.AddSeq(builder.Configuration["Logging:Seq:ServerUrl"], builder.Configuration["Logging:Seq:ApiKey"]);
+});
 builder.Services.AddHttpLogging(o => { });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -65,7 +68,7 @@ app.UseValidationMiddleware();
 app.MapWhen(context => ((Route)context.Items["_Route"]!).ResponseType == "static",
     appBuilder => appBuilder.Run(StaticResponseHandler.Handle));
 
-app.MapWhen(context => ((Route)context.Items["_Route"]!).ResponseType == "function", 
+app.MapWhen(context => ((Route)context.Items["_Route"]!).ResponseType == "function",
     appBuilder => appBuilder.Run(FunctionHandler.Handle));
 
 app.Run();

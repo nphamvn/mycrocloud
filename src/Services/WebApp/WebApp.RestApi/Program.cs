@@ -22,7 +22,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddLogging(options =>
 {
-    options.AddSeq(builder.Configuration["Logging:Seq:ServerUrl"]);
+    options.AddSeq(builder.Configuration["Logging:Seq:ServerUrl"], builder.Configuration["Logging:Seq:ApiKey"]);
 });
 builder.Services.AddHttpLogging(o => { });
 builder.Services.AddHealthChecks();
