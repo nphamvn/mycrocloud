@@ -25,6 +25,7 @@ import {
   LogonTextStorage,
   TextStorageList,
 } from "./components/storages/TextStorages";
+import ProtectedPage from "./components/ProtectedPage";
 
 function App() {
   return (
@@ -41,9 +42,18 @@ function App() {
         <div className="container mx-auto min-h-screen p-2">
           <Routes>
             <Route path="/" Component={Home} />
-            <Route path="/apps" Component={AppList} />
-            <Route path="/apps/new" Component={AppCreate} />
-            <Route path="/apps/:appId" Component={AppLayout}>
+            <Route
+              path="/apps"
+              element={<ProtectedPage children={<AppList />} />}
+            />
+            <Route
+              path="/apps/new"
+              element={<ProtectedPage children={<AppCreate />} />}
+            />
+            <Route
+              path="/apps/:appId"
+              element={<ProtectedPage children={<AppLayout />} />}
+            >
               <Route index Component={AppOverview} />
               <Route path="routes" Component={RouteIndex}>
                 <Route path="new" Component={RouteCreate} />
