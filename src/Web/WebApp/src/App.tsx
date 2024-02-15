@@ -46,8 +46,14 @@ function App() {
               path="/apps"
               element={<ProtectedPage children={<AppList />} />}
             />
-            <Route path="/apps/new" Component={AppCreate} />
-            <Route path="/apps/:appId" Component={AppLayout}>
+            <Route
+              path="/apps/new"
+              element={<ProtectedPage children={<AppCreate />} />}
+            />
+            <Route
+              path="/apps/:appId"
+              element={<ProtectedPage children={<AppLayout />} />}
+            >
               <Route index Component={AppOverview} />
               <Route path="routes" Component={RouteIndex}>
                 <Route path="new" Component={RouteCreate} />

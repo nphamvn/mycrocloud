@@ -8,13 +8,15 @@ export default function ProtectedPage({
 }) {
   const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
-      loginWithRedirect();
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        loginWithRedirect();
+      }
     }
-  }, [isAuthenticated, isLoading]);
+  }, [isLoading]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return null;
   }
   return <>{children}</>;
 }
