@@ -38,16 +38,16 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.200
+          
+      - name: Install dotnet-ef
+        run: dotnet tool install --global dotnet-ef
 
       - name: Install dependencies
         working-directory: src/Services/WebApp/WebApp.Migrations
         run: dotnet restore
-        
-      - name: Install dotnet-ef
-        run: dotnet tool install --global dotnet-ef
 
       - name: Update database
-        working-directory: src/Services/WebApp/WebApp.Infrastructure
+        working-directory: src/Services/WebApp/WebApp.Migrations
         env:
           ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=mycrocloud;Username=postgres;Password=postgres"
-        run: dotnet ef database update -s ../WebApp.Migrations/WebApp.Migrations.csproj
+        run: dotnet ef database update
