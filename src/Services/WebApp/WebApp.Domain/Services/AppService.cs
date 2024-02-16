@@ -22,6 +22,7 @@ public class AppService : IAppService
     public async Task Create(string userId, App app)
     {
         app.Status = AppStatus.Active;
+        app.CorsSettings ??= CorsSettings.Default;
         await _appRepository.Add(userId, app);
     }
 
