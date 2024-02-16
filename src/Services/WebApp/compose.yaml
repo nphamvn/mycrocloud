@@ -1,5 +1,14 @@
 version: '3.8'
 services:
+  db:
+    image: postgres:16.2-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
   restapi:
     image: webapp-restapi
     build:
@@ -21,10 +30,12 @@ services:
       - "5341:5341"
     environment:
       - ACCEPT_EULA=Y
-      - SEQ_FIRSTRUN_ADMINPASSWORDHASH=QGPsRgTPFdJUQfb+3rFJaorRrIjIn9/qmeykLr1vO5I0ZlEGK+a/6/hcK/OkaZZy92I9h3U/3XH7dAP3FeQ5mzZmfVa6KvtBTq1DEia04KQb
+      # admin
+      - SEQ_FIRSTRUN_ADMINPASSWORDHASH=QBAm4AeIC2BmexKEtzYXCIXz+LhyVhrwYB4lriNq9k4i0XXkPLy2rpfIvxeyNqVMDjbo2/hehpdbUr+8Vulm0ydmdizKTOPYO0l8CEiczX2/
     volumes:
       - seq_data:/data
     restart: "unless-stopped"
     
 volumes:
+  db_data:
   seq_data:
