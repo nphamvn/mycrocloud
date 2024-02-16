@@ -51,7 +51,7 @@ namespace WebApp.Migrations.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Apps");
+                    b.ToTable("Apps", (string)null);
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.AuthenticationScheme", b =>
@@ -96,7 +96,7 @@ namespace WebApp.Migrations.Migrations
 
                     b.HasIndex("AppId");
 
-                    b.ToTable("AuthenticationSchemes");
+                    b.ToTable("AuthenticationSchemes", (string)null);
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.Log", b =>
@@ -138,7 +138,7 @@ namespace WebApp.Migrations.Migrations
 
                     b.HasIndex("RouteId");
 
-                    b.ToTable("Logs");
+                    b.ToTable("Logs", (string)null);
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.Route", b =>
@@ -201,7 +201,7 @@ namespace WebApp.Migrations.Migrations
 
                     b.HasIndex("AppId");
 
-                    b.ToTable("Routes");
+                    b.ToTable("Routes", (string)null);
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.RouteValidation", b =>
@@ -231,7 +231,7 @@ namespace WebApp.Migrations.Migrations
 
                     b.HasIndex("RouteId");
 
-                    b.ToTable("RouteValidations");
+                    b.ToTable("RouteValidations", (string)null);
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.TextStorage", b =>
@@ -264,7 +264,7 @@ namespace WebApp.Migrations.Migrations
 
                     b.HasIndex("AppId");
 
-                    b.ToTable("TextStorages");
+                    b.ToTable("TextStorages", (string)null);
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.Variable", b =>
@@ -300,42 +300,12 @@ namespace WebApp.Migrations.Migrations
 
                     b.HasIndex("AppId");
 
-                    b.ToTable("Variables");
+                    b.ToTable("Variables", (string)null);
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.App", b =>
                 {
-                    b.OwnsOne("WebApp.Domain.Entities.AppSettings", "Settings", b1 =>
-                        {
-                            b1.Property<int>("AppId")
-                                .HasColumnType("integer");
-
-                            b1.Property<bool>("CheckFunctionExecutionLimitMemory")
-                                .HasColumnType("boolean");
-
-                            b1.Property<bool>("CheckFunctionExecutionTimeout")
-                                .HasColumnType("boolean");
-
-                            b1.Property<long?>("FunctionExecutionLimitMemoryBytes")
-                                .HasColumnType("bigint");
-
-                            b1.Property<int?>("FunctionExecutionTimeoutSeconds")
-                                .HasColumnType("integer");
-
-                            b1.Property<bool>("FunctionUseNoSqlConnection")
-                                .HasColumnType("boolean");
-
-                            b1.HasKey("AppId");
-
-                            b1.ToTable("Apps");
-
-                            b1.ToJson("Settings");
-
-                            b1.WithOwner()
-                                .HasForeignKey("AppId");
-                        });
-
-                    b.OwnsOne("WebApp.Domain.Entities.CorsSettings", "CorsSettings", b1 =>
+                    b.OwnsOne("WebApp.Domain.Entities.App.CorsSettings#WebApp.Domain.Entities.CorsSettings", "CorsSettings", b1 =>
                         {
                             b1.Property<int>("AppId")
                                 .HasColumnType("integer");
@@ -357,9 +327,39 @@ namespace WebApp.Migrations.Migrations
 
                             b1.HasKey("AppId");
 
-                            b1.ToTable("Apps");
+                            b1.ToTable("Apps", (string)null);
 
                             b1.ToJson("CorsSettings");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AppId");
+                        });
+
+                    b.OwnsOne("WebApp.Domain.Entities.App.Settings#WebApp.Domain.Entities.AppSettings", "Settings", b1 =>
+                        {
+                            b1.Property<int>("AppId")
+                                .HasColumnType("integer");
+
+                            b1.Property<bool>("CheckFunctionExecutionLimitMemory")
+                                .HasColumnType("boolean");
+
+                            b1.Property<bool>("CheckFunctionExecutionTimeout")
+                                .HasColumnType("boolean");
+
+                            b1.Property<long?>("FunctionExecutionLimitMemoryBytes")
+                                .HasColumnType("bigint");
+
+                            b1.Property<int?>("FunctionExecutionTimeoutSeconds")
+                                .HasColumnType("integer");
+
+                            b1.Property<bool>("FunctionUseNoSqlConnection")
+                                .HasColumnType("boolean");
+
+                            b1.HasKey("AppId");
+
+                            b1.ToTable("Apps", (string)null);
+
+                            b1.ToJson("Settings");
 
                             b1.WithOwner()
                                 .HasForeignKey("AppId");
@@ -406,7 +406,7 @@ namespace WebApp.Migrations.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsMany("WebApp.Domain.Entities.ResponseHeader", "ResponseHeaders", b1 =>
+                    b.OwnsMany("WebApp.Domain.Entities.Route.ResponseHeaders#WebApp.Domain.Entities.ResponseHeader", "ResponseHeaders", b1 =>
                         {
                             b1.Property<int>("RouteId")
                                 .HasColumnType("integer");
@@ -423,7 +423,7 @@ namespace WebApp.Migrations.Migrations
 
                             b1.HasKey("RouteId", "Id");
 
-                            b1.ToTable("Routes");
+                            b1.ToTable("Routes", (string)null);
 
                             b1.ToJson("ResponseHeaders");
 

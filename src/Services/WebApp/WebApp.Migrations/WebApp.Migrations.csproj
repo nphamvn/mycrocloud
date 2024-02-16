@@ -22,4 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\WebApp.Infrastructure\WebApp.Infrastructure.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Scripts\" />
+  </ItemGroup>
 </Project>
