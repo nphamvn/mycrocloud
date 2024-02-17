@@ -1,4 +1,4 @@
-import { Outlet, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams, useMatch } from "react-router-dom";
 import { useContext, useEffect, useReducer } from "react";
 import Route from "./Route";
 import { AppContext } from "../apps/AppContext";
@@ -35,8 +35,9 @@ export default function RouteIndex() {
     getRoutes();
   }, []);
 
-  const handleNewFolderClick = () => {};
-
+  const handleNewFolderClick = () => { };
+  const newRouteActive = useMatch("/apps/:appId/routes/new");
+  const editRouteActive = useMatch("/apps/:appId/routes/:routeId");
   return (
     <RoutesContext.Provider value={{ state, dispatch }}>
       <div className="flex h-full">
@@ -50,12 +51,15 @@ export default function RouteIndex() {
           <RouteList />
         </div>
         <div className="h-full flex-1">
-          <div className="h-full overflow-y-auto">
-            <Outlet key={routeId} />
-          </div>
-          <div>
-            Click New button to create new route or click route to edit.
-          </div>
+          {newRouteActive || editRouteActive ? (
+            <div className="h-full overflow-y-auto">
+              <Outlet key={routeId} />
+            </div>
+          ) : (
+            <div>
+              Click New button to create new route or click route to edit.
+            </div>
+          )}
         </div>
       </div>
     </RoutesContext.Provider>
