@@ -1,30 +1,30 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Home from "./components/Home";
-import AppList from "./components/apps/AppList";
-import AppCreate from "./components/apps/AppCreate";
+import AppList from "./pages/apps/AppList";
+import AppCreate from "./pages/apps/AppCreate";
 import Header from "./components/Header";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import AppLayout from "./components/apps/AppLayout";
-import AppLogs from "./components/apps/AppLog";
-import AppOverview from "./components/apps/AppOverview";
-import RouteIndex from "./components/routes/RouteIndex";
-import RouteLogs from "./components/routes/RouteLogs";
-import RouteEdit from "./components/routes/RouteEdit";
-import RouteCreate from "./components/routes/RouteCreate";
-import SchemeList from "./components/authentications/SchemeList";
-import AuthenticationsIndex from "./components/authentications/Authentication";
-import CreateUpdateScheme from "./components/authentications/CreateUpdateScheme";
-import AuthenticationSettings from "./components/authentications/Settings";
-import AppVariables from "./components/storages/AppVariables";
-import AddUpdateVariables from "./components/storages/CreateUpdateVariables";
+import AppLayout from "./pages/apps/AppLayout";
+import AppLogs from "./pages/apps/AppLog";
+import AppOverview from "./pages/apps/AppOverview";
+import RouteIndex from "./pages/routes/RouteIndex";
+import RouteLogs from "./pages/routes/RouteLogs";
+import RouteEdit from "./pages/routes/RouteEdit";
+import RouteCreate from "./pages/routes/RouteCreate";
+import SchemeList from "./pages/authentications/SchemeList";
+import AuthenticationsIndex from "./pages/authentications/Authentication";
+import CreateUpdateScheme from "./pages/authentications/CreateUpdateScheme";
+import AuthenticationSettings from "./pages/authentications/Settings";
+import AppVariables from "./pages/storages/AppVariables";
+import AddUpdateVariables from "./pages/storages/CreateUpdateVariables";
 import {
   CreateUpdateTextStorage,
   LogonTextStorage,
   TextStorageList,
-} from "./components/storages/TextStorages";
+} from "./pages/storages/TextStorages";
 import ProtectedPage from "./components/ProtectedPage";
 
 function App() {
