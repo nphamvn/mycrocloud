@@ -2,6 +2,7 @@ version: '3.8'
 services:
   db:
     image: postgres:16.2-alpine
+    container_name: mycrocloud-db
     environment:
       POSTGRES_PASSWORD: postgres
     volumes:
@@ -25,13 +26,14 @@ services:
 
   seq:
     image: datalust/seq
+    container_name: mycrocloud-seq
     ports:
       - "8000:80"
       - "5341:5341"
     environment:
       - ACCEPT_EULA=Y
-      # admin
-      - SEQ_FIRSTRUN_ADMINPASSWORDHASH=QBAm4AeIC2BmexKEtzYXCIXz+LhyVhrwYB4lriNq9k4i0XXkPLy2rpfIvxeyNqVMDjbo2/hehpdbUr+8Vulm0ydmdizKTOPYO0l8CEiczX2/
+      # 7Wy6ttuopDvTau
+      - SEQ_FIRSTRUN_ADMINPASSWORDHASH=QDFtcJLYGKj1Ir6xyrydGr+u6tYcTn33xd4WCe629b6cPQgPXs3UaCYyWkzJaJAyTqNgG89fdTfjF9LQYDkqvdiMsudVmoPJc1Ho3WT0j98w
     volumes:
       - seq_data:/data
     restart: "unless-stopped"
