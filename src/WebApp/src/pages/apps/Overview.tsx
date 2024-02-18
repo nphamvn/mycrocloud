@@ -1,21 +1,22 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { AppContext } from "./AppContext";
+import { AppContext } from ".";
 import { useForm } from "react-hook-form";
 import { useAuth0 } from "@auth0/auth0-react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { getAppDomain } from "./service";
 import { PlayCircleIcon, StopCircleIcon } from "@heroicons/react/24/solid";
+import { ClipboardIcon } from "@heroicons/react/24/outline";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 
 export default function AppOverview() {
-  console.log("AppOverview");
   const app = useContext(AppContext)!;
   const domain = getAppDomain(app.id);
 
   return (
     <div className="p-2">
-      <table>
+      <h2 className="font-bold">Overview</h2>
+      <table className="mt-1">
         <tbody>
           <tr>
             <td>Name</td>
@@ -55,9 +56,9 @@ export default function AppOverview() {
                 onClick={() => {
                   navigator.clipboard.writeText(domain);
                 }}
-                className="ms-2 text-xs text-blue-500 hover:underline"
+                className="ms-2"
               >
-                Copy
+                <ClipboardIcon className="h-4 w-4 text-blue-500" />
               </button>
             </td>
           </tr>
@@ -65,68 +66,71 @@ export default function AppOverview() {
       </table>
       <hr className="mt-2" />
       <div className="mt-2">
-        <RenameComponent />
+        <RenameSection />
       </div>
       <hr className="mt-2" />
       <div className="mt-2">
-        <ChangeStatusComponent />
+        <ChangeStateSection />
       </div>
       <hr className="mt-2" />
-      <div className="hidden">
-        <h3>Customer Handlers</h3>
-        <div>Route Not Found</div>
-        <select>
-          <option>Default handler</option>
-          <option>Redirect to </option>
-        </select>
-        <select>
-          <option>Route 1</option>
-          <option>Route 2</option>
-        </select>
-      </div>
       <div className="mt-2">
-        <CorsSettings />
+        <CorsSettingsSection />
       </div>
-      <hr />
-      <DeleteComponent />
+      <hr className="mt-2" />
+      <div className="mt-2">
+        <DeleteSection />
+      </div>
     </div>
   );
 }
 
-function CorsSettings() {
+function CorsSettingsSection() {
   const app = useContext(AppContext)!;
   const editorRef = useRef(null);
-  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
+  const [editor, setEditor] =
+    useState<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const [json, setJson] = useState<string>();
+
   const { getAccessTokenSilently } = useAuth0();
   useEffect(() => {
-    let isMounted = true;
-    if (editorRef.current && isMounted) {
-      const init = async () => {
-        const accessToken = await getAccessTokenSilently();
-        const res = await fetch(`/api/apps/${app.id}/cors`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        const json = await res.text();
-        setEditor((editor) => {
-          if (editor) return editor;
-          const instance = monaco.editor.create(editorRef.current!, {
-            language: "json",
-            value: JSON.stringify(JSON.parse(json), null, 2),
-            minimap: {
-              enabled: false,
-            },
-          });
-          return instance;
-        });
-      };
-      init();
-    }
-    return () => {
-      isMounted = false;
+    setEditor((prev) => {
+      if (prev) return prev;
+
+      return monaco.editor.create(editorRef.current!, {
+        language: "json",
+        value: "",
+        minimap: {
+          enabled: false,
+        },
+      });
+    });
+
+    const fetchCorsSettings = async () => {
+      const accessToken = await getAccessTokenSilently();
+      const res = await fetch(`/api/apps/${app.id}/cors`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setJson(JSON.stringify(json, null, 2));
+      }
     };
-  }, [editorRef.current]);
+
+    fetchCorsSettings();
+
+    return () => {
+      editor?.dispose();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (editor && json) {
+      editor.setValue(json);
+    }
+  }, [editor, json]);
+
   const handleSaveClick = async () => {
     if (!editor) return;
     const json = editor.getValue();
@@ -145,8 +149,9 @@ function CorsSettings() {
   };
   return (
     <>
-      <div className="flex">
-        <h3>CORS Settings</h3>
+      <h3 className="font-semibold">CORS Settings</h3>
+      <div className="mt-1">
+        <div className="h-[160px] w-full" ref={editorRef}></div>
         <button
           type="button"
           onClick={handleSaveClick}
@@ -155,17 +160,13 @@ function CorsSettings() {
           Save
         </button>
       </div>
-      <div className="mt-2">
-        <label>JSON</label>
-        <div className="h-[200px] w-full" ref={editorRef}></div>
-      </div>
     </>
   );
 }
 type RenameFormInput = {
   name: string;
 };
-function RenameComponent() {
+function RenameSection() {
   const app = useContext(AppContext)!;
   const { getAccessTokenSilently } = useAuth0();
 
@@ -175,35 +176,41 @@ function RenameComponent() {
     },
   });
   const onSubmit = async (input: RenameFormInput) => {
-    try {
-      const accessToken = await getAccessTokenSilently();
-      const res = await fetch(`/api/apps/${app.id}/rename`, {
-        method: "PATCH",
-        headers: {
-          "content-type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(input),
-      });
-      if (res.ok) {
-        toast("Renamed app");
-      }
-    } catch (error) {
-      console.log(error);
+    const accessToken = await getAccessTokenSilently();
+    const res = await fetch(`/api/apps/${app.id}/rename`, {
+      method: "PATCH",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(input),
+    });
+    if (res.ok) {
+      toast("Renamed app");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <input type="text" {...register("name")} className="border px-1 py-0.5" />
-      <button type="submit" className="ms-2 text-primary">
-        Rename
-      </button>
-    </form>
+    <>
+      <h3 className="font-semibold">App name</h3>
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-1">
+        <div className="flex">
+          <input
+            type="text"
+            {...register("name")}
+            className="border px-2 py-0.5"
+            autoComplete="off"
+          />
+          <button type="submit" className="ms-2 bg-primary px-2 text-white">
+            Rename
+          </button>
+        </div>
+      </form>
+    </>
   );
 }
 
-function DeleteComponent() {
+function DeleteSection() {
   const app = useContext(AppContext)!;
   const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
@@ -223,18 +230,20 @@ function DeleteComponent() {
     }
   };
   return (
-    <div className="mt-2">
+    <>
+      <h3 className="font-semibold">Delete the app</h3>
       <button
         type="button"
-        className="text-red-600"
+        className="bg-red-500 px-2 py-1 text-white"
         onClick={handleDeleteClick}
       >
         Delete
       </button>
-    </div>
+    </>
   );
 }
-function ChangeStatusComponent() {
+
+function ChangeStateSection() {
   const app = useContext(AppContext)!;
   const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
@@ -274,6 +283,7 @@ function ChangeStatusComponent() {
   }
   return (
     <div>
+      <h2 className="font-semibold">Change status</h2>
       <button
         type="button"
         className={`${getChangeStatusButtonClass(app.status)} border px-2 py-1`}

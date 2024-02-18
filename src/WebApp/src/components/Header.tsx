@@ -6,7 +6,6 @@ const isDevMode = import.meta.env.DEV;
 function Header() {
   const {
     isLoading,
-    error,
     isAuthenticated,
     user,
     loginWithRedirect,
@@ -18,11 +17,9 @@ function Header() {
     const accessToken = await getAccessTokenSilently();
     navigator.clipboard.writeText(accessToken);
   };
+
   if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  if (error) {
-    return <div>Oops... {error.message}</div>;
+    return null;
   }
 
   return (
@@ -60,7 +57,7 @@ function Header() {
           <Navbar.Collapse className="items-start">
             <li>
               <Link
-                className="block border-b border-gray-100 py-2 pl-3 pr-4 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:border-0 md:p-0 md:hover:bg-transparent md:hover:text-cyan-700 md:dark:hover:bg-transparent md:dark:hover:text-white"
+                className="block border-b border-gray-100 py-2 pl-3 pr-4 text-gray-700 hover:bg-gray-50 md:border-0 md:p-0 md:hover:bg-transparent md:hover:text-cyan-700 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent md:dark:hover:text-white"
                 to="apps"
               >
                 Apps

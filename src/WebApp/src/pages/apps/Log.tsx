@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
-import { AppContext } from "./AppContext";
 import { useAuth0 } from "@auth0/auth0-react";
-import ILog from "./Log";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { AppContext } from ".";
+import { IRouteLog } from "../routes";
 
 type Inputs = {
   accessDateFrom?: string;
@@ -13,7 +13,7 @@ type Inputs = {
 export default function AppLogs() {
   const app = useContext(AppContext)!;
   const { getAccessTokenSilently } = useAuth0();
-  const [logs, setLogs] = useState<ILog[]>([]);
+  const [logs, setLogs] = useState<IRouteLog[]>([]);
   const { register, handleSubmit, setValue } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const accessToken = await getAccessTokenSilently();
@@ -40,7 +40,7 @@ export default function AppLogs() {
           Authorization: `Bearer ${accessToken}`,
         },
       })
-    ).json()) as ILog[];
+    ).json()) as IRouteLog[];
     setLogs(logs);
   };
   const [routeIdsValue, setRouteIdsValue] = useState("");

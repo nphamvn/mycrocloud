@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import ITextStorage from "./ITextStorage";
 import { useAuth0 } from "@auth0/auth0-react";
-import { AppContext } from "../../apps/AppContext";
+import { AppContext } from "../../apps";
 import { Link } from "react-router-dom";
 
 export default function List() {

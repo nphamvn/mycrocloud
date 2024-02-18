@@ -1,7 +1,7 @@
 import { Outlet, useNavigate, useParams, useMatch } from "react-router-dom";
 import { useContext, useEffect, useReducer } from "react";
-import Route from "./Route";
-import { AppContext } from "../apps/AppContext";
+import IRoute from "./Route";
+import { AppContext } from "../apps";
 import { Dropdown } from "flowbite-react";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
@@ -29,13 +29,13 @@ export default function RouteIndex() {
             Authorization: `Bearer ${accessToken}`,
           },
         })
-      ).json()) as Route[];
+      ).json()) as IRoute[];
       dispatch({ type: "SET_ROUTES", payload: routes });
     };
     getRoutes();
   }, []);
 
-  const handleNewFolderClick = () => { };
+  const handleNewFolderClick = () => {};
   const newRouteActive = useMatch("/apps/:appId/routes/new");
   const editRouteActive = useMatch("/apps/:appId/routes/:routeId");
   return (
@@ -89,7 +89,7 @@ function RouteList() {
     </ul>
   );
 }
-function RouteItem({ route }: { route: Route }) {
+function RouteItem({ route }: { route: IRoute }) {
   const methodTextColors = new Map<string, string>([
     ["GET", "text-sky-400"],
     ["POST", "text-orange-400"],

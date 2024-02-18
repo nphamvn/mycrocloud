@@ -1,17 +1,27 @@
-import { Link, Outlet, useLocation, useParams } from "react-router-dom";
-import { AppContext } from "./AppContext";
+import { Link, Outlet, useMatch, useParams } from "react-router-dom";
+import { AppContext } from ".";
 import { useEffect, useState } from "react";
-import App from "./App";
+import IApp from "./App";
 import { Breadcrumb } from "flowbite-react";
 import { useAuth0 } from "@auth0/auth0-react";
 
 export default function AppLayout() {
   const { getAccessTokenSilently } = useAuth0();
   const appId = parseInt(useParams()["appId"]!.toString());
-  const [app, setApp] = useState<App>();
-  const { pathname } = useLocation();
-  const path3 = pathname.split("/")[3];
-  const path4 = pathname.split("/")[4];
+  const [app, setApp] = useState<IApp>();
+
+  const isMatchOverview = useMatch("/apps/:appId");
+  const isMatchRoutes = useMatch("/apps/:appId/routes");
+  const isMatchLogs = useMatch("/apps/:appId/logs");
+  const isMatchAuthenticationSchemes = useMatch(
+    "/apps/:appId/authentications/schemes",
+  );
+  const isMatchAuthenticationSettings = useMatch(
+    "/apps/:appId/authentications/settings",
+  );
+  const isMatchTextStorages = useMatch("/apps/:appId/storages/textstorages");
+  const isMatchVariables = useMatch("/apps/:appId/storages/variables");
+
   useEffect(() => {
     const getApp = async () => {
       const accessToken = await getAccessTokenSilently();
@@ -21,7 +31,7 @@ export default function AppLayout() {
             Authorization: `Bearer ${accessToken}`,
           },
         })
-      ).json()) as App;
+      ).json()) as IApp;
       setApp(app);
       setDocumentTitle();
     };
@@ -33,19 +43,14 @@ export default function AppLayout() {
       return;
     }
     let title;
-    switch (path3) {
-      case "overview":
-        title = app.name + " - Overview";
-        break;
-      case "routes":
-        title = app.name + " - Routes";
-        break;
-      case "logs":
-        title = app.name + " - Logs";
-        break;
-      default:
-        title = app.name;
-        break;
+    if (isMatchOverview) {
+      title = app.name + " - Overview";
+    } else if (isMatchRoutes) {
+      title = app.name + " - Routes";
+    } else if (isMatchLogs) {
+      title = app.name + " - Logs";
+    } else {
+      title = app.name;
     }
     document.title = title;
   }
@@ -68,13 +73,13 @@ export default function AppLayout() {
           <div className="flex w-28 flex-col space-y-0.5 border-r p-1">
             <Link
               to=""
-              className={`text-xs ${path3 === undefined ? "text-primary" : ""}`}
+              className={`text-xs ${isMatchOverview ? "text-primary" : ""}`}
             >
               Overview
             </Link>
             <Link
               to="routes"
-              className={`text-xs ${path3 === "routes" ? "text-primary" : ""}`}
+              className={`text-xs ${isMatchRoutes ? "text-primary" : ""}`}
             >
               Routes
             </Link>
@@ -84,9 +89,7 @@ export default function AppLayout() {
                 <Link
                   to="authentications/schemes"
                   className={`text-xs ${
-                    path3 === "authentications" && path4 === "schemes"
-                      ? "text-primary"
-                      : ""
+                    isMatchAuthenticationSchemes ? "text-primary" : ""
                   }`}
                 >
                   Schemes
@@ -94,9 +97,7 @@ export default function AppLayout() {
                 <Link
                   to="authentications/settings"
                   className={`text-xs ${
-                    path3 === "authentications" && path4 === "settings"
-                      ? "text-primary"
-                      : ""
+                    isMatchAuthenticationSettings ? "text-primary" : ""
                   }`}
                 >
                   Settings
@@ -109,9 +110,7 @@ export default function AppLayout() {
                 <Link
                   to="storages/textstorages"
                   className={`text-xs ${
-                    path3 === "storages" && path4 === "textstorages"
-                      ? "text-primary"
-                      : ""
+                    isMatchTextStorages ? "text-primary" : ""
                   }`}
                 >
                   Text Storages
@@ -119,9 +118,7 @@ export default function AppLayout() {
                 <Link
                   to="storages/variables"
                   className={`text-xs ${
-                    path3 === "storages" && path4 === "variables"
-                      ? "text-primary"
-                      : ""
+                    isMatchVariables ? "text-primary" : ""
                   }`}
                 >
                   Variables
@@ -130,7 +127,7 @@ export default function AppLayout() {
             </div>
             <Link
               to="logs"
-              className={`text-xs ${path3 === "logs" ? "text-primary" : ""}`}
+              className={`text-xs ${isMatchLogs ? "text-primary" : ""}`}
             >
               Logs
             </Link>

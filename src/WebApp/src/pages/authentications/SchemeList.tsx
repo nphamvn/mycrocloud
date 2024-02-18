@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { AppContext } from "../apps/AppContext";
-import { IScheme } from "./IScheme";
+import { AppContext } from "../apps";
+import IScheme from "./IScheme";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Link } from "react-router-dom";
 

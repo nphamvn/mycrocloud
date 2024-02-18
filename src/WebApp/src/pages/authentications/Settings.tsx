@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { IScheme } from "./IScheme";
-import { AppContext } from "../apps/AppContext";
+import IScheme from "./IScheme";
+import { AppContext } from "../apps";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";

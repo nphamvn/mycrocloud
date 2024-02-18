@@ -1,31 +1,38 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-import Home from "./components/Home";
-import AppList from "./pages/apps/AppList";
-import AppCreate from "./pages/apps/AppCreate";
-import Header from "./components/Header";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import AppLayout from "./pages/apps/AppLayout";
-import AppLogs from "./pages/apps/AppLog";
-import AppOverview from "./pages/apps/AppOverview";
-import RouteIndex from "./pages/routes/RouteIndex";
-import RouteLogs from "./pages/routes/RouteLogs";
-import RouteEdit from "./pages/routes/RouteEdit";
-import RouteCreate from "./pages/routes/RouteCreate";
-import SchemeList from "./pages/authentications/SchemeList";
-import AuthenticationsIndex from "./pages/authentications/Authentication";
-import CreateUpdateScheme from "./pages/authentications/CreateUpdateScheme";
-import AuthenticationSettings from "./pages/authentications/Settings";
-import AppVariables from "./pages/storages/AppVariables";
-import AddUpdateVariables from "./pages/storages/CreateUpdateVariables";
+
+import Header from "./components/Header";
+import Home from "./components/Home";
+import ProtectedPage from "./components/ProtectedPage";
+import DevPage from "./pages/DevPage";
+
+import {
+  AppList,
+  AppOverview,
+  AppCreate,
+  AppLog,
+  AppLayout,
+} from "./pages/apps";
+
+import { RouteIndex, RouteLogs, RouteCreate, RouteEdit } from "./pages/routes";
+
+import {
+  AuthenticationSchemeCreateUpdate,
+  AuthenticationSchemeList,
+  AuthenticationSchemeSettings,
+} from "./pages/authentications";
+import {
+  VariableList,
+  VariableCreateUpdate,
+} from "./pages/storages/VariablesAndSecrets";
 import {
   CreateUpdateTextStorage,
   LogonTextStorage,
   TextStorageList,
 } from "./pages/storages/TextStorages";
-import ProtectedPage from "./components/ProtectedPage";
 
 function App() {
   return (
@@ -41,6 +48,7 @@ function App() {
         <Header />
         <div className="container mx-auto min-h-screen p-2">
           <Routes>
+            {import.meta.env.DEV && <Route path="dev" Component={DevPage} />}
             <Route path="/" Component={Home} />
             <Route
               path="/apps"
@@ -60,16 +68,26 @@ function App() {
                 <Route path=":routeId" Component={RouteEdit} />
                 <Route path=":routeId/logs" Component={RouteLogs} />
               </Route>
-              <Route path="authentications" Component={AuthenticationsIndex}>
-                <Route path="schemes" Component={SchemeList} />
-                <Route path="schemes/new" Component={CreateUpdateScheme} />
+              <Route path="authentications">
+                <Route
+                  index
+                  path="schemes"
+                  Component={AuthenticationSchemeList}
+                />
+                <Route
+                  path="schemes/new"
+                  Component={AuthenticationSchemeCreateUpdate}
+                />
                 <Route
                   path="schemes/:schemeId"
-                  Component={CreateUpdateScheme}
+                  Component={AuthenticationSchemeCreateUpdate}
                 />
-                <Route path="settings" Component={AuthenticationSettings} />
+                <Route
+                  path="settings"
+                  Component={AuthenticationSchemeSettings}
+                />
               </Route>
-              <Route path="logs" Component={AppLogs} />
+              <Route path="logs" Component={AppLog} />
               <Route path="storages">
                 <Route path="textstorages">
                   <Route index Component={TextStorageList} />
@@ -81,11 +99,11 @@ function App() {
                   <Route path=":storageId/logon" Component={LogonTextStorage} />
                 </Route>
                 <Route path="variables">
-                  <Route index Component={AppVariables} />
-                  <Route path="new" Component={AddUpdateVariables} />
+                  <Route index Component={VariableList} />
+                  <Route path="new" Component={VariableCreateUpdate} />
                   <Route
                     path=":variableId/edit"
-                    Component={AddUpdateVariables}
+                    Component={VariableCreateUpdate}
                   />
                 </Route>
               </Route>

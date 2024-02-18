@@ -1,6 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useParams } from "react-router-dom";
-import { AppContext } from "../../apps/AppContext";
+import { AppContext } from "../../apps";
 import { useContext, useEffect, useRef, useState } from "react";
 import ITextStorage from "./ITextStorage";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";

@@ -1,9 +1,9 @@
 import { createContext, useContext } from "react";
-import Route from "./Route";
+import IRoute from "./Route";
 
 export interface IRoutesState {
-  routes: Route[];
-  activeRoute: Route | undefined;
+  routes: IRoute[];
+  activeRoute: IRoute | undefined;
 }
 
 export const initialState: IRoutesState = {
@@ -18,7 +18,7 @@ export interface IRoutesContext {
 
 export type IAction = {
   type: string;
-  payload: Route | Route[];
+  payload: IRoute | IRoute[];
 };
 
 export const RoutesContext = createContext<IRoutesContext>({
@@ -37,14 +37,14 @@ export const SET_ACTIVE_ROUTE = "SET_ACTIVE_ROUTE";
 export const routesReducer = (state: IRoutesState, action: IAction) => {
   switch (action.type) {
     case ADD_ROUTE: {
-      const addRoute = action.payload as Route;
+      const addRoute = action.payload as IRoute;
       return {
         ...state,
         routes: [...state.routes, addRoute],
       };
     }
     case UPDATE_ROUTE: {
-      const updateRoute = action.payload as Route;
+      const updateRoute = action.payload as IRoute;
       return {
         ...state,
         routes: state.routes.map((route) =>
@@ -53,21 +53,21 @@ export const routesReducer = (state: IRoutesState, action: IAction) => {
       };
     }
     case DELETE_ROUTE: {
-      const deleteRoute = action.payload as Route;
+      const deleteRoute = action.payload as IRoute;
       return {
         ...state,
         routes: state.routes.filter((route) => route.id !== deleteRoute.id),
       };
     }
     case SET_ROUTES: {
-      const routes = action.payload as Route[];
+      const routes = action.payload as IRoute[];
       return {
         ...state,
         routes,
       };
     }
     case SET_ACTIVE_ROUTE: {
-      const activeRoute = action.payload as Route;
+      const activeRoute = action.payload as IRoute;
       return {
         ...state,
         activeRoute,

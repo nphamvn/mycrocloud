@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import IVariable from "./Variable";
 import { Link } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
-import { AppContext } from "../apps/AppContext";
+import { AppContext } from "../../apps";
 
 export default function AppVariables() {
   const app = useContext(AppContext)!;

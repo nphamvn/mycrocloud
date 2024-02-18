@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
-import App from "./App";
+import IApp from "./App";
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
 export default function AppList() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [apps, setApps] = useState<App[]>([]);
+  const [apps, setApps] = useState<IApp[]>([]);
   const { getAccessTokenSilently } = useAuth0();
 
   const getApps = async () => {
@@ -15,7 +15,7 @@ export default function AppList() {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    const apps = (await res.json()) as App[];
+    const apps = (await res.json()) as IApp[];
     setApps(apps);
   };
 

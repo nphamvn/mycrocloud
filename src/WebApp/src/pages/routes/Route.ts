@@ -1,11 +1,11 @@
-export default interface Route {
+export default interface IRoute {
   id: number;
   name: string;
   path: string;
   method: string;
   responseType: string;
   responseStatusCode?: number;
-  responseHeaders?: Header[];
+  responseHeaders?: IResponseHeader[];
   responseBodyLanguage?: string;
   responseBody?: string;
   functionHandler?: string;
@@ -15,7 +15,7 @@ export default interface Route {
   useDynamicResponse: boolean;
 }
 
-interface Header {
+export interface IResponseHeader {
   name: string;
   value: string;
 }

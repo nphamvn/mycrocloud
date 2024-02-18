@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState } from "react";
-import { AppContext } from "../apps/AppContext";
+import { AppContext } from "../apps";
 import { useAuth0 } from "@auth0/auth0-react";
-import ILog from "../apps/Log";
 import { Link, useParams } from "react-router-dom";
+import { IRouteLog } from ".";
 
 export default function RouteLogs() {
   const app = useContext(AppContext)!;
   const { getAccessTokenSilently } = useAuth0();
-  const [logs, setLogs] = useState<ILog[]>([]);
+  const [logs, setLogs] = useState<IRouteLog[]>([]);
   const routeId = parseInt(useParams()["routeId"]!);
   useEffect(() => {
     getLogs();
@@ -21,7 +21,7 @@ export default function RouteLogs() {
           Authorization: `Bearer ${accessToken}`,
         },
       })
-    ).json()) as ILog[];
+    ).json()) as IRouteLog[];
     setLogs(logs);
   };
   const handleRefreshClick = async () => {

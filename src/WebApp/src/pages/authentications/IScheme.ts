@@ -1,4 +1,4 @@
-export interface IScheme {
+export default interface IScheme {
   id: number;
   appId: number;
   type: string;

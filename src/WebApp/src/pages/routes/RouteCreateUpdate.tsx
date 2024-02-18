@@ -6,8 +6,8 @@ import {
   useFormContext,
 } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { AppContext } from "../apps/AppContext";
-import Route from "./Route";
+import { AppContext } from "../apps";
+import IRoute from "./Route";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import { bodyLanguages, methods } from "./constants";
 import {
@@ -22,7 +22,7 @@ export default function RouteCreateUpdate({
   route,
   onSubmit,
 }: {
-  route: Route;
+  route: IRoute;
   onSubmit: (data: RouteCreateUpdateInputs) => void;
 }) {
   const app = useContext(AppContext)!;
@@ -346,30 +346,30 @@ function FunctionHandler() {
     getValues,
   } = useFormContext<RouteCreateUpdateInputs>();
   const handlerEditorRef = useRef(null);
-  const [, setHandlerEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
+  const [handlerEditor, setHandlerEditor] =
+    useState<monaco.editor.IStandaloneCodeEditor>();
 
   useEffect(() => {
-    let isMounted = true;
-    if (handlerEditorRef.current && isMounted) {
-      setHandlerEditor((editor) => {
-        if (editor) return editor;
-        const instance = monaco.editor.create(handlerEditorRef.current!, {
+    if (handlerEditorRef) {
+      setHandlerEditor((prev) => {
+        if (prev) return prev;
+
+        const editor = monaco.editor.create(handlerEditorRef.current!, {
           language: "javascript",
-          value:
-            getValues("functionHandler") || `function handler(req, res) {\n}`,
+          value: getValues("functionHandler") || `function handler(req) {\n}`,
           minimap: {
             enabled: false,
           },
         });
-        instance.onDidChangeModelContent(() => {
-          setValue("functionHandler", instance.getValue());
+        editor.onDidChangeModelContent(() => {
+          setValue("functionHandler", editor.getValue());
         });
-        return instance;
+        return editor;
       });
     }
 
     return () => {
-      isMounted = false;
+      handlerEditor?.dispose();
     };
   }, [handlerEditorRef.current]);
 

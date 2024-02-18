@@ -2,12 +2,12 @@ import { useAuth0 } from "@auth0/auth0-react";
 import RouteCreateUpdate from "./RouteCreateUpdate";
 import { RouteCreateUpdateInputs } from "./RouteCreateUpdateInputs";
 import { useContext } from "react";
-import { AppContext } from "../apps/AppContext";
+import { AppContext } from "../apps";
 import { toast } from "react-toastify";
-import Route from "./Route";
+import IRoute from "./Route";
 import { useRoutesContext } from "./RoutesContext";
 
-const newRoute: Route = {
+const newRoute: IRoute = {
   id: 0,
   name: "",
   path: "",
@@ -37,7 +37,7 @@ export default function RouteCreate() {
       body: JSON.stringify(data),
     });
     if (res.ok) {
-      const newRoute = (await res.json()) as Route;
+      const newRoute = (await res.json()) as IRoute;
       dispatch({ type: "ADD_ROUTE", payload: newRoute });
       toast("Route created");
     }

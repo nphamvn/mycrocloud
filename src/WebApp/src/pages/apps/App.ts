@@ -1,4 +1,4 @@
-export default interface App {
+export default interface IApp {
   id: number;
   name: string;
   description?: string;

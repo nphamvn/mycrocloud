@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuth0 } from "@auth0/auth0-react";
-import { AppContext } from "../apps/AppContext";
+import { AppContext } from "../../apps";
 
 type Inputs = {
   name: string;

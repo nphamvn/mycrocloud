@@ -2,9 +2,9 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import RouteCreateUpdate from "./RouteCreateUpdate";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useContext, useEffect, useState } from "react";
-import { AppContext } from "../apps/AppContext";
+import { AppContext } from "../apps";
 import { toast } from "react-toastify";
-import Route from "./Route";
+import IRoute from "./Route";
 import { RouteCreateUpdateInputs } from "./RouteCreateUpdateInputs";
 import { useRoutesContext } from "./RoutesContext";
 
@@ -17,7 +17,7 @@ export default function RouteEdit() {
   const { getAccessTokenSilently } = useAuth0();
   const routeId = parseInt(useParams()["routeId"]!);
   const navigate = useNavigate();
-  const [route, setRoute] = useState<Route>();
+  const [route, setRoute] = useState<IRoute>();
   const handleCloneClick = async () => {
     const accessToken = await getAccessTokenSilently();
     const res = await fetch(`/api/apps/${app.id}/routes/${routeId}/clone`, {
@@ -26,7 +26,7 @@ export default function RouteEdit() {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    const newRoute = (await res.json()) as Route;
+    const newRoute = (await res.json()) as IRoute;
     if (res.ok) {
       toast.success("Route cloned");
       dispatch({ type: "ADD_ROUTE", payload: newRoute });
@@ -63,7 +63,7 @@ export default function RouteEdit() {
             Authorization: `Bearer ${accessToken}`,
           },
         })
-      ).json()) as Route;
+      ).json()) as IRoute;
       setRoute(route);
     };
     getRoute();
@@ -110,7 +110,7 @@ export default function RouteEdit() {
           </button>
         </div>
       </div>
-      <RouteCreateUpdate route={route} onSubmit={onSubmit} />
+      <RouteCreateUpdate key={routeId} route={route} onSubmit={onSubmit} />
     </>
   );
 }
