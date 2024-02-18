@@ -41,13 +41,18 @@ if (app.Environment.IsDevelopment())
     app.Use((context, next) =>
     {
         //Mock header. In production this header should be set from LB
-        var subDomain = context.Request.Host.Host.Split(".")[0];
-        var appId = int.Parse(subDomain["App-".Length..]);
-        var source = builder.Configuration["AppIdSource"]!.Split(":")[0];
-        var name = builder.Configuration["AppIdSource"]!.Split(":")[1];
-        if (source == "Header")
+        var host = context.Request.Host.Host;
+        var pattern = builder.Configuration["Host"]!;
+        var match = System.Text.RegularExpressions.Regex.Match(host, pattern);
+        if (match.Success)
         {
-            context.Request.Headers.Append(name, appId.ToString());
+            var appId = int.Parse(match.Groups[1].Value);
+            var source = builder.Configuration["AppIdSource"]!.Split(":")[0];
+            var name = builder.Configuration["AppIdSource"]!.Split(":")[1];
+            if (source == "Header")
+            {
+                context.Request.Headers.Append(name, appId.ToString());
+            }
         }
         return next(context);
     });

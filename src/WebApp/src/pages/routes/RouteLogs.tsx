@@ -45,6 +45,7 @@ export default function RouteLogs() {
         <thead>
           <tr>
             <th>Timestamp</th>
+            <th>Method</th>
             <th>Path</th>
             <th>Status Code</th>
           </tr>
@@ -53,6 +54,7 @@ export default function RouteLogs() {
           {logs.map((l) => (
             <tr key={l.id} className="border">
               <td>{new Date(l.timestamp).toLocaleString()}</td>
+              <td>{l.method}</td>
               <td>{l.path}</td>
               <td>{l.statusCode}</td>
             </tr>

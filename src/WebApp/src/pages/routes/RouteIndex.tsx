@@ -38,6 +38,7 @@ export default function RouteIndex() {
   const handleNewFolderClick = () => {};
   const newRouteActive = useMatch("/apps/:appId/routes/new");
   const editRouteActive = useMatch("/apps/:appId/routes/:routeId");
+  const logPageActive = useMatch("/apps/:appId/routes/:routeId/logs");
   return (
     <RoutesContext.Provider value={{ state, dispatch }}>
       <div className="flex h-full">
@@ -51,7 +52,7 @@ export default function RouteIndex() {
           <RouteList />
         </div>
         <div className="h-full flex-1">
-          {newRouteActive || editRouteActive ? (
+          {newRouteActive || editRouteActive || logPageActive ? (
             <div className="h-full overflow-y-auto">
               <Outlet key={routeId} />
             </div>

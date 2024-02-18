@@ -11,18 +11,24 @@ services:
       - "5432:5432"
 
   restapi:
-    image: webapp-restapi
+    image: mycrocloud-restapi
     build:
       dockerfile: WebApp.RestApi/Dockerfile
+    container_name: mycrocloud-restapi
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
     ports:
-      - "8080:8080"
+      - "5000:8080"
       
   apigateway:
-    image: webapp-apigateway
+    image: mycrocloud-apigateway
     build: 
       dockerfile: WebApp.MiniApiGateway/Dockerfile
+    container_name: mycrocloud-apigateway
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
     ports:
-      - "8180:8080"
+      - "5001:8080"
 
   seq:
     image: datalust/seq
