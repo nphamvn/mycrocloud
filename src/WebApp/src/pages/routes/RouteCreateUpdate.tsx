@@ -31,23 +31,25 @@ export default function RouteCreateUpdate({
   const forms = useForm<RouteCreateUpdateInputs>({
     resolver: yupResolver(routeCreateUpdateInputsSchema),
     defaultValues: {
-      name: route.name,
-      path: route.path,
-      method: route.method,
-      responseType: route.responseType,
-      responseStatusCode: route.responseStatusCode,
-      responseHeaders: route.responseHeaders!.map((h) => {
-        return {
-          name: h.name,
-          value: h.value,
-        } as HeaderInput;
-      }),
-      responseBodyLanguage: route.responseBodyLanguage,
-      responseBody: route.responseBody,
-      functionHandler: route.functionHandler,
-      functionHandlerDependencies: route.functionHandlerDependencies,
-      requireAuthorization: route.requireAuthorization,
-      useDynamicResponse: route.useDynamicResponse,
+      name: route.name || "",
+      method: route.method || "GET",
+      path: route.path || "",
+      requireAuthorization: route.requireAuthorization || false,
+      responseType: route.responseType || "static",
+      responseStatusCode: route.responseStatusCode || 200,
+      responseHeaders: route.responseHeaders
+        ? route.responseHeaders.map((value) => {
+            return {
+              name: value.name,
+              value: value.value,
+            };
+          })
+        : [],
+      responseBody: route.responseBody || "",
+      responseBodyLanguage: route.responseBodyLanguage || "json",
+      functionHandler: route.functionHandler || "",
+      functionHandlerDependencies: route.functionHandlerDependencies || [],
+      useDynamicResponse: route.useDynamicResponse || false,
     },
   });
   const {
@@ -55,12 +57,11 @@ export default function RouteCreateUpdate({
     handleSubmit,
     formState: { errors },
     watch,
-    getValues,
   } = forms;
-  const responseType = watch("responseType");
 
-  watch(["method", "path"]);
-  const url = appDomain + getValues("path");
+  const responseType = watch("responseType");
+  const url = appDomain + watch("path");
+
   return (
     <FormProvider {...forms}>
       <form className="h-full p-2" onSubmit={handleSubmit(onSubmit)}>
@@ -156,14 +157,12 @@ export default function RouteCreateUpdate({
               <label className="me-1">Type</label>
               <select {...register("responseType")}>
                 <option value="static">static</option>
-                <option value="staticFile">static file</option>
                 <option value="function">function</option>
               </select>
             </div>
 
             <div className="mt-1">
               {responseType === "static" && <StaticResponse />}
-              {responseType === "staticFile" && <StaticFileResponse />}
               {responseType === "function" && <FunctionHandler />}
             </div>
           </section>
@@ -205,28 +204,27 @@ function StaticResponse() {
     useState<monaco.editor.IStandaloneCodeEditor>();
 
   useEffect(() => {
-    let isMounted = true;
-    if (bodyEditorRef.current && isMounted) {
-      setBodyEditor((editor) => {
-        if (editor) return editor;
-        const instance = monaco.editor.create(bodyEditorRef.current!, {
-          language: getValues("responseBodyLanguage"),
-          value: getValues("responseBody"),
-          minimap: {
-            enabled: false,
-          },
-        });
-        instance.onDidChangeModelContent(() => {
-          setValue("responseBody", instance.getValue());
-        });
-        return instance;
+    setBodyEditor((prevEditor) => {
+      if (prevEditor) return prevEditor;
+
+      const instance = monaco.editor.create(bodyEditorRef.current!, {
+        language: getValues("responseBodyLanguage"),
+        value: getValues("responseBody"),
+        minimap: {
+          enabled: false,
+        },
       });
-    }
+      instance.onDidChangeModelContent(() => {
+        setValue("responseBody", instance.getValue());
+      });
+      return instance;
+    });
 
     return () => {
-      isMounted = false;
+      bodyEditor?.dispose();
     };
-  }, [bodyEditorRef.current]);
+  }, []);
+
   const responseBodyLanguage = watch("responseBodyLanguage");
   useEffect(() => {
     if (bodyEditor && responseBodyLanguage) {
@@ -324,21 +322,6 @@ function StaticResponse() {
   );
 }
 
-function StaticFileResponse() {
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext<RouteCreateUpdateInputs>();
-
-  return (
-    <div>
-      <input type="file" {...register("staticFile")} />
-      {errors.staticFile && (
-        <p className="text-red-500">{errors.staticFile.message}</p>
-      )}
-    </div>
-  );
-}
 function FunctionHandler() {
   const {
     formState: { errors },

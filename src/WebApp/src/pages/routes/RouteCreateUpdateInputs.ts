@@ -12,7 +12,6 @@ export type RouteCreateUpdateInputs = {
   functionHandler?: string;
   functionHandlerDependencies?: string[];
   requireAuthorization: boolean;
-  staticFile?: File;
   useDynamicResponse?: boolean;
 };
 
@@ -38,6 +37,5 @@ export const routeCreateUpdateInputsSchema = yup.object({
   functionHandler: yup.string(),
   functionHandlerDependencies: yup.array().of(yup.string().required()),
   requireAuthorization: yup.boolean().required(),
-  staticFile: yup.mixed(),
   useDynamicResponse: yup.boolean(),
 });
