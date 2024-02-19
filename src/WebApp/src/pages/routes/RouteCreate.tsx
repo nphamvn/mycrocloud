@@ -7,21 +7,6 @@ import { toast } from "react-toastify";
 import IRoute from "./Route";
 import { useRoutesContext } from "./RoutesContext";
 
-const newRoute: IRoute = {
-  id: 0,
-  name: "",
-  path: "",
-  method: "GET",
-  responseType: "static",
-  responseStatusCode: 200,
-  responseHeaders: [{ name: "content-type", value: "text/plain" }],
-  responseBodyLanguage: "text/plain",
-  responseBody: "",
-  requireAuthorization: false,
-  status: "active",
-  useDynamicResponse: false,
-};
-
 export default function RouteCreate() {
   const app = useContext(AppContext)!;
   const { dispatch } = useRoutesContext();
@@ -42,5 +27,5 @@ export default function RouteCreate() {
       toast("Route created");
     }
   };
-  return <RouteCreateUpdate route={newRoute} onSubmit={onSubmit} />;
+  return <RouteCreateUpdate onSubmit={onSubmit} />;
 }

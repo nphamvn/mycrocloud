@@ -21,7 +21,7 @@ export default function RouteCreateUpdate({
   route,
   onSubmit,
 }: {
-  route: IRoute;
+  route?: IRoute;
   onSubmit: (data: RouteCreateUpdateInputs) => void;
 }) {
   const app = useContext(AppContext)!;
@@ -30,13 +30,13 @@ export default function RouteCreateUpdate({
   const forms = useForm<RouteCreateUpdateInputs>({
     resolver: yupResolver(routeCreateUpdateInputsSchema),
     defaultValues: {
-      name: route.name || "",
-      method: route.method || "GET",
-      path: route.path || "",
-      requireAuthorization: route.requireAuthorization || false,
-      responseType: route.responseType || "static",
-      responseStatusCode: route.responseStatusCode || 200,
-      responseHeaders: route.responseHeaders
+      name: route?.name || "",
+      method: route?.method || "GET",
+      path: route?.path || "",
+      requireAuthorization: route?.requireAuthorization || false,
+      responseType: route?.responseType || "static",
+      responseStatusCode: route?.responseStatusCode || 200,
+      responseHeaders: route?.responseHeaders
         ? route.responseHeaders.map((value) => {
             return {
               name: value.name,
@@ -44,11 +44,11 @@ export default function RouteCreateUpdate({
             };
           })
         : [],
-      responseBody: route.responseBody || "",
-      responseBodyLanguage: route.responseBodyLanguage || "json",
-      functionHandler: route.functionHandler || "",
-      functionHandlerDependencies: route.functionHandlerDependencies || [],
-      useDynamicResponse: route.useDynamicResponse || false,
+      responseBody: route?.responseBody || "",
+      responseBodyLanguage: route?.responseBodyLanguage || "json",
+      functionHandler: route?.functionHandler || "",
+      functionHandlerDependencies: route?.functionHandlerDependencies || [],
+      useDynamicResponse: route?.useDynamicResponse || false,
     },
   });
   const {
@@ -64,7 +64,7 @@ export default function RouteCreateUpdate({
   return (
     <FormProvider {...forms}>
       <form className="h-full p-2" onSubmit={handleSubmit(onSubmit)}>
-        {route.status === "Blocked" && (
+        {route?.status === "Blocked" && (
           <div className="border border-red-200 bg-red-50 p-2 text-red-700">
             <p>
               This route is blocked because of some reason. Your route will be
@@ -170,7 +170,7 @@ export default function RouteCreateUpdate({
           <button
             type="submit"
             className="border border-transparent bg-cyan-700 px-3 py-1 text-center font-medium text-white focus:z-10 focus:outline-none focus:ring-2 focus:ring-cyan-300 enabled:hover:bg-cyan-800"
-            disabled={route.status === "Blocked"}
+            disabled={route?.status === "Blocked"}
           >
             Save
           </button>
