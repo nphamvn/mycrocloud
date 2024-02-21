@@ -8,6 +8,8 @@ import { getAppDomain } from "./service";
 import { PlayCircleIcon, StopCircleIcon } from "@heroicons/react/24/solid";
 import { ClipboardIcon } from "@heroicons/react/24/outline";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 export default function AppOverview() {
   const app = useContext(AppContext)!;
@@ -169,8 +171,15 @@ type RenameFormInput = {
 function RenameSection() {
   const app = useContext(AppContext)!;
   const { getAccessTokenSilently } = useAuth0();
-
-  const { register, handleSubmit } = useForm<RenameFormInput>({
+  const schema = yup.object({
+    name: yup.string().required(),
+  });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RenameFormInput>({
+    resolver: yupResolver(schema),
     defaultValues: {
       name: app.name,
     },
@@ -195,15 +204,25 @@ function RenameSection() {
       <h3 className="font-semibold">App name</h3>
       <form onSubmit={handleSubmit(onSubmit)} className="mt-1">
         <div className="flex">
-          <input
-            type="text"
-            {...register("name")}
-            className="border px-2 py-0.5"
-            autoComplete="off"
-          />
-          <button type="submit" className="ms-2 bg-primary px-2 text-white">
-            Rename
-          </button>
+          <div>
+            <input
+              type="text"
+              {...register("name")}
+              className="block border px-2 py-0.5"
+              autoComplete="off"
+            />
+            {errors.name && (
+              <span className="text-red-500">{errors.name.message}</span>
+            )}
+          </div>
+          <div className="relative ms-1">
+            <button
+              type="submit"
+              className="absolute top-0 my-auto bg-primary px-2 py-0.5 text-white"
+            >
+              Rename
+            </button>
+          </div>
         </div>
       </form>
     </>
