@@ -9,6 +9,16 @@ services:
       - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+      
+  db-updater:
+    image: mycrocloud-db-updater
+    build:
+      dockerfile: WebApp.Migrations/Dockerfile
+    container_name: mycrocloud-db-updater
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - db
 
   restapi:
     image: mycrocloud-restapi
