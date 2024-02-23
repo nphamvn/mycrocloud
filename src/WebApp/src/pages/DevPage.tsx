@@ -5,11 +5,9 @@ export default function DevPage() {
   return (
     <div>
       <h1>DevPage</h1>
-      <MonacoEditor />
-      <hr />
-      <ChildComponent />
-      <hr />
-      <Dropdown />
+      {false && <MonacoEditor />}
+      {false && <ChildComponent />}
+      {false && <Dropdown />}
     </div>
   );
 }
