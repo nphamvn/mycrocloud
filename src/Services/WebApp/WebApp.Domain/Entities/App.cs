@@ -14,5 +14,4 @@ public class App : BaseEntity
     public AppSettings Settings { get; set; }
     public ICollection<Variable> Variables { get; set; }
     public CorsSettings CorsSettings { get; set; }
-    public string NewProperty { get; set; }
 }
