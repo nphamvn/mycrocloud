@@ -46,6 +46,10 @@ jobs:
         working-directory: src/Services/WebApp/WebApp.Migrations
         run: dotnet restore
 
+      - name: Check if has pending model changes
+        working-directory: src/Services/WebApp/WebApp.MigrationTest
+        run: dotnet test
+      
       - name: Update database
         working-directory: src/Services/WebApp/WebApp.Migrations
         env:
