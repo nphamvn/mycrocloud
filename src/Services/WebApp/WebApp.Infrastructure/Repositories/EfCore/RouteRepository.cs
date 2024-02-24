@@ -39,7 +39,7 @@ public class RouteRepository(AppDbContext dbContext) : IRouteRepository
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<Route> Find(int appId, string method, string path)
+    public Task<Route> Find(int appId, string method, string path)
     {
         throw new NotImplementedException();
     }
