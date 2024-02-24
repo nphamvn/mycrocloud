@@ -4,10 +4,27 @@ updates:
     directory: "src/Services/WebApp/WebApp.Domain"
     schedule:
       interval: "daily"
+
   - package-ecosystem: "nuget"
     directory: "src/Services/WebApp/WebApp.Infrastructure"
     schedule:
       interval: "daily"
+
+  - package-ecosystem: "nuget"
+    directory: "src/Services/WebApp/WebApp.Migrations"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "nuget"
+    directory: "src/Services/WebApp/WebApp.MiniApiGateway"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "nuget"
+    directory: "src/Services/WebApp/WebApp.RestApi"
+    schedule:
+      interval: "daily"
+
   - package-ecosystem: "npm"
     directory: "src/WebApp"
     schedule:
