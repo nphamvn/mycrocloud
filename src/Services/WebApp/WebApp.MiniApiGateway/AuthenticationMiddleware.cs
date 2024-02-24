@@ -37,6 +37,7 @@ public class AuthenticationMiddleware(RequestDelegate next)
                 {
                     continue;
                 }
+                ArgumentNullException.ThrowIfNull(jwt);
                 //TODO: 
                 var claims = jwt.Claims;
                 var user = new Dictionary<string, string>();
@@ -58,7 +59,7 @@ public class AuthenticationMiddleware(RequestDelegate next)
         string issuer, 
         string audience, 
         ICollection<SecurityKey> signingKeys,
-        out JwtSecurityToken jwt)
+        out JwtSecurityToken? jwt)
     {
         var validationParameters = new TokenValidationParameters {
             ValidateIssuer = true,
@@ -76,7 +77,8 @@ public class AuthenticationMiddleware(RequestDelegate next)
             jwt = (JwtSecurityToken)validatedToken;
     
             return true;
-        } catch (SecurityTokenValidationException ex) {
+        } catch (SecurityTokenValidationException)
+        {
             // Log the reason why the token is not valid
             jwt = null;
             return false;
