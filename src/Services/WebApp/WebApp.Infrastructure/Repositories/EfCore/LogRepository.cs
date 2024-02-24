@@ -19,10 +19,10 @@ public class LogRepository(AppDbContext appDbContext) : ILogRepository
         await appDbContext.SaveChangesAsync();
     }
 
-    public async Task<IQueryable<Log>> Search(int appId)
+    public Task<IQueryable<Log>> Search(int appId)
     {
-        return appDbContext.Logs
+        return Task.FromResult(appDbContext.Logs
             .Include(l => l.Route)
-            .Where(l => l.AppId == appId);
+            .Where(l => l.AppId == appId));
     }
 }
