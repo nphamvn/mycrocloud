@@ -48,12 +48,8 @@ jobs:
         working-directory: src/Services/WebApp/WebApp.Migrations
         run: dotnet restore
 
-      - name: Check if has pending model changes
+      - name: Run test
         working-directory: src/Services/WebApp/WebApp.MigrationTest
-        run: dotnet test
-      
-      - name: Update database
-        working-directory: src/Services/WebApp/WebApp.Migrations
         env:
           ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=mycrocloud;Username=postgres;Password=postgres"
-        run: dotnet ef database update
+        run: dotnet test

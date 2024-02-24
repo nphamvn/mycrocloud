@@ -13,4 +13,12 @@ public class UnitTest
         var result = dbContext.Database.HasPendingModelChanges();
         Assert.False(result);
     }
+
+    [Fact]
+    public void Should_Migrate_Database()
+    {
+        var factory = new AppDbContextFactory();
+        var dbContext = factory.CreateDbContext([]);
+        dbContext.Database.Migrate();
+    }
 }
