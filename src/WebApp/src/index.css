@@ -5,18 +5,3 @@
 body {
   @apply text-sm text-slate-900;
 }
-
-/* Tooltip container */
-.tooltip {
-  @apply relative inline-block;
-}
-
-/* Tooltip text */
-.tooltip .tooltiptext {
-  @apply absolute bottom-full left-1/2 hidden w-[120] border;
-}
-
-/* Show the tooltip text when mouse over the tooltip container */
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-}

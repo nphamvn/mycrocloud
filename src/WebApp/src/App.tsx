@@ -7,7 +7,6 @@ import "react-toastify/dist/ReactToastify.css";
 import Header from "./components/Header";
 import Home from "./components/Home";
 import ProtectedPage from "./components/ProtectedPage";
-import DevPage from "./pages/DevPage";
 
 import {
   AppList,
@@ -24,15 +23,19 @@ import {
   AuthenticationSchemeList,
   AuthenticationSchemeSettings,
 } from "./pages/authentications";
+
 import {
   VariableList,
   VariableCreateUpdate,
 } from "./pages/storages/VariablesAndSecrets";
+
 import {
   CreateUpdateTextStorage,
   LogonTextStorage,
   TextStorageList,
 } from "./pages/storages/TextStorages";
+
+import { DevPage, devRoutes } from "./components/devpages";
 
 function App() {
   return (
@@ -48,7 +51,6 @@ function App() {
         <Header />
         <div className="container mx-auto min-h-screen p-2">
           <Routes>
-            {import.meta.env.DEV && <Route path="dev" Component={DevPage} />}
             <Route path="/" Component={Home} />
             <Route
               path="/apps"
@@ -108,6 +110,13 @@ function App() {
                 </Route>
               </Route>
             </Route>
+            {import.meta.env.DEV && (
+              <Route path="_dev" Component={DevPage}>
+                {devRoutes.map((r, i) => (
+                  <Route key={i} path={r.path} Component={r.component} />
+                ))}
+              </Route>
+            )}
           </Routes>
         </div>
         <ToastContainer />
