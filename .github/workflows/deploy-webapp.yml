@@ -10,6 +10,13 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}-webapp
+  WORK_DIR: src/WebApp
+
+  BASE_API_URL: https://dev.api.mycrocloud.online
+  AUTH0_DOMAIN: https://dev-vzxphouz.us.auth0.com
+  AUTH0_CLIENTID: 8YECKUMM3I7ejQgsVky40b5LooQB0YFf
+  AUTH0_AUDIENCE: https://dev.api.mycrocloud.online
+  APIGATEWAY_DOMAIN: https://dev.apigw-__app_id__.mycrocloud.online
 
 jobs:
   build-and-push-image:
@@ -30,16 +37,23 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      
+      - name: Add config file
+        working-directory: ${{env.WORK_DIR}}
+        run: |
+          echo "VITE_BASE_API_URL=${{env.BASE_API_URL}}" > .env.production
+          echo "VITE_AUTH0_DOMAIN=${{env.AUTH0_DOMAIN}}" > .env.production
+          echo "VITE_AUTH0_CLIENTID=${{env.AUTH0_CLIENTID}}" > .env.production
+          echo "VITE_AUTH0_AUDIENCE=${{env.AUTH0_AUDIENCE}}" > .env.production
+          echo "VITE_WEBAPP_APIGATEWAY_DOMAIN=${{env.APIGATEWAY_DOMAIN}}" > .env.production
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: "{{defaultContext}}:src/WebApp"
+          context: "{{defaultContext}}:${{env.WORK_DIR}}"
           file: Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-
-      #- run: echo "tags=${{ steps.meta.outputs.tags }}" >> "$GITHUB_OUTPUT"
 
   deploy:
     runs-on: ubuntu-latest
@@ -52,13 +66,12 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ vars.SSH_HOST }} >> ~/.ssh/known_hosts
-          ssh -Tv ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} -i ~/.ssh/id_rsa
 
       - name: Deploy to dev server
         env:
           TAG: ${{ needs.build-and-push-image.outputs.tags }}
         run: |
-          ssh ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} -i ~/.ssh/id_rsa "cd ${{ vars.WORKDIR }} && docker compose down webapp && docker compose pull webapp && docker compose up -d webapp"
+          ssh ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} -i ~/.ssh/id_rsa "cd ${{ vars.WORK_DIR }} && docker compose down webapp && docker compose pull webapp && docker compose up -d webapp"
       
       - name: cleanup
         run: rm -rf ~/.ssh
