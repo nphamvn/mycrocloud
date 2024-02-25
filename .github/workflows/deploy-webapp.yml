@@ -37,6 +37,7 @@ jobs:
           echo "VITE_AUTH0_CLIENTID=${{env.AUTH0_CLIENTID}}" > .env.production
           echo "VITE_AUTH0_AUDIENCE=${{env.AUTH0_AUDIENCE}}" > .env.production
           echo "VITE_WEBAPP_APIGATEWAY_DOMAIN=${{env.APIGATEWAY_DOMAIN}}" > .env.production
+          cat .env.production
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
