@@ -52,11 +52,10 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ vars.SSH_HOST }} >> ~/.ssh/known_hosts
-
-      - env:
+          
+      - name: Deploy to dev server
+        env:
           TAG: ${{ needs.build-and-push-image.outputs.tags }}
         run: |
           echo "Deploying ${{ env.TAG }} to dev server"
-      # - name: Deploy to dev server
-      #   run: |
-      #     ssh ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} "cd ${{ vars.WORKDIR }} && docker compose pull webapp && docker compose up -d webapp"
+          ssh ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} "cd ${{ vars.WORKDIR }} && docker compose down webapp && docker compose pull webapp && docker compose up -d webapp"
