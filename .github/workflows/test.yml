@@ -19,3 +19,5 @@ jobs:
               run: |
                 pwd
                 ls -la
+                docker --version
+              
