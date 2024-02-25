@@ -58,4 +58,4 @@ jobs:
           TAG: ${{ needs.build-and-push-image.outputs.tags }}
         run: |
           echo "Deploying ${{ env.TAG }} to dev server"
-          ssh ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} "cd ${{ vars.WORKDIR }} && docker compose down webapp && docker compose pull webapp && docker compose up -d webapp"
+          ssh ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} -i ~/.ssh/id_rsa "cd ${{ vars.WORKDIR }} && docker compose down webapp && docker compose pull webapp && docker compose up -d webapp"
