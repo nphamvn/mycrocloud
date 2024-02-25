@@ -30,7 +30,6 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-        run: echo "tags=${{ steps.meta.outputs.tags }}" >> "$GITHUB_OUTPUT"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -40,6 +39,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
 
+      - run: echo "tags=${{ steps.meta.outputs.tags }}" >> "$GITHUB_OUTPUT"
+      
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push-image
