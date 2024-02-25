@@ -29,7 +29,10 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ vars.SSH_HOST }} >> ~/.ssh/known_hosts
-          scp -i ~/.ssh/id_rsa ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }}:~/${{ vars.WORK_DIR }}/config/WebApp/.env .
+          scp -i ~/.ssh/id_rsa ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }}:~/${{ vars.WORK_DIR }}/config/WebApp/.env .env.production
+          pwd
+          ls -la
+          cat .env.production
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
