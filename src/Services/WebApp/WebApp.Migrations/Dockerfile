@@ -14,6 +14,4 @@ COPY WebApp.Infrastructure/ WebApp.Infrastructure/
 COPY WebApp.Domain/ WebApp.Domain/
 COPY WebApp.Migrations/ WebApp.Migrations/
 
-RUN dotnet build WebApp.Migrations/WebApp.Migrations.csproj -c Release
-
 CMD [ "dotnet", "ef", "database", "update", "--project", "WebApp.Migrations/WebApp.Migrations.csproj"]
