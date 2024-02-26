@@ -70,7 +70,7 @@ jobs:
         env:
           TAG: ${{ needs.build-and-push-image.outputs.tags }}
         run: |
-          ssh ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} -i ~/.ssh/id_rsa "cd ${{ vars.WORK_DIR }} && docker compose down webapp && docker compose pull webapp && docker compose up -d webapp"
+          ssh ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} -i ~/.ssh/id_rsa "cd workspaces/mycrocloud-deploy && docker compose down webapp && docker compose pull webapp && docker compose up -d webapp"
       
       - name: cleanup
         run: rm -rf ~/.ssh
