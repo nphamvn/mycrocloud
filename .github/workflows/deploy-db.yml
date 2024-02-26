@@ -1,4 +1,4 @@
-name: Deploy to Api to dev server
+name: Deploy to database to dev server
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}-api
+  IMAGE_NAME: ${{ github.repository }}-db-updater
   WORK_DIR: src/Services/WebApp
 
 jobs:
@@ -37,7 +37,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ${{env.WORK_DIR}}
-          file: ${{env.WORK_DIR}}/WebApp.RestApi/Dockerfile
+          file: ${{env.WORK_DIR}}/WebApp.Migrations/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
 
@@ -57,7 +57,7 @@ jobs:
         env:
           TAG: ${{ needs.build-and-push-image.outputs.tags }}
         run: |
-          ssh ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} -i ~/.ssh/id_rsa "cd workspaces/mycrocloud-deploy && docker compose down api && docker compose pull api && docker compose up -d api"
+          ssh ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} -i ~/.ssh/id_rsa "cd workspaces/mycrocloud-deploy && docker compose down db-updater && docker compose pull db-updater && docker compose up db-updater"
       
       - name: cleanup
         run: rm -rf ~/.ssh
