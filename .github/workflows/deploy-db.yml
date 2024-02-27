@@ -1,4 +1,4 @@
-name: Deploy to database to dev server
+name: Deploy to database
 
 on:
   push:
@@ -57,7 +57,7 @@ jobs:
         env:
           TAG: ${{ needs.build-and-push-image.outputs.tags }}
         run: |
-          ssh ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} -i ~/.ssh/id_rsa "cd workspaces/mycrocloud-deploy && docker compose down db && docker compose pull db-updater && docker compose up db db-updater"
+          ssh ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} -i ~/.ssh/id_rsa "cd workspaces/mycrocloud-deploy && docker compose pull db-updater && docker compose up -d db db-updater"
       
       - name: cleanup
         run: rm -rf ~/.ssh
