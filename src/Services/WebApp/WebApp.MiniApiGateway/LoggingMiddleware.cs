@@ -22,7 +22,8 @@ public class LoggingMiddleware(RequestDelegate next)
                 Path = context.Request.Path,
                 StatusCode = context.Response.StatusCode,
                 AdditionalLogMessage = functionExecutionResult?.AdditionalLogMessage,
-                FunctionExecutionDuration = functionExecutionResult?.Duration
+                FunctionExecutionDuration = functionExecutionResult?.Duration,
+                RemoteIp = context.Request.Headers["CF-Connecting-IP"].ToString()
             });
 
             if (functionExecutionResult?.Exception is { } e)
