@@ -12,4 +12,5 @@ public class Log : BaseEntity
     public int StatusCode { get; set; }
     public string AdditionalLogMessage { get; set; }
     public TimeSpan? FunctionExecutionDuration { get; set; }
+    public string RemoteIp { get; set; }
 }
