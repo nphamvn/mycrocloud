@@ -1,6 +1,7 @@
 export default interface ILog {
   id: string;
   timestamp: string;
+  remoteIp: string;
   appId: number;
   routeId?: number;
   routeName?: string;
