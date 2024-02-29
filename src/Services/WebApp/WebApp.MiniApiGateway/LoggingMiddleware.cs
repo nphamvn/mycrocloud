@@ -7,8 +7,12 @@ namespace WebApp.MiniApiGateway;
 
 public class LoggingMiddleware(RequestDelegate next)
 {
-    public async Task Invoke(HttpContext context, ILogRepository logRepository, IRouteRepository routeRepository)
+    public async Task Invoke(HttpContext context, ILogger<LoggingMiddleware> logger, ILogRepository logRepository, IRouteRepository routeRepository)
     {
+        foreach (var header in context.Request.Headers)
+        {
+            logger.LogInformation("Header: {Key}: {Value}", header.Key, header.Value);
+        }
         await next.Invoke(context);
         if (context.Items["_App"] is App app && !context.Request.IsPreflightRequest())
         {
