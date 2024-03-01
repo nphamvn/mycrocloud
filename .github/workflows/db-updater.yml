@@ -1,0 +1,77 @@
+name: Publish database
+
+on:
+  push:
+    branches:
+      - dev
+    paths: 
+      - 'src/Services/WebApp/WebApp.Domain/**'
+      - 'src/Services/WebApp/WebApp.Infrastructure/**'
+      - 'src/Services/WebApp\WebApp.Migrations/**' 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}-db-updater
+  WORK_DIR: src/Services/WebApp
+
+jobs:
+  #ref: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+  #ref: https://docs.github.com/en/actions/using-containerized-services/creating-postgresql-service-containers#running-jobs-directly-on-the-runner-machine  
+  test-migrations:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:16.2-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.200
+
+      - name: Run test
+        env:
+          ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=mycrocloud;Username=postgres;Password=postgres"
+        run: dotnet test src/Services/WebApp/WebApp.MigrationTest
+
+
+  build-and-push-image:
+    needs: test-migrations
+    runs-on: ubuntu-latest
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{env.WORK_DIR}}
+          file: ${{env.WORK_DIR}}/WebApp.Migrations/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
