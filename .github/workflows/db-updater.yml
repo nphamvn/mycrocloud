@@ -7,7 +7,7 @@ on:
     paths: 
       - 'src/Services/WebApp/WebApp.Domain/**'
       - 'src/Services/WebApp/WebApp.Infrastructure/**'
-      - 'src/Services/WebApp\WebApp.Migrations/**' 
+      - 'src/Services/WebApp/WebApp.Migrations/**' 
 
   workflow_dispatch: 
     
