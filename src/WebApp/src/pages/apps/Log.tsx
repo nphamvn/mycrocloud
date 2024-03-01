@@ -87,7 +87,7 @@ export default function AppLogs() {
         <thead>
           <tr>
             <th>Timestamp</th>
-            <th>RemoteIp</th>
+            <th>Remote Address</th>
             <th>Route Id</th>
             <th>Method</th>
             <th>Path</th>
@@ -98,7 +98,7 @@ export default function AppLogs() {
           {logs.map((l) => (
             <tr key={l.id} className="border">
               <td>{new Date(l.timestamp).toLocaleString()}</td>
-              <td>{l.remoteIp}</td>
+              <td>{l.remoteAddress}</td>
               <td className="tooltip">
                 {l.routeId || "-"}
                 <span className="tooltiptext">

@@ -45,7 +45,7 @@ export default function RouteLogs() {
         <thead>
           <tr>
             <th>Timestamp</th>
-            <th>RemoteIp</th>
+            <th>Remote Address</th>
             <th>Method</th>
             <th>Path</th>
             <th>Status Code</th>
@@ -55,7 +55,7 @@ export default function RouteLogs() {
           {logs.map((l) => (
             <tr key={l.id} className="border">
               <td>{new Date(l.timestamp).toLocaleString()}</td>
-              <td>{l.remoteIp}</td>
+              <td>{l.remoteAddress}</td>
               <td>{l.method}</td>
               <td>{l.path}</td>
               <td>{l.statusCode}</td>

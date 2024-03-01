@@ -23,7 +23,7 @@ public class LogsController(ILogRepository logRepository) : BaseController
         return Ok(logs.Select(l => new {
             l.Id,
             Timestamp = l.CreatedAt,
-            l.RemoteIp,
+            l.RemoteAddress,
             l.RouteId,
             RouteName = l.Route != null ? l.Route.Name : null,
             l.Method,
