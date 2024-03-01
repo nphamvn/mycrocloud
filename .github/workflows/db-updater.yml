@@ -8,6 +8,9 @@ on:
       - 'src/Services/WebApp/WebApp.Domain/**'
       - 'src/Services/WebApp/WebApp.Infrastructure/**'
       - 'src/Services/WebApp\WebApp.Migrations/**' 
+
+  workflow_dispatch: 
+    
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}-db-updater

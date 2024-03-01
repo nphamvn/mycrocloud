@@ -8,6 +8,8 @@ on:
       - 'src/Services/WebApp/WebApp.Domain/**'
       - 'src/Services/WebApp/WebApp.Infrastructure/**'
       - 'src/Services/WebApp/WebApp.MiniApiGateway/**'
+      
+  workflow_dispatch: 
 
 env:
   REGISTRY: ghcr.io

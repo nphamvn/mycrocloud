@@ -6,7 +6,9 @@ on:
       - dev
     paths:
       - 'src/Web/WebApp/**'
-
+  
+  workflow_dispatch: 
+    
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}-webapp

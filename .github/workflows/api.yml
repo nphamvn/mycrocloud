@@ -8,7 +8,9 @@ on:
       - 'src/Services/WebApp/WebApp.Domain/**'
       - 'src/Services/WebApp/WebApp.Infrastructure/**'
       - 'src/Services/WebApp/WebApp.RestApi/**'
-
+      
+  workflow_dispatch: 
+    
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}-api
