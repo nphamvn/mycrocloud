@@ -5,7 +5,7 @@ on:
     branches:
       - dev
     paths:
-      - 'src/Web/WebApp/**'
+      - 'src/WebApp/**'
   
   workflow_dispatch: 
     
