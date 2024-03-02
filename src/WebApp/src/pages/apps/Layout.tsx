@@ -1,4 +1,10 @@
-import { Link, Outlet, useMatch, useParams } from "react-router-dom";
+import {
+  Link,
+  Outlet,
+  useLocation,
+  useMatch,
+  useParams,
+} from "react-router-dom";
 import { AppContext } from ".";
 import { useEffect, useState } from "react";
 import IApp from "./App";
@@ -8,19 +14,27 @@ import { useAuth0 } from "@auth0/auth0-react";
 export default function AppLayout() {
   const { getAccessTokenSilently } = useAuth0();
   const appId = parseInt(useParams()["appId"]!.toString());
+  const { pathname } = useLocation();
   const [app, setApp] = useState<IApp>();
 
-  const isMatchOverview = useMatch("/apps/:appId");
-  const isMatchRoutes = useMatch("/apps/:appId/routes");
-  const isMatchLogs = useMatch("/apps/:appId/logs");
+  const isMatch_Overview = useMatch("/apps/:appId");
+
+  const isMatch_Routes = useMatch("/apps/:appId/routes");
+  const isMatch_Routes_New = useMatch("/apps/:appId/routes/new");
+  const isMatch_Routes_Edit = useMatch("/apps/:appId/routes/:routeId");
+  const isMatch_Routes_Log = useMatch("/apps/:appId/routes/:routeId/logs");
+
   const isMatchAuthenticationSchemes = useMatch(
     "/apps/:appId/authentications/schemes",
   );
   const isMatchAuthenticationSettings = useMatch(
     "/apps/:appId/authentications/settings",
   );
+
   const isMatchTextStorages = useMatch("/apps/:appId/storages/textstorages");
   const isMatchVariables = useMatch("/apps/:appId/storages/variables");
+
+  const isMatchLogs = useMatch("/apps/:appId/logs");
 
   useEffect(() => {
     const getApp = async () => {
@@ -33,27 +47,36 @@ export default function AppLayout() {
         })
       ).json()) as IApp;
       setApp(app);
-      setDocumentTitle();
     };
     getApp();
   }, []);
 
-  function setDocumentTitle() {
+  useEffect(() => {
     if (!app) {
       return;
     }
     let title;
-    if (isMatchOverview) {
+    if (isMatch_Overview) {
       title = app.name + " - Overview";
-    } else if (isMatchRoutes) {
+    } else if (
+      isMatch_Routes ||
+      isMatch_Routes_New ||
+      isMatch_Routes_Edit ||
+      isMatch_Routes_Log
+    ) {
       title = app.name + " - Routes";
+    } else if (isMatchAuthenticationSchemes) {
+      title = app.name + " - Authentications Schemes";
+    } else if (isMatchAuthenticationSettings) {
+      title = app.name + " - Authentications Settings";
     } else if (isMatchLogs) {
       title = app.name + " - Logs";
     } else {
       title = app.name;
     }
     document.title = title;
-  }
+  }, [app, pathname]);
+
   if (!app) {
     return <h1>Loading...</h1>;
   }
@@ -73,13 +96,13 @@ export default function AppLayout() {
           <div className="flex w-28 flex-col space-y-0.5 border-r p-1">
             <Link
               to=""
-              className={`text-xs ${isMatchOverview ? "text-primary" : ""}`}
+              className={`text-xs ${isMatch_Overview ? "text-primary" : ""}`}
             >
               Overview
             </Link>
             <Link
               to="routes"
-              className={`text-xs ${isMatchRoutes ? "text-primary" : ""}`}
+              className={`text-xs ${isMatch_Routes || isMatch_Routes_New || isMatch_Routes_Edit || isMatch_Routes_Log ? "text-primary" : ""}`}
             >
               Routes
             </Link>

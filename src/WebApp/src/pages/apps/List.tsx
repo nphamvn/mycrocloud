@@ -23,6 +23,10 @@ export default function AppList() {
     //TODO: debounce
     getApps();
   }, [searchTerm]);
+
+  useEffect(() => {
+    document.title = "Apps";
+  }, []);
   return (
     <div className="mx-auto mt-2 max-w-4xl p-2">
       <div className="flex items-center">
