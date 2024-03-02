@@ -3,6 +3,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { AppContext } from ".";
 import { IRouteLog } from "../routes";
+import { Link } from "react-router-dom";
 
 type Inputs = {
   accessDateFrom?: string;
@@ -86,24 +87,30 @@ export default function AppLogs() {
       <table className="w-full">
         <thead>
           <tr>
-            <th>Timestamp</th>
-            <th>Remote Address</th>
-            <th>Route Id</th>
-            <th>Method</th>
-            <th>Path</th>
-            <th>Status Code</th>
+            <th className="text-start">Timestamp</th>
+            <th className="text-start">Remote Address</th>
+            <th className="text-start">Route Id</th>
+            <th className="text-start">Method</th>
+            <th className="text-start">Path</th>
+            <th className="text-start">Status Code</th>
           </tr>
         </thead>
         <tbody>
           {logs.map((l) => (
             <tr key={l.id} className="border">
               <td>{new Date(l.timestamp).toLocaleString()}</td>
-              <td>{l.remoteAddress}</td>
-              <td className="tooltip">
-                {l.routeId || "-"}
-                <span className="tooltiptext">
-                  {l.routeName || "NOT FOUND"}
-                </span>
+              <td>{l.remoteAddress || "-"}</td>
+              <td>
+                {l.routeId ? (
+                  <Link
+                    to={`../routes/${l.routeId}`}
+                    className="text-blue-500 underline"
+                  >
+                    {l.routeId}
+                  </Link>
+                ) : (
+                  "-"
+                )}
               </td>
               <td>{l.method}</td>
               <td>{l.path}</td>

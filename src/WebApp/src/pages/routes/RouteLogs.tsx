@@ -44,18 +44,18 @@ export default function RouteLogs() {
       <table className="w-full">
         <thead>
           <tr>
-            <th>Timestamp</th>
-            <th>Remote Address</th>
-            <th>Method</th>
-            <th>Path</th>
-            <th>Status Code</th>
+            <th className="text-start">Timestamp</th>
+            <th className="text-start">Remote Address</th>
+            <th className="text-start">Method</th>
+            <th className="text-start">Path</th>
+            <th className="text-start">Status Code</th>
           </tr>
         </thead>
         <tbody>
           {logs.map((l) => (
             <tr key={l.id} className="border">
               <td>{new Date(l.timestamp).toLocaleString()}</td>
-              <td>{l.remoteAddress}</td>
+              <td>{l.remoteAddress || "-"}</td>
               <td>{l.method}</td>
               <td>{l.path}</td>
               <td>{l.statusCode}</td>
