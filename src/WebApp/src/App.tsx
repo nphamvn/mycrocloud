@@ -35,6 +35,8 @@ import {
   TextStorageList,
 } from "./pages/storages/TextStorages";
 
+import { default as ipRoutes } from "./modules/ip/routes.ts";
+
 import { DevPage, devRoutes } from "./components/devpages";
 import About from "./pages/About";
 import { NotFoundPage } from "./pages/NotFoundPage";
