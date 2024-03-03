@@ -35,6 +35,8 @@ import {
   TextStorageList,
 } from "./pages/storages/TextStorages";
 
+import { default as ipRoutes } from "./modules/ip/routes.ts";
+
 import { DevPage, devRoutes } from "./components/devpages";
 
 function App() {
@@ -110,6 +112,9 @@ function App() {
                 </Route>
               </Route>
             </Route>
+            {ipRoutes.map((r, i) => (
+              <Route key={i} path={`ip/${r.path}`} Component={r.component} />
+            ))}
             {import.meta.env.DEV && (
               <Route path="_dev" Component={DevPage}>
                 {devRoutes.map((r, i) => (
