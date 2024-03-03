@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Install SSH key
         run: |
-            echo ${{secrets.SSH_PRIVATE_KEY}} > .ssh/id_rsa
+            echo "${{secrets.SSH_PRIVATE_KEY}}" > .ssh/id_rsa
             chmod 400 .ssh/id_rsa
             ssh-keyscan -H ${{vars.SSH_HOST}} > .ssh/known_hosts
             ssh -T ${{vars.SSH_USERNAME}}@${{vars.SSH_HOST}}
