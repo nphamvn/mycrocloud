@@ -1,0 +1,20 @@
+name: Deploy
+on: 
+    workflow_dispatch: 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install SSH key
+        run: |
+            echo ${{secrets.SSH_PRIVATE_KEY}} > .ssh/id_rsa
+            chmod 400 .ssh/id_rsa
+            ssh-keyscan -H ${{vars.SSH_HOST}} > .ssh/known_hosts
+            ssh -T ${{vars.SSH_USERNAME}}@${{vars.SSH_HOST}}
+        
+      - name: Deploy
+        working-directory: 
+        run: |
+            ssh ${{vars.SSH_USERNAME}}@${{vars.SSH_HOST}} "cd workspaces/mycrocloud-deploy && docker compose down && docker compose pull && docker compose up -d"
