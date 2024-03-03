@@ -28,14 +28,14 @@ export default function List() {
         <Link to={"new"} className="bg-primary px-3 py-1 text-white">
           Create Storage
         </Link>
-        <table className="mt-2 table-auto">
+        <table className="mt-2 w-full">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Size (bytes)</th>
-              <th>Created At</th>
-              <th>Updated At</th>
-              <th>Actions</th>
+              <th className="text-start">Name</th>
+              <th className="text-start">Size (bytes)</th>
+              <th className="text-start">Created At</th>
+              <th className="text-start">Updated At</th>
+              <th className="text-start">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -43,12 +43,12 @@ export default function List() {
               <tr key={s.id}>
                 <td>{s.name}</td>
                 <td>{s.size}</td>
-                <td>{new Date(s.createdAt).toISOString()}</td>
+                <td>{new Date(s.createdAt).toLocaleString()}</td>
                 <td>
-                  {s.updatedAt ? new Date(s.updatedAt).toISOString() : "-"}
+                  {s.updatedAt ? new Date(s.updatedAt).toLocaleString() : "-"}
                 </td>
-                <td>
-                  <Link to={`${s.id}`} className="text-blue-500">
+                <td className="flex space-x-2 divide-x">
+                  <Link to={`${s.id}`} className=" text-blue-500">
                     Edit
                   </Link>
                   <Link to={`${s.id}/logon`} className="text-blue-500">

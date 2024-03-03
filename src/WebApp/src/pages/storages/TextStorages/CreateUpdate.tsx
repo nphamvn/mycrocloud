@@ -54,24 +54,22 @@ export default function CreateUpdate() {
   };
 
   useEffect(() => {
-    if (storageId) {
-      const getStorage = async () => {
-        const accessToken = await getAccessTokenSilently();
-        const res = await fetch(
-          `/api/apps/${app.id}/textstorages/${storageId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          },
-        );
-        const storage = (await res.json()) as ITextStorage;
-        setValue("name", storage.name);
-        setValue("description", storage.description);
-      };
+    const getStorage = async () => {
+      if (!storageId) {
+        return;
+      }
+      const accessToken = await getAccessTokenSilently();
+      const res = await fetch(`/api/apps/${app.id}/textstorages/${storageId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const storage = (await res.json()) as ITextStorage;
+      setValue("name", storage.name);
+      setValue("description", storage.description);
+    };
 
-      getStorage();
-    }
+    getStorage();
   }, []);
   return (
     <div className="p-3">
@@ -85,6 +83,7 @@ export default function CreateUpdate() {
             type="text"
             {...register("name")}
             className="block w-full border px-2 py-1"
+            autoComplete="off"
           />
           {errors.name && (
             <span className="text-red-500">{errors.name.message}</span>
