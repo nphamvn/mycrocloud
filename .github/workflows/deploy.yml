@@ -16,6 +16,9 @@ jobs:
             ssh -T ${{vars.SSH_USERNAME}}@${{vars.SSH_HOST}}
         
       - name: Deploy
-        working-directory: 
         run: |
-            ssh ${{vars.SSH_USERNAME}}@${{vars.SSH_HOST}} "cd workspaces/mycrocloud-deploy && docker compose down && docker compose pull && docker compose up -d"
+          ssh ${{vars.SSH_USERNAME}}@${{vars.SSH_HOST}} "cd workspaces/mycrocloud-deploy && docker compose down && docker compose pull && docker compose up -d"
+
+      - name: Cleanup
+        run: |
+          rm -r ~/.ssh
