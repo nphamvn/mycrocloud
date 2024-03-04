@@ -39,6 +39,17 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+      - name: Download appsettings.json file
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ vars.SSH_HOST }} >> ~/.ssh/known_hosts
+          scp ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }}:$SOURCE $DESTINATION
+        env:
+          SOURCE: workspaces/mycrocloud-deploy/dev/config/Services/WebApp/WebApp.MiniApiGateway/appsettings.json
+          DESTINATION: ${{env.WORK_DIR}}/WebApp.MiniApiGateway/appsettings.json
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -46,6 +57,10 @@ jobs:
           file: ${{env.WORK_DIR}}/WebApp.MiniApiGateway/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+
+      - name: Cleanup
+        run: rm -r ~/.ssh
+        
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push-image
