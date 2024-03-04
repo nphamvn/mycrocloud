@@ -7,6 +7,7 @@ import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
+import { Alert } from "flowbite-react";
 
 type Inputs = {
   schemes: IScheme[];
@@ -87,6 +88,12 @@ export default function AuthenticationSettings() {
   return (
     <form className="p-2" onSubmit={handleSubmit(onSubmit)}>
       <h1 className="font-bold">Authentication Settings</h1>
+      <Alert color="info" className="mt-2">
+        <span className="font-medium">
+          Drag from the right to the left to enable a scheme. Drag and drop to
+          reorder the enabled schemes.
+        </span>
+      </Alert>
       <div className="mt-3 flex w-full">
         <div className="flex-1 border p-2">
           <h2 className="text-center">Enabled Schemes</h2>
@@ -113,9 +120,15 @@ export default function AuthenticationSettings() {
         <div className="flex-1 border p-2">
           <h2 className="text-center">Available Schemes</h2>
           <div>
-            {availableSchemes.map((s) => (
-              <AvailableItem scheme={s} onEnableClick={handleEnableClick} />
-            ))}
+            {availableSchemes.length ? (
+              availableSchemes.map((s) => (
+                <AvailableItem scheme={s} onEnableClick={handleEnableClick} />
+              ))
+            ) : (
+              <div>
+                <span className="text-gray-400">No schemes available.</span>
+              </div>
+            )}
           </div>
         </div>
         {errors.schemes && (

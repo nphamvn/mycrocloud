@@ -91,7 +91,7 @@ export default function RouteEdit() {
   }
   return (
     <>
-      <div className="mb-1 border-b border-gray-200 dark:border-gray-700">
+      <div className="mb-1 border-b border-gray-200">
         <div className="flex items-end justify-end space-x-1 px-2">
           <Link to={"logs"}>Logs</Link>
           {/* <button className="border px-3 py-0.5">Test</button> */}

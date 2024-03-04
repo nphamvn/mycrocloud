@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { AppContext } from "../../apps";
 import { useContext, useEffect, useRef, useState } from "react";
 import ITextStorage from "./ITextStorage";
@@ -95,8 +95,11 @@ export default function Logon() {
   const [openWriteConfirmModal, setOpenWriteConfirmModal] = useState(false);
 
   return (
-    <div className="p-3">
-      <h1 className="font-bold">
+    <div className="px-3 py-2">
+      <Link to="../" className="text-gray-700">
+        Back
+      </Link>
+      <h1 className="mt-1 font-bold">
         Logon to storage{" "}
         <span className="italic text-primary">{storage?.name}</span>
       </h1>
@@ -177,11 +180,14 @@ function WriteConfirmModal({
             Are you sure you want to overwrite the content of the storage?
           </p>
           <div className="mt-2">
-            <p className="">Please type the name of the storage to confirm.</p>
+            <label className="">
+              Please type <span className="font-semibold">{storage.name}</span>{" "}
+              to confirm.
+            </label>
             <input
               type="text"
               onChange={(e) => setConfirmName(e.target.value)}
-              className="w-full border px-2 py-0.5 text-slate-900"
+              className="mt-2 w-full border px-2 py-1 text-slate-900"
               placeholder={storage.name}
             />
           </div>

@@ -1,0 +1,51 @@
+name: 'Deploy'
+description: 'Deploy to server via SSH'
+inputs:
+  ssh-host:
+    description: 'SSH host'
+    required: true
+
+  ssh-username:
+    description: 'SSH username'
+    required: true
+
+  ssh-key:
+    description: 'SSH private key'
+    required: true
+
+  service:
+    description: 'Service name'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install SSH key
+      shell: bash
+      run: |
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+        chmod 400 ~/.ssh/id_rsa
+        ssh-keyscan -H $SSH_HOST > ~/.ssh/known_hosts
+      env:
+        SSH_HOST: ${{ inputs.ssh-host }}
+        SSH_PRIVATE_KEY: ${{ inputs.ssh-key }}
+
+    - name: Deploy
+      shell: bash
+      run: |
+        ssh $SSH_USERNAME@$SSH_HOST "
+            cd workspaces/mycrocloud-deploy \
+              && docker compose down $SERVICE \
+              && docker compose pull $SERVICE \
+              && docker compose up $SERVICE -d
+            "
+      env:
+        SSH_HOST: ${{ inputs.ssh-host }}
+        SSH_USERNAME: ${{ inputs.ssh-username }}
+        SERVICE: ${{ inputs.service }}
+
+    - name: Cleanup
+      shell: bash
+      run: |
+        rm -r ~/.ssh
