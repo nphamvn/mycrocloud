@@ -24,14 +24,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download .env file from server
-        working-directory: ${{env.WORK_DIR}}
+      - name: Download .env file
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ vars.SSH_HOST }} >> ~/.ssh/known_hosts
-          scp -i ~/.ssh/id_rsa ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }}:~/workspaces/mycrocloud-deploy/config/WebApp/.env .env.production
+          scp ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }}:$SOURCE $DESTINATION
+        env:
+          SOURCE: workspaces/mycrocloud-deploy/dev/config/WebApp/.env
+          DESTINATION: ${{env.WORK_DIR}}/.env
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -53,7 +55,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           
-      - name: cleanup
+      - name: Cleanup
         run: rm -rf ~/.ssh
 
   deploy:
