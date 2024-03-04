@@ -17,6 +17,9 @@ inputs:
     description: 'Service name'
     required: true
 
+env:
+  WORK_DIR: workspaces/mycrocloud-deploy/dev
+
 runs:
   using: composite
   steps:
@@ -35,7 +38,7 @@ runs:
       shell: bash
       run: |
         ssh $SSH_USERNAME@$SSH_HOST "
-            cd workspaces/mycrocloud-deploy \
+            cd $WORK_DIR \
               && docker compose down $SERVICE \
               && docker compose pull $SERVICE \
               && docker compose up $SERVICE -d
