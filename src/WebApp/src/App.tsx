@@ -36,6 +36,7 @@ import {
 } from "./pages/storages/TextStorages";
 
 import { DevPage, devRoutes } from "./components/devpages";
+import AppInfo from "./pages/AppInfo";
 
 function App() {
   return (
@@ -110,6 +111,10 @@ function App() {
                 </Route>
               </Route>
             </Route>
+            <Route
+              path="_appInfo"
+              element={<ProtectedPage children={<AppInfo />} />}
+            />
             {import.meta.env.DEV && (
               <Route path="_dev" Component={DevPage}>
                 {devRoutes.map((r, i) => (
