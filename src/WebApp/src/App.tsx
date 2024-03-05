@@ -37,6 +37,7 @@ import {
 
 import { DevPage, devRoutes } from "./components/devpages";
 import AppInfo from "./pages/AppInfo";
+import AdminGuardPage from "./components/AdminGuardPage";
 
 function App() {
   return (
@@ -122,6 +123,7 @@ function App() {
                 ))}
               </Route>
             )}
+            <Route path="/admin" element={<AdminGuardPage children={<h1>Admin</h1>} />} />
           </Routes>
         </div>
         <ToastContainer />
