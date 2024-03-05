@@ -36,6 +36,7 @@ import {
 } from "./pages/storages/TextStorages";
 
 import { DevPage, devRoutes } from "./components/devpages";
+import AdminGuardPage from "./components/AdminGuardPage";
 
 function App() {
   return (
@@ -117,6 +118,7 @@ function App() {
                 ))}
               </Route>
             )}
+            <Route path="/admin" element={<AdminGuardPage children={<h1>Admin</h1>} />} />
           </Routes>
         </div>
         <ToastContainer />
