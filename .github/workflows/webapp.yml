@@ -54,6 +54,8 @@ jobs:
           context: ${{env.WORK_DIR}}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+          build-args: 
+            COMMIT_HASH:${{github.sha}}
           
       - name: Cleanup
         run: rm -rf ~/.ssh
