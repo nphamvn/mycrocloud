@@ -33,7 +33,7 @@ jobs:
           scp ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }}:$SOURCE $DESTINATION
         env:
           SOURCE: workspaces/mycrocloud-deploy/dev/config/WebApp/.env
-          DESTINATION: ${{env.WORK_DIR}}/
+          DESTINATION: ${{env.WORK_DIR}}/.env.production
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
