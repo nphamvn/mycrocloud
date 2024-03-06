@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      __COMMIT_HASH__: JSON.stringify(env.VITE_COMMIT_HASH),
+      __COMMIT_HASH__: JSON.stringify(process.env.COMMIT_HASH),
     },
   };
 });

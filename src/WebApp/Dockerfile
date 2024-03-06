@@ -4,7 +4,7 @@ COPY package.json ./
 RUN npm install
 COPY . .
 ARG COMMIT_HASH
-ENV VITE_COMMIT_HASH=$COMMIT_HASH
+ENV COMMIT_HASH=$COMMIT_HASH
 RUN npm run build
 
 FROM nginx:1.25-alpine
