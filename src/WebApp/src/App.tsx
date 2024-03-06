@@ -37,6 +37,7 @@ import {
 
 import { DevPage, devRoutes } from "./components/devpages";
 import About from "./pages/About";
+import { NotFoundPage } from "./pages/NotFoundPage";
 
 function App() {
   return (
@@ -114,6 +115,10 @@ function App() {
             <Route
               path="_about"
               element={<ProtectedPage children={<About />} />}
+            />
+            <Route
+              path="*"
+              Component={NotFoundPage}
             />
             {import.meta.env.DEV && (
               <Route path="_dev" Component={DevPage}>
