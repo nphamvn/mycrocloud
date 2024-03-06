@@ -7,6 +7,7 @@ using WebApp.Domain.Repositories;
 using WebApp.Infrastructure.Repositories.EfCore;
 using WebApp.RestApi.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,5 +82,13 @@ app.MapHealthChecks("/healthz");
 app.Map("ping", () => "pong");
 app.Map("me", (ClaimsPrincipal user) => user.GetUserId())
     .RequireAuthorization();
+
+app.MapGet("_assembly", ()  => {
+    var assembly = Assembly.GetExecutingAssembly();
+    return new
+    {
+        assembly.GetName().Name,
+    };
+}).RequireAuthorization();
 
 app.Run();
