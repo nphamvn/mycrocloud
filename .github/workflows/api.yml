@@ -81,9 +81,10 @@ jobs:
 
       - name: Check
         run: |
-          export ACCESS_TOKEN = $(curl --request POST \
+          export ACCESS_TOKEN=$(curl --request POST \
             --url ${{ vars.AUTH0_DOMAIN }}/oauth/token \
             --header 'content-type: application/json' \
-            --data '{"client_id":"${{ vars.M2M_APP_CLIENT_ID }}","client_secret":"${{ secrets.M2M_APP_CLIENT_SECRET }}","audience":"${{ vars.API_IDENTIFIER }}","grant_type":"client_credentials"}'
-            | grep -o '"access_token": *"[^"]*"' | grep -o '"[^"]*"$' | sed 's/"//g')
-          echo $ACCESS_TOKEN
+            --data '{"client_id":"${{ vars.M2M_APP_CLIENT_ID }}","client_secret":"${{ secrets.M2M_APP_CLIENT_SECRET }}","audience":"${{ vars.API_IDENTIFIER }}","grant_type":"client_credentials"}' |
+            grep -o '"access_token": *"[^"]*"' | grep -o '"[^"]*"$' | sed 's/"//g')
+
+          curl -X GET 'https://api.mycrocloud.online/_assembly' -H "Authorization: Bearer $ACCESS_TOKEN"
