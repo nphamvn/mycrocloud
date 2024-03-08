@@ -14,7 +14,9 @@ COPY WebApp.RestApi/ WebApp.RestApi/
 COPY WebApp.Domain/ WebApp.Domain/
 COPY WebApp.Infrastructure/ WebApp.Infrastructure/
 
-RUN dotnet publish WebApp.RestApi/WebApp.RestApi.csproj -c Release -o /app
+ARG COMMIT_HASH
+
+RUN dotnet publish WebApp.RestApi/WebApp.RestApi.csproj /p:SourceRevisionId=$COMMIT_HASH -c Release -o /app
 
 # final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0

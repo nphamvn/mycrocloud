@@ -87,7 +87,7 @@ app.MapGet("_assembly", ()  => {
     var assembly = Assembly.GetExecutingAssembly();
     return new
     {
-        assembly.GetName().Name,
+        assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
     };
 }).RequireAuthorization();
 

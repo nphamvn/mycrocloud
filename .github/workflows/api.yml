@@ -57,6 +57,8 @@ jobs:
           file: ${{env.WORK_DIR}}/WebApp.RestApi/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            COMMIT_HASH=${{ github.sha }}
 
       - name: Cleanup
         run: rm -r ~/.ssh
