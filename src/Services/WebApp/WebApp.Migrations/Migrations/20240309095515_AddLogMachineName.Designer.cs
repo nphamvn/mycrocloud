@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebApp.Infrastructure.Repositories.EfCore;
@@ -12,9 +13,11 @@ using WebApp.Infrastructure.Repositories.EfCore;
 namespace WebApp.Migrations.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240309095515_AddLogMachineName")]
+    partial class AddLogMachineName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -117,6 +120,9 @@ namespace WebApp.Migrations.Migrations
                     b.Property<TimeSpan?>("FunctionExecutionDuration")
                         .HasColumnType("interval");
 
+                    b.Property<string>("MachineName")
+                        .HasColumnType("text");
+
                     b.Property<string>("Method")
                         .HasColumnType("text");
 
@@ -126,8 +132,8 @@ namespace WebApp.Migrations.Migrations
                     b.Property<string>("RemoteAddress")
                         .HasColumnType("text");
 
-                    b.Property<long?>("RequestContentLength")
-                        .HasColumnType("bigint");
+                    b.Property<int>("RequestContentLength")
+                        .HasColumnType("integer");
 
                     b.Property<string>("RequestContentType")
                         .HasColumnType("text");
@@ -139,6 +145,9 @@ namespace WebApp.Migrations.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("RequestHeaders")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RequestPayload")
                         .HasColumnType("text");
 
                     b.Property<int?>("RouteId")

@@ -13,4 +13,9 @@ public class Log : BaseEntity
     public string AdditionalLogMessage { get; set; }
     public TimeSpan? FunctionExecutionDuration { get; set; }
     public string RemoteAddress { get; set; }
+    public long? RequestContentLength { get; set; }
+    public string RequestContentType { get; set; }
+    public string RequestCookie { get; set; }
+    public string RequestFormContent { get; set; }
+    public string RequestHeaders { get; set; }
 }

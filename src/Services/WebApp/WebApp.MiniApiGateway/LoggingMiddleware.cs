@@ -1,4 +1,5 @@
-﻿using WebApp.Domain.Entities;
+﻿using System.Text.Json;
+using WebApp.Domain.Entities;
 using WebApp.Domain.Enums;
 using WebApp.Domain.Repositories;
 using Route = WebApp.Domain.Entities.Route;
@@ -18,6 +19,17 @@ public class LoggingMiddleware(RequestDelegate next)
         {
             var route = context.Items["_Route"] as Route;
             var functionExecutionResult = context.Items["_FunctionExecutionResult"] as FunctionExecutionResult;
+            Dictionary<string, string>? formDataDict = null;
+            if (context.Request.HasFormContentType)
+            {
+                formDataDict = [];
+                var formData = context.Request.Form;
+                foreach (var keyValuePair in formData)
+                {
+                    formDataDict[keyValuePair.Key] = keyValuePair.Value;
+                }
+            }
+
             await logRepository.Add(new Log
             {
                 App = app,
@@ -27,7 +39,12 @@ public class LoggingMiddleware(RequestDelegate next)
                 StatusCode = context.Response.StatusCode,
                 AdditionalLogMessage = functionExecutionResult?.AdditionalLogMessage,
                 FunctionExecutionDuration = functionExecutionResult?.Duration,
-                RemoteAddress = context.Request.Headers["CF-Connecting-IP"].ToString()
+                RemoteAddress = context.Request.Headers["CF-Connecting-IP"].ToString(),
+                RequestContentLength = context.Request.ContentLength,
+                RequestContentType = context.Request.ContentType,
+                RequestCookie = JsonSerializer.Serialize(context.Request.Cookies.ToDictionary()),
+                RequestFormContent = formDataDict != null ? JsonSerializer.Serialize(formDataDict): null,
+                RequestHeaders = JsonSerializer.Serialize(context.Request.Headers.ToDictionary()),
             });
 
             if (functionExecutionResult?.Exception is { } e)
