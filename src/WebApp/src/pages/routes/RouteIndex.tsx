@@ -8,7 +8,6 @@ import {
   routesReducer,
   useRoutesContext,
 } from "./RoutesContext";
-import { sampleRoute } from "./constants";
 
 export default function RouteIndex() {
   const app = useContext(AppContext)!;
@@ -35,17 +34,6 @@ export default function RouteIndex() {
     getRoutes();
   }, []);
 
-  const handleOnNewClick = () => {
-    dispatch({
-      type: "SET_ROUTES",
-      payload: [...state.routes, sampleRoute],
-    });
-    dispatch({
-      type: "SET_ACTIVE_ROUTE",
-      payload: sampleRoute,
-    });
-    navigate("new");
-  };
   const newRouteActive = useMatch("/apps/:appId/routes/new");
   const editRouteActive = useMatch("/apps/:appId/routes/:routeId");
   const logPageActive = useMatch("/apps/:appId/routes/:routeId/logs");
@@ -56,7 +44,9 @@ export default function RouteIndex() {
         <div className="w-48 border-r p-1">
           <button
             type="button"
-            onClick={handleOnNewClick}
+            onClick={() => {
+              navigate("new");
+            }}
             className="mt-1 w-full bg-primary py-1 text-white disabled:opacity-50"
             disabled={newRouteActive !== null}
           >

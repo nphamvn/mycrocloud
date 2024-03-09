@@ -11,10 +11,7 @@ import { useNavigate } from "react-router-dom";
 export default function RouteCreate() {
   const navigate = useNavigate();
   const app = useContext(AppContext)!;
-  const {
-    state: { activeRoute },
-    dispatch,
-  } = useRoutesContext();
+  const { dispatch } = useRoutesContext();
 
   const { getAccessTokenSilently } = useAuth0();
   const onSubmit = async (data: RouteCreateUpdateInputs) => {
@@ -29,7 +26,6 @@ export default function RouteCreate() {
     });
     if (res.ok) {
       const newRoute = (await res.json()) as IRoute;
-      dispatch({ type: "DELETE_ROUTE", payload: activeRoute! });
       dispatch({ type: "ADD_ROUTE", payload: newRoute });
       toast("Route created");
       navigate(`../${newRoute.id}`);
