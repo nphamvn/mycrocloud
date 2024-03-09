@@ -56,6 +56,9 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           build-args: |
             COMMIT_HASH=${{ github.sha }}
+          #https://docs.docker.com/build/cache/backends/gha/#using-dockerbuild-push-action
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           
       - name: Cleanup
         run: rm -rf ~/.ssh
