@@ -2,13 +2,13 @@ import { Outlet, useNavigate, useParams, useMatch } from "react-router-dom";
 import { useContext, useEffect, useReducer } from "react";
 import IRoute from "./Route";
 import { AppContext } from "../apps";
-import { Dropdown } from "flowbite-react";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   RoutesContext,
   routesReducer,
   useRoutesContext,
 } from "./RoutesContext";
+import { sampleRoute } from "./constants";
 
 export default function RouteIndex() {
   const app = useContext(AppContext)!;
@@ -35,29 +35,42 @@ export default function RouteIndex() {
     getRoutes();
   }, []);
 
-  const handleNewFolderClick = () => {};
+  const handleOnNewClick = () => {
+    dispatch({
+      type: "SET_ROUTES",
+      payload: [...state.routes, sampleRoute],
+    });
+    dispatch({
+      type: "SET_ACTIVE_ROUTE",
+      payload: sampleRoute,
+    });
+    navigate("new");
+  };
   const newRouteActive = useMatch("/apps/:appId/routes/new");
   const editRouteActive = useMatch("/apps/:appId/routes/:routeId");
   const logPageActive = useMatch("/apps/:appId/routes/:routeId/logs");
+
   return (
     <RoutesContext.Provider value={{ state, dispatch }}>
       <div className="flex h-full">
         <div className="w-48 border-r p-1">
-          <Dropdown size="xs" label="New">
-            <Dropdown.Item onClick={() => navigate("new")}>Route</Dropdown.Item>
-            <Dropdown.Item disabled onClick={handleNewFolderClick}>
-              Folder
-            </Dropdown.Item>
-          </Dropdown>
+          <button
+            type="button"
+            onClick={handleOnNewClick}
+            className="mt-1 w-full bg-primary py-1 text-white disabled:opacity-50"
+            disabled={newRouteActive !== null}
+          >
+            New
+          </button>
           <RouteList />
         </div>
-        <div className="h-full flex-1">
+        <div className="flex-1">
           {newRouteActive || editRouteActive || logPageActive ? (
-            <div className="h-full overflow-y-auto">
+            <div className="">
               <Outlet key={routeId} />
             </div>
           ) : (
-            <div>
+            <div className="flex h-screen items-center justify-center">
               Click New button to create new route or click route to edit.
             </div>
           )}
@@ -92,11 +105,11 @@ function RouteList() {
 }
 function RouteItem({ route }: { route: IRoute }) {
   const methodTextColors = new Map<string, string>([
-    ["GET", "text-sky-400"],
-    ["POST", "text-orange-400"],
-    ["PUT", "text-rose-400"],
-    ["DELETE", "text-red-400"],
-    ["PATCH", "text-yellow-400"],
+    ["GET", "text-sky-500"],
+    ["POST", "text-orange-500"],
+    ["PUT", "text-green-500"],
+    ["DELETE", "text-red-500"],
+    ["PATCH", "text-yellow-500"],
   ]);
   return (
     <div className="flex items-center p-0.5" style={{ cursor: "pointer" }}>

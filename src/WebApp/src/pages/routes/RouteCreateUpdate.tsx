@@ -9,7 +9,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { AppContext } from "../apps";
 import IRoute from "./Route";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
-import { bodyLanguages, methods } from "./constants";
+import { bodyLanguages, methods, sampleRoute } from "./constants";
 import {
   RouteCreateUpdateInputs,
   routeCreateUpdateInputsSchema,
@@ -24,19 +24,20 @@ export default function RouteCreateUpdate({
   route?: IRoute;
   onSubmit: (data: RouteCreateUpdateInputs) => void;
 }) {
+  route = route || sampleRoute;
   const app = useContext(AppContext)!;
   const appDomain = apiGatewayDomain.replace("__app_id__", app.id.toString());
 
   const forms = useForm<RouteCreateUpdateInputs>({
     resolver: yupResolver(routeCreateUpdateInputsSchema),
     defaultValues: {
-      name: route?.name || "",
-      method: route?.method || "GET",
-      path: route?.path || "",
-      requireAuthorization: route?.requireAuthorization || false,
-      responseType: route?.responseType || "static",
-      responseStatusCode: route?.responseStatusCode || 200,
-      responseHeaders: route?.responseHeaders
+      name: route.name,
+      method: route.method,
+      path: route.path,
+      requireAuthorization: route.requireAuthorization,
+      responseType: route.responseType,
+      responseStatusCode: route.responseStatusCode,
+      responseHeaders: route.responseHeaders
         ? route.responseHeaders.map((value) => {
             return {
               name: value.name,
@@ -44,11 +45,11 @@ export default function RouteCreateUpdate({
             };
           })
         : [],
-      responseBody: route?.responseBody || "",
-      responseBodyLanguage: route?.responseBodyLanguage || "json",
-      functionHandler: route?.functionHandler || "",
-      functionHandlerDependencies: route?.functionHandlerDependencies || [],
-      useDynamicResponse: route?.useDynamicResponse || false,
+      responseBody: route.responseBody,
+      responseBodyLanguage: route.responseBodyLanguage,
+      functionHandler: route.functionHandler,
+      functionHandlerDependencies: route.functionHandlerDependencies || [],
+      useDynamicResponse: route.useDynamicResponse,
     },
   });
   const {

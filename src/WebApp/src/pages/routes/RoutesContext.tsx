@@ -18,7 +18,7 @@ export interface IRoutesContext {
 
 export type IAction = {
   type: string;
-  payload: IRoute | IRoute[];
+  payload: IRoute | IRoute[] | undefined;
 };
 
 export const RoutesContext = createContext<IRoutesContext>({
