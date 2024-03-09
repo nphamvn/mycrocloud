@@ -97,9 +97,9 @@ jobs:
           echo COMMIT_HASH=$COMMIT_HASH
           echo sha=${{ github.sha }}
           if [ $COMMIT_HASH == ${{ github.sha }} ]
+          then
           echo passed
           exit 0
-          then
           else
           echo passed
           exit 1
