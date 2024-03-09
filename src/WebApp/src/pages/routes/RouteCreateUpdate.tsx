@@ -136,11 +136,14 @@ export default function RouteCreateUpdate({
             <div className="mt-1">
               <div>
                 <input
+                  id="requireAuthorization"
                   type="checkbox"
                   {...register("requireAuthorization")}
                   className="inline-block border border-gray-200 px-2 py-1"
                 />
-                <label className="mt-2">Require Authorization</label>
+                <label htmlFor="requireAuthorization" className="mt-2">
+                  Require Authorization
+                </label>
               </div>
               {errors.requireAuthorization && (
                 <span className="text-red-500">
@@ -293,11 +296,14 @@ function StaticResponse() {
         <div className="mt-1 flex">
           <div>
             <input
+              id="useDynamicResponse"
               type="checkbox"
               {...register("useDynamicResponse")}
               className="inline-block border border-gray-200 px-2 py-1"
             />
-            <label className="mt-2">Use dynamic response</label>
+            <label htmlFor="useDynamicResponse" className="mt-2">
+              Use dynamic response
+            </label>
           </div>
           <div className="ms-auto">
             <label htmlFor="responseBodyLanguage">Editor format</label>
