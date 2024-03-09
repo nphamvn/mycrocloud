@@ -248,10 +248,12 @@ function StaticResponse() {
           type="number"
           {...register("responseStatusCode")}
           autoComplete="none"
-          className="w-1/6 border border-gray-200 px-2 py-1"
+          className="block w-1/6 border border-gray-200 px-2 py-1"
         />
         {errors.responseStatusCode && (
-          <span>{errors.responseStatusCode.message}</span>
+          <span className="text-red-500">
+            {errors.responseStatusCode.message}
+          </span>
         )}
       </div>
       <div className="mt-2">

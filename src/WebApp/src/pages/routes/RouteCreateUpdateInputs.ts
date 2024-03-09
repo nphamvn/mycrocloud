@@ -21,8 +21,8 @@ export interface HeaderInput {
 }
 
 export const routeCreateUpdateInputsSchema = yup.object({
-  name: yup.string().required(),
-  path: yup.string().required(),
+  name: yup.string().required("Name is required"),
+  path: yup.string().required().matches(/^\//, "Path must start with /"),
   method: yup.string().required(),
   responseType: yup.string().required(),
   responseStatusCode: yup.number(),

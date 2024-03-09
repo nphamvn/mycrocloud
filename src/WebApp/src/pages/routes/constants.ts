@@ -17,11 +17,14 @@ export const bodyLanguages = [
 
 export const sampleRoute: IRoute = {
   id: 0,
+  status: "Active",
   name: "untitled",
   method: "GET",
-  path: "",
-  status: "Active",
-  responseType: "static",
-  useDynamicResponse: false,
+  path: "/",
   requireAuthorization: false,
+  responseType: "static",
+  responseStatusCode: 200,
+  responseHeaders: [{ name: "content-type", value: "text/plain" }],
+  useDynamicResponse: false,
+  responseBodyLanguage: "plaintext",
 };
