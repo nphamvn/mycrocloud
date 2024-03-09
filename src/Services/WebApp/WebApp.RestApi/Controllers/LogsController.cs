@@ -30,7 +30,12 @@ public class LogsController(ILogRepository logRepository) : BaseController
             l.Path,
             l.StatusCode,
             l.FunctionExecutionDuration,
-            l.AdditionalLogMessage
+            l.AdditionalLogMessage,
+            l.RequestContentLength,
+            l.RequestContentType,
+            l.RequestCookie,
+            l.RequestFormContent,
+            l.RequestHeaders
         }));
     }
 }

@@ -10,4 +10,9 @@ export default interface ILog {
   statusCode: number;
   additionalLogMessage?: string;
   functionExecutionDuration?: number;
+  requestContentLength?: number;
+  requestContentType?: string;
+  requestCookie?: string;
+  requestFormContent?: string;
+  requestHeaders?: string;
 }
