@@ -84,41 +84,49 @@ export default function AppLogs() {
         </div>
       </form>
       <hr />
-      <table className="w-full">
-        <thead>
-          <tr>
-            <th className="text-start">Timestamp</th>
-            <th className="text-start">Remote Address</th>
-            <th className="text-start">Route Id</th>
-            <th className="text-start">Method</th>
-            <th className="text-start">Path</th>
-            <th className="text-start">Status Code</th>
-          </tr>
-        </thead>
-        <tbody>
-          {logs.map((l) => (
-            <tr key={l.id} className="border">
-              <td>{new Date(l.timestamp).toLocaleString()}</td>
-              <td>{l.remoteAddress || "-"}</td>
-              <td>
-                {l.routeId ? (
-                  <Link
-                    to={`../routes/${l.routeId}`}
-                    className="text-blue-500 underline"
-                  >
-                    {l.routeId}
-                  </Link>
-                ) : (
-                  "-"
-                )}
-              </td>
-              <td>{l.method}</td>
-              <td>{l.path}</td>
-              <td>{l.statusCode}</td>
+      <div className="overflow-x-scroll">
+        <table className="w-auto">
+          <thead>
+            <tr>
+              <th className="text-start">Timestamp</th>
+              <th className="text-start">Remote Address</th>
+              <th className="text-start">Route Id</th>
+              <th className="text-start">Method</th>
+              <th className="text-start">Path</th>
+              <th className="text-start">Request Content Length</th>
+              <th className="text-start">Request Content Type</th>
+              <th className="text-start">requestCookie</th>
+              <th className="text-start">Status Code</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {logs.map((l) => (
+              <tr key={l.id} className="border">
+                <td>{new Date(l.timestamp).toLocaleString()}</td>
+                <td>{l.remoteAddress || "-"}</td>
+                <td>
+                  {l.routeId ? (
+                    <Link
+                      to={`../routes/${l.routeId}`}
+                      className="text-blue-500 underline"
+                    >
+                      {l.routeId}
+                    </Link>
+                  ) : (
+                    "-"
+                  )}
+                </td>
+                <td>{l.method}</td>
+                <td>{l.path}</td>
+                <td>{l.requestContentLength || "-"}</td>
+                <td>{l.requestContentType || "-"}</td>
+                <td>{l.requestCookie || "-"}</td>
+                <td>{l.statusCode}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }
