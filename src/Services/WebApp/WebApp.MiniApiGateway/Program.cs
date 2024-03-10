@@ -29,10 +29,18 @@ builder.Services.AddSingleton(new ScriptCollection
     { "lodash", File.ReadAllText("Scripts/lodash.min.js")}
 });
 builder.Services.AddSingleton<ICachedOpenIdConnectionSigningKeys, MemoryCachedOpenIdConnectionSigningKeys>();
-
+builder.Services.AddHealthChecks();
 var app = builder.Build();
 
 app.UseHttpLogging();
+app.UseWhen(context => context.Request.Host.Host == builder.Configuration["Host"], (config) =>
+{
+    config.UseHealthChecks("/healthz");
+    config.Run(async context =>
+    {
+        await context.Response.CompleteAsync();
+    });
+});
 
 app.UseLoggingMiddleware();
 
@@ -42,7 +50,7 @@ if (app.Environment.IsDevelopment())
     {
         //Mock header. In production this header should be set from LB
         var host = context.Request.Host.Host;
-        var pattern = builder.Configuration["Host"]!;
+        var pattern = builder.Configuration["HostRegex"]!;
         var match = System.Text.RegularExpressions.Regex.Match(host, pattern);
         if (match.Success)
         {
