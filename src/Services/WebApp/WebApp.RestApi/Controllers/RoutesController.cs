@@ -36,6 +36,9 @@ public class RoutesController(IRouteService routeService,
             route.Name,
             route.Method,
             route.Path,
+            route.RequestQuerySchema,
+            route.RequestHeaderSchema,
+            route.RequestBodySchema,
             route.ResponseType,
             route.ResponseStatusCode,
             ResponseHeaders = (route.ResponseHeaders ?? []).Select(h => new {
@@ -65,7 +68,7 @@ public class RoutesController(IRouteService routeService,
     [HttpPost]
     public async Task<IActionResult> Create(int appId, RouteCreateUpdateRequest route)
     {
-        var entity = route.ToEntity();
+        var entity = route.ToCreateEntity();
         await routeService.Create(appId, entity);
         return Created("", entity);
     }
@@ -79,7 +82,7 @@ public class RoutesController(IRouteService routeService,
             // Do not allow editing blocked route
             return BadRequest();
         }
-        route.ToEntity(currentRoute);
+        route.ToUpdateEntity(currentRoute);
         await routeService.Update(id, currentRoute);
         return NoContent();
     }

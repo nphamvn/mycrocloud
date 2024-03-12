@@ -4,6 +4,9 @@ export type RouteCreateUpdateInputs = {
   name: string;
   path: string;
   method: string;
+  requestQuerySchema?: string;
+  requestHeaderSchema?: string;
+  requestBodySchema?: string;
   responseType: string;
   responseStatusCode?: number;
   responseHeaders?: HeaderInput[];
@@ -24,6 +27,9 @@ export const routeCreateUpdateInputsSchema = yup.object({
   name: yup.string().required("Name is required"),
   path: yup.string().required().matches(/^\//, "Path must start with /"),
   method: yup.string().required(),
+  requestQuerySchema: yup.string(),
+  requestHeaderSchema: yup.string(),
+  requestBodySchema: yup.string(),
   responseType: yup.string().required(),
   responseStatusCode: yup.number(),
   responseHeaders: yup.array().of(

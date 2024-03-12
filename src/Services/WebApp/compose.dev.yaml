@@ -10,11 +10,11 @@ services:
     ports:
       - "5432:5432"
       
-  db-updater:
-    image: mycrocloud-db-updater
+  db-migrator:
+    image: mycrocloud-db-migrator
     build:
       dockerfile: WebApp.Migrations/Dockerfile
-    container_name: mycrocloud-db-updater
+    container_name: mycrocloud-db-migrator
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:

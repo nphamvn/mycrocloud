@@ -18,26 +18,12 @@ public class Route : BaseEntity
     public string ResponseBodyLanguage { get; set; }
     public string FunctionHandler { get; set; }
     public IList<string> FunctionHandlerDependencies { get; set; }
-    public IList<RouteValidation> Validations { get; set; }
+    public string RequestQuerySchema { get; set; }
+    public string RequestHeaderSchema { get; set; }
+    public string RequestBodySchema { get; set; }
     public bool RequireAuthorization { get; set; }
     public RouteStatus Status { get; set; } = RouteStatus.Active;
     public bool UseDynamicResponse { get; set; }
-}
-
-public class RouteValidation
-{
-    public int Id { get; set; }
-    public int RouteId { get; set; }
-    public Route Route { get; set; }
-    public string Source { get; set; }
-    public string Name { get; set; }
-
-    /// <summary>
-    /// Key: Rule name e.g. required, Value: Rule details
-    /// </summary>
-    public Dictionary<string, object> Rules { get; set; }
-
-    public List<string> Expressions { get; set; }
 }
 
 public class ResponseHeader

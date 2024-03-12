@@ -1,6 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import {
   FormProvider,
+  SubmitErrorHandler,
   useFieldArray,
   useForm,
   useFormContext,
@@ -11,6 +12,7 @@ import IRoute from "./Route";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import { bodyLanguages, methods, sampleRoute } from "./constants";
 import {
+  HeaderInput,
   RouteCreateUpdateInputs,
   routeCreateUpdateInputsSchema,
 } from "./RouteCreateUpdateInputs";
@@ -34,6 +36,9 @@ export default function RouteCreateUpdate({
       name: route.name,
       method: route.method,
       path: route.path,
+      requestQuerySchema: route.requestQuerySchema,
+      requestHeaderSchema: route.requestHeaderSchema,
+      requestBodySchema: route.requestBodySchema,
       requireAuthorization: route.requireAuthorization,
       responseType: route.responseType,
       responseStatusCode: route.responseStatusCode,
@@ -52,6 +57,7 @@ export default function RouteCreateUpdate({
       useDynamicResponse: route.useDynamicResponse,
     },
   });
+  const onInvalid = (errors: SubmitErrorHandler<RouteCreateUpdateInputs>) => console.error(errors);
   const {
     register,
     handleSubmit,
@@ -64,7 +70,7 @@ export default function RouteCreateUpdate({
 
   return (
     <FormProvider {...forms}>
-      <form className="h-full p-2" onSubmit={handleSubmit(onSubmit)}>
+      <form className="h-full p-2" onSubmit={handleSubmit(onSubmit, onInvalid)}>
         {route?.status === "Blocked" && (
           <div className="border border-red-200 bg-red-50 p-2 text-red-700">
             <p>
@@ -151,6 +157,9 @@ export default function RouteCreateUpdate({
                 </span>
               )}
             </div>
+            <div>
+              <RequestValidation />
+            </div>
           </section>
           <section>
             <h3 className="mt-3 border-l-2 border-primary pl-1 font-semibold">
@@ -182,6 +191,45 @@ export default function RouteCreateUpdate({
       </form>
     </FormProvider>
   );
+}
+
+function RequestValidation() {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<RouteCreateUpdateInputs>();
+  return (
+    <div>
+      <div>Validation</div>
+      <div className="p-1">
+        <label htmlFor="">Query Params</label>
+        <textarea {...register('requestQuerySchema')} className="w-full p-1" rows={3}></textarea>
+        {errors.requestQuerySchema && (
+          <span className="text-red-500">
+            {errors.requestQuerySchema.message}
+          </span>
+        )}
+      </div>
+      <div className="p-1">
+        <label htmlFor="">Headers</label>
+        <textarea {...register('requestHeaderSchema')} className="w-full p-1" rows={3}></textarea>
+        {errors.requestHeaderSchema && (
+          <span className="text-red-500">
+            {errors.requestHeaderSchema.message}
+          </span>
+        )}
+      </div>
+      <div className="p-1">
+        <label htmlFor="">Body</label>
+        <textarea {...register('requestBodySchema')} className="w-full p-1" rows={3}></textarea>
+        {errors.requestBodySchema && (
+          <span className="text-red-500">
+            {errors.requestBodySchema.message}
+          </span>
+        )}
+      </div>
+    </div>
+  )
 }
 
 function StaticResponse() {

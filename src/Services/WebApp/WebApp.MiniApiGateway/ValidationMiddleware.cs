@@ -1,6 +1,7 @@
-﻿using Jint;
-using Route = WebApp.Domain.Entities.Route;
+﻿using Route = WebApp.Domain.Entities.Route;
 using WebApp.Domain.Repositories;
+using Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Linq;
 
 namespace WebApp.MiniApiGateway;
 
@@ -9,52 +10,32 @@ public class ValidationMiddleware(RequestDelegate next)
     public async Task InvokeAsync(HttpContext context, IRouteRepository routeRepository)
     {
         var route = (Route)context.Items["_Route"]!;
-        var validations = await routeRepository.GetValidations(route.Id);
-        if (validations.Count == 0)
+        if (string.IsNullOrEmpty(route.RequestQuerySchema) 
+            && string.IsNullOrEmpty(route.RequestHeaderSchema)
+            && string.IsNullOrEmpty(route.RequestBodySchema))
         {
             await next(context);
             return;
         }
 
-        var request = context.Items["_Request"]!;
-        var engine = new Engine()
-            .SetValue("request", request);
-        var errors = new Dictionary<string, string>();
-        foreach (var validation in validations)
+        List<ValidationError> errors = [];
+        if (!string.IsNullOrEmpty(route.RequestQuerySchema))
         {
-            var errorKey = $"{validation.Source.ToLower()}:{validation.Name}";
-            switch (validation.Source.ToLower())
-            {
-                case "header":
-                {
-                    foreach (var rule in validation.Rules)
-                    {
-                        switch (rule.Key.ToLower())
-                        {
-                            case "required":
-                                if (!context.Request.Headers.TryGetValue(validation.Name, out var value) ||
-                                    string.IsNullOrEmpty(value))
-                                {
-                                    var property = rule.Value.GetType().GetProperty("message");
-                                    var message = property != null
-                                        ? property.GetValue(rule.Value)?.ToString() ?? ""
-                                        : $"header {validation.Name} is required";
-                                    errors.Add(errorKey, message);
-                                }
-
-                                break;
-                        }
-                    }
-
-                    foreach (var expression in validation.Expressions ?? [])
-                    {
-                        engine.Evaluate(expression);
-                    }
-
-                    break;
-                }
-            }
+            var schema = JSchema.Parse(route.RequestQuerySchema);
+            var query = JObject.FromObject(context.Request.Query.ToDictionary());
+            query.IsValid(schema, out IList<ValidationError>? validationErrors);
+            errors.AddRange(validationErrors);
         }
+
+        if (!string.IsNullOrEmpty(route.RequestHeaderSchema))
+        {
+            var schema = JSchema.Parse(route.RequestHeaderSchema);
+            var query = JObject.FromObject(context.Request.Headers.ToDictionary());
+            query.IsValid(schema, out IList<ValidationError>? validationErrors);
+            errors.AddRange(validationErrors);
+        }
+
+        //TODO: Validate body
 
         if (errors.Count == 0)
         {

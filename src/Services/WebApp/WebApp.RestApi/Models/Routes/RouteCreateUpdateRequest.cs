@@ -15,13 +15,20 @@ public class RouteCreateUpdateRequest
     public string? FunctionHandler { get; set; }
     public List<string>? FunctionHandlerDependencies { get; set; }
     public bool RequireAuthorization { get; set; }
-    public Route ToEntity()
+    public string? RequestQuerySchema { get; set; }
+    public string? RequestHeaderSchema { get; set; }
+    public string? RequestBodySchema { get; set; }
+
+    public Route ToCreateEntity()
     {
         return new Route
         {
             Name = Name,
             Method = Method,
             Path = Path,
+            RequestQuerySchema = RequestQuerySchema,
+            RequestHeaderSchema = RequestHeaderSchema,
+            RequestBodySchema = RequestBodySchema,
             ResponseType = ResponseType,
             ResponseStatusCode = ResponseStatusCode,
             ResponseHeaders = ResponseHeaders.Select(h => h.ToEntity()).ToList(),
@@ -33,11 +40,14 @@ public class RouteCreateUpdateRequest
             RequireAuthorization = RequireAuthorization
         };
     }
-    public void ToEntity(Route route)
+    public void ToUpdateEntity(Route route)
     {
         route.Name = Name;
         route.Method = Method;
         route.Path = Path;
+        route.RequestQuerySchema = RequestQuerySchema;
+        route.RequestHeaderSchema = RequestHeaderSchema;
+        route.RequestBodySchema = RequestBodySchema;
         route.ResponseType = ResponseType;
         route.ResponseStatusCode = ResponseStatusCode;
         route.ResponseHeaders = ResponseHeaders?.Select(h => h.ToEntity()).ToList();
