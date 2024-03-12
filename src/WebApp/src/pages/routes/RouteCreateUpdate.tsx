@@ -57,7 +57,6 @@ export default function RouteCreateUpdate({
       useDynamicResponse: route.useDynamicResponse,
     },
   });
-  const onInvalid = (errors: SubmitErrorHandler<RouteCreateUpdateInputs>) => console.error(errors);
   const {
     register,
     handleSubmit,
@@ -70,7 +69,7 @@ export default function RouteCreateUpdate({
 
   return (
     <FormProvider {...forms}>
-      <form className="h-full p-2" onSubmit={handleSubmit(onSubmit, onInvalid)}>
+      <form className="h-full p-2" onSubmit={handleSubmit(onSubmit)}>
         {route?.status === "Blocked" && (
           <div className="border border-red-200 bg-red-50 p-2 text-red-700">
             <p>
@@ -195,33 +194,96 @@ export default function RouteCreateUpdate({
 
 function RequestValidation() {
   const {
-    register,
+    getValues,
+    setValue,
     formState: { errors },
   } = useFormContext<RouteCreateUpdateInputs>();
+  const [tab, setTab] = useState("requestQuerySchema");
+  const editorRef = useRef(null);
+  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
+  //https://github.com/microsoft/monaco-editor/issues/432#issuecomment-307337344
+  useEffect(() => {
+    setEditor((prevEditor) => {
+      if (prevEditor) return prevEditor;
+
+      const instance = monaco.editor.create(editorRef.current!, {
+        language: "json",
+        value: getValues("requestQuerySchema"),
+        minimap: {
+          enabled: false,
+        },
+      });
+      
+      return instance;
+    });
+
+    return () => {
+      editor?.dispose();
+    };
+  }, []);
+  const handler = useRef<monaco.IDisposable>();
+  const handleChangeModelContent = (e: monaco.editor.IModelContentChangedEvent) => {
+    if (e.isFlush) {
+          
+    } else {
+      //@ts-ignore
+      setValue(tab, editor.getValue());
+    }
+  }
+  useEffect(() => {
+    if (!editor) {
+      return;
+    }
+    handler.current?.dispose();
+    handler.current = editor.onDidChangeModelContent(handleChangeModelContent);
+    //@ts-ignore
+    const value = getValues(tab) as string;
+    editor.setValue(value);
+  }, [tab]);
   return (
     <div>
       <div>Validation</div>
       <div className="p-1">
-        <label htmlFor="">Query Params</label>
-        <textarea {...register('requestQuerySchema')} className="w-full p-1" rows={3}></textarea>
+        <div className="flex space-x-2">
+          <button
+            type="button"
+            onClick={() => setTab("requestQuerySchema")}
+            className={
+              tab === "requestQuerySchema" ? "border-b-2 border-primary" : ""
+            }
+          >
+            Query Params
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("requestHeaderSchema")}
+            className={
+              tab === "requestHeaderSchema" ? "border-b-2 border-primary" : ""
+            }
+          >
+            Headers
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("requestBodySchema")}
+            className={
+              tab === "requestBodySchema" ? "border-b-2 border-primary" : ""
+            }
+          >
+            Body
+          </button>
+        </div>
+        <div ref={editorRef} style={{ width: "100%", height: "300px" }}></div>
         {errors.requestQuerySchema && (
           <span className="text-red-500">
             {errors.requestQuerySchema.message}
           </span>
         )}
-      </div>
-      <div className="p-1">
-        <label htmlFor="">Headers</label>
-        <textarea {...register('requestHeaderSchema')} className="w-full p-1" rows={3}></textarea>
         {errors.requestHeaderSchema && (
           <span className="text-red-500">
             {errors.requestHeaderSchema.message}
           </span>
         )}
-      </div>
-      <div className="p-1">
-        <label htmlFor="">Body</label>
-        <textarea {...register('requestBodySchema')} className="w-full p-1" rows={3}></textarea>
         {errors.requestBodySchema && (
           <span className="text-red-500">
             {errors.requestBodySchema.message}
@@ -229,7 +291,7 @@ function RequestValidation() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
 function StaticResponse() {
