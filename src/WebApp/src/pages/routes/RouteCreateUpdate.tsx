@@ -193,6 +193,7 @@ export default function RouteCreateUpdate({
 }
 
 function RequestValidation() {
+  console.log("RequestValidation");
   const {
     getValues,
     setValue,
@@ -201,44 +202,84 @@ function RequestValidation() {
   const [tab, setTab] = useState("requestQuerySchema");
   const editorRef = useRef(null);
   const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
+  //https://github.com/Microsoft/monaco-editor/issues/604#issuecomment-344214706
+  const [requestQuerySchemaModel, setRequestQuerySchemaModel] =
+    useState<monaco.editor.ITextModel>();
+  // const [requestHeaderSchemaModel] = useState<monaco.editor.ITextModel>(
+  //   monaco.editor.createModel(getValues("requestHeaderSchema") || "", "json"),
+  // );
+  // const [requestBodySchemaModel] = useState<monaco.editor.ITextModel>(
+  //   monaco.editor.createModel(getValues("requestBodySchema") || "", "json"),
+  // );
   //https://github.com/microsoft/monaco-editor/issues/432#issuecomment-307337344
   useEffect(() => {
+    // const requestHeaderSchemaModelListener =
+    //   requestHeaderSchemaModel.onDidChangeContent(() => {
+    //     setValue("requestHeaderSchema", requestHeaderSchemaModel.getValue());
+    //   });
+    // const requestBodySchemaModelListener =
+    //   requestBodySchemaModel.onDidChangeContent(() => {
+    //     setValue("requestBodySchema", requestBodySchemaModel.getValue());
+    //   });
+
+    setRequestQuerySchemaModel((prevModel) => {
+      if (prevModel) {
+        prevModel.setValue(getValues("requestQuerySchema") || "");
+        return prevModel;
+      }
+      const model = monaco.editor.createModel(
+        getValues("requestQuerySchema") || "",
+        "json",
+      );
+
+      model.onDidChangeContent(() => {
+        setValue("requestQuerySchema", requestQuerySchemaModel!.getValue());
+      });
+
+      return model;
+    });
     setEditor((prevEditor) => {
       if (prevEditor) return prevEditor;
-
       const instance = monaco.editor.create(editorRef.current!, {
         language: "json",
-        value: getValues("requestQuerySchema"),
+        value: getValues("requestQuerySchema") || "",
         minimap: {
           enabled: false,
         },
+        model: requestQuerySchemaModel,
       });
-      
+
       return instance;
     });
 
     return () => {
+      requestQuerySchemaModel?.dispose();
       editor?.dispose();
+
+      // requestHeaderSchemaModel?.dispose();
+      // requestBodySchemaModel?.dispose();
+      // requestQuerySchemaModelListener?.dispose();
+      // requestHeaderSchemaModelListener?.dispose();
+      // requestBodySchemaModelListener?.dispose();
     };
   }, []);
-  const handler = useRef<monaco.IDisposable>();
-  const handleChangeModelContent = (e: monaco.editor.IModelContentChangedEvent) => {
-    if (e.isFlush) {
-          
-    } else {
-      //@ts-ignore
-      setValue(tab, editor.getValue());
-    }
-  }
   useEffect(() => {
     if (!editor) {
       return;
     }
-    handler.current?.dispose();
-    handler.current = editor.onDidChangeModelContent(handleChangeModelContent);
-    //@ts-ignore
-    const value = getValues(tab) as string;
-    editor.setValue(value);
+    switch (tab) {
+      case "requestQuerySchema":
+        editor.setModel(requestQuerySchemaModel);
+        break;
+      // case "requestHeaderSchema":
+      //   editor.setModel(requestHeaderSchemaModel);
+      //   break;
+      // case "requestBodySchema":
+      //   editor.setModel(requestBodySchemaModel);
+      //   break;
+      default:
+        break;
+    }
   }, [tab]);
   return (
     <div>
@@ -273,7 +314,7 @@ function RequestValidation() {
             Body
           </button>
         </div>
-        <div ref={editorRef} style={{ width: "100%", height: "300px" }}></div>
+        <div ref={editorRef} className="mt-1 h-[200px] w-full"></div>
         {errors.requestQuerySchema && (
           <span className="text-red-500">
             {errors.requestQuerySchema.message}
