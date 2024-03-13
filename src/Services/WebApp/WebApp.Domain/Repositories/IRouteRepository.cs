@@ -9,6 +9,5 @@ public interface IRouteRepository
     Task<Route> GetById(int id);
     Task Update(int id, Route route);
     Task Delete(int id);
-    Task<List<RouteValidation>> GetValidations(int routeId);
     Task<Route> GetByIdAsNoTracking(int id);
 }

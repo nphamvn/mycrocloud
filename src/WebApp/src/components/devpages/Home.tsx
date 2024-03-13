@@ -6,7 +6,6 @@ export default function Home() {
   return (
     <div>
       <Link to=".">Home</Link>
-      <div>COMMIT_HASH: {__COMMIT_HASH__}</div>
       {isHomePage && (
         <ul>
           {routes.map((r) => (

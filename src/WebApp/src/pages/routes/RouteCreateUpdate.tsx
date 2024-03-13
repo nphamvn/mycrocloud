@@ -29,11 +29,15 @@ export default function RouteCreateUpdate({
   const appDomain = apiGatewayDomain.replace("__app_id__", app.id.toString());
 
   const forms = useForm<RouteCreateUpdateInputs>({
+    //@ts-ignore TODO
     resolver: yupResolver(routeCreateUpdateInputsSchema),
     defaultValues: {
       name: route.name,
       method: route.method,
       path: route.path,
+      requestQuerySchema: route.requestQuerySchema,
+      requestHeaderSchema: route.requestHeaderSchema,
+      requestBodySchema: route.requestBodySchema,
       requireAuthorization: route.requireAuthorization,
       responseType: route.responseType,
       responseStatusCode: route.responseStatusCode,
@@ -151,6 +155,9 @@ export default function RouteCreateUpdate({
                 </span>
               )}
             </div>
+            <div>
+              <RequestValidation />
+            </div>
           </section>
           <section>
             <h3 className="mt-3 border-l-2 border-primary pl-1 font-semibold">
@@ -181,6 +188,137 @@ export default function RouteCreateUpdate({
         </div>
       </form>
     </FormProvider>
+  );
+}
+
+function RequestValidation() {
+  console.log("RequestValidation");
+  const {
+    getValues,
+    setValue,
+    formState: { errors },
+  } = useFormContext<RouteCreateUpdateInputs>();
+  const [tab, setTab] = useState("requestQuerySchema");
+  const editorEl = useRef<HTMLDivElement>(null);
+  const editor = useRef<monaco.editor.IStandaloneCodeEditor>();
+  const requestQuerySchemaModel = useRef<monaco.editor.ITextModel>();
+  const requestHeaderSchemaModel = useRef<monaco.editor.ITextModel>();
+  const requestBodySchemaModel = useRef<monaco.editor.ITextModel>();
+  
+  useEffect(() => {
+    requestQuerySchemaModel.current?.dispose();
+    requestHeaderSchemaModel.current?.dispose();
+    requestBodySchemaModel.current?.dispose();
+    editor.current?.dispose();
+
+    requestQuerySchemaModel.current = monaco.editor.createModel(
+      getValues("requestQuerySchema") || "",
+      "json",
+    );
+    requestQuerySchemaModel.current.onDidChangeContent(() => {
+      const value = requestQuerySchemaModel.current!.getValue();
+      setValue("requestQuerySchema", value);
+    });
+
+    requestHeaderSchemaModel.current = monaco.editor.createModel(
+      getValues("requestHeaderSchema") || "",
+      "json",
+    );
+    requestHeaderSchemaModel.current.onDidChangeContent(() => {
+      const value = requestHeaderSchemaModel.current!.getValue();
+      setValue("requestHeaderSchema", value);
+    });
+
+    requestBodySchemaModel.current = monaco.editor.createModel(
+      getValues("requestBodySchema") || "",
+      "json",
+    );
+    requestBodySchemaModel.current.onDidChangeContent(() => {
+      const value = requestBodySchemaModel.current!.getValue();
+      setValue("requestBodySchema", value);
+    });
+
+    editor.current = monaco.editor.create(editorEl.current!, {
+      model: requestQuerySchemaModel.current,
+    });
+
+    return () => {
+      requestQuerySchemaModel.current?.dispose();
+      requestHeaderSchemaModel.current?.dispose();
+      requestBodySchemaModel.current?.dispose();
+      editor.current?.dispose();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!editor.current) {
+      return;
+    }
+    switch (tab) {
+      case "requestQuerySchema":
+        editor.current.setModel(requestQuerySchemaModel.current!);
+        break;
+      case "requestHeaderSchema":
+        editor.current.setModel(requestHeaderSchemaModel.current!);
+        break;
+      case "requestBodySchema":
+        editor.current.setModel(requestBodySchemaModel.current!);
+        break;
+      default:
+        break;
+    }
+  }, [tab]);
+  return (
+    <div>
+      <div>Validation</div>
+      <div className="p-1">
+        <div className="flex space-x-2">
+          <button
+            type="button"
+            onClick={() => setTab("requestQuerySchema")}
+            className={
+              tab === "requestQuerySchema" ? "border-b-2 border-primary" : ""
+            }
+          >
+            Query Params
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("requestHeaderSchema")}
+            className={
+              tab === "requestHeaderSchema" ? "border-b-2 border-primary" : ""
+            }
+          >
+            Headers
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("requestBodySchema")}
+            className={
+              tab === "requestBodySchema" ? "border-b-2 border-primary" : ""
+            }
+          >
+            Body
+          </button>
+        </div>
+        <div ref={editorEl} className="mt-1 h-[200px] w-full"></div>
+        {errors.requestQuerySchema && (
+          <span className="text-red-500">
+            {errors.requestQuerySchema.message}
+          </span>
+        )}
+        {errors.requestHeaderSchema && (
+          <span className="text-red-500">
+            {errors.requestHeaderSchema.message}
+          </span>
+        )}
+        {errors.requestBodySchema && (
+          <span className="text-red-500">
+            {errors.requestBodySchema.message}
+          </span>
+        )}
+      </div>
+    </div>
   );
 }
 

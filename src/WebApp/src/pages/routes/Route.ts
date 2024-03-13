@@ -3,6 +3,9 @@ export default interface IRoute {
   name: string;
   path: string;
   method: string;
+  requestQuerySchema?: string;
+  requestHeaderSchema?: string;
+  requestBodySchema?: string;
   responseType: string;
   responseStatusCode?: number;
   responseHeaders?: IResponseHeader[];

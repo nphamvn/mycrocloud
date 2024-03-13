@@ -19,19 +19,6 @@ public class RouteRepository(AppDbContext dbContext) : IRouteRepository
         throw new NotImplementedException();
     }
 
-    public async Task<List<RouteValidation>> GetValidations(int routeId)
-    {
-        try
-        {
-            return await dbContext.RouteValidations.Where(v => v.RouteId == routeId).ToListAsync();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
-    }
-
     public async Task Delete(int id)
     {
         var route = await dbContext.Routes.FirstOrDefaultAsync(r => r.Id == id);

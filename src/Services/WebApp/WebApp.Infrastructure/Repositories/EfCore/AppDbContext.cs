@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
 
 namespace WebApp.Infrastructure.Repositories.EfCore;
@@ -8,7 +7,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<App> Apps { get; set; }
     public DbSet<Route> Routes { get; set; }
-    public DbSet<RouteValidation> RouteValidations { get; set; }
     public DbSet<Log> Logs { get; set; }
     public DbSet<AuthenticationScheme> AuthenticationSchemes { get; set; }
     public DbSet<Variable> Variables { get; set; }
@@ -28,10 +26,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         modelBuilder.Entity<Route>().OwnsMany(route => route.ResponseHeaders,
             ownedNavigationBuilder => { ownedNavigationBuilder.ToJson(); });
-        _ = modelBuilder.Entity<RouteValidation>()
-            .Property(p => p.Rules)
-            .HasConversion(v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
-                v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, new JsonSerializerOptions()));
     }
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
