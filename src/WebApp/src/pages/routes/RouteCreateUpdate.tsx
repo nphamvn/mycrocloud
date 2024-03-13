@@ -204,7 +204,7 @@ function RequestValidation() {
   const requestQuerySchemaModel = useRef<monaco.editor.ITextModel>();
   const requestHeaderSchemaModel = useRef<monaco.editor.ITextModel>();
   const requestBodySchemaModel = useRef<monaco.editor.ITextModel>();
-  
+
   useEffect(() => {
     requestQuerySchemaModel.current?.dispose();
     requestHeaderSchemaModel.current?.dispose();
@@ -340,37 +340,33 @@ function StaticResponse() {
     name: "responseHeaders",
   });
 
-  const bodyEditorRef = useRef(null);
-  const [bodyEditor, setBodyEditor] =
-    useState<monaco.editor.IStandaloneCodeEditor>();
+  const bodyEditorRef = useRef<HTMLDivElement>(null);
+  const bodyEditor = useRef<monaco.editor.IStandaloneCodeEditor>();
 
   useEffect(() => {
-    setBodyEditor((prevEditor) => {
-      if (prevEditor) return prevEditor;
+    bodyEditor.current?.dispose();
 
-      const instance = monaco.editor.create(bodyEditorRef.current!, {
-        language: getValues("responseBodyLanguage"),
-        value: getValues("responseBody"),
-        minimap: {
-          enabled: false,
-        },
-      });
-      instance.onDidChangeModelContent(() => {
-        setValue("responseBody", instance.getValue());
-      });
-      return instance;
+    bodyEditor.current = monaco.editor.create(bodyEditorRef.current!, {
+      language: getValues("responseBodyLanguage"),
+      value: getValues("responseBody"),
+      minimap: {
+        enabled: false,
+      },
+    });
+    bodyEditor.current.onDidChangeModelContent(() => {
+      setValue("responseBody", bodyEditor.current!.getValue());
     });
 
     return () => {
-      bodyEditor?.dispose();
+      bodyEditor.current?.dispose();
     };
   }, []);
 
   const responseBodyLanguage = watch("responseBodyLanguage");
   useEffect(() => {
-    if (bodyEditor && responseBodyLanguage) {
+    if (bodyEditor.current && responseBodyLanguage) {
       monaco.editor.setModelLanguage(
-        bodyEditor.getModel()!,
+        bodyEditor.current!.getModel()!,
         responseBodyLanguage,
       );
     }
@@ -474,33 +470,27 @@ function FunctionHandler() {
     setValue,
     getValues,
   } = useFormContext<RouteCreateUpdateInputs>();
-  const handlerEditorRef = useRef(null);
-  const [handlerEditor, setHandlerEditor] =
-    useState<monaco.editor.IStandaloneCodeEditor>();
+  const handlerEditorRef = useRef<HTMLDivElement>(null);
+  const handlerEditor = useRef<monaco.editor.IStandaloneCodeEditor>();
 
   useEffect(() => {
-    if (handlerEditorRef) {
-      setHandlerEditor((prev) => {
-        if (prev) return prev;
+    handlerEditor.current?.dispose();
 
-        const editor = monaco.editor.create(handlerEditorRef.current!, {
-          language: "javascript",
-          value: getValues("functionHandler") || `function handler(req) {\n}`,
-          minimap: {
-            enabled: false,
-          },
-        });
-        editor.onDidChangeModelContent(() => {
-          setValue("functionHandler", editor.getValue());
-        });
-        return editor;
-      });
-    }
+    handlerEditor.current = monaco.editor.create(handlerEditorRef.current!, {
+      language: "javascript",
+      value: getValues("functionHandler") || `function handler(req) {\n}`,
+      minimap: {
+        enabled: false,
+      },
+    });
+    handlerEditor.current.onDidChangeModelContent(() => {
+      setValue("functionHandler", handlerEditor.current!.getValue());
+    });
 
     return () => {
-      handlerEditor?.dispose();
+      handlerEditor.current?.dispose();
     };
-  }, [handlerEditorRef.current]);
+  }, []);
 
   const [depsInputValue, setDepsInputValue] = useState(
     getValues("functionHandlerDependencies")?.join(",") || "",
