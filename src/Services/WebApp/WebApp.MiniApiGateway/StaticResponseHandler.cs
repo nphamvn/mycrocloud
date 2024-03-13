@@ -42,7 +42,9 @@ public static class StaticResponseHandler
 
     private static async Task<object> ReadRequest(HttpRequest request)
     {
+        request.EnableBuffering();
         var body = await new StreamReader(request.Body).ReadToEndAsync();
+        request.Body.Position = 0;
 
         return new
         {
