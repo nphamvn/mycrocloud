@@ -87,9 +87,9 @@ jobs:
             --header 'content-type: application/json' \
             --data '{"client_id":"${{ vars.M2M_APP_CLIENT_ID }}","client_secret":"${{ secrets.M2M_APP_CLIENT_SECRET }}","audience":"${{ vars.API_IDENTIFIER }}","grant_type":"client_credentials"}' |
             jq -r .access_token)
-
+          echo access_token=$access_token
           commit_hash=$(curl -X GET '${{ env.DEPLOY_DOMAIN }}/_assembly' -H "Authorization: Bearer $access_token" | jq -r .informationalVersion | cut -d'+' -f2)
-          
+          echo commit_hash=$commit_hash
           echo "COMMIT_HASH=$commit_hash" >> $GITHUB_ENV
           
       - name: Assert
