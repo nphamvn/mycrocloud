@@ -302,17 +302,17 @@ function RequestValidation() {
         </div>
         <div ref={editorEl} className="mt-1 h-[200px] w-full"></div>
         {errors.requestQuerySchema && (
-          <span className="text-red-500">
+          <span className="block text-red-500">
             {errors.requestQuerySchema.message}
           </span>
         )}
         {errors.requestHeaderSchema && (
-          <span className="text-red-500">
+          <span className="block text-red-500">
             {errors.requestHeaderSchema.message}
           </span>
         )}
         {errors.requestBodySchema && (
-          <span className="text-red-500">
+          <span className="block text-red-500">
             {errors.requestBodySchema.message}
           </span>
         )}
