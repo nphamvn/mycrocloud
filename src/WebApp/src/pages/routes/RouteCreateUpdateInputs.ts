@@ -1,9 +1,11 @@
 import * as yup from "yup";
+import type { ObjectSchema } from "yup";
 
 export type RouteCreateUpdateInputs = {
   name: string;
   path: string;
   method: string;
+  requireAuthorization: boolean;
   requestQuerySchema?: string;
   requestHeaderSchema?: string;
   requestBodySchema?: string;
@@ -14,7 +16,6 @@ export type RouteCreateUpdateInputs = {
   responseBody?: string;
   functionHandler?: string;
   functionHandlerDependencies?: string[];
-  requireAuthorization: boolean;
   useDynamicResponse?: boolean;
 };
 
@@ -23,31 +24,26 @@ export interface HeaderInput {
   value: string;
 }
 
-export const routeCreateUpdateInputsSchema = yup.object({
-  name: yup.string().required("Name is required"),
-  path: yup.string().required().matches(/^\//, "Path must start with /"),
-  method: yup.string().required(),
-  requestQuerySchema: yup.string().nullable(),
-  requestHeaderSchema: yup.string().nullable(),
-  requestBodySchema: yup.string().nullable(),
-  responseType: yup.string().required(),
-  responseStatusCode: yup.number().nullable(),
-  responseHeaders: yup
-    .array()
-    .of(
+export const routeCreateUpdateInputsSchema: ObjectSchema<RouteCreateUpdateInputs> =
+  yup.object({
+    name: yup.string().required("Name is required"),
+    path: yup.string().required().matches(/^\//, "Path must start with /"),
+    method: yup.string().required(),
+    requireAuthorization: yup.boolean().required(),
+    requestQuerySchema: yup.string().defined(),
+    requestHeaderSchema: yup.string().defined(),
+    requestBodySchema: yup.string().defined(),
+    responseType: yup.string().required(),
+    responseStatusCode: yup.number().defined(),
+    responseHeaders: yup.array().of(
       yup.object({
         name: yup.string().required(),
         value: yup.string().required(),
       }),
-    )
-    .optional(),
-  responseBodyLanguage: yup.string().nullable(),
-  responseBody: yup.string().nullable(),
-  functionHandler: yup.string().nullable(),
-  functionHandlerDependencies: yup
-    .array()
-    .of(yup.string().required())
-    .optional(),
-  requireAuthorization: yup.boolean().required(),
-  useDynamicResponse: yup.boolean().nullable(),
-});
+    ),
+    responseBodyLanguage: yup.string().defined(),
+    responseBody: yup.string().defined(),
+    functionHandler: yup.string().defined(),
+    functionHandlerDependencies: yup.array().of(yup.string().required()),
+    useDynamicResponse: yup.boolean().defined(),
+  });

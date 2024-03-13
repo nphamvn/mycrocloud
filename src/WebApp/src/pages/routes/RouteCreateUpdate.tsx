@@ -29,7 +29,6 @@ export default function RouteCreateUpdate({
   const appDomain = apiGatewayDomain.replace("__app_id__", app.id.toString());
 
   const forms = useForm<RouteCreateUpdateInputs>({
-    //@ts-ignore TODO
     resolver: yupResolver(routeCreateUpdateInputsSchema),
     defaultValues: {
       name: route.name,
