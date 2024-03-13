@@ -1,7 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import {
   FormProvider,
-  SubmitErrorHandler,
   useFieldArray,
   useForm,
   useFormContext,
@@ -12,7 +11,6 @@ import IRoute from "./Route";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import { bodyLanguages, methods, sampleRoute } from "./constants";
 import {
-  HeaderInput,
   RouteCreateUpdateInputs,
   routeCreateUpdateInputsSchema,
 } from "./RouteCreateUpdateInputs";
@@ -31,6 +29,7 @@ export default function RouteCreateUpdate({
   const appDomain = apiGatewayDomain.replace("__app_id__", app.id.toString());
 
   const forms = useForm<RouteCreateUpdateInputs>({
+    //@ts-ignore TODO
     resolver: yupResolver(routeCreateUpdateInputsSchema),
     defaultValues: {
       name: route.name,
@@ -200,83 +199,71 @@ function RequestValidation() {
     formState: { errors },
   } = useFormContext<RouteCreateUpdateInputs>();
   const [tab, setTab] = useState("requestQuerySchema");
-  const editorRef = useRef(null);
-  const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor>();
-  //https://github.com/Microsoft/monaco-editor/issues/604#issuecomment-344214706
-  const [requestQuerySchemaModel, setRequestQuerySchemaModel] =
-    useState<monaco.editor.ITextModel>();
-  // const [requestHeaderSchemaModel] = useState<monaco.editor.ITextModel>(
-  //   monaco.editor.createModel(getValues("requestHeaderSchema") || "", "json"),
-  // );
-  // const [requestBodySchemaModel] = useState<monaco.editor.ITextModel>(
-  //   monaco.editor.createModel(getValues("requestBodySchema") || "", "json"),
-  // );
-  //https://github.com/microsoft/monaco-editor/issues/432#issuecomment-307337344
+  const editorEl = useRef<HTMLDivElement>(null);
+  const editor = useRef<monaco.editor.IStandaloneCodeEditor>();
+  const requestQuerySchemaModel = useRef<monaco.editor.ITextModel>();
+  const requestHeaderSchemaModel = useRef<monaco.editor.ITextModel>();
+  const requestBodySchemaModel = useRef<monaco.editor.ITextModel>();
+  
   useEffect(() => {
-    // const requestHeaderSchemaModelListener =
-    //   requestHeaderSchemaModel.onDidChangeContent(() => {
-    //     setValue("requestHeaderSchema", requestHeaderSchemaModel.getValue());
-    //   });
-    // const requestBodySchemaModelListener =
-    //   requestBodySchemaModel.onDidChangeContent(() => {
-    //     setValue("requestBodySchema", requestBodySchemaModel.getValue());
-    //   });
+    requestQuerySchemaModel.current?.dispose();
+    requestHeaderSchemaModel.current?.dispose();
+    requestBodySchemaModel.current?.dispose();
+    editor.current?.dispose();
 
-    setRequestQuerySchemaModel((prevModel) => {
-      if (prevModel) {
-        prevModel.setValue(getValues("requestQuerySchema") || "");
-        return prevModel;
-      }
-      const model = monaco.editor.createModel(
-        getValues("requestQuerySchema") || "",
-        "json",
-      );
-
-      model.onDidChangeContent(() => {
-        setValue("requestQuerySchema", requestQuerySchemaModel!.getValue());
-      });
-
-      return model;
+    requestQuerySchemaModel.current = monaco.editor.createModel(
+      getValues("requestQuerySchema") || "",
+      "json",
+    );
+    requestQuerySchemaModel.current.onDidChangeContent(() => {
+      const value = requestQuerySchemaModel.current!.getValue();
+      setValue("requestQuerySchema", value);
     });
-    setEditor((prevEditor) => {
-      if (prevEditor) return prevEditor;
-      const instance = monaco.editor.create(editorRef.current!, {
-        language: "json",
-        value: getValues("requestQuerySchema") || "",
-        minimap: {
-          enabled: false,
-        },
-        model: requestQuerySchemaModel,
-      });
 
-      return instance;
+    requestHeaderSchemaModel.current = monaco.editor.createModel(
+      getValues("requestHeaderSchema") || "",
+      "json",
+    );
+    requestHeaderSchemaModel.current.onDidChangeContent(() => {
+      const value = requestHeaderSchemaModel.current!.getValue();
+      setValue("requestHeaderSchema", value);
+    });
+
+    requestBodySchemaModel.current = monaco.editor.createModel(
+      getValues("requestBodySchema") || "",
+      "json",
+    );
+    requestBodySchemaModel.current.onDidChangeContent(() => {
+      const value = requestBodySchemaModel.current!.getValue();
+      setValue("requestBodySchema", value);
+    });
+
+    editor.current = monaco.editor.create(editorEl.current!, {
+      model: requestQuerySchemaModel.current,
     });
 
     return () => {
-      requestQuerySchemaModel?.dispose();
-      editor?.dispose();
-
-      // requestHeaderSchemaModel?.dispose();
-      // requestBodySchemaModel?.dispose();
-      // requestQuerySchemaModelListener?.dispose();
-      // requestHeaderSchemaModelListener?.dispose();
-      // requestBodySchemaModelListener?.dispose();
+      requestQuerySchemaModel.current?.dispose();
+      requestHeaderSchemaModel.current?.dispose();
+      requestBodySchemaModel.current?.dispose();
+      editor.current?.dispose();
     };
   }, []);
+
   useEffect(() => {
-    if (!editor) {
+    if (!editor.current) {
       return;
     }
     switch (tab) {
       case "requestQuerySchema":
-        editor.setModel(requestQuerySchemaModel);
+        editor.current.setModel(requestQuerySchemaModel.current!);
         break;
-      // case "requestHeaderSchema":
-      //   editor.setModel(requestHeaderSchemaModel);
-      //   break;
-      // case "requestBodySchema":
-      //   editor.setModel(requestBodySchemaModel);
-      //   break;
+      case "requestHeaderSchema":
+        editor.current.setModel(requestHeaderSchemaModel.current!);
+        break;
+      case "requestBodySchema":
+        editor.current.setModel(requestBodySchemaModel.current!);
+        break;
       default:
         break;
     }
@@ -314,7 +301,7 @@ function RequestValidation() {
             Body
           </button>
         </div>
-        <div ref={editorRef} className="mt-1 h-[200px] w-full"></div>
+        <div ref={editorEl} className="mt-1 h-[200px] w-full"></div>
         {errors.requestQuerySchema && (
           <span className="text-red-500">
             {errors.requestQuerySchema.message}

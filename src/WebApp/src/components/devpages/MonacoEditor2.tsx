@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 //https://github.com/Microsoft/monaco-editor/issues/604#issuecomment-344214706
 export function MonacoEditor2() {
