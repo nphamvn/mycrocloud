@@ -17,5 +17,6 @@ COPY WebApp.Migrations/ WebApp.Migrations/
 RUN dotnet ef migrations bundle -p WebApp.Migrations/WebApp.Migrations.csproj -o /out/efbundle -v
 
 FROM mcr.microsoft.com/dotnet/runtime:8.0.3
-COPY --from=build /out/efbundle /db-migrator/
+WORKDIR /db-migrator
+COPY --from=build /out/efbundle .
 ENTRYPOINT [ "/db-migrator/efbundle" ]
