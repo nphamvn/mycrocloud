@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0.201
+FROM mcr.microsoft.com/dotnet/sdk:8.0.202 AS build
 WORKDIR /source
 
 RUN dotnet tool install --global dotnet-ef
@@ -14,4 +14,8 @@ COPY WebApp.Infrastructure/ WebApp.Infrastructure/
 COPY WebApp.Domain/ WebApp.Domain/
 COPY WebApp.Migrations/ WebApp.Migrations/
 
-CMD [ "dotnet", "ef", "database", "update", "--project", "WebApp.Migrations/WebApp.Migrations.csproj"]
+RUN dotnet ef migrations bundle -p WebApp.Migrations/WebApp.Migrations.csproj -o /out/efbundle -v
+
+FROM mcr.microsoft.com/dotnet/runtime:8.0.3
+COPY --from=build /out/efbundle /db-migrator/
+ENTRYPOINT [ "/db-migrator/efbundle" ]
