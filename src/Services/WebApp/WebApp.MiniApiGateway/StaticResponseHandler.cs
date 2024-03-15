@@ -6,6 +6,20 @@ namespace WebApp.MiniApiGateway;
 
 public static class StaticResponseHandler
 {
+    public const string ScriptTemplate =
+"""
+const request = {{
+    method: '{0}',
+    path: '{1}',
+    params: JSON.parse(`{2}`),
+    query: JSON.parse(`{3}`),
+    headers: JSON.parse(`{4}`),
+    body: JSON.parse(`{5}`),
+}};
+const template = Handlebars.compile(`{6}`);
+template({{ request }});
+""";
+
     public static async Task Handle(HttpContext context)
     {
         var route = (Route)context.Items["_Route"]!;
@@ -20,21 +34,31 @@ public static class StaticResponseHandler
             }
         }
 
-        var body = route.ResponseBody;
+        string body = string.Empty;
         if (route.UseDynamicResponse)
         {
-            var request = await ReadRequest(context.Request);
+            context.Request.EnableBuffering();
+            var requestBodyString = await new StreamReader(context.Request.Body).ReadToEndAsync();
+            context.Request.Body.Position = 0;
+
+            var script = string.Format(ScriptTemplate,
+                    context.Request.Method,
+                    context.Request.Path,
+                    JsonSerializer.Serialize(context.Request.RouteValues.ToDictionary(x => x.Key, x => x.Value?.ToString())),
+                    JsonSerializer.Serialize(context.Request.Query.ToDictionary(x => x.Key, x => x.Value.ToString())),
+                    JsonSerializer.Serialize(context.Request.Headers.ToDictionary(x => x.Key, x => x.Value.ToString())),
+                    requestBodyString,
+                    route.ResponseBody);
+
             body = new Engine()
-                .SetValue("requestJson", JsonSerializer.Serialize(request))
-                .SetValue("source", body)
                 .Execute(scripts["handlebars"])
                 .Execute("Handlebars.registerHelper('json', function(context) { return JSON.stringify(context); });")
-                .Evaluate("""
-                    const request = JSON.parse(requestJson);
-                    const template = Handlebars.compile(source);
-                    template({ request });
-                    """)
+                .Evaluate(script)
                 .AsString();
+        }
+        else
+        {
+            body = route.ResponseBody;
         }
 
         await context.Response.WriteAsync(body);

@@ -152,4 +152,37 @@ public class Tests
         
         Assert.AreEqual("My name is Nam. I know C# and Javascript. I live in HCM, VN", result);
     }
+    [Test]
+    public void Test_Optimize() {
+        const string ScriptTemplate =
+"""
+const request = {{
+    method: '{0}',
+    path: '{1}',
+    params: JSON.parse(`{2}`),
+    query: JSON.parse(`{3}`),
+    headers: JSON.parse(`{4}`),
+    body: JSON.parse(`{5}`),
+}};
+const template = Handlebars.compile(`{6}`);
+template({{ request }});
+""";
+        var script = string.Format(ScriptTemplate, 
+        "GET",
+        "/foo",
+        JsonSerializer.Serialize(new { name = "Nam" }),
+        JsonSerializer.Serialize(new { age = 28 }),
+        JsonSerializer.Serialize(new { ContentType = "application-json" }),
+        JsonSerializer.Serialize(new { name = "Nam" }),
+        "Hi {{ request.body.name }}"
+        );
+
+        var result = new Engine()
+                .Execute(File.ReadAllText("Scripts/handlebars.min-v4.7.8.js"))
+                .Execute("Handlebars.registerHelper('json', function(context) { return JSON.stringify(context); });")
+                .Evaluate(script)
+                .AsString();
+
+        Assert.That(result, Is.EqualTo("Hi Nam"));
+    }
 }
