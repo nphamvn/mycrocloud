@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { AppContext } from ".";
 import { useForm } from "react-hook-form";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -88,25 +88,31 @@ export default function AppOverview() {
 
 function CorsSettingsSection() {
   const app = useContext(AppContext)!;
-  const editorRef = useRef(null);
-  const [editor, setEditor] =
-    useState<monaco.editor.IStandaloneCodeEditor | null>(null);
-  const [json, setJson] = useState<string>();
-
   const { getAccessTokenSilently } = useAuth0();
-  useEffect(() => {
-    setEditor((prev) => {
-      if (prev) return prev;
 
-      return monaco.editor.create(editorRef.current!, {
-        language: "json",
-        value: "",
-        minimap: {
-          enabled: false,
-        },
-      });
+  const editorElRef = useRef(null);
+  const editor = useRef<monaco.editor.IStandaloneCodeEditor>();
+
+  useEffect(() => {
+    editor.current?.dispose();
+
+    editor.current = monaco.editor.create(editorElRef.current!, {
+      language: "json",
+      value: "",
+      minimap: {
+        enabled: false,
+      },
     });
 
+    return () => {
+      editor.current?.dispose();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!editor.current) {
+      return;
+    }
     const fetchCorsSettings = async () => {
       const accessToken = await getAccessTokenSilently();
       const res = await fetch(`/api/apps/${app.id}/cors`, {
@@ -116,26 +122,16 @@ function CorsSettingsSection() {
       });
       if (res.ok) {
         const json = await res.json();
-        setJson(JSON.stringify(json, null, 2));
+        editor.current!.setValue(JSON.stringify(json, null, 2));
       }
     };
 
     fetchCorsSettings();
-
-    return () => {
-      editor?.dispose();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (editor && json) {
-      editor.setValue(json);
-    }
-  }, [editor, json]);
+  }, [editor.current]);
 
   const handleSaveClick = async () => {
-    if (!editor) return;
-    const json = editor.getValue();
+    if (!editor.current) return;
+    const json = editor.current.getValue();
     const accessToken = await getAccessTokenSilently();
     const res = await fetch(`/api/apps/${app.id}/cors`, {
       method: "PATCH",
@@ -153,7 +149,7 @@ function CorsSettingsSection() {
     <>
       <h3 className="font-semibold">CORS Settings</h3>
       <div className="mt-1">
-        <div className="h-[160px] w-full" ref={editorRef}></div>
+        <div className="h-[160px] w-full" ref={editorElRef}></div>
         <button
           type="button"
           onClick={handleSaveClick}
