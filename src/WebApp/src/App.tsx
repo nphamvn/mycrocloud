@@ -122,6 +122,9 @@ function App() {
               path="*"
               Component={NotFoundPage}
             />
+            {ipRoutes.map((r, i) => (
+              <Route key={i} path={`ip/${r.path}`} Component={r.component} />
+            ))}
             {import.meta.env.DEV && (
               <Route path="_dev" Component={DevPage}>
                 {devRoutes.map((r, i) => (
