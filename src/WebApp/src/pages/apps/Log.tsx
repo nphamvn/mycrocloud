@@ -4,6 +4,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { AppContext } from ".";
 import { IRouteLog } from "../routes";
 import { Link } from "react-router-dom";
+import moment from "moment";
 
 type Inputs = {
   accessDateFrom?: string;
@@ -16,8 +17,8 @@ export default function AppLogs() {
   const { getAccessTokenSilently } = useAuth0();
   const [logs, setLogs] = useState<IRouteLog[]>([]);
   const { register, handleSubmit, setValue } = useForm<Inputs>();
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const accessToken = await getAccessTokenSilently();
+
+  function buildQuery(data: Inputs) {
     let query = "";
     const conditions = [];
     if (data.accessDateFrom) {
@@ -34,14 +35,22 @@ export default function AppLogs() {
     if (conditions.length > 0) {
       query += `&${conditions.join("&")}`;
     }
-    console.log(query);
+    return query;
+  }
+
+  const searchLogs = async (data: Inputs) => {
+    const accessToken = await getAccessTokenSilently();
     const logs = (await (
-      await fetch(`/api/apps/${app.id}/logs?${query}`, {
+      await fetch(`/api/apps/${app.id}/logs?${buildQuery(data)}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       })
     ).json()) as IRouteLog[];
+    return logs;
+  };
+  const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
+    const logs = await searchLogs(data);
     setLogs(logs);
   };
   const [routeIdsValue, setRouteIdsValue] = useState("");
@@ -56,6 +65,58 @@ export default function AppLogs() {
     }
   }, [routeIdsValue]);
 
+  const handleDownloadDisplayingAsCsvClick = () => {
+    const csv = logs
+      .map((l) => {
+        return `${new Date(l.timestamp).toLocaleString()},${l.remoteAddress || "-"},${l.routeId || "-"},${l.method},${l.path},${l.statusCode}`;
+      })
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `logs_${moment(new Date()).format("YYYYMMDDHHMMSS")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadDisplayingAsJsonClick = () => {
+    const json = JSON.stringify(logs, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `logs_${moment(new Date()).format("YYYYMMDDHHMMSS")}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  const onDownloadAsJson = async (data: Inputs) => {
+    const logs = await searchLogs(data);
+    const json = JSON.stringify(logs, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `logs_${moment(new Date()).format("YYYYMMDDHHMMSS")}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const onDownloadAsCsv = async (data: Inputs) => {
+    const logs = await searchLogs(data);
+    const csv = logs
+      .map((l) => {
+        return `${new Date(l.timestamp).toLocaleString()},${l.remoteAddress || "-"},${l.routeId || "-"},${l.method},${l.path},${l.statusCode}`;
+      })
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `logs_${moment(new Date()).format("YYYYMMDDHHMMSS")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)} className="border p-2">
@@ -74,17 +135,43 @@ export default function AppLogs() {
             className="border border-gray-200"
           />
         </div>
-        <div className="flex">
-          <button
-            type="submit"
-            className="ms-auto bg-primary px-2 py-0.5 text-white"
-          >
+        <div className="flex justify-end space-x-1">
+          <button type="submit" className=" bg-primary px-2 py-0.5 text-white">
             Filter
           </button>
         </div>
       </form>
-      <hr />
-      <table className="w-full">
+      <div className="mt-2 flex justify-end space-x-1 p-2">
+        <button
+          type="button"
+          onClick={handleSubmit(onDownloadAsCsv)}
+          className="bg-primary px-2 py-0.5 text-white"
+        >
+          Download as CSV
+        </button>
+        <button
+          type="button"
+          onClick={handleSubmit(onDownloadAsJson)}
+          className="bg-primary px-2 py-0.5 text-white"
+        >
+          Download as JSON
+        </button>
+        <button
+          type="button"
+          onClick={handleDownloadDisplayingAsCsvClick}
+          className="bg-primary px-2 py-0.5 text-white"
+        >
+          Download displaying logs as CSV
+        </button>
+        <button
+          type="button"
+          onClick={handleDownloadDisplayingAsJsonClick}
+          className="bg-primary px-2 py-0.5 text-white"
+        >
+          Download displaying logs as JSON
+        </button>
+      </div>
+      <table className="mt-2 w-full">
         <thead>
           <tr>
             <th className="text-start">Timestamp</th>
