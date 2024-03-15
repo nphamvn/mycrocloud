@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import RouteCreateUpdate from "./RouteCreateUpdate";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useContext, useEffect, useState } from "react";
@@ -16,40 +16,8 @@ export default function RouteEdit() {
   } = useRoutesContext();
   const { getAccessTokenSilently } = useAuth0();
   const routeId = parseInt(useParams()["routeId"]!);
-  const navigate = useNavigate();
   const [route, setRoute] = useState<IRoute>();
-  const handleCloneClick = async () => {
-    const accessToken = await getAccessTokenSilently();
-    const res = await fetch(`/api/apps/${app.id}/routes/${routeId}/clone`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    const newRoute = (await res.json()) as IRoute;
-    if (res.ok) {
-      toast.success("Route cloned");
-      dispatch({ type: "ADD_ROUTE", payload: newRoute });
-    }
-  };
-  const handleDeleteClick = async () => {
-    if (confirm("Are you sure want to delete this route?")) {
-      const accessToken = await getAccessTokenSilently();
-      const res = await fetch(`/api/apps/${app.id}/routes/${routeId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      if (res.ok) {
-        dispatch({
-          type: "DELETE_ROUTE",
-          payload: routes.find((r) => r.id === routeId)!,
-        });
-        navigate("../");
-      }
-    }
-  };
+  
   useEffect(() => {
     dispatch({
       type: "SET_ACTIVE_ROUTE",
@@ -98,16 +66,6 @@ export default function RouteEdit() {
           {/* <button className="border px-3 py-0.5">Share</button>
                     <button className="border px-3 py-0.5">History</button>
                     <button className="border px-3 py-0.5">Settings</button> */}
-          <button
-            type="button"
-            onClick={handleCloneClick}
-            className="text-sm text-primary"
-          >
-            Clone
-          </button>
-          <button onClick={handleDeleteClick} className="text-sm text-red-600">
-            Delete
-          </button>
         </div>
       </div>
       <RouteCreateUpdate key={routeId} route={route} onSubmit={onSubmit} />
