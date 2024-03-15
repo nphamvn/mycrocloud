@@ -179,7 +179,7 @@ export default function RouteCreateUpdate({
         <div className="sticky bottom-0 mt-2">
           <button
             type="submit"
-            className="border border-transparent bg-cyan-700 px-3 py-1 text-center font-medium text-white focus:z-10 focus:outline-none focus:ring-2 focus:ring-cyan-300 enabled:hover:bg-cyan-800"
+            className="border bg-primary px-3 py-1 text-center font-medium text-white enabled:hover:bg-cyan-700"
             disabled={route?.status === "Blocked"}
           >
             Save
