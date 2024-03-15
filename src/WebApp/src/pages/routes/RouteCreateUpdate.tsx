@@ -14,6 +14,7 @@ import {
   RouteCreateUpdateInputs,
   routeCreateUpdateInputsSchema,
 } from "./RouteCreateUpdateInputs";
+import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/16/solid";
 const apiGatewayDomain = import.meta.env
   .VITE_WEBAPP_APIGATEWAY_DOMAIN as string;
 
@@ -137,12 +138,12 @@ export default function RouteCreateUpdate({
               </div>
             </div>
             <div className="mt-1">
-              <div>
+              <div className="p-1">
                 <input
                   id="requireAuthorization"
                   type="checkbox"
                   {...register("requireAuthorization")}
-                  className="inline-block border border-gray-200 px-2 py-1"
+                  className="me-1 inline-block border border-gray-200 px-2 py-1"
                 />
                 <label htmlFor="requireAuthorization" className="mt-2">
                   Require Authorization
@@ -154,7 +155,7 @@ export default function RouteCreateUpdate({
                 </span>
               )}
             </div>
-            <div>
+            <div className="mt-1">
               <RequestValidation />
             </div>
           </section>
@@ -238,6 +239,7 @@ function RequestValidation() {
 
     editor.current = monaco.editor.create(editorEl.current!, {
       model: requestQuerySchemaModel.current,
+      automaticLayout: true,
     });
 
     return () => {
@@ -266,10 +268,24 @@ function RequestValidation() {
         break;
     }
   }, [tab]);
+
+  const [show, setShow] = useState(false);
+
   return (
     <div>
-      <div>Validation</div>
-      <div className="p-1">
+      <button
+        type="button"
+        onClick={() => setShow(!show)}
+        className="inline-flex"
+      >
+        {show ? (
+          <ChevronDownIcon className="h-4 w-4 text-blue-500" />
+        ) : (
+          <ChevronRightIcon className="h-4 w-4 text-blue-500" />
+        )}
+        Validation
+      </button>
+      <div className={`p-1 ${show ? "" : "hidden"}`}>
         <div className="flex space-x-2">
           <button
             type="button"
