@@ -5,6 +5,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import ITextStorage from "./ITextStorage";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import { Modal } from "flowbite-react";
+import { toast } from "react-toastify";
 
 export default function Logon() {
   const { getAccessTokenSilently } = useAuth0();
@@ -27,33 +28,30 @@ export default function Logon() {
   }, []);
 
   const contentEditorRef = useRef(null);
-  const [contentEditor, setContentEditor] =
-    useState<monaco.editor.IStandaloneCodeEditor>();
+  const contentEditor = useRef<monaco.editor.IStandaloneCodeEditor>();
   const languages = monaco.languages.getLanguages();
   useEffect(() => {
-    let isMounted = true;
-    if (contentEditorRef.current && isMounted) {
-      setContentEditor((editor) => {
-        if (editor) return editor;
-        const instance = monaco.editor.create(contentEditorRef.current!, {
-          language: "",
-          value: "",
-          minimap: {
-            enabled: false,
-          },
-        });
-        return instance;
-      });
-    }
+    contentEditor.current?.dispose();
+
+    contentEditor.current = monaco.editor.create(contentEditorRef.current!, {
+      language: "",
+      value: "",
+      minimap: {
+        enabled: false,
+      },
+    });
 
     return () => {
-      isMounted = false;
+      contentEditor.current?.dispose();
     };
-  }, [contentEditorRef.current]);
+  }, []);
 
   const handleContentEditorLanguageChange = (language: string) => {
-    if (contentEditor) {
-      monaco.editor.setModelLanguage(contentEditor.getModel()!, language);
+    if (contentEditor.current) {
+      monaco.editor.setModelLanguage(
+        contentEditor.current.getModel()!,
+        language,
+      );
     }
   };
 
@@ -69,8 +67,8 @@ export default function Logon() {
     );
 
     const content = await res.text();
-    if (contentEditor) {
-      contentEditor.setValue(content);
+    if (contentEditor.current) {
+      contentEditor.current.setValue(content);
     }
   };
 
@@ -84,14 +82,15 @@ export default function Logon() {
           "content-type": "text/plain",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: contentEditor?.getValue(),
+        body: contentEditor.current?.getValue(),
       },
     );
 
     if (res.ok) {
-      //
+      toast.success("Content has been written successfully");
     }
   };
+
   const [openWriteConfirmModal, setOpenWriteConfirmModal] = useState(false);
 
   return (
