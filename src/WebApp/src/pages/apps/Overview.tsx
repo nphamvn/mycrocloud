@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { AppContext } from ".";
 import { useForm } from "react-hook-form";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -10,6 +10,7 @@ import { ClipboardIcon } from "@heroicons/react/24/outline";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import Ajv, { JSONSchemaType } from "ajv";
 
 export default function AppOverview() {
   const app = useContext(AppContext)!;
@@ -86,12 +87,60 @@ export default function AppOverview() {
   );
 }
 
+interface CorsSettings {
+  allowedHeaders?: string[];
+  allowedMethods?: string[];
+  allowedOrigins?: string[];
+  exposeHeaders?: string[];
+  maxAgeSeconds?: number;
+}
+
+const corsSettingsSchema: JSONSchemaType<CorsSettings> = {
+  type: "object",
+  properties: {
+    allowedHeaders: {
+      type: "array",
+      nullable: true,
+      items: {
+        type: "string",
+      },
+    },
+    allowedMethods: {
+      type: "array",
+      nullable: true,
+      items: {
+        type: "string",
+      },
+    },
+    allowedOrigins: {
+      type: "array",
+      nullable: true,
+      items: {
+        type: "string",
+      },
+    },
+    exposeHeaders: {
+      type: "array",
+      nullable: true,
+      items: {
+        type: "string",
+      },
+    },
+    maxAgeSeconds: {
+      type: "number",
+      nullable: true,
+    },
+  },
+  additionalProperties: false,
+};
+
 function CorsSettingsSection() {
   const app = useContext(AppContext)!;
   const { getAccessTokenSilently } = useAuth0();
 
   const editorElRef = useRef(null);
   const editor = useRef<monaco.editor.IStandaloneCodeEditor>();
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
     editor.current?.dispose();
@@ -131,7 +180,24 @@ function CorsSettingsSection() {
 
   const handleSaveClick = async () => {
     if (!editor.current) return;
+    if (error) {
+      setError(undefined);
+    }
     const json = editor.current.getValue();
+    let data;
+    try {
+      data = JSON.parse(json);
+    } catch (e) {
+      setError("Invalid JSON");
+      return;
+    }
+    const ajv = new Ajv();
+    const validate = ajv.compile(corsSettingsSchema);
+    const valid = validate(data);
+    if (!valid) {
+      setError(validate.errors?.[0].message!);
+      return;
+    }
     const accessToken = await getAccessTokenSilently();
     const res = await fetch(`/api/apps/${app.id}/cors`, {
       method: "PATCH",
@@ -150,6 +216,7 @@ function CorsSettingsSection() {
       <h3 className="font-semibold">CORS Settings</h3>
       <div className="mt-1">
         <div className="h-[160px] w-full" ref={editorElRef}></div>
+        {error && <span className="text-red-500">{error}</span>}
         <button
           type="button"
           onClick={handleSaveClick}
