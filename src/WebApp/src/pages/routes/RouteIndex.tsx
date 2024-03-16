@@ -49,11 +49,12 @@ export default function RouteIndex() {
             onClick={() => {
               navigate("new");
             }}
-            className="mt-1 w-full bg-primary py-1 text-white disabled:opacity-50 enabled:hover:bg-cyan-700"
+            className="mt-1 w-full bg-primary py-1 text-white enabled:hover:bg-cyan-700 disabled:opacity-50"
             disabled={newRouteActive !== null}
           >
             New
           </button>
+          <hr className="my-1" />
           <RouteList />
         </div>
         <div className="flex-1">
@@ -150,7 +151,7 @@ function RouteList() {
   };
   return (
     <div>
-      <div ref={actionMenuRef} className="relative border">
+      <div ref={actionMenuRef} className="relative">
         {actionMenuRoute && (
           <ActionMenu
             top={calculateActionMenuTop()}
@@ -170,7 +171,11 @@ function RouteList() {
               onClick={() => {
                 navigate(route.id!.toString());
               }}
-              className={route.id == activeRoute?.id ? "bg-slate-100" : "hover:bg-slate-50"}
+              className={
+                route.id == activeRoute?.id
+                  ? "bg-slate-100"
+                  : "hover:bg-slate-50"
+              }
             >
               <RouteItem
                 route={route}
@@ -205,7 +210,10 @@ function RouteItem({
     onActionMenuClick(e.currentTarget.offsetLeft, e.currentTarget.offsetTop);
   };
   return (
-    <div className="group flex items-center p-0.5" style={{ cursor: "pointer" }}>
+    <div
+      className="group flex items-center p-0.5"
+      style={{ cursor: "pointer" }}
+    >
       <span
         className={`me-1 font-semibold ${methodTextColors.get(
           route.method.toUpperCase(),
@@ -214,8 +222,14 @@ function RouteItem({
       >
         {route.method}
       </span>
-      <span className="text-sm text-ellipsis overflow-hidden whitespace-nowrap">{route.name}</span>
-      <button type="button" onClick={(e) => handleClick(e)} className="ms-auto hidden group-hover:block">
+      <span className="overflow-hidden text-ellipsis whitespace-nowrap text-sm">
+        {route.name}
+      </span>
+      <button
+        type="button"
+        onClick={(e) => handleClick(e)}
+        className="ms-auto hidden group-hover:block"
+      >
         <EllipsisVerticalIcon className="h-4 w-4 text-gray-600" />
       </button>
       {route.status === "Blocked" && (
@@ -255,11 +269,15 @@ function ActionMenu({
       <div
         style={{ top: `${top}px`, right: `${right}px` }}
         ref={ref}
-        className="bg-white absolute w-[80%] border shadow"
+        className="absolute w-[80%] border bg-white shadow"
       >
         <ul>
           <li className="p-1.5">
-            <button type="button" onClick={onDuplicateClick} className="w-full text-left">
+            <button
+              type="button"
+              onClick={onDuplicateClick}
+              className="w-full text-left"
+            >
               Duplicate
             </button>
           </li>
@@ -267,7 +285,7 @@ function ActionMenu({
           <li className="p-1.5">
             <button
               type="button"
-              className="text-red-500 w-full text-left"
+              className="w-full text-left text-red-500"
               onClick={onDeleteClick}
             >
               Delete
