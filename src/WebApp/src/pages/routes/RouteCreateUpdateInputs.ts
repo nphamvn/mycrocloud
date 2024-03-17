@@ -1,5 +1,6 @@
 import * as yup from "yup";
 import type { ObjectSchema } from "yup";
+import { methods } from "./constants";
 
 export type RouteCreateUpdateInputs = {
   name: string;
@@ -28,7 +29,7 @@ export const routeCreateUpdateInputsSchema: ObjectSchema<RouteCreateUpdateInputs
   yup.object({
     name: yup.string().required("Name is required"),
     path: yup.string().required().matches(/^\//, "Path must start with /"),
-    method: yup.string().required(),
+    method: yup.string().required().oneOf(methods),
     requireAuthorization: yup.boolean().required(),
     requestQuerySchema: yup.string().defined(),
     requestHeaderSchema: yup.string().defined(),
