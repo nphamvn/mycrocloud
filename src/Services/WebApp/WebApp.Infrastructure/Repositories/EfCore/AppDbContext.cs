@@ -7,6 +7,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<App> Apps { get; set; }
     public DbSet<Route> Routes { get; set; }
+    public DbSet<RouteStaticFile> RouteStaticFiles { get; set; }
     public DbSet<Log> Logs { get; set; }
     public DbSet<AuthenticationScheme> AuthenticationSchemes { get; set; }
     public DbSet<Variable> Variables { get; set; }
