@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebApp.Infrastructure.Repositories.EfCore;
@@ -12,9 +13,11 @@ using WebApp.Infrastructure.Repositories.EfCore;
 namespace WebApp.Migrations.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240318140738_DropRouteStaticFiles")]
+    partial class DropRouteStaticFiles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,68 +100,6 @@ namespace WebApp.Migrations.Migrations
                     b.HasIndex("AppId");
 
                     b.ToTable("AuthenticationSchemes");
-                });
-
-            modelBuilder.Entity("WebApp.Domain.Entities.File", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<byte[]>("Content")
-                        .HasColumnType("bytea");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("FolderId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FolderId");
-
-                    b.ToTable("Files");
-                });
-
-            modelBuilder.Entity("WebApp.Domain.Entities.Folder", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AppId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("ParentId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppId");
-
-                    b.HasIndex("ParentId");
-
-                    b.ToTable("Folders");
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.Log", b =>
@@ -277,9 +218,6 @@ namespace WebApp.Migrations.Migrations
                     b.Property<string>("ResponseType")
                         .HasColumnType("text");
 
-                    b.Property<int?>("StaticFileId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -293,9 +231,38 @@ namespace WebApp.Migrations.Migrations
 
                     b.HasIndex("AppId");
 
-                    b.HasIndex("StaticFileId");
-
                     b.ToTable("Routes");
+                });
+
+            modelBuilder.Entity("WebApp.Domain.Entities.RouteStaticFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("Content")
+                        .HasColumnType("bytea");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int>("RouteId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RouteId")
+                        .IsUnique();
+
+                    b.ToTable("RouteStaticFile");
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.TextStorage", b =>
@@ -445,34 +412,6 @@ namespace WebApp.Migrations.Migrations
                     b.Navigation("App");
                 });
 
-            modelBuilder.Entity("WebApp.Domain.Entities.File", b =>
-                {
-                    b.HasOne("WebApp.Domain.Entities.Folder", "Folder")
-                        .WithMany("Files")
-                        .HasForeignKey("FolderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Folder");
-                });
-
-            modelBuilder.Entity("WebApp.Domain.Entities.Folder", b =>
-                {
-                    b.HasOne("WebApp.Domain.Entities.App", "App")
-                        .WithMany()
-                        .HasForeignKey("AppId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebApp.Domain.Entities.Folder", "Parent")
-                        .WithMany("Children")
-                        .HasForeignKey("ParentId");
-
-                    b.Navigation("App");
-
-                    b.Navigation("Parent");
-                });
-
             modelBuilder.Entity("WebApp.Domain.Entities.Log", b =>
                 {
                     b.HasOne("WebApp.Domain.Entities.App", "App")
@@ -497,10 +436,6 @@ namespace WebApp.Migrations.Migrations
                         .HasForeignKey("AppId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("WebApp.Domain.Entities.File", "StaticFile")
-                        .WithMany()
-                        .HasForeignKey("StaticFileId");
 
                     b.OwnsMany("WebApp.Domain.Entities.ResponseHeader", "ResponseHeaders", b1 =>
                         {
@@ -530,8 +465,17 @@ namespace WebApp.Migrations.Migrations
                     b.Navigation("App");
 
                     b.Navigation("ResponseHeaders");
+                });
 
-                    b.Navigation("StaticFile");
+            modelBuilder.Entity("WebApp.Domain.Entities.RouteStaticFile", b =>
+                {
+                    b.HasOne("WebApp.Domain.Entities.Route", "Route")
+                        .WithOne("StaticFile")
+                        .HasForeignKey("WebApp.Domain.Entities.RouteStaticFile", "RouteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Route");
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.TextStorage", b =>
@@ -565,11 +509,9 @@ namespace WebApp.Migrations.Migrations
                     b.Navigation("Variables");
                 });
 
-            modelBuilder.Entity("WebApp.Domain.Entities.Folder", b =>
+            modelBuilder.Entity("WebApp.Domain.Entities.Route", b =>
                 {
-                    b.Navigation("Children");
-
-                    b.Navigation("Files");
+                    b.Navigation("StaticFile");
                 });
 #pragma warning restore 612, 618
         }
