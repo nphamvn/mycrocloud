@@ -1,5 +1,4 @@
 import {
-  ChevronRightIcon,
   DocumentIcon,
   EllipsisHorizontalIcon,
   FolderIcon,

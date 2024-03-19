@@ -115,7 +115,6 @@ ORDER BY depth;
             await appDbContext.Folders.Where(f => f.AppId == appId && f.Id == folderId).SingleAsync()
             : await appDbContext.Folders.Where(f => f.AppId == appId && f.ParentId == null).SingleAsync();
 
-
         using (var memoryStream = new MemoryStream())
         {
             await file.CopyToAsync(memoryStream);
@@ -134,6 +133,16 @@ ORDER BY depth;
             }
         }
         return NoContent();
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> Download(int appId, int fileId)
+    {
+        var file = await appDbContext.Files
+            .Include(f => f.Folder)
+            .SingleAsync(f => f.Folder.AppId == appId && f.Id == fileId);
+        
+        return new FileContentResult(file.Content, "");
     }
 }
 
