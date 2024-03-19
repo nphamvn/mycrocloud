@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebApp.Infrastructure.Repositories.EfCore;
@@ -12,9 +13,11 @@ using WebApp.Infrastructure.Repositories.EfCore;
 namespace WebApp.Migrations.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240319045418_InitAppRootFolder")]
+    partial class InitAppRootFolder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,7 +54,7 @@ namespace WebApp.Migrations.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Apps", (string)null);
+                    b.ToTable("Apps");
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.AuthenticationScheme", b =>
@@ -96,7 +99,7 @@ namespace WebApp.Migrations.Migrations
 
                     b.HasIndex("AppId");
 
-                    b.ToTable("AuthenticationSchemes", (string)null);
+                    b.ToTable("AuthenticationSchemes");
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.File", b =>
@@ -126,7 +129,7 @@ namespace WebApp.Migrations.Migrations
 
                     b.HasIndex("FolderId");
 
-                    b.ToTable("Files", (string)null);
+                    b.ToTable("Files");
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.Folder", b =>
@@ -158,7 +161,7 @@ namespace WebApp.Migrations.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Folders", (string)null);
+                    b.ToTable("Folders");
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.Log", b =>
@@ -218,7 +221,7 @@ namespace WebApp.Migrations.Migrations
 
                     b.HasIndex("RouteId");
 
-                    b.ToTable("Logs", (string)null);
+                    b.ToTable("Logs");
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.Route", b =>
@@ -295,7 +298,7 @@ namespace WebApp.Migrations.Migrations
 
                     b.HasIndex("StaticFileId");
 
-                    b.ToTable("Routes", (string)null);
+                    b.ToTable("Routes");
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.TextStorage", b =>
@@ -328,7 +331,7 @@ namespace WebApp.Migrations.Migrations
 
                     b.HasIndex("AppId");
 
-                    b.ToTable("TextStorages", (string)null);
+                    b.ToTable("TextStorages");
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.Variable", b =>
@@ -364,42 +367,12 @@ namespace WebApp.Migrations.Migrations
 
                     b.HasIndex("AppId");
 
-                    b.ToTable("Variables", (string)null);
+                    b.ToTable("Variables");
                 });
 
             modelBuilder.Entity("WebApp.Domain.Entities.App", b =>
                 {
-                    b.OwnsOne("WebApp.Domain.Entities.App.CorsSettings#WebApp.Domain.Entities.CorsSettings", "CorsSettings", b1 =>
-                        {
-                            b1.Property<int>("AppId")
-                                .HasColumnType("integer");
-
-                            b1.Property<List<string>>("AllowedHeaders")
-                                .HasColumnType("text[]");
-
-                            b1.Property<List<string>>("AllowedMethods")
-                                .HasColumnType("text[]");
-
-                            b1.Property<List<string>>("AllowedOrigins")
-                                .HasColumnType("text[]");
-
-                            b1.Property<List<string>>("ExposeHeaders")
-                                .HasColumnType("text[]");
-
-                            b1.Property<int?>("MaxAgeSeconds")
-                                .HasColumnType("integer");
-
-                            b1.HasKey("AppId");
-
-                            b1.ToTable("Apps", (string)null);
-
-                            b1.ToJson("CorsSettings");
-
-                            b1.WithOwner()
-                                .HasForeignKey("AppId");
-                        });
-
-                    b.OwnsOne("WebApp.Domain.Entities.App.Settings#WebApp.Domain.Entities.AppSettings", "Settings", b1 =>
+                    b.OwnsOne("WebApp.Domain.Entities.AppSettings", "Settings", b1 =>
                         {
                             b1.Property<int>("AppId")
                                 .HasColumnType("integer");
@@ -421,9 +394,39 @@ namespace WebApp.Migrations.Migrations
 
                             b1.HasKey("AppId");
 
-                            b1.ToTable("Apps", (string)null);
+                            b1.ToTable("Apps");
 
                             b1.ToJson("Settings");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AppId");
+                        });
+
+                    b.OwnsOne("WebApp.Domain.Entities.CorsSettings", "CorsSettings", b1 =>
+                        {
+                            b1.Property<int>("AppId")
+                                .HasColumnType("integer");
+
+                            b1.Property<List<string>>("AllowedHeaders")
+                                .HasColumnType("text[]");
+
+                            b1.Property<List<string>>("AllowedMethods")
+                                .HasColumnType("text[]");
+
+                            b1.Property<List<string>>("AllowedOrigins")
+                                .HasColumnType("text[]");
+
+                            b1.Property<List<string>>("ExposeHeaders")
+                                .HasColumnType("text[]");
+
+                            b1.Property<int?>("MaxAgeSeconds")
+                                .HasColumnType("integer");
+
+                            b1.HasKey("AppId");
+
+                            b1.ToTable("Apps");
+
+                            b1.ToJson("CorsSettings");
 
                             b1.WithOwner()
                                 .HasForeignKey("AppId");
@@ -502,7 +505,7 @@ namespace WebApp.Migrations.Migrations
                         .WithMany()
                         .HasForeignKey("StaticFileId");
 
-                    b.OwnsMany("WebApp.Domain.Entities.Route.ResponseHeaders#WebApp.Domain.Entities.ResponseHeader", "ResponseHeaders", b1 =>
+                    b.OwnsMany("WebApp.Domain.Entities.ResponseHeader", "ResponseHeaders", b1 =>
                         {
                             b1.Property<int>("RouteId")
                                 .HasColumnType("integer");
@@ -519,7 +522,7 @@ namespace WebApp.Migrations.Migrations
 
                             b1.HasKey("RouteId", "Id");
 
-                            b1.ToTable("Routes", (string)null);
+                            b1.ToTable("Routes");
 
                             b1.ToJson("ResponseHeaders");
 

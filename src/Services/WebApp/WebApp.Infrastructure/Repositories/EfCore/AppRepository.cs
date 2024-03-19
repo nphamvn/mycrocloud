@@ -10,6 +10,12 @@ public class AppRepository(AppDbContext dbContext) : IAppRepository
     {
         app.UserId = userId;
         await dbContext.Apps.AddAsync(app);
+        //TODO: refactoring
+        await dbContext.Folders.AddAsync(new Folder {
+            App = app,
+            Name = "/",
+            ParentId = null,
+        });
         await dbContext.SaveChangesAsync();
     }
 
