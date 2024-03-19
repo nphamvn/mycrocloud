@@ -35,6 +35,8 @@ import {
   TextStorageList,
 } from "./pages/storages/TextStorages";
 
+import { FileList } from "./pages/storages/files";
+
 import { DevPage, devRoutes } from "./components/devpages";
 import About from "./pages/About";
 import { NotFoundPage } from "./pages/NotFoundPage";
@@ -93,6 +95,9 @@ function App() {
               </Route>
               <Route path="logs" Component={AppLog} />
               <Route path="storages">
+                <Route path="files">
+                  <Route index Component={FileList} />
+                </Route>
                 <Route path="textstorages">
                   <Route index Component={TextStorageList} />
                   <Route path="new" Component={CreateUpdateTextStorage} />
@@ -116,10 +121,7 @@ function App() {
               path="_about"
               element={<ProtectedPage children={<About />} />}
             />
-            <Route
-              path="*"
-              Component={NotFoundPage}
-            />
+            <Route path="*" Component={NotFoundPage} />
             {import.meta.env.DEV && (
               <Route path="_dev" Component={DevPage}>
                 {devRoutes.map((r, i) => (

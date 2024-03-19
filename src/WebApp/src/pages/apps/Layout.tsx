@@ -30,7 +30,7 @@ export default function AppLayout() {
   const isMatchAuthenticationSettings = useMatch(
     "/apps/:appId/authentications/settings",
   );
-
+  const isMatchFileStorages = useMatch("/apps/:appId/storages/files");
   const isMatchTextStorages = useMatch("/apps/:appId/storages/textstorages");
   const isMatchVariables = useMatch("/apps/:appId/storages/variables");
 
@@ -130,6 +130,14 @@ export default function AppLayout() {
             <div className="text-xs">
               Storages
               <div className="flex flex-col px-1">
+                <Link
+                  to="storages/files"
+                  className={`text-xs ${
+                    isMatchFileStorages ? "text-primary" : ""
+                  }`}
+                >
+                  Files
+                </Link>
                 <Link
                   to="storages/textstorages"
                   className={`text-xs ${

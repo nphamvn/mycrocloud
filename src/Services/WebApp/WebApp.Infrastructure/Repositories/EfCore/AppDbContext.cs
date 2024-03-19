@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
+using File = WebApp.Domain.Entities.File;
 
 namespace WebApp.Infrastructure.Repositories.EfCore;
 
@@ -7,6 +8,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<App> Apps { get; set; }
     public DbSet<Route> Routes { get; set; }
+    public DbSet<Folder> Folders { get; set; }
+    public DbSet<File> Files { get; set; }
     public DbSet<Log> Logs { get; set; }
     public DbSet<AuthenticationScheme> AuthenticationSchemes { get; set; }
     public DbSet<Variable> Variables { get; set; }

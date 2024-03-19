@@ -167,12 +167,14 @@ export default function RouteCreateUpdate({
               <label className="me-1">Type</label>
               <select {...register("responseType")}>
                 <option value="static">static</option>
+                <option value="staticFile">static file</option>
                 <option value="function">function</option>
               </select>
             </div>
 
             <div className="mt-1">
               {responseType === "static" && <StaticResponse />}
+              {responseType === "staticFile" && <StaticFile />}
               {responseType === "function" && <FunctionHandler />}
             </div>
           </section>
@@ -478,6 +480,13 @@ function StaticResponse() {
   );
 }
 
+function StaticFile() {
+  return (
+    <div>
+      <input type="file" />
+    </div>
+  );
+}
 function FunctionHandler() {
   const {
     formState: { errors },
