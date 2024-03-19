@@ -78,16 +78,16 @@ ORDER BY depth;
                 .Include(f => f.App)
                 .Where(f => f.AppId == appId && ((folderId != null && f.Id == folderId) || (folderId == null && f.ParentId == null)))
                 .SingleAsync();
-
-        await appDbContext.Folders.AddAsync(new()
+        var folder = new Folder
         {
             App = parentFolder.App,
             Name = createFolderModel.Name,
             Parent = parentFolder,
-        });
+        };
+        await appDbContext.Folders.AddAsync(folder);
 
         await appDbContext.SaveChangesAsync();
-        return Created();
+        return Created("", new { folder.Id, folder.Name, folder.CreatedAt });
     }
 
     [HttpPatch("folders")]
@@ -98,14 +98,58 @@ ORDER BY depth;
                         .SingleAsync();
         folder.Name = renameFolderModel.Name;
 
-        await appDbContext.SaveChangesAsync();        
+        await appDbContext.SaveChangesAsync();
         return NoContent();
     }
 
-    [HttpDelete("folders/{folderId:int}")]
-    public async Task<IActionResult> Delete(int appId, int folderId)
+    [HttpDelete]
+    public async Task<IActionResult> Delete(int appId, int? folderId, int? fileId)
     {
+        if (folderId == null && fileId == null)
+        {
+            return BadRequest();
+        }
+
+        if (folderId != null)
+        {
+            var folder = await appDbContext.Folders
+                .Where(f => f.AppId == appId && f.Id == folderId)
+                .SingleAsync();
+            if (folder.ParentId == null)
+            {
+                return BadRequest("Cannot delete root folder.");
+            }
+            await DeleteFolder(folderId.Value);
+            await appDbContext.SaveChangesAsync();
+        }
+        else
+        {
+            var file = await appDbContext.Files
+                .Where(f => f.Folder.AppId == appId && f.Id == fileId)
+                .SingleAsync();
+            appDbContext.Files.Remove(file);
+            await appDbContext.SaveChangesAsync();
+        }
         return NoContent();
+    }
+
+    private async Task DeleteFolder(int folderId)
+    {
+        var subFolders = await appDbContext.Folders
+                .Where(f => f.ParentId == folderId)
+                .ToListAsync();
+        foreach (var subFolder in subFolders)
+        {
+            await DeleteFolder(subFolder.Id);
+        }
+        var files = await appDbContext.Files
+                .Where(f => f.FolderId == folderId)
+                .ToListAsync();
+        appDbContext.Files.RemoveRange(files);
+        var folder = await appDbContext.Folders
+                .Where(f => f.Id == folderId)
+                .SingleAsync();
+        appDbContext.Folders.Remove(folder);
     }
 
     [HttpPost]
@@ -134,14 +178,14 @@ ORDER BY depth;
         }
         return NoContent();
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> Download(int appId, int fileId)
     {
         var file = await appDbContext.Files
             .Include(f => f.Folder)
             .SingleAsync(f => f.Folder.AppId == appId && f.Id == fileId);
-        
+
         return new FileContentResult(file.Content, "");
     }
 }

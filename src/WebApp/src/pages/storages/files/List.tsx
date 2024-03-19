@@ -33,34 +33,56 @@ export default function List() {
   const folderId = searchParams.get("folderId")
     ? parseInt(searchParams.get("folderId")!)
     : undefined;
-
+  const fetchItems = async () => {
+    let url = `/api/apps/${app.id}/files`;
+    if (folderId) {
+      url += `?folderId=${folderId}`;
+    }
+    const accessToken = await getAccessTokenSilently();
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const items = (await res.json()) as Item[];
+    const folderPathItems = JSON.parse(
+      res.headers.get("Path-Items")!,
+    ) as FolderPathItem[];
+    setPageData({
+      items: items,
+      folderPathItems: folderPathItems,
+    });
+  };
   useEffect(() => {
-    const fetchItems = async (folderId?: number) => {
-      const accessToken = await getAccessTokenSilently();
-      const res = await fetch(
-        folderId
-          ? `/api/apps/${app.id}/files?folderId=${folderId}`
-          : `/api/apps/${app.id}/files`,
-        {
+    fetchItems();
+  }, [folderId]);
+
+  const handleUploadFileClick = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.onchange = async (_) => {
+      const file = input.files?.item(0);
+      if (file) {
+        console.log("Uploading file", file.name);
+        const form = new FormData();
+        form.append("file", file);
+        const accessToken = await getAccessTokenSilently();
+        let url = `/api/apps/${app.id}/files`;
+        if (folderId) {
+          url += `?folderId=${folderId}`;
+        }
+        await fetch(url, {
+          method: "POST",
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
-        },
-      );
-      const items = (await res.json()) as Item[];
-      const folderPathItems = JSON.parse(
-        res.headers.get("Path-Items")!,
-      ) as FolderPathItem[];
-      setPageData({
-        items: items,
-        folderPathItems: folderPathItems,
-      });
+          body: form,
+        });
+      }
     };
-    fetchItems(folderId);
-  }, [folderId]);
-
+    input.click();
+  };
   const renameFolder = useRef<Item>();
-
   const createRenameFolderForm = useForm<CreateRenameFolderFormInputs>();
   const onSumitCreateRenameFolderForm = async (
     inputs: CreateRenameFolderFormInputs,
@@ -86,6 +108,30 @@ export default function List() {
 
     if (res.ok) {
       setShowCreateRenameFolder(false);
+
+      if (!isEditMode) {
+        const newFolder: Item = {
+          ...(await res.json()),
+          type: "Folder",
+        };
+        setPageData((prev) => ({
+          ...prev,
+          items: [...prev.items, newFolder],
+        }));
+      } else {
+        setPageData((prev) => ({
+          ...prev,
+          items: prev.items.map((item) => {
+            if (item.id === renameFolder.current!.id) {
+              return {
+                ...item,
+                name: inputs.name,
+              };
+            }
+            return item;
+          }),
+        }));
+      }
     }
   };
   const [showCreateRenameFolder, setShowCreateRenameFolder] = useState(false);
@@ -97,11 +143,43 @@ export default function List() {
     createRenameFolderForm.setValue("name", item.name);
     setShowCreateRenameFolder(true);
   };
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const deleteItem = useRef<Item>();
+  const onSubmitDelete = async () => {
+    const item = deleteItem.current!;
+    const accessToken = await getAccessTokenSilently();
+    let url = `/api/apps/${app.id}/files`;
+    if (item.type === "File") {
+      url += `?fileId=${item.id}`;
+    } else {
+      url += `?folderId=${item.id}`;
+    }
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (res.ok) {
+      deleteItem.current = undefined;
+      setShowDeleteConfirm(false);
+      setPageData((prev) => ({
+        ...prev,
+        items: prev.items.filter((i) => i.id !== item.id),
+      }));
+    }
+  };
+
   return (
     <div className="p-2">
       <h1>Files</h1>
       <div className="mt-2 flex space-x-1">
-        <button className="bg-primary px-2 py-1 text-white">Upload File</button>
+        <button
+          onClick={handleUploadFileClick}
+          className="bg-primary px-2 py-1 text-white"
+        >
+          Upload File
+        </button>
         <button
           onClick={() => {
             if (renameFolder.current) {
@@ -141,7 +219,7 @@ export default function List() {
         </thead>
         <tbody>
           {items.map((item) => (
-            <tr key={item.id}>
+            <tr key={item.type + item.id}>
               <td>
                 {item.type === "File" ? (
                   <DocumentIcon className="h-4 w-4 text-blue-500" />
@@ -158,11 +236,22 @@ export default function List() {
               </td>
               <td>{item.size || "-"}</td>
               <td>{new Date(item.createdAt).toDateString()}</td>
-              <td>
-                <button>
-                  <EllipsisHorizontalIcon className="h-4 w-4" />
+              <td className="flex space-x-1">
+                <button
+                  onClick={() => handleRenameClick(item)}
+                  className="text-blue-500 hover:underline"
+                >
+                  Rename
                 </button>
-                <button onClick={() => handleRenameClick(item)}>Rename</button>
+                <button
+                  onClick={() => {
+                    deleteItem.current = item;
+                    setShowDeleteConfirm(true);
+                  }}
+                  className="text-red-500 hover:underline"
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           ))}
@@ -180,7 +269,9 @@ export default function List() {
             onSumitCreateRenameFolderForm,
           )}
         >
-          <Modal.Header>Create new folder</Modal.Header>
+          <Modal.Header>
+            {renameFolder.current ? "Rename folder" : "Create new folder"}
+          </Modal.Header>
           <Modal.Body>
             <div>
               <input
@@ -189,6 +280,7 @@ export default function List() {
                   required: "Folder name is required",
                 })}
                 className="w-full border px-2 py-1"
+                aria-autocomplete="none"
               />
               {createRenameFolderForm.formState.errors.name && (
                 <span className="text-red-500">
@@ -196,13 +288,61 @@ export default function List() {
                 </span>
               )}
             </div>
-            <div className="mt-2">
+            <div className="mt-2 flex justify-end space-x-1">
               <button type="submit" className="bg-primary px-2 py-1 text-white">
-                Create
+                {renameFolder.current ? "Rename" : "Create"}
+              </button>
+              <button
+                onClick={() => {
+                  if (renameFolder.current) {
+                    renameFolder.current = undefined;
+                  }
+                  setShowCreateRenameFolder(false);
+                }}
+                className="bg-gray-500 px-2 py-1 text-white"
+              >
+                Cancel
               </button>
             </div>
           </Modal.Body>
         </form>
+      </Modal>
+      <Modal
+        show={showDeleteConfirm}
+        onClose={() => {
+          deleteItem.current = undefined;
+          setShowDeleteConfirm(false);
+        }}
+      >
+        <div className="p-2">
+          <h4 className="font-semibold">Delete confirm</h4>
+          <hr className="my-1" />
+          <div className="min-h-20 p-2">
+            Are you sure you want to delete{" "}
+            <span className="font-semibold">
+              {deleteItem.current?.type === "File" ? "file" : "folder"}{" "}
+              {deleteItem.current?.name}
+            </span>
+            ?
+          </div>
+          <div className="mt-2 flex justify-end space-x-1">
+            <button
+              onClick={onSubmitDelete}
+              className="bg-red-500 px-2 py-1 text-white"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => {
+                deleteItem.current = undefined;
+                setShowDeleteConfirm(false);
+              }}
+              className="bg-gray-500 px-2 py-1 text-white"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );
