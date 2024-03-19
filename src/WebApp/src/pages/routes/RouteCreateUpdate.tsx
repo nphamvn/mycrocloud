@@ -15,6 +15,15 @@ import {
   routeCreateUpdateInputsSchema,
 } from "./RouteCreateUpdateInputs";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/16/solid";
+import { Modal } from "flowbite-react";
+import {
+  default as FileFolderItem,
+  FolderPathItem,
+} from "../storages/files/Item";
+import { DocumentIcon, FolderIcon } from "@heroicons/react/24/solid";
+import { Link } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
+import React from "react";
 const apiGatewayDomain = import.meta.env
   .VITE_WEBAPP_APIGATEWAY_DOMAIN as string;
 
@@ -174,7 +183,9 @@ export default function RouteCreateUpdate({
 
             <div className="mt-1">
               {responseType === "static" && <StaticResponse />}
-              {responseType === "staticFile" && <StaticFile />}
+              {responseType === "staticFile" && (
+                <StaticFile fileName={route.fileName} />
+              )}
               {responseType === "function" && <FunctionHandler />}
             </div>
           </section>
@@ -480,10 +491,179 @@ function StaticResponse() {
   );
 }
 
-function StaticFile() {
+interface PageData {
+  items: FileFolderItem[];
+  folderPathItems: FolderPathItem[];
+}
+
+function StaticFile({ fileName }: { fileName?: string }) {
+  const app = useContext(AppContext)!;
+  const { getAccessTokenSilently } = useAuth0();
+  const {
+    register,
+    formState: { errors },
+    setValue,
+    getValues,
+  } = useFormContext<RouteCreateUpdateInputs>();
+  const [showModal, setShowModal] = useState(false);
+  const handleChooseFileClick = () => {
+    setSelectedFileId(getValues("fileId") || undefined);
+    setShowModal(true);
+  };
+  const [{ items, folderPathItems }, setPageData] = useState<PageData>({
+    items: [],
+    folderPathItems: [],
+  });
+  const [folderId, setFolderId] = useState<number>();
+  const handleFolderClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    folderId: number,
+  ) => {
+    e.preventDefault();
+    setFolderId(folderId);
+  };
+
+  const fetchItems = async () => {
+    let url = `/api/apps/${app.id}/files`;
+    if (folderId) {
+      url += `?folderId=${folderId}`;
+    }
+    const accessToken = await getAccessTokenSilently();
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const items = (await res.json()) as FileFolderItem[];
+    const folderPathItems = JSON.parse(
+      res.headers.get("Path-Items")!,
+    ) as FolderPathItem[];
+    setPageData({
+      items: items,
+      folderPathItems: folderPathItems,
+    });
+  };
+  const [selectedFileId, setSelectedFileId] = useState<number>();
+  const [selectedFileName, setSelectedFileName] = useState<string | undefined>(
+    fileName,
+  );
+  useEffect(() => {
+    if (showModal) {
+      fetchItems();
+    }
+  }, [showModal, folderId]);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedFileId(parseInt(e.target.value));
+  };
+  const handleChooseClick = () => {
+    setShowModal(false);
+    setValue("fileId", selectedFileId);
+    const selectedFile = items.find((item) => item.id === selectedFileId);
+    setSelectedFileName(selectedFile?.name);
+  };
   return (
     <div>
-      <input type="file" />
+      <label htmlFor="" className="block">
+        {selectedFileName || "Choose a file"}
+      </label>
+      <input type="hidden" {...register("fileId")} />
+      {errors.fileId && (
+        <span className="text-red-500">{errors.fileId.message}</span>
+      )}
+      <button
+        type="button"
+        onClick={handleChooseFileClick}
+        className="bg-blue-500 px-2 py-1 text-white"
+      >
+        Choose File
+      </button>
+      <Modal show={showModal} onClose={() => setShowModal(false)}>
+        <div className="p-2">
+          <h3 className="font-semibold">Choose a file</h3>
+          <hr className="my-1" />
+          <div className="min-h-56">
+            <div className="mt-2 flex space-x-1">
+              {folderPathItems.map((item, index) => (
+                <React.Fragment key={item.id}>
+                  <Link
+                    to={``}
+                    className={item.id === folderId ? "font-semibold" : ""}
+                    onClick={(e) => handleFolderClick(e, item.id)}
+                  >
+                    {item.name}
+                  </Link>
+                  {index < folderPathItems.length - 1 && <span>{">"}</span>}
+                </React.Fragment>
+              ))}
+            </div>
+            <table className="w-full">
+              <thead>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td>Name</td>
+                  <td>Size (B)</td>
+                  <td>Created At</td>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item) => (
+                  <tr key={item.type + item.id}>
+                    <td>
+                      <input
+                        type="radio"
+                        name="file"
+                        value={item.id}
+                        disabled={item.type === "Folder"}
+                        onChange={handleFileSelect}
+                        checked={item.id === selectedFileId}
+                      />
+                    </td>
+                    <td>
+                      {item.type === "File" ? (
+                        <DocumentIcon className="h-4 w-4 text-blue-500" />
+                      ) : (
+                        <FolderIcon className="h-4 w-4 text-yellow-500" />
+                      )}
+                    </td>
+                    <td>
+                      {item.type === "File" ? (
+                        <>{item.name}</>
+                      ) : (
+                        <Link
+                          to={""}
+                          onClick={(e) => handleFolderClick(e, item.id)}
+                        >
+                          {item.name}
+                        </Link>
+                      )}
+                    </td>
+                    <td>{item.size || "-"}</td>
+                    <td>{new Date(item.createdAt).toDateString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <hr className="my-1" />
+          <div className="mt-1 flex justify-end space-x-1">
+            <button
+              onClick={handleChooseClick}
+              className="bg-primary px-2 py-1 text-white disabled:opacity-50"
+              disabled={selectedFileId === undefined}
+            >
+              Choose
+            </button>
+            <button
+              onClick={() => setShowModal(false)}
+              className="bg-gray-500 px-2 py-1 text-white"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

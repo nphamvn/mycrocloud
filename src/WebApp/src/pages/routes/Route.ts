@@ -16,6 +16,8 @@ export default interface IRoute {
   requireAuthorization: boolean;
   status: string;
   useDynamicResponse: boolean;
+  fileId?: number;
+  fileName?: string;
 }
 
 export interface IResponseHeader {

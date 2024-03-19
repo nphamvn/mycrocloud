@@ -18,6 +18,7 @@ export type RouteCreateUpdateInputs = {
   functionHandler?: string;
   functionHandlerDependencies?: string[];
   useDynamicResponse?: boolean;
+  fileId?: number;
 };
 
 export interface HeaderInput {
@@ -47,4 +48,5 @@ export const routeCreateUpdateInputsSchema: ObjectSchema<RouteCreateUpdateInputs
     functionHandler: yup.string().defined(),
     functionHandlerDependencies: yup.array().of(yup.string().required()),
     useDynamicResponse: yup.boolean().defined(),
+    fileId: yup.number().defined(),
   });
