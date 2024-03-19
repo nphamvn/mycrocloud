@@ -17,7 +17,7 @@ export default function RouteEdit() {
   const { getAccessTokenSilently } = useAuth0();
   const routeId = parseInt(useParams()["routeId"]!);
   const [route, setRoute] = useState<IRoute>();
-  
+
   useEffect(() => {
     dispatch({
       type: "SET_ACTIVE_ROUTE",
