@@ -1,8 +1,4 @@
-import {
-  DocumentIcon,
-  EllipsisHorizontalIcon,
-  FolderIcon,
-} from "@heroicons/react/24/solid";
+import { DocumentIcon, FolderIcon } from "@heroicons/react/24/solid";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Item, { FolderPathItem } from "./Item";
 import { Link, useSearchParams } from "react-router-dom";
