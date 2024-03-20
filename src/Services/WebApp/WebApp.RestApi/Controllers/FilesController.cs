@@ -179,10 +179,11 @@ ORDER BY depth;
     
     private async Task GenereateRouteForFile(IEnumerable<FolderPathItem> folderPathItems, File file)
     {
-        var nameList = folderPathItems.Where(f => f.Depth > 0)
-                        .Select(f => f.Name).Append(file.Name);
-        var name = string.Join('_', nameList);
-        var path = "/" + string.Join('/', nameList);
+        var segs = folderPathItems.Where(f => f.Depth > 0)
+                        .Select(f => f.Name.Replace(" ", "-"))
+                        .Append(file.Name.Replace(" ", "-"));
+        var name = string.Join('_', segs);
+        var path = "/" + string.Join('/', segs);
         await routeRepository.Add(file.Folder.AppId, new Domain.Entities.Route
         {
             Name = name,
