@@ -4,6 +4,7 @@ using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
+using WebApp.Domain.Repositories;
 using WebApp.Infrastructure.Repositories.EfCore;
 using WebApp.RestApi.Controllers;
 using WebApp.RestApi.Models.Files;
@@ -12,7 +13,7 @@ using File = WebApp.Domain.Entities.File;
 namespace WebApp.RestApi;
 
 [Route("apps/{appId:int}/[controller]")]
-public class FilesController(AppDbContext appDbContext) : BaseController
+public class FilesController(AppDbContext appDbContext, IRouteRepository routeRepository) : BaseController
 {
     [HttpGet]
     public async Task<IActionResult> List(int appId, int? folderId)
@@ -36,9 +37,18 @@ WHERE f0."FolderId" = @FolderId
         {
             FolderId = parentFolder.Id
         });
+        var pathItems = await GetFolderPathItems(appDbContext, parentFolder);
+        Response.Headers.Append("Path-Items", JsonSerializer.Serialize(pathItems, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        }));
+        return Ok(items);
+    }
 
-        const string sql2 =
-"""
+    private static async Task<IEnumerable<FolderPathItem>> GetFolderPathItems(AppDbContext appDbContext, Folder parentFolder)
+    {
+        const string sql =
+        """
 WITH RECURSIVE FolderPath AS (
   SELECT "Id", "ParentId", 1 AS depth
   FROM public."Folders"
@@ -60,15 +70,11 @@ ORDER BY depth;
 """;
 
         var pathItems = await appDbContext.Database.GetDbConnection()
-        .QueryAsync<FolderPathItem>(sql2, new
+        .QueryAsync<FolderPathItem>(sql, new
         {
             Id = parentFolder.Id
         });
-        Response.Headers.Append("Path-Items", JsonSerializer.Serialize(pathItems, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        }));
-        return Ok(items);
+        return pathItems;
     }
 
     [HttpPost("folders")]
@@ -111,6 +117,81 @@ ORDER BY depth;
         file.Name = fileRenameModel.Name;
         await appDbContext.SaveChangesAsync();
         return NoContent();
+    }
+
+    [HttpPost("generate-route")]
+    public async Task<IActionResult> GenerateRoute(int appId, int? fileId, int? folderId)
+    {
+        if (folderId == null && fileId == null)
+        {
+            return BadRequest();
+        }
+        var trans = await appDbContext.Database.BeginTransactionAsync();
+        try
+        {
+            if (folderId != null)
+            {
+                var folder = await appDbContext.Folders
+                    .Where(f => f.AppId == appId && f.Id == folderId)
+                    .SingleAsync();
+                await GenerateRouteForFolder(appDbContext, folder);
+            }
+            else
+            {
+                var file = await appDbContext.Files
+                    .Include(f => f.Folder)
+                    .Where(f => f.Folder.AppId == appId && f.Id == fileId)
+                    .SingleAsync();
+                var folderPathItems = await GetFolderPathItems(appDbContext, file.Folder);
+                await GenereateRouteForFile(folderPathItems, file);
+            }
+            await trans.CommitAsync();
+            return Created();
+        }
+        catch (System.Exception)
+        {
+            await trans.RollbackAsync();
+            throw;
+        }
+    }
+
+    private async Task GenerateRouteForFolder(AppDbContext appDbContext, Folder folder)
+    {
+        var folderPathItems = await GetFolderPathItems(appDbContext, folder);
+
+        foreach (var subFolder in await appDbContext.Folders
+            .Where(f => f.ParentId == folder.Id)
+            .ToListAsync())
+        {
+            await GenerateRouteForFolder(appDbContext, subFolder);
+        }
+
+        var files = await appDbContext.Files
+                .Include(f => f.Folder)
+                .Where(f => f.FolderId == folder.Id)
+                .ToListAsync();
+
+        foreach (var file in files)
+        {
+            await GenereateRouteForFile(folderPathItems, file);
+        }
+    }
+    
+    private async Task GenereateRouteForFile(IEnumerable<FolderPathItem> folderPathItems, File file)
+    {
+        var nameList = folderPathItems.Where(f => f.Depth > 0)
+                        .Select(f => f.Name).Append(file.Name);
+        var name = string.Join('_', nameList);
+        var path = "/" + string.Join('/', nameList);
+        await routeRepository.Add(file.Folder.AppId, new Domain.Entities.Route
+        {
+            Name = name,
+            Method = "GET",
+            Path = path,
+            ResponseType = "staticFile",
+            ResponseStatusCode = 200,
+            File = file
+        });
     }
 
     [HttpDelete]

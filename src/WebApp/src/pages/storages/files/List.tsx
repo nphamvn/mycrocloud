@@ -6,6 +6,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { AppContext } from "../../apps";
 import { Modal } from "flowbite-react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 interface PageData {
   items: Item[];
@@ -198,6 +199,25 @@ export default function List() {
       a.click();
     }
   };
+
+  const handleGenerateRouteClick = async (item: Item) => {
+    const accessToken = await getAccessTokenSilently();
+    let url = `/api/apps/${app.id}/files/generate-route`;
+    if (item.type === "File") {
+      url += `?fileId=${item.id}`;
+    } else {
+      url += `?folderId=${item.id}`;
+    }
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (res.ok) {
+      toast.success("Route generated successfully");
+    }
+  };
   return (
     <div className="p-2">
       <h1>Files</h1>
@@ -265,6 +285,12 @@ export default function List() {
               <td>{item.size || "-"}</td>
               <td>{new Date(item.createdAt).toDateString()}</td>
               <td className="flex space-x-1">
+                <button
+                  onClick={() => handleGenerateRouteClick(item)}
+                  className="text-blue-500 hover:underline"
+                >
+                  Generate Route
+                </button>
                 <button
                   onClick={() => handleDownloadClick(item)}
                   className="text-blue-500 hover:underline"
