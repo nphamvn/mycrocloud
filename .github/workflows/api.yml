@@ -101,6 +101,6 @@ jobs:
           echo passed
           exit 0
           else
-          echo passed
+          echo failed
           exit 1
           fi
