@@ -34,6 +34,7 @@ runs:
     - name: Deploy
       shell: bash
       run: |
+        echo deploying $SERVICE
         ssh $SSH_USERNAME@$SSH_HOST "
             cd workspaces/mycrocloud-deploy/dev \
               && docker compose down $SERVICE \
