@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.IO.Compression;
+using System.Text.Json;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -188,14 +189,50 @@ ORDER BY depth;
         return Created("", new { fileEntity.Id, fileEntity.Name, fileEntity.CreatedAt });
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Download(int appId, int fileId)
+    [HttpGet("download")]
+    public async Task<IActionResult> Download(int appId, int? folderId, int? fileId)
     {
-        var file = await appDbContext.Files
-            .Include(f => f.Folder)
-            .SingleAsync(f => f.Folder.AppId == appId && f.Id == fileId);
+        if (folderId == null && fileId == null)
+        {
+            return BadRequest();
+        }
 
-        return new FileContentResult(file.Content, "");
+        if (fileId is not null)
+        {
+            var file = await appDbContext.Files
+                        .SingleAsync(f => f.Folder.AppId == appId && f.Id == fileId);
+
+            return File(file.Content, "application/octet-stream", file.Name);
+        }
+
+        var folder = await appDbContext.Folders
+                        .SingleAsync(f => f.AppId == appId && f.Id == folderId);
+        var zipStream = new MemoryStream();
+        using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
+        {
+            await AddFolderToZip(archive, folder);
+        }
+        zipStream.Seek(0, SeekOrigin.Begin);
+        return File(zipStream, "application/zip", folder.Name + ".zip");
+    }
+
+    private async Task AddFolderToZip(ZipArchive archive, Folder folder)
+    {
+        var folderEntry = archive.CreateEntry(folder.Name + "/");
+        foreach (var subFolder in await appDbContext.Folders
+            .Where(f => f.ParentId == folder.Id)
+            .ToListAsync())
+        {
+            await AddFolderToZip(archive, subFolder);
+        }
+        foreach (var file in await appDbContext.Files
+            .Where(f => f.FolderId == folder.Id)
+            .ToListAsync())
+        {
+            var fileEntry = archive.CreateEntry(folderEntry.FullName + file.Name);
+            using var entryStream = fileEntry.Open();
+            await entryStream.WriteAsync(file.Content);
+        }
     }
 }
 

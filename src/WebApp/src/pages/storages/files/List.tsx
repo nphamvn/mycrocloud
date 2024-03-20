@@ -176,6 +176,28 @@ export default function List() {
     }
   };
 
+  const handleDownloadClick = async (item: Item) => {
+    const accessToken = await getAccessTokenSilently();
+    let url = `/api/apps/${app.id}/files/download`;
+    if (item.type === "File") {
+      url += `?fileId=${item.id}`;
+    } else {
+      url += `?folderId=${item.id}`;
+    }
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (res.ok) {
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = item.name;
+      a.click();
+    }
+  };
   return (
     <div className="p-2">
       <h1>Files</h1>
@@ -243,6 +265,12 @@ export default function List() {
               <td>{item.size || "-"}</td>
               <td>{new Date(item.createdAt).toDateString()}</td>
               <td className="flex space-x-1">
+                <button
+                  onClick={() => handleDownloadClick(item)}
+                  className="text-blue-500 hover:underline"
+                >
+                  Download
+                </button>
                 <button
                   onClick={() => handleRenameClick(item)}
                   className="text-blue-500 hover:underline"
