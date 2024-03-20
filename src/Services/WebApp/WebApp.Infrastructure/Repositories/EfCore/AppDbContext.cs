@@ -29,6 +29,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         modelBuilder.Entity<Route>().OwnsMany(route => route.ResponseHeaders,
             ownedNavigationBuilder => { ownedNavigationBuilder.ToJson(); });
+
+        modelBuilder.Entity<Route>()
+            .HasOne(route => route.File)
+            .WithMany()
+            .OnDelete(DeleteBehavior.SetNull);
     }
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
