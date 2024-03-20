@@ -208,6 +208,64 @@ export default function RouteCreateUpdate({
   );
 }
 
+const quickAddResponseHeaderButtons = [
+  {
+    text: "Add",
+    key: "",
+    value: "",
+  },
+  {
+    text: "text/css",
+    key: "content-type",
+    value: "text/css",
+  },
+  {
+    text: "text/csv",
+    key: "content-type",
+    value: "text/csv",
+  },
+  {
+    text: "text/html",
+    key: "content-type",
+    value: "text/html",
+  },
+  {
+    text: "image/jpeg",
+    key: "content-type",
+    value: "image/jpeg",
+  },
+  {
+    text: "text/javascript",
+    key: "content-type",
+    value: "text/javascript",
+  },
+  {
+    text: "application/json",
+    key: "content-type",
+    value: "application/json",
+  },
+  {
+    text: "image/png",
+    key: "content-type",
+    value: "image/png",
+  },
+  {
+    text: "application/pdf",
+    key: "content-type",
+    value: "application/pdf",
+  },
+  {
+    text: "image/svg+xml",
+    key: "content-type",
+    value: "image/svg+xml",
+  },
+  {
+    text: "text/plain",
+    key: "content-type",
+    value: "text/plain",
+  },
+];
+
 function RequestValidation() {
   const {
     getValues,
@@ -450,13 +508,20 @@ function StaticResponse() {
             </div>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={() => addResponseHeaders({ name: "", value: "" })}
-          className=" mt-1 text-blue-600"
-        >
-          Add
-        </button>
+        <div className="flex flex-wrap space-x-2">
+          {quickAddResponseHeaderButtons.map((button, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() =>
+                addResponseHeaders({ name: button.key, value: button.value })
+              }
+              className=" mt-1 text-blue-600 hover:underline"
+            >
+              {button.text}
+            </button>
+          ))}
+        </div>
       </div>
       <div className="mt-2">
         <label className="block">Body</label>
@@ -613,56 +678,23 @@ function StaticFile({
             </div>
           ))}
         </div>
-        <div className="flex space-x-2">
-          <button
-            type="button"
-            onClick={() => addResponseHeaders({ name: "", value: "" })}
-            className=" mt-1 text-blue-600"
-          >
-            Add
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              addResponseHeaders({ name: "content-type", value: "" })
-            }
-            className=" mt-1 text-blue-600"
-          >
-            content-type
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              addResponseHeaders({ name: "content-type", value: "text/html" })
-            }
-            className=" mt-1 text-blue-600"
-          >
-            text/html
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              addResponseHeaders({ name: "content-type", value: "text/css" })
-            }
-            className=" mt-1 text-blue-600"
-          >
-            text/css
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              addResponseHeaders({
-                name: "content-type",
-                value: "text/javascript",
-              })
-            }
-            className=" mt-1 text-blue-600"
-          >
-            text/javascript
-          </button>
+        <div className="flex flex-wrap space-x-2">
+          {quickAddResponseHeaderButtons.map((button, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() =>
+                addResponseHeaders({ name: button.key, value: button.value })
+              }
+              className=" mt-1 text-blue-600 hover:underline"
+            >
+              {button.text}
+            </button>
+          ))}
         </div>
       </div>
-      <div>
+      <div className="mt-2">
+        <div>File</div>
         <label className="block">{selectedFileName || "Choose a file"}</label>
         <input type="hidden" {...register("fileId")} />
         {errors.fileId && (
