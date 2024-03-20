@@ -30,7 +30,10 @@ export const routeCreateUpdateInputsSchema: ObjectSchema<RouteCreateUpdateInputs
   yup.object({
     name: yup.string().required("Name is required"),
     path: yup.string().required().matches(/^\//, "Path must start with /"),
-    method: yup.string().required().oneOf(methods),
+    method: yup
+      .string()
+      .required()
+      .oneOf(methods.map((m) => m.toUpperCase())),
     requireAuthorization: yup.boolean().required(),
     requestQuerySchema: yup.string().defined(),
     requestHeaderSchema: yup.string().defined(),
