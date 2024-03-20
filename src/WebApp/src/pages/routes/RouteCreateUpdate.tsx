@@ -613,13 +613,54 @@ function StaticFile({
             </div>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={() => addResponseHeaders({ name: "", value: "" })}
-          className=" mt-1 text-blue-600"
-        >
-          Add
-        </button>
+        <div className="flex space-x-2">
+          <button
+            type="button"
+            onClick={() => addResponseHeaders({ name: "", value: "" })}
+            className=" mt-1 text-blue-600"
+          >
+            Add
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              addResponseHeaders({ name: "content-type", value: "" })
+            }
+            className=" mt-1 text-blue-600"
+          >
+            content-type
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              addResponseHeaders({ name: "content-type", value: "text/html" })
+            }
+            className=" mt-1 text-blue-600"
+          >
+            text/html
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              addResponseHeaders({ name: "content-type", value: "text/css" })
+            }
+            className=" mt-1 text-blue-600"
+          >
+            text/css
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              addResponseHeaders({
+                name: "content-type",
+                value: "text/javascript",
+              })
+            }
+            className=" mt-1 text-blue-600"
+          >
+            text/javascript
+          </button>
+        </div>
       </div>
       <div>
         <label className="block">{selectedFileName || "Choose a file"}</label>
