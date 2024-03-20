@@ -33,7 +33,9 @@ public class RouteRepository(AppDbContext dbContext) : IRouteRepository
 
     public async Task<Route> GetById(int id)
     {
-        return await dbContext.Routes.FirstAsync(r => r.Id == id);
+        return await dbContext.Routes
+                .Include(r => r.File)
+                .FirstAsync(r => r.Id == id);
     }
 
     public async Task<IEnumerable<Route>> List(int appId, string searchTerm, string sort)

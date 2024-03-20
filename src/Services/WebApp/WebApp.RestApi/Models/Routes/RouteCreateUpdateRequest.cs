@@ -18,7 +18,7 @@ public class RouteCreateUpdateRequest
     public string? RequestQuerySchema { get; set; }
     public string? RequestHeaderSchema { get; set; }
     public string? RequestBodySchema { get; set; }
-
+    public int? FileId { get; set; }
     public Route ToCreateEntity()
     {
         return new Route
@@ -37,7 +37,8 @@ public class RouteCreateUpdateRequest
             UseDynamicResponse = UseDynamicResponse,
             FunctionHandler = FunctionHandler,
             FunctionHandlerDependencies = FunctionHandlerDependencies,
-            RequireAuthorization = RequireAuthorization
+            RequireAuthorization = RequireAuthorization,
+            FileId = FileId
         };
     }
     public void ToUpdateEntity(Route route)
@@ -57,6 +58,7 @@ public class RouteCreateUpdateRequest
         route.FunctionHandler = FunctionHandler;
         route.FunctionHandlerDependencies = FunctionHandlerDependencies;
         route.RequireAuthorization = RequireAuthorization;
+        route.FileId = FileId;
     }
 }
 

@@ -63,6 +63,7 @@ export default function RouteCreateUpdate({
       functionHandler: route.functionHandler,
       functionHandlerDependencies: route.functionHandlerDependencies || [],
       useDynamicResponse: route.useDynamicResponse,
+      fileId: route.fileId,
     },
   });
   const {
@@ -184,7 +185,10 @@ export default function RouteCreateUpdate({
             <div className="mt-1">
               {responseType === "static" && <StaticResponse />}
               {responseType === "staticFile" && (
-                <StaticFile fileName={route.fileName} />
+                <StaticFile
+                  fileName={route.fileName}
+                  folderId={route.fileFolderId}
+                />
               )}
               {responseType === "function" && <FunctionHandler />}
             </div>
@@ -496,15 +500,31 @@ interface PageData {
   folderPathItems: FolderPathItem[];
 }
 
-function StaticFile({ fileName }: { fileName?: string }) {
+function StaticFile({
+  fileName,
+  folderId: fileFolderId,
+}: {
+  fileName?: string;
+  folderId?: number;
+}) {
   const app = useContext(AppContext)!;
   const { getAccessTokenSilently } = useAuth0();
   const {
+    control,
     register,
     formState: { errors },
     setValue,
     getValues,
   } = useFormContext<RouteCreateUpdateInputs>();
+
+  const {
+    fields: responseHeaders,
+    append: addResponseHeaders,
+    remove: removeResponseHeader,
+  } = useFieldArray({
+    control,
+    name: "responseHeaders",
+  });
   const [showModal, setShowModal] = useState(false);
   const handleChooseFileClick = () => {
     setSelectedFileId(getValues("fileId") || undefined);
@@ -514,7 +534,7 @@ function StaticFile({ fileName }: { fileName?: string }) {
     items: [],
     folderPathItems: [],
   });
-  const [folderId, setFolderId] = useState<number>();
+  const [folderId, setFolderId] = useState<number | undefined>(fileFolderId);
   const handleFolderClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
     folderId: number,
@@ -564,106 +584,143 @@ function StaticFile({ fileName }: { fileName?: string }) {
   };
   return (
     <div>
-      <label htmlFor="" className="block">
-        {selectedFileName || "Choose a file"}
-      </label>
-      <input type="hidden" {...register("fileId")} />
-      {errors.fileId && (
-        <span className="text-red-500">{errors.fileId.message}</span>
-      )}
-      <button
-        type="button"
-        onClick={handleChooseFileClick}
-        className="bg-blue-500 px-2 py-1 text-white"
-      >
-        Choose File
-      </button>
-      <Modal show={showModal} onClose={() => setShowModal(false)}>
-        <div className="p-2">
-          <h3 className="font-semibold">Choose a file</h3>
-          <hr className="my-1" />
-          <div className="min-h-56">
-            <div className="mt-2 flex space-x-1">
-              {folderPathItems.map((item, index) => (
-                <React.Fragment key={item.id}>
-                  <Link
-                    to={``}
-                    className={item.id === folderId ? "font-semibold" : ""}
-                    onClick={(e) => handleFolderClick(e, item.id)}
-                  >
-                    {item.name}
-                  </Link>
-                  {index < folderPathItems.length - 1 && <span>{">"}</span>}
-                </React.Fragment>
-              ))}
+      <div className="mt-2">
+        <label htmlFor="header">Headers</label>
+        <div className="flex flex-col space-y-0.5">
+          {responseHeaders.map((header, index) => (
+            <div key={header.id} className="flex space-x-1">
+              <input
+                id={`responseHeaders[${index}].name`}
+                type="text"
+                {...register(`responseHeaders.${index}.name` as const)}
+                autoComplete="none"
+                className="border border-gray-200 px-2 py-1"
+              />
+              <input
+                id={`responseHeaders[${index}].value`}
+                type="text"
+                {...register(`responseHeaders.${index}.value` as const)}
+                autoComplete="none"
+                className="border border-gray-200 px-2 py-1"
+              />
+              <button
+                type="button"
+                onClick={() => removeResponseHeader(index)}
+                className="text-red-600"
+              >
+                Remove
+              </button>
             </div>
-            <table className="w-full">
-              <thead>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td>Name</td>
-                  <td>Size (B)</td>
-                  <td>Created At</td>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item) => (
-                  <tr key={item.type + item.id}>
-                    <td>
-                      <input
-                        type="radio"
-                        name="file"
-                        value={item.id}
-                        disabled={item.type === "Folder"}
-                        onChange={handleFileSelect}
-                        checked={item.id === selectedFileId}
-                      />
-                    </td>
-                    <td>
-                      {item.type === "File" ? (
-                        <DocumentIcon className="h-4 w-4 text-blue-500" />
-                      ) : (
-                        <FolderIcon className="h-4 w-4 text-yellow-500" />
-                      )}
-                    </td>
-                    <td>
-                      {item.type === "File" ? (
-                        <>{item.name}</>
-                      ) : (
-                        <Link
-                          to={""}
-                          onClick={(e) => handleFolderClick(e, item.id)}
-                        >
-                          {item.name}
-                        </Link>
-                      )}
-                    </td>
-                    <td>{item.size || "-"}</td>
-                    <td>{new Date(item.createdAt).toDateString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <hr className="my-1" />
-          <div className="mt-1 flex justify-end space-x-1">
-            <button
-              onClick={handleChooseClick}
-              className="bg-primary px-2 py-1 text-white disabled:opacity-50"
-              disabled={selectedFileId === undefined}
-            >
-              Choose
-            </button>
-            <button
-              onClick={() => setShowModal(false)}
-              className="bg-gray-500 px-2 py-1 text-white"
-            >
-              Cancel
-            </button>
-          </div>
+          ))}
         </div>
-      </Modal>
+        <button
+          type="button"
+          onClick={() => addResponseHeaders({ name: "", value: "" })}
+          className=" mt-1 text-blue-600"
+        >
+          Add
+        </button>
+      </div>
+      <div>
+        <label className="block">{selectedFileName || "Choose a file"}</label>
+        <input type="hidden" {...register("fileId")} />
+        {errors.fileId && (
+          <span className="text-red-500">{errors.fileId.message}</span>
+        )}
+        <button
+          type="button"
+          onClick={handleChooseFileClick}
+          className="bg-blue-500 px-2 py-1 text-white"
+        >
+          Choose File
+        </button>
+        <Modal show={showModal} onClose={() => setShowModal(false)}>
+          <div className="p-2">
+            <h3 className="font-semibold">Choose a file</h3>
+            <hr className="my-1" />
+            <div className="min-h-56">
+              <div className="mt-2 flex space-x-1">
+                {folderPathItems.map((item, index) => (
+                  <React.Fragment key={item.id}>
+                    <Link
+                      to={``}
+                      className={item.id === folderId ? "font-semibold" : ""}
+                      onClick={(e) => handleFolderClick(e, item.id)}
+                    >
+                      {item.name}
+                    </Link>
+                    {index < folderPathItems.length - 1 && <span>{">"}</span>}
+                  </React.Fragment>
+                ))}
+              </div>
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td>Name</td>
+                    <td>Size (B)</td>
+                    <td>Created At</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((item) => (
+                    <tr key={item.type + item.id}>
+                      <td>
+                        <input
+                          type="radio"
+                          name="file"
+                          value={item.id}
+                          disabled={item.type === "Folder"}
+                          onChange={handleFileSelect}
+                          checked={item.id === selectedFileId}
+                        />
+                      </td>
+                      <td>
+                        {item.type === "File" ? (
+                          <DocumentIcon className="h-4 w-4 text-blue-500" />
+                        ) : (
+                          <FolderIcon className="h-4 w-4 text-yellow-500" />
+                        )}
+                      </td>
+                      <td>
+                        {item.type === "File" ? (
+                          <>{item.name}</>
+                        ) : (
+                          <Link
+                            to={""}
+                            onClick={(e) => handleFolderClick(e, item.id)}
+                          >
+                            {item.name}
+                          </Link>
+                        )}
+                      </td>
+                      <td>{item.size || "-"}</td>
+                      <td>{new Date(item.createdAt).toDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <hr className="my-1" />
+            <div className="mt-1 flex justify-end space-x-1">
+              <button
+                onClick={handleChooseClick}
+                className="bg-primary px-2 py-1 text-white disabled:opacity-50"
+                disabled={selectedFileId === undefined}
+              >
+                Choose
+              </button>
+              <button
+                onClick={() => setShowModal(false)}
+                className="bg-gray-500 px-2 py-1 text-white"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </Modal>
+      </div>
     </div>
   );
 }

@@ -52,6 +52,9 @@ public class RoutesController(IRouteService routeService,
             route.FunctionHandlerDependencies,
             route.RequireAuthorization,
             Status = route.Status.ToString(),
+            route.FileId,
+            FileName = route.File?.Name,
+            FileFolderId = route.File?.FolderId,
             route.CreatedAt,
             route.UpdatedAt
         });

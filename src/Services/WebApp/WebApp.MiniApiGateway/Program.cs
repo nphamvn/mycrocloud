@@ -81,6 +81,9 @@ app.UseValidationMiddleware();
 app.MapWhen(context => ((Route)context.Items["_Route"]!).ResponseType == "static",
     appBuilder => appBuilder.Run(StaticResponseHandler.Handle));
 
+app.MapWhen(context => ((Route)context.Items["_Route"]!).ResponseType == "staticFile",
+    appBuilder => appBuilder.Run(FileResponseHandler.Handle));
+
 app.MapWhen(context => ((Route)context.Items["_Route"]!).ResponseType == "function",
     appBuilder => appBuilder.Run(FunctionHandler.Handle));
 

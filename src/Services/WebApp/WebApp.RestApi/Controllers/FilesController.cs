@@ -1,6 +1,4 @@
-﻿using System.Text;
-using System.Text.Json;
-using System.Transactions;
+﻿using System.Text.Json;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +6,7 @@ using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Repositories.EfCore;
 using WebApp.RestApi.Controllers;
 using WebApp.RestApi.Models.Files;
+using File = WebApp.Domain.Entities.File;
 
 namespace WebApp.RestApi;
 
@@ -72,7 +71,7 @@ ORDER BY depth;
     }
 
     [HttpPost("folders")]
-    public async Task<IActionResult> CreateFolder(int appId, int? folderId, CreateUpdateFolderModel createFolderModel)
+    public async Task<IActionResult> CreateFolder(int appId, int? folderId, CreateRenameFolderModel createFolderModel)
     {
         var parentFolder = await appDbContext.Folders
                 .Include(f => f.App)
@@ -91,13 +90,24 @@ ORDER BY depth;
     }
 
     [HttpPatch("folders")]
-    public async Task<IActionResult> RenameFolder(int appId, int folderId, CreateUpdateFolderModel renameFolderModel)
+    public async Task<IActionResult> RenameFolder(int appId, int folderId, CreateRenameFolderModel renameFolderModel)
     {
         var folder = await appDbContext.Folders
                         .Where(f => f.AppId == appId && f.Id == folderId)
                         .SingleAsync();
         folder.Name = renameFolderModel.Name;
 
+        await appDbContext.SaveChangesAsync();
+        return NoContent();
+    }
+
+    [HttpPatch]
+    public async Task<IActionResult> Rename(int appId, int fileId, FileRenameModel fileRenameModel)
+    {
+        var file = await appDbContext.Files
+                        .Where(f => f.Folder.AppId == appId && f.Id == fileId)
+                        .SingleAsync();
+        file.Name = fileRenameModel.Name;
         await appDbContext.SaveChangesAsync();
         return NoContent();
     }
@@ -155,28 +165,27 @@ ORDER BY depth;
     [HttpPost]
     public async Task<IActionResult> Upload(int appId, int? folderId, IFormFile file)
     {
-        var parentFolder = folderId != null ?
-            await appDbContext.Folders.Where(f => f.AppId == appId && f.Id == folderId).SingleAsync()
-            : await appDbContext.Folders.Where(f => f.AppId == appId && f.ParentId == null).SingleAsync();
+        var parentFolder = await appDbContext.Folders
+                .Where(f => f.AppId == appId && ((folderId != null && f.Id == folderId) || (folderId == null && f.ParentId == null)))
+                .SingleAsync();
 
+        var fileEntity = new File
+        {
+            Folder = parentFolder,
+            Name = file.FileName,
+        };
         using (var memoryStream = new MemoryStream())
         {
             await file.CopyToAsync(memoryStream);
-
             // Upload the file if less than 2 MB
             if (memoryStream.Length < 2097152)
             {
-                await appDbContext.Files.AddAsync(new()
-                {
-                    Folder = parentFolder,
-                    Name = file.FileName,
-                    Content = memoryStream.ToArray()
-                });
-
-                await appDbContext.SaveChangesAsync();
+                fileEntity.Content = memoryStream.ToArray();
             }
         }
-        return NoContent();
+        await appDbContext.Files.AddAsync(fileEntity);
+        await appDbContext.SaveChangesAsync();
+        return Created("", new { fileEntity.Id, fileEntity.Name, fileEntity.CreatedAt });
     }
 
     [HttpPost]
@@ -190,7 +199,7 @@ ORDER BY depth;
     }
 }
 
-public class CreateUpdateFolderModel
+public class CreateRenameFolderModel
 {
     public string Name { get; set; }
 }
@@ -198,4 +207,8 @@ public class CreateUpdateFolderModel
 public class FileUploadModel
 {
     public IFormFile File { get; set; }
+}
+public class FileRenameModel
+{
+    public string Name { get; set; }
 }
