@@ -44,12 +44,12 @@ export default function RouteCreateUpdate({
       name: route.name,
       method: route.method,
       path: route.path,
-      requestQuerySchema: route.requestQuerySchema,
-      requestHeaderSchema: route.requestHeaderSchema,
-      requestBodySchema: route.requestBodySchema,
-      requireAuthorization: route.requireAuthorization,
-      responseType: route.responseType,
-      responseStatusCode: route.responseStatusCode,
+      requestQuerySchema: route.requestQuerySchema || "",
+      requestHeaderSchema: route.requestHeaderSchema || "",
+      requestBodySchema: route.requestBodySchema || "",
+      requireAuthorization: route.requireAuthorization || false,
+      responseType: route.responseType || "static",
+      responseStatusCode: route.responseStatusCode || 200,
       responseHeaders: route.responseHeaders
         ? route.responseHeaders.map((value) => {
             return {
@@ -58,11 +58,11 @@ export default function RouteCreateUpdate({
             };
           })
         : [],
-      responseBody: route.responseBody,
-      responseBodyLanguage: route.responseBodyLanguage,
-      functionHandler: route.functionHandler,
+      responseBody: route.responseBody || "",
+      responseBodyLanguage: route.responseBodyLanguage || "plaintext",
+      functionHandler: route.functionHandler || "",
       functionHandlerDependencies: route.functionHandlerDependencies || [],
-      useDynamicResponse: route.useDynamicResponse,
+      useDynamicResponse: route.useDynamicResponse || false,
       fileId: route.fileId,
     },
   });
