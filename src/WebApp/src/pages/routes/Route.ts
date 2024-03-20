@@ -18,6 +18,7 @@ export default interface IRoute {
   useDynamicResponse: boolean;
   fileId?: number;
   fileName?: string;
+  fileFolderId?: number;
 }
 
 export interface IResponseHeader {

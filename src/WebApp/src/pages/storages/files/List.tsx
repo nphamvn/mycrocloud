@@ -59,7 +59,6 @@ export default function List() {
     input.onchange = async (_) => {
       const file = input.files?.item(0);
       if (file) {
-        console.log("Uploading file", file.name);
         const form = new FormData();
         form.append("file", file);
         const accessToken = await getAccessTokenSilently();
@@ -67,13 +66,24 @@ export default function List() {
         if (folderId) {
           url += `?folderId=${folderId}`;
         }
-        await fetch(url, {
+        const res = await fetch(url, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
           body: form,
         });
+
+        if (res.ok) {
+          const newFile: Item = {
+            ...(await res.json()),
+            type: "File",
+          };
+          setPageData((prev) => ({
+            ...prev,
+            items: [...prev.items, newFile],
+          }));
+        }
       }
     };
     input.click();
@@ -103,7 +113,7 @@ export default function List() {
     });
 
     if (res.ok) {
-      setShowCreateRenameFolder(false);
+      setShowCreateRenameModal(false);
 
       if (!isEditMode) {
         const newFolder: Item = {
@@ -130,14 +140,14 @@ export default function List() {
       }
     }
   };
-  const [showCreateRenameFolder, setShowCreateRenameFolder] = useState(false);
+  const [showCreateRenameModal, setShowCreateRenameModal] = useState(false);
 
   const handleRenameClick = (item: Item) => {
     renameFolder.current = item;
     createRenameFolderForm.reset();
     createRenameFolderForm.resetField("name");
     createRenameFolderForm.setValue("name", item.name);
-    setShowCreateRenameFolder(true);
+    setShowCreateRenameModal(true);
   };
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const deleteItem = useRef<Item>();
@@ -183,7 +193,7 @@ export default function List() {
             }
             createRenameFolderForm.reset();
             createRenameFolderForm.resetField("name");
-            setShowCreateRenameFolder(true);
+            setShowCreateRenameModal(true);
           }}
           className="bg-primary px-2 py-1 text-white"
         >
@@ -255,9 +265,9 @@ export default function List() {
       </table>
       <Modal
         dismissible
-        show={showCreateRenameFolder}
+        show={showCreateRenameModal}
         onClose={() => {
-          setShowCreateRenameFolder(false);
+          setShowCreateRenameModal(false);
         }}
       >
         <form
@@ -293,7 +303,7 @@ export default function List() {
                   if (renameFolder.current) {
                     renameFolder.current = undefined;
                   }
-                  setShowCreateRenameFolder(false);
+                  setShowCreateRenameModal(false);
                 }}
                 className="bg-gray-500 px-2 py-1 text-white"
               >

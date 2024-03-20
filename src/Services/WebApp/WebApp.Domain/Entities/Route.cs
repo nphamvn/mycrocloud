@@ -24,7 +24,8 @@ public class Route : BaseEntity
     public bool RequireAuthorization { get; set; }
     public RouteStatus Status { get; set; } = RouteStatus.Active;
     public bool UseDynamicResponse { get; set; }
-    public File StaticFile { get; set; }
+    public int? FileId { get; set; }
+    public File File { get; set; }
 }
 
 public class ResponseHeader
