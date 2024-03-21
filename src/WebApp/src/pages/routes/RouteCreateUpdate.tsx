@@ -71,7 +71,6 @@ export default function RouteCreateUpdate({
     handleSubmit,
     formState: { errors },
     watch,
-    getValues,
   } = forms;
 
   const responseType = watch("responseType");
