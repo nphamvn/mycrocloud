@@ -52,11 +52,11 @@ export default function RouteCreateUpdate({
       responseStatusCode: route.responseStatusCode || 200,
       responseHeaders: route.responseHeaders
         ? route.responseHeaders.map((value) => {
-            return {
-              name: value.name,
-              value: value.value,
-            };
-          })
+          return {
+            name: value.name,
+            value: value.value,
+          };
+        })
         : [],
       responseBody: route.responseBody || "",
       responseBodyLanguage: route.responseBodyLanguage || "plaintext",
@@ -71,11 +71,11 @@ export default function RouteCreateUpdate({
     handleSubmit,
     formState: { errors },
     watch,
+    getValues,
   } = forms;
 
   const responseType = watch("responseType");
   const url = appDomain + watch("path");
-
   return (
     <FormProvider {...forms}>
       <form className="h-full p-2" onSubmit={handleSubmit(onSubmit)}>
@@ -186,8 +186,15 @@ export default function RouteCreateUpdate({
               {responseType === "static" && <StaticResponse />}
               {responseType === "staticFile" && (
                 <StaticFile
-                  fileName={route.fileName}
-                  folderId={route.fileFolderId}
+                  file={
+                    route.fileId
+                      ? {
+                        id: route.fileId!,
+                        name: route.fileName!,
+                        folderId: route.fileFolderId!,
+                      }
+                      : undefined
+                  }
                 />
               )}
               {responseType === "function" && <FunctionHandler />}
@@ -565,13 +572,12 @@ interface PageData {
   folderPathItems: FolderPathItem[];
 }
 
-function StaticFile({
-  fileName,
-  folderId: fileFolderId,
-}: {
-  fileName?: string;
-  folderId?: number;
-}) {
+interface IFile {
+  id: number;
+  name: string;
+  folderId: number;
+}
+function StaticFile({ file }: { file?: IFile }) {
   const app = useContext(AppContext)!;
   const { getAccessTokenSilently } = useAuth0();
   const {
@@ -579,7 +585,6 @@ function StaticFile({
     register,
     formState: { errors },
     setValue,
-    getValues,
   } = useFormContext<RouteCreateUpdateInputs>();
 
   const {
@@ -590,16 +595,19 @@ function StaticFile({
     control,
     name: "responseHeaders",
   });
+  const selectedFile = useRef<IFile | undefined>(file);
+  const [modalSelectedFile, setModalSelectedFile] = useState<IFile | undefined>(file);
+  const [folderId, setFolderId] = useState<number | undefined>(file?.folderId);
   const [showModal, setShowModal] = useState(false);
   const handleChooseFileClick = () => {
-    setSelectedFileId(getValues("fileId") || undefined);
+    setModalSelectedFile(selectedFile.current);
     setShowModal(true);
   };
   const [{ items, folderPathItems }, setPageData] = useState<PageData>({
     items: [],
     folderPathItems: [],
   });
-  const [folderId, setFolderId] = useState<number | undefined>(fileFolderId);
+
   const handleFolderClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
     folderId: number,
@@ -628,24 +636,24 @@ function StaticFile({
       folderPathItems: folderPathItems,
     });
   };
-  const [selectedFileId, setSelectedFileId] = useState<number>();
-  const [selectedFileName, setSelectedFileName] = useState<string | undefined>(
-    fileName,
-  );
+
   useEffect(() => {
     if (showModal) {
       fetchItems();
     }
   }, [showModal, folderId]);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedFileId(parseInt(e.target.value));
+  const handleFileSelect = (file: FileFolderItem) => {
+    setModalSelectedFile({
+      id: file.id,
+      name: file.name,
+      folderId: file.parentId,
+    });
   };
   const handleChooseClick = () => {
+    selectedFile.current = modalSelectedFile;
+    setValue("fileId", selectedFile.current?.id);
     setShowModal(false);
-    setValue("fileId", selectedFileId);
-    const selectedFile = items.find((item) => item.id === selectedFileId);
-    setSelectedFileName(selectedFile?.name);
   };
   return (
     <div>
@@ -695,7 +703,16 @@ function StaticFile({
       </div>
       <div className="mt-2">
         <div>File</div>
-        <label className="block">{selectedFileName || "Choose a file"}</label>
+        {selectedFile ? (
+          <Link
+            to={`/apps/${app.id}/storages/files?folderId=${selectedFile.current!.folderId}`}
+            className="block text-blue-500 hover:underline"
+          >
+            {selectedFile.current!.name}
+          </Link>
+        ) : (
+          <p>Choose a file</p>
+        )}
         <input type="hidden" {...register("fileId")} />
         {errors.fileId && (
           <span className="text-red-500">{errors.fileId.message}</span>
@@ -703,9 +720,9 @@ function StaticFile({
         <button
           type="button"
           onClick={handleChooseFileClick}
-          className="bg-blue-500 px-2 py-1 text-white"
+          className="mt-1 bg-blue-500 px-2 py-1 text-white"
         >
-          Choose File
+          Choose
         </button>
         <Modal show={showModal} onClose={() => setShowModal(false)}>
           <div className="p-2">
@@ -745,8 +762,10 @@ function StaticFile({
                           name="file"
                           value={item.id}
                           disabled={item.type === "Folder"}
-                          onChange={handleFileSelect}
-                          checked={item.id === selectedFileId}
+                          onChange={() => {
+                            handleFileSelect(item);
+                          }}
+                          checked={item.id === modalSelectedFile?.id}
                         />
                       </td>
                       <td>
@@ -780,7 +799,7 @@ function StaticFile({
               <button
                 onClick={handleChooseClick}
                 className="bg-primary px-2 py-1 text-white disabled:opacity-50"
-                disabled={selectedFileId === undefined}
+                disabled={selectedFile === undefined}
               >
                 Choose
               </button>

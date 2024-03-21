@@ -7,6 +7,7 @@ public class FolderContent
     public string Name { get; set; }
     public DateTime CreatedAt { get; set; }
     public long? Size { get; set; }
+    public int ParentId { get; set; }
 }
 
 public class FolderPathItem

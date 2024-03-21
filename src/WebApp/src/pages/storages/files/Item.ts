@@ -4,6 +4,7 @@ export default interface Item {
   id: number;
   size?: number;
   createdAt: string;
+  parentId: number
 }
 
 export interface FolderPathItem {

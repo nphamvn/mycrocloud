@@ -24,11 +24,11 @@ public class FilesController(AppDbContext appDbContext, IRouteRepository routeRe
 
         const string sql =
 """
-SELECT 'Folder' AS "Type", f."Id", f."Name", f."CreatedAt", NULL AS "Size"
+SELECT 'Folder' AS "Type", f."Id", f."Name", f."CreatedAt", NULL AS "Size", f."ParentId" 
 FROM "Folders" AS f
 WHERE f."ParentId" = @FolderId
 UNION
-SELECT 'File' AS "Type", f0."Id", f0."Name", f0."CreatedAt", LENGTH(f0."Content") AS "Size"
+SELECT 'File' AS "Type", f0."Id", f0."Name", f0."CreatedAt", LENGTH(f0."Content") AS "Size", f0."FolderId"
 FROM "Files" AS f0
 WHERE f0."FolderId" = @FolderId
 """;
