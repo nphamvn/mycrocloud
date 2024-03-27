@@ -261,14 +261,20 @@ ORDER BY depth;
         {
             await file.CopyToAsync(memoryStream);
             // Upload the file if less than 2 MB
-            if (memoryStream.Length < 2097152)
+            if (memoryStream.Length < 2 * 1024* 1024)
             {
                 fileEntity.Content = memoryStream.ToArray();
             }
         }
         await appDbContext.Files.AddAsync(fileEntity);
         await appDbContext.SaveChangesAsync();
-        return Created("", new { fileEntity.Id, fileEntity.Name, fileEntity.CreatedAt });
+        const string getFileSizeSql = 
+        """
+        SELECT LENGTH(f."Content") FROM "Files" AS f WHERE f."Id" = @FileId
+        """;
+        var size = await appDbContext.Database.GetDbConnection()
+            .ExecuteScalarAsync<int>(getFileSizeSql, new { FileId = fileEntity.Id });
+        return Created("", new { fileEntity.Id, fileEntity.Name, fileEntity.CreatedAt, size });
     }
 
     [HttpGet("download")]
