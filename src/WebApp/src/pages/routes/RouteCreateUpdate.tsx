@@ -1,5 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import {
+  FieldErrors,
   FormProvider,
   useFieldArray,
   useForm,
@@ -75,9 +76,12 @@ export default function RouteCreateUpdate({
 
   const responseType = watch("responseType");
   const url = appDomain + watch("path");
+  const onInvalid = (e: FieldErrors<RouteCreateUpdateInputs>) => {
+    console.log(e);
+  }
   return (
     <FormProvider {...forms}>
-      <form className="h-full p-2" onSubmit={handleSubmit(onSubmit)}>
+      <form className="h-full p-2" onSubmit={handleSubmit(onSubmit, onInvalid)}>
         {route?.status === "Blocked" && (
           <div className="border border-red-200 bg-red-50 p-2 text-red-700">
             <p>
