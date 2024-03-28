@@ -21,7 +21,7 @@ import {
   default as FileFolderItem,
   FolderPathItem,
 } from "../storages/files/Item";
-import { DocumentIcon, FolderIcon } from "@heroicons/react/24/solid";
+import { ArrowTopRightOnSquareIcon, DocumentIcon, FolderIcon } from "@heroicons/react/24/solid";
 import { Link } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import React from "react";
@@ -138,8 +138,9 @@ export default function RouteCreateUpdate({
               )}
               <div className="mt-1">
                 <small className="me-2">URL:</small>
-                <a className="text-blue-500 hover:underline" href={url}>
+                <a className="text-blue-500 hover:underline inline-flex" href={url} target="_blank">
                   <small>{url}</small>
+                  <ArrowTopRightOnSquareIcon className="h-4 w-4 ms-0.5" />
                 </a>
                 <button
                   type="button"
