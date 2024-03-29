@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace MyApp.Namespace;
+namespace WebApp.Admin.Pages.Routes;
 
 public class RouteEdit : PageModel
 {
