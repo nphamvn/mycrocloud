@@ -56,64 +56,66 @@ function App() {
         <div className="container mx-auto min-h-screen p-2">
           <Routes>
             <Route path="/" Component={Home} />
-            <Route
-              path="/apps"
-              element={<ProtectedPage children={<AppList />} />}
-            />
-            <Route
-              path="/apps/new"
-              element={<ProtectedPage children={<AppCreate />} />}
-            />
-            <Route
-              path="/apps/:appId"
-              element={<ProtectedPage children={<AppLayout />} />}
-            >
-              <Route index Component={AppOverview} />
-              <Route path="routes" Component={RouteIndex}>
-                <Route path="new" Component={RouteCreate} />
-                <Route path=":routeId" Component={RouteEdit} />
-                <Route path=":routeId/logs" Component={RouteLogs} />
-              </Route>
-              <Route path="authentications">
-                <Route
-                  index
-                  path="schemes"
-                  Component={AuthenticationSchemeList}
-                />
-                <Route
-                  path="schemes/new"
-                  Component={AuthenticationSchemeCreateUpdate}
-                />
-                <Route
-                  path="schemes/:schemeId"
-                  Component={AuthenticationSchemeCreateUpdate}
-                />
-                <Route
-                  path="settings"
-                  Component={AuthenticationSchemeSettings}
-                />
-              </Route>
-              <Route path="logs" Component={AppLog} />
-              <Route path="storages">
-                <Route path="files">
-                  <Route index Component={FileList} />
+            <Route path="apps">
+              <Route index element={<ProtectedPage children={<AppList />} />} />
+              <Route
+                path="new"
+                element={<ProtectedPage children={<AppCreate />} />}
+              />
+              <Route
+                path=":appId"
+                element={<ProtectedPage children={<AppLayout />} />}
+              >
+                <Route index Component={AppOverview} />
+                <Route path="routes" Component={RouteIndex}>
+                  <Route path="new" Component={RouteCreate} />
+                  <Route path=":routeId" Component={RouteEdit} />
+                  <Route path=":routeId/logs" Component={RouteLogs} />
                 </Route>
-                <Route path="textstorages">
-                  <Route index Component={TextStorageList} />
-                  <Route path="new" Component={CreateUpdateTextStorage} />
+                <Route path="authentications">
                   <Route
-                    path=":storageId"
-                    Component={CreateUpdateTextStorage}
+                    index
+                    path="schemes"
+                    Component={AuthenticationSchemeList}
                   />
-                  <Route path=":storageId/logon" Component={LogonTextStorage} />
+                  <Route
+                    path="schemes/new"
+                    Component={AuthenticationSchemeCreateUpdate}
+                  />
+                  <Route
+                    path="schemes/:schemeId"
+                    Component={AuthenticationSchemeCreateUpdate}
+                  />
+                  <Route
+                    path="settings"
+                    Component={AuthenticationSchemeSettings}
+                  />
                 </Route>
-                <Route path="variables">
-                  <Route index Component={VariableList} />
-                  <Route path="new" Component={VariableCreateUpdate} />
-                  <Route
-                    path=":variableId/edit"
-                    Component={VariableCreateUpdate}
-                  />
+                <Route path="logs" Component={AppLog} />
+                <Route path="storages">
+                  <Route path="files">
+                    <Route index Component={FileList} />
+                  </Route>
+                  <Route path="textstorages">
+                    <Route index Component={TextStorageList} />
+                    <Route path="new" Component={CreateUpdateTextStorage} />
+                    <Route
+                      path=":storageId"
+                      Component={CreateUpdateTextStorage}
+                    />
+                    <Route
+                      path=":storageId/logon"
+                      Component={LogonTextStorage}
+                    />
+                  </Route>
+                  <Route path="variables">
+                    <Route index Component={VariableList} />
+                    <Route path="new" Component={VariableCreateUpdate} />
+                    <Route
+                      path=":variableId/edit"
+                      Component={VariableCreateUpdate}
+                    />
+                  </Route>
                 </Route>
               </Route>
             </Route>
