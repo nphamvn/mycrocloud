@@ -1,5 +1,4 @@
 import { SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
@@ -24,22 +23,18 @@ function AppCreate() {
     resolver: yupResolver(schema),
   });
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    try {
-      const accessToken = await getAccessTokenSilently();
-      const res = await fetch("/api/apps", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(data),
-      });
-      if (res.ok) {
-        toast("Created app");
-        navigate("/apps");
-      }
-    } catch (error) {
-      console.log(error);
+    const accessToken = await getAccessTokenSilently();
+    const res = await fetch("/api/apps", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(data),
+    });
+    if (res.ok) {
+      const id = parseInt(res.headers.get("Location")!);
+      navigate(`../${id}`);
     }
   };
   return (

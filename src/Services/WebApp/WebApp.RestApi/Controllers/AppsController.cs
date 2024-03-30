@@ -27,8 +27,9 @@ public class AppsController(IAppService appService, IAppRepository appRepository
     [HttpPost]
     public async Task<IActionResult> Create(AppCreateRequest appCreateRequest)
     {
-        await appService.Create(User.GetUserId(), appCreateRequest.ToEntity());
-        return Created();
+        var app = appCreateRequest.ToEntity();
+        await appService.Create(User.GetUserId(), app);
+        return Created(app.Id.ToString(), app);
     }
 
     [HttpGet("{id:int}")]
