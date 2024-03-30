@@ -21,7 +21,11 @@ import {
   default as FileFolderItem,
   FolderPathItem,
 } from "../storages/files/Item";
-import { ArrowTopRightOnSquareIcon, DocumentIcon, FolderIcon } from "@heroicons/react/24/solid";
+import {
+  ArrowTopRightOnSquareIcon,
+  DocumentIcon,
+  FolderIcon,
+} from "@heroicons/react/24/solid";
 import { Link } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import React from "react";
@@ -53,11 +57,11 @@ export default function RouteCreateUpdate({
       responseStatusCode: route.responseStatusCode || 200,
       responseHeaders: route.responseHeaders
         ? route.responseHeaders.map((value) => {
-          return {
-            name: value.name,
-            value: value.value,
-          };
-        })
+            return {
+              name: value.name,
+              value: value.value,
+            };
+          })
         : [],
       responseBody: route.responseBody || "",
       responseBodyLanguage: route.responseBodyLanguage || "plaintext",
@@ -77,8 +81,8 @@ export default function RouteCreateUpdate({
   const responseType = watch("responseType");
   const url = appDomain + watch("path");
   const onInvalid = (e: FieldErrors<RouteCreateUpdateInputs>) => {
-    console.log(e);
-  }
+    console.error(e);
+  };
   return (
     <FormProvider {...forms}>
       <form className="h-full p-2" onSubmit={handleSubmit(onSubmit, onInvalid)}>
@@ -138,9 +142,13 @@ export default function RouteCreateUpdate({
               )}
               <div className="mt-1">
                 <small className="me-2">URL:</small>
-                <a className="text-blue-500 hover:underline inline-flex" href={url} target="_blank">
+                <a
+                  className="inline-flex text-blue-500 hover:underline"
+                  href={url}
+                  target="_blank"
+                >
                   <small>{url}</small>
-                  <ArrowTopRightOnSquareIcon className="h-4 w-4 ms-0.5" />
+                  <ArrowTopRightOnSquareIcon className="ms-0.5 h-4 w-4" />
                 </a>
                 <button
                   type="button"
@@ -193,10 +201,10 @@ export default function RouteCreateUpdate({
                   file={
                     route.fileId
                       ? {
-                        id: route.fileId!,
-                        name: route.fileName!,
-                        folderId: route.fileFolderId!,
-                      }
+                          id: route.fileId!,
+                          name: route.fileName!,
+                          folderId: route.fileFolderId!,
+                        }
                       : undefined
                   }
                 />
@@ -600,7 +608,9 @@ function StaticFile({ file }: { file?: IFile }) {
     name: "responseHeaders",
   });
   const selectedFile = useRef<IFile | undefined>(file);
-  const [modalSelectedFile, setModalSelectedFile] = useState<IFile | undefined>(file);
+  const [modalSelectedFile, setModalSelectedFile] = useState<IFile | undefined>(
+    file,
+  );
   const [folderId, setFolderId] = useState<number | undefined>(file?.folderId);
   const [showModal, setShowModal] = useState(false);
   const handleChooseFileClick = () => {
