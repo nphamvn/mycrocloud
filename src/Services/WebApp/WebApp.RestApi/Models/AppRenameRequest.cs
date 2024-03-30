@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebApp.Api.Models;
+namespace WebApp.RestApi.Models;
 
 public class AppRenameRequest
 {

@@ -5,15 +5,16 @@ using WebApp.Domain.Enums;
 using WebApp.Domain.Repositories;
 using WebApp.Domain.Services;
 using WebApp.RestApi.Extensions;
+using WebApp.RestApi.Models;
 
 namespace WebApp.RestApi.Controllers;
 
 public class AppsController(IAppService appService, IAppRepository appRepository) : BaseController
 {
     [HttpGet]
-    public async Task<IActionResult> Index(string? term)
+    public async Task<IActionResult> Index(string? q)
     {
-        var apps = await appRepository.ListByUserId(User.GetUserId(), term, "");
+        var apps = await appRepository.ListByUserId(User.GetUserId(), q, "");
         return Ok(apps.Select(app => new {
             app.Id,
             app.Name,
@@ -27,9 +28,18 @@ public class AppsController(IAppService appService, IAppRepository appRepository
     [HttpPost]
     public async Task<IActionResult> Create(AppCreateRequest appCreateRequest)
     {
-        var app = appCreateRequest.ToEntity();
+        var app = Map(appCreateRequest);
         await appService.Create(User.GetUserId(), app);
         return Created(app.Id.ToString(), app);
+
+        App Map(AppCreateRequest source)
+        {
+            return new App
+            {
+                Name = source.Name,
+                Description =source. Description
+            };
+        }
     }
 
     [HttpGet("{id:int}")]
