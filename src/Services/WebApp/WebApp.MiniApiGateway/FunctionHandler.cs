@@ -24,12 +24,12 @@ public static class FunctionHandler
         {
             if (app.Settings.CheckFunctionExecutionLimitMemory)
             {
-                options.LimitMemory(app.Settings.FunctionExecutionLimitMemoryBytes ?? 10 * 1024 * 1024);
+                options.LimitMemory(app.Settings.FunctionExecutionLimitMemoryBytes ?? 2 * 1024 * 1024);
             }
 
             if (app.Settings.CheckFunctionExecutionTimeout)
             {
-                options.TimeoutInterval(TimeSpan.FromSeconds(app.Settings.FunctionExecutionTimeoutSeconds ?? 15));
+                options.TimeoutInterval(TimeSpan.FromSeconds(app.Settings.FunctionExecutionTimeoutSeconds ?? 10));
             }
         });
 
@@ -59,9 +59,9 @@ public static class FunctionHandler
             }
         }
         //Inject plugins
-        engine.SetValue("useLocalTextStorage", new Func<string, LocalTextStorageAdapter>((name) => {
+        engine.SetValue("useTextStorage", new Func<string, LocalTextStorageAdapter>(name => {
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseNpgsql(ConfigurationHelper.Configuration!.GetConnectionString("PostgreSQL"));
+            optionsBuilder.UseNpgsql(ConfigurationHelper.Configuration!.GetConnectionString("DefaultConnection"));
             var appDbContext = new AppDbContext(optionsBuilder.Options);
             var adapter = new LocalTextStorageAdapter(app, name, appDbContext);
             return adapter;
