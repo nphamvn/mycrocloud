@@ -59,11 +59,11 @@ public static class FunctionHandler
             }
         }
         //Inject plugins
-        engine.SetValue("useTextStorage", new Func<string, LocalTextStorageAdapter>(name => {
+        engine.SetValue("useTextStorage", new Func<string, TextStorageAdapter>(name => {
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
             optionsBuilder.UseNpgsql(ConfigurationHelper.Configuration!.GetConnectionString("DefaultConnection"));
             var appDbContext = new AppDbContext(optionsBuilder.Options);
-            var adapter = new LocalTextStorageAdapter(app, name, appDbContext);
+            var adapter = new TextStorageAdapter(app, name, appDbContext);
             return adapter;
         }));
 
