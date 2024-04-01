@@ -55,7 +55,7 @@ services:
       - SEQ_FIRSTRUN_ADMINPASSWORDHASH=QDFtcJLYGKj1Ir6xyrydGr+u6tYcTn33xd4WCe629b6cPQgPXs3UaCYyWkzJaJAyTqNgG89fdTfjF9LQYDkqvdiMsudVmoPJc1Ho3WT0j98w
     volumes:
       - seq_data:/data
-    restart: "unless-stopped"
+    #restart: "unless-stopped"
     
 volumes:
   db_data:
