@@ -1,6 +1,7 @@
 FROM node:21-alpine3.18 as build
 WORKDIR /app
 COPY package.json ./
+COPY package-lock.json ./
 RUN npm install
 COPY . .
 ARG COMMIT_HASH
