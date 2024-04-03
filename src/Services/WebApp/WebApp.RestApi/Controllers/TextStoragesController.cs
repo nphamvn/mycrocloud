@@ -3,9 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Repositories.EfCore;
-using WebApp.RestApi.Controllers;
 
-namespace WebApp.RestApi;
+namespace WebApp.RestApi.Controllers;
 
 [Route("apps/{appId:int}/[controller]")]
 public class TextStoragesController(AppDbContext appDbContext) : BaseController

@@ -12,9 +12,9 @@ public class RoutesController(IRouteService routeService,
     ) : BaseController
 {
     [HttpGet]
-    public async Task<IActionResult> Index(int appId, string? SearchTerm, string? Sort)
+    public async Task<IActionResult> Index(int appId, string? q, string? s)
     {
-        var routes = await routeRepository.List(appId, SearchTerm, Sort);
+        var routes = await routeRepository.List(appId, q, s);
         return Ok(routes.Select(route => new {
             route.Id,
             route.Name,

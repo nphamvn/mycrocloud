@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+﻿using System.ComponentModel.DataAnnotations;
+using System.IO.Compression;
 using System.Text.Json;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
@@ -6,11 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
 using WebApp.Infrastructure.Repositories.EfCore;
-using WebApp.RestApi.Controllers;
 using WebApp.RestApi.Models.Files;
 using File = WebApp.Domain.Entities.File;
 
-namespace WebApp.RestApi;
+namespace WebApp.RestApi.Controllers;
 
 [Route("apps/{appId:int}/[controller]")]
 public class FilesController(AppDbContext appDbContext, IRouteRepository routeRepository) : BaseController
@@ -71,8 +71,8 @@ ORDER BY depth;
 
         var pathItems = await appDbContext.Database.GetDbConnection()
         .QueryAsync<FolderPathItem>(sql, new
-        {
-            Id = parentFolder.Id
+        { 
+            parentFolder.Id
         });
         return pathItems;
     }
@@ -143,47 +143,48 @@ ORDER BY depth;
                     .Where(f => f.Folder.AppId == appId && f.Id == fileId)
                     .SingleAsync();
                 var folderPathItems = await GetFolderPathItems(appDbContext, file.Folder);
-                await GenereateRouteForFile(folderPathItems, file);
+                await GenerateRouteForFile(folderPathItems, file);
             }
             await trans.CommitAsync();
             return Created();
         }
-        catch (System.Exception)
+        catch (Exception)
         {
             await trans.RollbackAsync();
             throw;
         }
     }
 
-    private async Task GenerateRouteForFolder(AppDbContext appDbContext, Folder folder)
+    private async Task GenerateRouteForFolder(AppDbContext dbContext, Folder folder)
     {
-        var folderPathItems = await GetFolderPathItems(appDbContext, folder);
+        var folderPathItems = (await GetFolderPathItems(dbContext, folder)).ToList();
 
-        foreach (var subFolder in await appDbContext.Folders
+        foreach (var subFolder in await dbContext.Folders
             .Where(f => f.ParentId == folder.Id)
             .ToListAsync())
         {
-            await GenerateRouteForFolder(appDbContext, subFolder);
+            await GenerateRouteForFolder(dbContext, subFolder);
         }
 
-        var files = await appDbContext.Files
+        var files = await dbContext.Files
                 .Include(f => f.Folder)
                 .Where(f => f.FolderId == folder.Id)
                 .ToListAsync();
 
         foreach (var file in files)
         {
-            await GenereateRouteForFile(folderPathItems, file);
+            await GenerateRouteForFile(folderPathItems, file);
         }
     }
     
-    private async Task GenereateRouteForFile(IEnumerable<FolderPathItem> folderPathItems, File file)
+    private async Task GenerateRouteForFile(IEnumerable<FolderPathItem> folderPathItems, File file)
     {
-        var segs = folderPathItems.Where(f => f.Depth > 0)
+        var items = folderPathItems.Where(f => f.Depth > 0)
                         .Select(f => f.Name.Replace(" ", "-"))
-                        .Append(file.Name.Replace(" ", "-"));
-        var name = string.Join('_', segs);
-        var path = "/" + string.Join('/', segs);
+                        .Append(file.Name.Replace(" ", "-"))
+                        .ToList();
+        var name = string.Join('_', items);
+        var path = "/" + string.Join('/', items);
         await routeRepository.Add(file.Folder.AppId, new Domain.Entities.Route
         {
             Name = name,
@@ -318,7 +319,7 @@ ORDER BY depth;
             .ToListAsync())
         {
             var fileEntry = archive.CreateEntry(folderEntry.FullName + file.Name);
-            using var entryStream = fileEntry.Open();
+            await using var entryStream = fileEntry.Open();
             await entryStream.WriteAsync(file.Content);
         }
     }
@@ -326,14 +327,12 @@ ORDER BY depth;
 
 public class CreateRenameFolderModel
 {
+    [Required]
     public string Name { get; set; }
 }
 
-public class FileUploadModel
-{
-    public IFormFile File { get; set; }
-}
 public class FileRenameModel
 {
+    [Required]
     public string Name { get; set; }
 }

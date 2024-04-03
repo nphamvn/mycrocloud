@@ -3,9 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure.Repositories.EfCore;
-using WebApp.RestApi.Controllers;
 
-namespace WebApp.RestApi;
+namespace WebApp.RestApi.Controllers;
 
 [Route("apps/{appId:int}/[controller]")]
 public class VariablesController(AppDbContext appDbContext) : BaseController
@@ -76,8 +75,10 @@ public class CreateUpdateVariableRequest
 {
     public string Name { get; set; }
     public string? StringValue { get; set; }
+    
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public VariableValueType ValueType { get; set; }
+    
     public bool IsSecret { get; set; }
 
     public Variable ToEntity()

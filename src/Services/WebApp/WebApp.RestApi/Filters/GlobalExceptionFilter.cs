@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace WebApp.Api.Filters;
+namespace WebApp.RestApi.Filters;
 
 public class GlobalExceptionFilter : IExceptionFilter
 {

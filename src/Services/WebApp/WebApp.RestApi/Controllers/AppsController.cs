@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using WebApp.Api.Models;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Enums;
 using WebApp.Domain.Repositories;

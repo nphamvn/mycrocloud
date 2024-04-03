@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using WebApp.Api.Filters;
 using WebApp.RestApi;
 using WebApp.Domain.Services;
 using WebApp.Domain.Repositories;
@@ -8,6 +7,7 @@ using WebApp.Infrastructure.Repositories.EfCore;
 using WebApp.RestApi.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Reflection;
+using WebApp.RestApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
