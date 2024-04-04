@@ -36,7 +36,10 @@ public class AppsController(IAppService appService, IAppRepository appRepository
             return new App
             {
                 Name = source.Name,
-                Description =source. Description
+                Description =source. Description,
+                Status = AppStatus.Active,
+                CorsSettings = CorsSettings.Default,
+                Version = Guid.NewGuid()
             };
         }
     }
@@ -45,19 +48,34 @@ public class AppsController(IAppService appService, IAppRepository appRepository
     public async Task<IActionResult> Get(int id)
     {
         var app = await appRepository.GetByAppId(id);
+        Response.Headers.Append(ETagHeader, app.Version.ToString());
         return Ok(new {
             app.Id,
             app.Name,
             app.Description,
             Status = app.Status.ToString(),
             app.CreatedAt,
-            app.UpdatedAt
+            app.UpdatedAt,
+            app.Version
         });
     }
 
     [HttpPatch("{id:int}/Rename")]
     public async Task<IActionResult> Rename(int id, AppRenameRequest renameRequest)
     {
+        var app = await appRepository.GetByAppId(id);
+        
+        if (app is null) return BadRequest();
+
+        if (!User.GetUserId().Equals(app.UserId)) return BadRequest();
+        
+        var currentETag = app.Version.ToString();
+        var requestETag = Request.Headers[IfMatchHeader].ToString();
+        if (requestETag != currentETag)
+        {
+            return StatusCode(StatusCodes.Status412PreconditionFailed);
+        }
+        
         await appService.Rename(id, renameRequest.Name);
         return NoContent();
     }

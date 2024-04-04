@@ -11,44 +11,39 @@ public interface IAppService {
     Task SetStatus(int id, AppStatus status);
 }
 
-public class AppService : IAppService
+public class AppService(IAppRepository appRepository) : IAppService
 {
-    private readonly IAppRepository _appRepository;
-
-    public AppService(IAppRepository appRepository)
-    {
-        _appRepository = appRepository;
-    }
     public async Task Create(string userId, App app)
     {
-        app.Status = AppStatus.Active;
-        app.CorsSettings ??= CorsSettings.Default;
-        await _appRepository.Add(userId, app);
+        await appRepository.Add(userId, app);
     }
 
     public async Task Delete(int id)
     {
-        await _appRepository.Delete(id);
+        await appRepository.Delete(id);
     }
 
     public async Task Rename(int id, string name)
     {
-        var currentApp = await _appRepository.GetByAppId(id);
+        var currentApp = await appRepository.GetByAppId(id);
         currentApp.Name = name;
-        await _appRepository.Update(id, currentApp);
+        currentApp.Version = Guid.NewGuid();
+        await appRepository.Update(id, currentApp);
     }
 
     public async Task SetCorsSettings(int id, CorsSettings settings)
     {
-        var app = await _appRepository.GetByAppId(id);
+        var app = await appRepository.GetByAppId(id);
         app.CorsSettings = settings;
-        await _appRepository.Update(id, app);
+        app.Version = Guid.NewGuid();
+        await appRepository.Update(id, app);
     }
 
     public async Task SetStatus(int id, AppStatus status)
     {
-        var app = await _appRepository.GetByAppId(id);
+        var app = await appRepository.GetByAppId(id);
         app.Status = status;
-        await _appRepository.Update(id, app);
+        app.Version = Guid.NewGuid();
+        await appRepository.Update(id, app);
     }
 }
