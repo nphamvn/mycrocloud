@@ -1,0 +1,21 @@
+﻿services:
+  formaas:
+    image: formaas
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=formaas;Username=formaas;Password=formaas"
+
+  db:
+    image: postgres:16.2-alpine
+    environment:
+      POSTGRES_USER: formaas
+      POSTGRES_PASSWORD: formaas
+      POSTGRES_DB: formaas
+    ports:
+      - "5432:5432"
