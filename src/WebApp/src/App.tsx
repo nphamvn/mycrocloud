@@ -37,6 +37,10 @@ import {
 
 import { FileList } from "./pages/storages/files";
 
+import { default as FormList } from "./modules/form/List";
+import { default as FormCreateUpdate } from "./modules/form/CreateUpdate";
+import { default as FormSubmissionList } from "./modules/form/SubmissionList";
+
 import { DevPage, devRoutes } from "./components/devpages";
 import About from "./pages/About";
 import { NotFoundPage } from "./pages/NotFoundPage";
@@ -117,6 +121,26 @@ function App() {
                     />
                   </Route>
                 </Route>
+              </Route>
+            </Route>
+            <Route path="forms">
+              <Route
+                index
+                element={<ProtectedPage children={<FormList />} />}
+              />
+              <Route
+                path="new"
+                element={<ProtectedPage children={<FormCreateUpdate />} />}
+              />
+              <Route path=":id">
+                <Route
+                  index
+                  element={<ProtectedPage children={<FormCreateUpdate />} />}
+                />
+                <Route
+                  path="submissions"
+                  element={<ProtectedPage children={<FormSubmissionList />} />}
+                />
               </Route>
             </Route>
             <Route

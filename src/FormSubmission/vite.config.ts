@@ -8,11 +8,6 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       proxy: {
-        "/api": {
-          target: env.VITE_BASE_API_URL,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, ""),
-        },
         "/formapi": {
           target: env.VITE_BASE_FORM_API_URL,
           changeOrigin: true,
