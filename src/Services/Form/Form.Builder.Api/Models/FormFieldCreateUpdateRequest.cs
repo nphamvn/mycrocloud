@@ -24,6 +24,20 @@ namespace Form.Builder.Api.Models
     {
         public FormFieldTextInputDetails? TextInput { get; set; }
         public FormFieldNumberInputDetails? NumberInput { get; set; }
+        
+        public FormFieldDropdownDetails? Dropdown { get; set; }
+    }
+
+    public class FormFieldDropdownDetails
+    {
+        public ICollection<SelectListItemModel> SelectListItems { get; set; }
+    }
+
+    public class SelectListItemModel
+    {
+        public Guid Id { get; set; }
+        
+        public string Text { get; set; }
     }
 
     public class FormFieldTextInputDetails

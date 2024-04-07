@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Form.Builder.Api.Entities;
-using Form.Builder.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Form.Builder.Api
@@ -14,7 +13,9 @@ namespace Form.Builder.Api
         public DbSet<FormSubmission> FormSubmissions { get; set; } = null!;
         
         public DbSet<FormSubmissionFieldValue> FormSubmissionFieldValues { get; set; } = null!;
-
+        
+        public DbSet<SelectListItem> SelectListItems { get; set; } = null!;
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

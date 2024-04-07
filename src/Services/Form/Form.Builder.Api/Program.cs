@@ -104,18 +104,30 @@ app.MapPost("forms", async (ClaimsPrincipal user, AppDbContext dbContext, FormCr
         
     foreach (var field in formCreateUpdateRequest.Fields)
     {
-        form.Fields.Add(new FormField()
+        var newField = new FormField
         {
             Name = field.Name,
             Type = field.Type,
             FormId = form.Id,
-            Details = new FormFieldDetails()
+            Details = new FormFieldDetails
             {
                 TextInput = MapTextInputDetails(field.Details.TextInput),
-                NumberInput = MapNumberInputDetails(field.Details.NumberInput)
+                NumberInput = MapNumberInputDetails(field.Details.NumberInput),
+                DropdownDetails = MapDropdownDetails(field.Details.Dropdown)
             },
             CreatedAt = DateTime.UtcNow
-        });
+        };
+
+        if (newField.Type == "Dropdown")
+        {
+            newField.SelectListItems = field.Details.Dropdown!.SelectListItems.Select(i => new SelectListItem
+            {
+                Id = i.Id,
+                Text = i.Text
+            }).ToList();
+        }
+        
+        form.Fields.Add(newField);
     }
         
     await dbContext.Forms.AddAsync(form);
@@ -329,5 +341,18 @@ NumberInputDetails? MapNumberInputDetails(FormFieldNumberInputDetails? numberInp
     {
         Min = numberInputDetails.Min,
         Max = numberInputDetails.Max
+    };
+}
+
+DropdownDetails? MapDropdownDetails(FormFieldDropdownDetails? detailsDropdown)
+{
+    if (detailsDropdown is null)
+    {
+        return null;
+    }
+
+    return new DropdownDetails()
+    {
+        
     };
 }

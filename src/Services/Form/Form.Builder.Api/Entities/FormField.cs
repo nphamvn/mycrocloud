@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace Form.Builder.Api.Entities
 {
@@ -24,6 +23,8 @@ namespace Form.Builder.Api.Entities
         
         public DateTime? UpdatedAt { get; set; }
 
+        public ICollection<SelectListItem>? SelectListItems { get; set; }
+        
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             yield return ValidationResult.Success;
@@ -32,13 +33,17 @@ namespace Form.Builder.Api.Entities
     
     public class FormFieldDetails
     {
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public TextInputDetails? TextInput { get; set; }
         
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public NumberInputDetails? NumberInput { get; set; }
+
+        public DropdownDetails? DropdownDetails { get; set; }
     }
-    
+
+    public class DropdownDetails
+    {
+    }
+
     public class TextInputDetails
     {
         public int? MinLength { get; set; }
