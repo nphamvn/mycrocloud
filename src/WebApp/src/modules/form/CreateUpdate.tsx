@@ -26,34 +26,6 @@ type NumberInput = {
   max?: number;
 };
 
-const sampleInputs: Inputs = {
-  name: "User Form",
-  description: "Form for user data",
-  fields: [
-    {
-      id: uuidv4(),
-      name: "Name",
-      type: "TextInput",
-      details: {
-        textInput: {
-          minLength: 3,
-          maxLength: 50,
-        },
-      },
-    },
-    {
-      id: uuidv4(),
-      name: "Age",
-      type: "NumberInput",
-      details: {
-        numberInput: {
-          min: 18,
-          max: 100,
-        },
-      },
-    },
-  ],
-};
 export default function CreateUpdate() {
   const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
@@ -66,11 +38,9 @@ export default function CreateUpdate() {
     handleSubmit,
     watch,
     setValue,
-  } = useForm<Inputs>({
-    //defaultValues: sampleInputs,
-  });
-  //https://react-hook-form.com/docs/usefieldarray#Controlled Field Array
+  } = useForm<Inputs>({});
 
+  //https://react-hook-form.com/docs/usefieldarray#Controlled Field Array
   const { fields, append } = useFieldArray({
     control,
     name: "fields",
@@ -158,6 +128,9 @@ export default function CreateUpdate() {
             id="name"
             className="mt-1 block w-full border px-2 py-1"
           />
+          {errors.name && (
+            <span className="text-danger">{errors.name.message}</span>
+          )}
         </div>
 
         <div className="mt-2">
@@ -167,6 +140,9 @@ export default function CreateUpdate() {
             id="description"
             className="mt-1 block w-full border px-2 py-1"
           />
+          {errors.description && (
+            <span className="text-danger">{errors.description.message}</span>
+          )}
         </div>
 
         <section>
