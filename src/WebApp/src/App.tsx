@@ -44,10 +44,6 @@ import { default as FormSubmissionList } from "./modules/form/SubmissionList";
 import { DevPage, devRoutes } from "./components/devpages";
 import About from "./pages/About";
 import { NotFoundPage } from "./pages/NotFoundPage";
-import ContactList from "./modules/chat/contactList";
-import ConversationList from "./modules/chat/conversationList";
-import Conversation from "./modules/chat/Conversation";
-import PeopleList from "./modules/chat/peopleList";
 
 function App() {
   return (
@@ -146,28 +142,6 @@ function App() {
                   element={<ProtectedPage children={<FormSubmissionList />} />}
                 />
               </Route>
-            </Route>
-            <Route path="chat">
-              <Route
-                index
-                element={<ProtectedPage children={<ConversationList />} />}
-              />
-              <Route
-                path=":conversationId"
-                element={<ProtectedPage children={<Conversation />} />}
-              />
-              <Route
-                path="u/:userId"
-                element={<ProtectedPage children={<Conversation />} />}
-              />
-              <Route
-                path="contacts"
-                element={<ProtectedPage children={<ContactList />} />}
-              />
-              <Route
-                path="people"
-                element={<ProtectedPage children={<PeopleList />} />}
-              />
             </Route>
             <Route
               path="_about"
