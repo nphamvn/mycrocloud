@@ -10,7 +10,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { AppContext } from "../apps";
 import IRoute from "./Route";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
-import { bodyLanguages, methods, sampleRoute } from "./constants";
+import { bodyLanguages, methods } from "./constants";
 import {
   RouteCreateUpdateInputs,
   routeCreateUpdateInputsSchema,
@@ -39,23 +39,23 @@ export default function RouteCreateUpdate({
   route?: IRoute;
   onSubmit: (data: RouteCreateUpdateInputs) => void;
 }) {
-  route = route || sampleRoute;
+  //route = route || sampleRoute;
   const app = useContext(AppContext)!;
   const appDomain = apiGatewayDomain.replace("__app_id__", app.id.toString());
 
   const forms = useForm<RouteCreateUpdateInputs>({
     resolver: yupResolver(routeCreateUpdateInputsSchema),
     defaultValues: {
-      name: route.name,
-      method: route.method,
-      path: route.path,
-      requestQuerySchema: route.requestQuerySchema || "",
-      requestHeaderSchema: route.requestHeaderSchema || "",
-      requestBodySchema: route.requestBodySchema || "",
-      requireAuthorization: route.requireAuthorization || false,
-      responseType: route.responseType || "static",
-      responseStatusCode: route.responseStatusCode || 200,
-      responseHeaders: route.responseHeaders
+      name: route?.name || "untitled route",
+      method: route?.method || "GET",
+      path: route?.path || "/",
+      requestQuerySchema: route?.requestQuerySchema,
+      requestHeaderSchema: route?.requestHeaderSchema,
+      requestBodySchema: route?.requestBodySchema,
+      requireAuthorization: route?.requireAuthorization,
+      responseType: route?.responseType || "static",
+      responseStatusCode: route?.responseStatusCode || 200,
+      responseHeaders: route?.responseHeaders
         ? route.responseHeaders.map((value) => {
             return {
               name: value.name,
@@ -63,12 +63,12 @@ export default function RouteCreateUpdate({
             };
           })
         : [],
-      responseBody: route.responseBody || "",
-      responseBodyLanguage: route.responseBodyLanguage || "plaintext",
-      functionHandler: route.functionHandler || "",
-      functionHandlerDependencies: route.functionHandlerDependencies || [],
-      useDynamicResponse: route.useDynamicResponse || false,
-      fileId: route.fileId,
+      responseBody: route?.responseBody,
+      responseBodyLanguage: route?.responseBodyLanguage || "plaintext",
+      functionHandler: route?.functionHandler,
+      functionHandlerDependencies: route?.functionHandlerDependencies || [],
+      useDynamicResponse: route?.useDynamicResponse || false,
+      fileId: route?.fileId,
     },
   });
   const {
@@ -199,7 +199,7 @@ export default function RouteCreateUpdate({
               {responseType === "staticFile" && (
                 <StaticFile
                   file={
-                    route.fileId
+                    route?.fileId
                       ? {
                           id: route.fileId!,
                           name: route.fileName!,
@@ -456,7 +456,7 @@ function StaticResponse() {
 
     bodyEditor.current = monaco.editor.create(bodyEditorRef.current!, {
       language: getValues("responseBodyLanguage"),
-      value: getValues("responseBody"),
+      value: getValues("responseBody") || undefined,
       minimap: {
         enabled: false,
       },
@@ -589,6 +589,7 @@ interface IFile {
   name: string;
   folderId: number;
 }
+
 function StaticFile({ file }: { file?: IFile }) {
   const app = useContext(AppContext)!;
   const { getAccessTokenSilently } = useAuth0();
@@ -717,7 +718,7 @@ function StaticFile({ file }: { file?: IFile }) {
       </div>
       <div className="mt-2">
         <div>File</div>
-        {selectedFile ? (
+        {selectedFile.current ? (
           <Link
             to={`/apps/${app.id}/storages/files?folderId=${selectedFile.current!.folderId}`}
             className="block text-blue-500 hover:underline"

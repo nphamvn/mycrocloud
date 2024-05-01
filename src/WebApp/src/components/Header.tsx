@@ -71,14 +71,6 @@ function Header() {
                 Forms
               </Link>
             </li>
-            <li>
-              <Link
-                className="block border-b border-gray-100 py-2 pl-3 pr-4 text-gray-700 hover:bg-gray-50 md:border-0 md:p-0 md:hover:bg-transparent md:hover:text-cyan-700 "
-                to="chat"
-              >
-                Chat
-              </Link>
-            </li>
           </Navbar.Collapse>
         </>
       ) : (

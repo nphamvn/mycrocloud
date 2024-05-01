@@ -7,18 +7,18 @@ export type RouteCreateUpdateInputs = {
   path: string;
   method: string;
   requireAuthorization: boolean;
-  requestQuerySchema?: string;
-  requestHeaderSchema?: string;
-  requestBodySchema?: string;
+  requestQuerySchema?: string | null;
+  requestHeaderSchema?: string | null;
+  requestBodySchema?: string | null;
   responseType: string;
   responseStatusCode?: number;
   responseHeaders?: HeaderInput[];
   responseBodyLanguage?: string;
-  responseBody?: string;
-  functionHandler?: string;
-  functionHandlerDependencies?: string[];
+  responseBody?: string | null;
+  functionHandler?: string | null;
+  functionHandlerDependencies?: (string | undefined)[];
   useDynamicResponse?: boolean;
-  fileId?: number;
+  fileId?: number | null;
 };
 
 export interface HeaderInput {
@@ -35,21 +35,21 @@ export const routeCreateUpdateInputsSchema: ObjectSchema<RouteCreateUpdateInputs
       .required()
       .oneOf(methods.map((m) => m.toUpperCase())),
     requireAuthorization: yup.boolean().required(),
-    requestQuerySchema: yup.string().defined(),
-    requestHeaderSchema: yup.string().defined(),
-    requestBodySchema: yup.string().defined(),
+    requestQuerySchema: yup.string().nullable(),
+    requestHeaderSchema: yup.string().nullable(),
+    requestBodySchema: yup.string().nullable(),
     responseType: yup.string().required(),
-    responseStatusCode: yup.number().defined(),
+    responseStatusCode: yup.number(),
     responseHeaders: yup.array().of(
       yup.object({
         name: yup.string().required(),
         value: yup.string().required(),
       }),
     ),
-    responseBodyLanguage: yup.string().defined(),
-    responseBody: yup.string().defined(),
-    functionHandler: yup.string().defined(),
-    functionHandlerDependencies: yup.array().of(yup.string().required()),
-    useDynamicResponse: yup.boolean().defined(),
-    fileId: yup.number().defined(),
+    responseBodyLanguage: yup.string(),
+    responseBody: yup.string().nullable(),
+    functionHandler: yup.string().nullable(),
+    functionHandlerDependencies: yup.array().of(yup.string()),
+    useDynamicResponse: yup.boolean(),
+    fileId: yup.number().nullable(),
   });
