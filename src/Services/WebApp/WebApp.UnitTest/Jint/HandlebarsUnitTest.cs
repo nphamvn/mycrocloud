@@ -26,12 +26,11 @@ public class Tests
                       template({ person });
                       """)
             .AsString();
-        Assert.AreEqual($"My name is {name}", result);
+        Assert.That(result, Is.EqualTo($"My name is {name}"));
     }
     [Test]
     public void Test2()
     {
-        var name = "Nam";
         var result = new Engine()
             .Execute(File.ReadAllText("Scripts/handlebars.min-v4.7.8.js"))
             .SetValue("person", new
@@ -45,22 +44,21 @@ public class Tests
                       """)
             .AsString();
         
-        Assert.AreEqual("My name is Nam. I know C# and Javascript", result);
+        Assert.That(result, Is.EqualTo("My name is Nam. I know C# and Javascript"));
     }
     [Test]
     public void Test3()
     {
-        var name = "Nam";
         const string bodyString = """
-                         {
-                            "name": "Nam",
-                            "skills": ["C#", "Javascript"],
-                            "address": {
-                                "city": "HCM",
-                                "country": "VN"
-                            }
-                         }
-                         """;
+                                  {
+                                     "name": "Nam",
+                                     "skills": ["C#", "Javascript"],
+                                     "address": {
+                                         "city": "HCM",
+                                         "country": "VN"
+                                     }
+                                  }
+                                  """;
         var result = new Engine()
             .Execute(File.ReadAllText("Scripts/handlebars.min-v4.7.8.js"))
             .SetValue("bodyString", bodyString)
@@ -71,7 +69,7 @@ public class Tests
                       """)
             .AsString();
         
-        Assert.AreEqual("My name is Nam. I know C# and Javascript. I live in HCM, VN", result);
+        Assert.That(result, Is.EqualTo("My name is Nam. I know C# and Javascript. I live in HCM, VN"));
     }
     
     [Test]
@@ -96,7 +94,7 @@ public class Tests
                       """)
             .AsString();
         
-        Assert.AreEqual("My name is Nam. I know C# and Javascript. I live in HCM, VN", result);
+        Assert.That(result, Is.EqualTo("My name is Nam. I know C# and Javascript. I live in HCM, VN"));
     }
     
     [Test]
@@ -121,7 +119,7 @@ public class Tests
                       """)
             .AsString();
         
-        Assert.AreEqual("My name is Nam. I know C# and Javascript. I live in HCM, VN", result);
+        Assert.That(result, Is.EqualTo("My name is Nam. I know C# and Javascript. I live in HCM, VN"));
     }
     [Test]
     public void Test6()
@@ -150,6 +148,6 @@ public class Tests
                       """)
             .AsString();
         
-        Assert.AreEqual("My name is Nam. I know C# and Javascript. I live in HCM, VN", result);
+        Assert.That(result, Is.EqualTo("My name is Nam. I know C# and Javascript. I live in HCM, VN"));
     }
 }
