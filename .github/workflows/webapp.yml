@@ -26,13 +26,9 @@ jobs:
 
       - name: Download .env file
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ vars.SSH_HOST }} >> ~/.ssh/known_hosts
-          scp ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }}:$SOURCE $DESTINATION
+          curl $URL -o $DESTINATION
         env:
-          SOURCE: workspaces/mycrocloud-deploy/dev/config/WebApp/.env
+          URL: https://${{ secrets.CR_PAT }}@raw.githubusercontent.com/nphamvn/mycrocloud-deploy/main/dev/config/WebApp/.env
           DESTINATION: ${{env.WORK_DIR}}/.env.production
 
       - name: Login to GitHub Container Registry
