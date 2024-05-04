@@ -193,7 +193,7 @@ export default function AppLogs() {
                     to={`../routes/${l.routeId}`}
                     className="text-blue-500 underline"
                   >
-                    {l.routeId}
+                    <span title={l.routeName}>{l.routeId}</span>
                   </Link>
                 ) : (
                   "-"
