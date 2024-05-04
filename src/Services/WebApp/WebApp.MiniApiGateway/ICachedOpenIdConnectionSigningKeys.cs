@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -12,20 +13,24 @@ public interface ICachedOpenIdConnectionSigningKeys
 
 public class MemoryCachedOpenIdConnectionSigningKeys : ICachedOpenIdConnectionSigningKeys
 {
-    private readonly ConcurrentDictionary<string, ICollection<SecurityKey>> _cache = new();
+    private readonly ConcurrentDictionary<string, JsonWebKeySet> _jsonWebKeySet = new();
+    
     public async Task<ICollection<SecurityKey>> Get(string issuer)
     {
-        if (_cache.TryGetValue(issuer, out var keys))
+        if (_jsonWebKeySet.TryGetValue(issuer, out var jsonWebKeySet))
         {
+            ICollection<SecurityKey> keys = new Collection<SecurityKey>();
+            foreach (var signingKey in jsonWebKeySet.GetSigningKeys())
+                keys.Add(signingKey);
             return keys;
         }
+        
         var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
             $"{issuer.TrimEnd('/')}/.well-known/openid-configuration",
             new OpenIdConnectConfigurationRetriever(),
             new HttpDocumentRetriever());
-        var discoveryDocument = await configurationManager.GetConfigurationAsync();
-        keys = discoveryDocument.SigningKeys;
-        _cache.TryAdd(issuer, keys);
-        return keys;
+        var openIdConnectConfiguration = await configurationManager.GetConfigurationAsync();
+        _jsonWebKeySet.TryAdd(issuer, openIdConnectConfiguration.JsonWebKeySet);
+        return openIdConnectConfiguration.SigningKeys;
     }
 }
