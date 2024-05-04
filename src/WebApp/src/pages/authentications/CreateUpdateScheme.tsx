@@ -72,9 +72,8 @@ export default function CreateUpdateScheme() {
   const onSubmit = async (data: Inputs) => {
     if (data.type === "OpenIdConnect") {
       try {
-        const res = await fetch(
-          `${data.openIdConnectIssuer}.well-known/openid-configuration`,
-        );
+        const issuer = data.openIdConnectIssuer?.replace(/\/$/, "");
+        const res = await fetch(`${issuer}/.well-known/openid-configuration`);
         if (!res.ok) {
           throw new Error("Invalid issuer");
         }
