@@ -58,7 +58,7 @@ public class AuthenticationMiddleware(RequestDelegate next)
     private static bool ValidateToken(string token, 
         string issuer, 
         string audience, 
-        ICollection<SecurityKey> signingKeys,
+        IEnumerable<SecurityKey> signingKeys,
         out JwtSecurityToken? jwt)
     {
         var validationParameters = new TokenValidationParameters {
@@ -77,9 +77,8 @@ public class AuthenticationMiddleware(RequestDelegate next)
             jwt = (JwtSecurityToken)validatedToken;
     
             return true;
-        } catch (SecurityTokenValidationException)
+        } catch
         {
-            // Log the reason why the token is not valid
             jwt = null;
             return false;
         }
