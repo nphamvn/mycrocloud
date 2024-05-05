@@ -53,53 +53,59 @@ export default function List() {
       >
         Create new key
       </button>
-      <div>
+      <div className="mt-3">
         <table className="w-full">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Key</th>
-              <th>Created At</th>
-              <th>Updated At</th>
-              <th>Actions</th>
+              <th className="w-48 border ps-2 text-start">Name</th>
+              <th className="border ps-2 text-start">Key</th>
+              <th className="w-36 border ps-2 text-start">Created At</th>
+              <th className="w-36 border ps-2 text-start">Updated At</th>
+              <th className="w-32 border ps-2 text-start">Actions</th>
             </tr>
           </thead>
           <tbody>
             {keys.map((key) => (
               <tr key={key.id}>
-                <td>{key.name}</td>
-                <td className="flex space-x-1">
+                <td className="px-2 text-start">{key.name}</td>
+                <td className="flex px-2">
                   <span>
                     {showingKeys.includes(key.id)
                       ? key.key
                       : "****************"}
                   </span>
-                  <button
-                    onClick={() => {
-                      if (showingKeys.includes(key.id)) {
-                        setShowingKeys(showingKeys.filter((k) => k !== key.id));
-                      } else {
-                        setShowingKeys([...showingKeys, key.id]);
-                      }
-                    }}
-                    className="text-primary hover:underline"
-                  >
-                    {showingKeys.includes(key.id) ? "Hide" : "Show"}
-                  </button>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(key.key);
-                    }}
-                    className="text-primary hover:underline"
-                  >
-                    Copy
-                  </button>
+                  <div className="ms-auto">
+                    <button
+                      onClick={() => {
+                        if (showingKeys.includes(key.id)) {
+                          setShowingKeys(
+                            showingKeys.filter((k) => k !== key.id),
+                          );
+                        } else {
+                          setShowingKeys([...showingKeys, key.id]);
+                        }
+                      }}
+                      className="me-1 text-primary hover:underline"
+                    >
+                      {showingKeys.includes(key.id) ? "Hide" : "Show"}
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(key.key);
+                      }}
+                      className="text-primary hover:underline"
+                    >
+                      Copy
+                    </button>
+                  </div>
                 </td>
-                <td>{new Date(key.createdAt).toDateString()}</td>
-                <td>
+                <td className="px-2">
+                  {new Date(key.createdAt).toDateString()}
+                </td>
+                <td className="px-2">
                   {key.updatedAt ? new Date(key.updatedAt).toDateString() : "-"}
                 </td>
-                <td className="flex space-x-2">
+                <td className="flex space-x-2 px-2">
                   <Link
                     to={`${key.id}/edit`}
                     className="text-primary hover:underline"
