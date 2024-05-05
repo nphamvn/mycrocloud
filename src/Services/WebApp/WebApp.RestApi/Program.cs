@@ -18,6 +18,7 @@ builder.Services.AddControllers(options =>
     options.Filters.Add(typeof(GlobalExceptionFilter));
     options.InputFormatters.Insert(options.InputFormatters.Count, new TextPlainInputFormatter());
 });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -54,6 +55,8 @@ builder.Services.AddScoped<IAppService, AppService>();
 builder.Services.AddScoped<IRouteRepository, RouteRepository>();
 builder.Services.AddScoped<IRouteService, RouteService>();
 builder.Services.AddScoped<ILogRepository, LogRepository>();
+
+builder.Services.AddScoped<AppOwnerActionFilter>();
 
 var app = builder.Build();
 

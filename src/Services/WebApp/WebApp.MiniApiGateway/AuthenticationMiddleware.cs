@@ -1,8 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Enums;
 using WebApp.Domain.Repositories;
+using WebApp.Infrastructure.Repositories.EfCore;
 
 namespace WebApp.MiniApiGateway;
 
@@ -12,7 +14,6 @@ public class AuthenticationMiddleware(RequestDelegate next)
     {
         var app = (App)context.Items["_App"]!;
         var appRepository = context.RequestServices.GetService<IAppRepository>()!;
-        var cachedOpenIdConnectionSigningKeys = context.RequestServices.GetService<ICachedOpenIdConnectionSigningKeys>()!;
         var authenticationSchemes = await appRepository.GetAuthenticationSchemes(app.Id);
         if (!authenticationSchemes.Any())
         {
@@ -21,40 +22,75 @@ public class AuthenticationMiddleware(RequestDelegate next)
         }
         foreach (var scheme in authenticationSchemes)
         {
-            //TODO: Get from settings
-            var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-            if (string.IsNullOrEmpty(token))
+            switch (scheme.Type)
             {
-                continue;
-            }
-
-            if (scheme.Type == AuthenticationSchemeType.OpenIdConnect)
-            {
-                var signingKeys = await cachedOpenIdConnectionSigningKeys.Get(scheme.OpenIdConnectAuthority);
-                if (!ValidateToken(token, scheme.OpenIdConnectAuthority,
-                        scheme.OpenIdConnectAudience,
-                        signingKeys, out var jwt))  
+                case AuthenticationSchemeType.OpenIdConnect:
                 {
-                    continue;
+                    await AuthenticateOpenIdConnectScheme(context, scheme);
+                    break;
                 }
-                ArgumentNullException.ThrowIfNull(jwt);
-                //TODO: 
-                var claims = jwt.Claims;
-                var user = new Dictionary<string, string>();
-                foreach (var claim in claims)
+                case AuthenticationSchemeType.ApiKey:
                 {
-                    //TODO: A claim can have multiple values
-                    if (!user.TryAdd(claim.Type, claim.Value))
-                    {
-                        user[claim.Type] = claim.Value;
-                    }
+                    await AuthenticateApiKeyScheme(context, app, scheme);
+                    break;
                 }
-                context.Items.Add("_AuthenticatedScheme", scheme);
-                context.Items.Add("_OpenIdConnectUser", user);
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
         await next.Invoke(context);
     }
+
+    private static async Task AuthenticateOpenIdConnectScheme(HttpContext context, AuthenticationScheme scheme)
+    {
+        var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+        if (string.IsNullOrEmpty(token))
+        {
+            return;
+        }
+        var cachedOpenIdConnectionSigningKeys = context.RequestServices.GetService<ICachedOpenIdConnectionSigningKeys>()!;
+        var signingKeys = await cachedOpenIdConnectionSigningKeys.Get(scheme.OpenIdConnectAuthority);
+        if (!ValidateToken(token, scheme.OpenIdConnectAuthority,
+                scheme.OpenIdConnectAudience,
+                signingKeys, out var jwt))
+        {
+            return;
+        }
+        ArgumentNullException.ThrowIfNull(jwt);
+        //TODO: 
+        var claims = jwt.Claims;
+        var user = new Dictionary<string, string>();
+        foreach (var claim in claims)
+        {
+            //TODO: A claim can have multiple values
+            if (!user.TryAdd(claim.Type, claim.Value))
+            {
+                user[claim.Type] = claim.Value;
+            }
+        }
+        context.Items.Add("_AuthenticatedScheme", scheme);
+        context.Items.Add("_OpenIdConnectUser", user);
+    }
+
+    private static async Task AuthenticateApiKeyScheme(HttpContext context, App app, AuthenticationScheme scheme)
+    {
+        var apiKey = context.Request.Headers["X-Api-Key"].FirstOrDefault();
+        if (string.IsNullOrEmpty(apiKey))
+        {
+            return;
+        }
+        var appDbContext = context.RequestServices.GetService<AppDbContext>()!;
+        var apiKeyEntity = await appDbContext.ApiKeys
+            .Where(k => k.App.Id == app.Id && k.Key == apiKey)
+            .SingleOrDefaultAsync();
+        if (apiKeyEntity is null)
+        {
+            return;
+        }
+        context.Items.Add("_AuthenticatedScheme", scheme);
+        context.Items.Add("_ApiKey", apiKeyEntity);
+    }
+
     private static bool ValidateToken(string token, 
         string issuer, 
         string audience, 

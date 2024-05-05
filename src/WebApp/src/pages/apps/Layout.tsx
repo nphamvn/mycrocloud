@@ -118,6 +118,14 @@ export default function AppLayout() {
                   Schemes
                 </Link>
                 <Link
+                  to="authentications/apikeys"
+                  className={`text-xs ${
+                    isMatchAuthenticationSchemes ? "text-primary" : ""
+                  }`}
+                >
+                  API Keys
+                </Link>
+                <Link
                   to="authentications/settings"
                   className={`text-xs ${
                     isMatchAuthenticationSettings ? "text-primary" : ""

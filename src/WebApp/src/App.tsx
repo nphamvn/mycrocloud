@@ -44,6 +44,7 @@ import { default as FormSubmissionList } from "./modules/form/SubmissionList";
 import { DevPage, devRoutes } from "./components/devpages";
 import About from "./pages/About";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { ApiKeyCreateUpdate, ApiKeyList } from "./pages/authentications/apikey";
 
 function App() {
   return (
@@ -94,6 +95,11 @@ function App() {
                     path="settings"
                     Component={AuthenticationSchemeSettings}
                   />
+                  <Route path="apikeys">
+                    <Route index Component={ApiKeyList} />
+                    <Route path="new" Component={ApiKeyCreateUpdate} />
+                    <Route path=":keyId/edit" Component={ApiKeyCreateUpdate} />
+                  </Route>
                 </Route>
                 <Route path="logs" Component={AppLog} />
                 <Route path="storages">

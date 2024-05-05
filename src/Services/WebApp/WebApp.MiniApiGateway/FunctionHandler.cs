@@ -73,7 +73,7 @@ public static class FunctionHandler
         var stopwatch = Stopwatch.StartNew();
         try
         {
-            engine.Execute(route.FunctionHandler ?? throw new InvalidOperationException("FunctionHandler is null"));
+            engine.Execute(route.FunctionHandler);
             var handler = engine.GetValue("handler");
             jsResult = engine.Invoke(handler, request);
         }

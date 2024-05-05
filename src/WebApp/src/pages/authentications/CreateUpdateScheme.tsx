@@ -11,6 +11,7 @@ import {
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { toast } from "react-toastify";
 
 type Inputs = {
   name: string;
@@ -89,7 +90,7 @@ export default function CreateUpdateScheme() {
     };
     delete submitData.openIdConnectIssuer;
     const accessToken = await getAccessTokenSilently();
-    await fetch(
+    const response = await fetch(
       !editMode
         ? `/api/apps/${app.id}/authentications/schemes`
         : `/api/apps/${app.id}/authentications/schemes/${parseInt(schemeId)}`,
@@ -102,7 +103,12 @@ export default function CreateUpdateScheme() {
         body: JSON.stringify(submitData),
       },
     );
-    navigate("../schemes");
+    if (response.ok) {
+      navigate("../schemes");
+      return;
+    } else {
+      toast.error("Failed to save scheme");
+    }
   };
 
   useEffect(() => {
@@ -147,14 +153,14 @@ export default function CreateUpdateScheme() {
           <label htmlFor="type">Type</label>
           <select id="type" {...register("type", { required: true })}>
             <option value="OpenIdConnect">OpenID Connect</option>
-            <option value="API Key">API Key</option>
+            <option value="ApiKey">API Key</option>
           </select>
           {errors.type && (
             <p className="text-xs text-red-500">{errors.type.message}</p>
           )}
         </div>
         {watchType === "OpenIdConnect" && <OpenIdConnect />}
-        {watchType === "API Key" && <ApiKey />}
+        {watchType === "ApiKey" && <ApiKey />}
         <div className="mt-2 flex">
           <Link
             to="../schemes"
