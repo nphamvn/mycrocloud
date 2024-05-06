@@ -39,6 +39,7 @@ public class AppsController(IAppService appService, IAppRepository appRepository
                 Description =source. Description,
                 Status = AppStatus.Active,
                 CorsSettings = CorsSettings.Default,
+                Settings = AppSettings.Default,
                 Version = Guid.NewGuid()
             };
         }
