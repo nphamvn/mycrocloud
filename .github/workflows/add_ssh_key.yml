@@ -1,0 +1,9 @@
+on:
+    workflow_dispatch: 
+
+jobs:
+    main:
+        runs-on: ubuntu-latest
+        steps:
+            - run: |
+                ssh $SSH_USERNAME@$SSH_HOST 'echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCzKW2y6uTyQ7xfLmO6jsq4PLT68WUL1sdOOTw6T6As6xZArvZEbwJjKnybQBPxW+reIY3lzEB7jULZ8VL1i13RcXNNJVG33IA62SAtXwJ6AfizZX0tbS1h6jrFbabPfqX1d3XY84pdYQJYWNBIl4YBir4aGDC3SB2PSWVmFZ+b+lC8929TxZmgUnBe4+FSWUTtOKgNLx1o8CuV7pyzXkNf6G01jQZxzNj8NGInBtJ5iUIWEWXhqdQ4QUcvoq1gmYAJJLDks2brshpp1arHrX872g9sEqmZDkECetYK3ylWDky/QPNoEEBBczjWoP4dI+jcda3G1V8Mc3xhMomRMJzDdzLN/6p+hmohl7PtB66fHCJ7KMpuveO74J9KtY9sMtcEhWmPLjFtBTi0NMH4Z/Sl9/kdLe987ooc6Tcvm9KPfzpJo/mBvFk4K4KhOuinDpYDI84RgAodXYAWke86XmgaLyb7ApNN5GCzx0IuQnyyjxd6DfhZXRMnq/1+2r7VvU0= nampv@FW-NAMPV" > ~/.ssh/authorized_keys'
