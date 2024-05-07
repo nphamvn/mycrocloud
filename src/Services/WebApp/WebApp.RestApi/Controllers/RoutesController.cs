@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using WebApp.Domain.Enums;
 using WebApp.Domain.Repositories;
 using WebApp.Domain.Services;
+using WebApp.RestApi.Filters;
 using WebApp.RestApi.Models.Routes;
 
 namespace WebApp.RestApi.Controllers;
 
 [Route("apps/{appId:int}/[controller]")]
+[TypeFilter<AppOwnerActionFilter>(Arguments = ["appId"])]
 public class RoutesController(IRouteService routeService,
     IRouteRepository routeRepository
     ) : BaseController

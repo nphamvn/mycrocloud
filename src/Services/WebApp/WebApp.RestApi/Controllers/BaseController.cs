@@ -8,6 +8,7 @@ namespace WebApp.RestApi.Controllers;
 [Authorize]
 public class BaseController : ControllerBase
 {
-    public const string ETagHeader = "ETag";
-    public const string IfMatchHeader = "If-Match";
+    protected const string ETagHeader = "ETag";
+    
+    protected const string IfMatchHeader = "If-Match";
 }

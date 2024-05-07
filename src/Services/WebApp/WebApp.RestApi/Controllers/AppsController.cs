@@ -4,10 +4,12 @@ using WebApp.Domain.Enums;
 using WebApp.Domain.Repositories;
 using WebApp.Domain.Services;
 using WebApp.RestApi.Extensions;
+using WebApp.RestApi.Filters;
 using WebApp.RestApi.Models;
 
 namespace WebApp.RestApi.Controllers;
 
+[TypeFilter<AppOwnerActionFilter>(Arguments = ["id"])]
 public class AppsController(IAppService appService, IAppRepository appRepository) : BaseController
 {
     [HttpGet]

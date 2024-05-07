@@ -8,7 +8,7 @@ using WebApp.RestApi.Filters;
 namespace WebApp.RestApi.Controllers;
 
 [Route("apps/{appId:int}/[controller]")]
-[ServiceFilter<AppOwnerActionFilter>]
+[TypeFilter<AppOwnerActionFilter>(Arguments = ["appId"])]
 public class ApiKeysController(AppDbContext appDbContext) : BaseController
 {
     [HttpGet]

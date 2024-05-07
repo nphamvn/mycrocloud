@@ -7,12 +7,14 @@ using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
 using WebApp.Infrastructure.Repositories.EfCore;
+using WebApp.RestApi.Filters;
 using WebApp.RestApi.Models.Files;
 using File = WebApp.Domain.Entities.File;
 
 namespace WebApp.RestApi.Controllers;
 
 [Route("apps/{appId:int}/[controller]")]
+[TypeFilter<AppOwnerActionFilter>(Arguments = ["appId"])]
 public class FilesController(AppDbContext appDbContext, IRouteRepository routeRepository) : BaseController
 {
     [HttpGet]

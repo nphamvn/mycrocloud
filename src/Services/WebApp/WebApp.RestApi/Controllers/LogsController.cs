@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApp.Domain.Repositories;
+using WebApp.RestApi.Filters;
 
 namespace WebApp.RestApi.Controllers;
 
 [Route("apps/{appId:int}/[controller]")]
+[TypeFilter<AppOwnerActionFilter>(Arguments = ["appId"])]
 public class LogsController(ILogRepository logRepository) : BaseController
 {
     public async Task<IActionResult> Search(int appId, [FromQuery]List<int>? routeIds, DateTime? accessDateFrom,

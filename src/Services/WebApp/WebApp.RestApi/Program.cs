@@ -56,8 +56,6 @@ builder.Services.AddScoped<IRouteRepository, RouteRepository>();
 builder.Services.AddScoped<IRouteService, RouteService>();
 builder.Services.AddScoped<ILogRepository, LogRepository>();
 
-builder.Services.AddScoped<AppOwnerActionFilter>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

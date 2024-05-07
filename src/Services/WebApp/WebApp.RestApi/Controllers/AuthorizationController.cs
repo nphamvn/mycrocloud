@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Api.Models;
+using WebApp.RestApi.Filters;
 
 namespace WebApp.RestApi.Controllers;
 
 [Route("apps/{appId:int}/[controller]")]
+[TypeFilter<AppOwnerActionFilter>(Arguments = ["appId"])]
 public class AuthorizationController : BaseController
 {
     [HttpGet("policies")]

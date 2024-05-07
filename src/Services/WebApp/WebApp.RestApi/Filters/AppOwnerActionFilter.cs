@@ -6,7 +6,7 @@ using WebApp.RestApi.Extensions;
 namespace WebApp.RestApi.Filters;
 
 public class AppOwnerActionFilter(AppDbContext appDbContext,
-    ILogger<AppOwnerActionFilter> logger)
+    ILogger<AppOwnerActionFilter> logger, string appIdArgumentName = "appId")
     : IAsyncActionFilter
 {
     public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -20,14 +20,13 @@ public class AppOwnerActionFilter(AppDbContext appDbContext,
         var userId = context.HttpContext.User.GetUserId();
         logger.LogDebug("UserId: {UserId}", userId);
         
-        var appIdArgument = context.ActionArguments["appId"];
-        if (appIdArgument is null)
+        if (!context.ActionArguments.TryGetValue(appIdArgumentName, out var appIdArgument))
         {
             logger.LogWarning("AppId argument is missing");
             return next();
         }
         
-        var appId = (int) appIdArgument;
+        var appId = (int) appIdArgument!;
         logger.LogDebug("AppId: {AppId}", appId);
         
         var isAppOwner = appDbContext.Apps.Any(a => a.Id == appId && a.UserId == userId);
