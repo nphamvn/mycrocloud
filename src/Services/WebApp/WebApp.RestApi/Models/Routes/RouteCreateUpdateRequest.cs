@@ -19,6 +19,9 @@ public class RouteCreateUpdateRequest
     public string? RequestHeaderSchema { get; set; }
     public string? RequestBodySchema { get; set; }
     public int? FileId { get; set; }
+
+    public int? FolderId { get; set; }
+    
     public Route ToCreateEntity()
     {
         return new Route

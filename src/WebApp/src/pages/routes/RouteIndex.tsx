@@ -11,12 +11,29 @@ import {
 import { EllipsisVerticalIcon } from "@heroicons/react/24/solid";
 import { toast } from "react-toastify";
 
+interface Node {
+  type: string;
+  id: number;
+  parentId: number | null;
+  route: {
+    name: string;
+    method: string;
+    path: string;
+    status: string;
+  } | null;
+  folder: {
+    name: string;
+  } | null;
+}
+
 export default function RouteIndex() {
   const app = useContext(AppContext)!;
   const [state, dispatch] = useReducer(routesReducer, {
     routes: [],
     activeRoute: undefined,
   });
+
+  const [nodes, setNodes] = useState<Node[]>([]);
   const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
   const params = useParams();
@@ -32,10 +49,40 @@ export default function RouteIndex() {
         })
       ).json()) as IRoute[];
       dispatch({ type: "SET_ROUTES", payload: routes });
+
+      fetch(`/api/apps/${app.id}/routes/v2`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((routes) => {
+          console.log(routes);
+          setNodes(routes);
+        });
     };
     getRoutes();
   }, []);
 
+  const handleNewFolderClick = async () => {
+    const folderName = prompt("Enter folder name");
+    if (folderName) {
+      const accessToken = await getAccessTokenSilently();
+      const res = await fetch(`/api/apps/${app.id}/routes/folders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ name: folderName }),
+      });
+      if (res.ok) {
+        console.log("Folder created");
+      } else {
+        console.log("Folder creation failed");
+      }
+    }
+  };
   const newRouteActive = useMatch("/apps/:appId/routes/new");
   const editRouteActive = useMatch("/apps/:appId/routes/:routeId");
   const logPageActive = useMatch("/apps/:appId/routes/:routeId/logs");
@@ -44,18 +91,29 @@ export default function RouteIndex() {
     <RoutesContext.Provider value={{ state, dispatch }}>
       <div className="flex h-full">
         <div className="w-48 border-r p-1">
-          <button
-            type="button"
-            onClick={() => {
-              navigate("new");
-            }}
-            className="mt-1 w-full bg-primary py-1 text-white enabled:hover:bg-cyan-700 disabled:opacity-50"
-            disabled={newRouteActive !== null}
-          >
-            New
-          </button>
+          <div className="flex justify-center space-x-2">
+            <button
+              type="button"
+              onClick={() => {
+                navigate("new");
+              }}
+              className="bg-primary px-2 py-1 text-white enabled:hover:bg-cyan-700 disabled:opacity-50"
+            >
+              New Route
+            </button>
+            <button
+              type="button"
+              onClick={handleNewFolderClick}
+              className="bg-primary px-2 py-1 text-white enabled:hover:bg-cyan-700 disabled:opacity-50"
+            >
+              New Folder
+            </button>
+          </div>
+
           <hr className="my-1" />
           <RouteList />
+          <hr />
+          <TreeNode data={nodes} />
         </div>
         <div className="flex-1">
           {newRouteActive || editRouteActive || logPageActive ? (
@@ -73,6 +131,29 @@ export default function RouteIndex() {
   );
 }
 
+function TreeNode({ data }: { data: Node[] }) {
+  const renderTree = (
+    nodes: Node[],
+    parentId: number | null,
+    isRoot: boolean = false,
+  ) => {
+    return nodes
+      .filter((node) => node.parentId === parentId)
+      .map((node) => (
+        <div key={node.id} style={{ marginLeft: isRoot ? 0 : 20 }}>
+          {node.folder ? (
+            <span>{node.folder.name}</span>
+          ) : (
+            <span>{node.route!.name}</span>
+          )}
+          {renderTree(nodes, node.id)}
+        </div>
+      ));
+  };
+
+  return <div>{renderTree(data, null, true)}</div>;
+}
+
 function RouteList() {
   const app = useContext(AppContext)!;
   const { getAccessTokenSilently } = useAuth0();
@@ -83,7 +164,7 @@ function RouteList() {
 
   const navigate = useNavigate();
   const [actionMenuRoute, setActionMenuRoute] = useState<IRoute>();
-  
+
   const actionMenuRef = useRef<HTMLDivElement>(null);
   const actionMenuClientXRef = useRef<number>();
   const actionMenuClientYRef = useRef<number>();
