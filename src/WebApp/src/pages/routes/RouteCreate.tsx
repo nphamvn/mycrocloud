@@ -6,13 +6,14 @@ import { AppContext } from "../apps";
 import { toast } from "react-toastify";
 import IRoute from "./Route";
 import { useRoutesContext } from "./RoutesContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function RouteCreate() {
   const navigate = useNavigate();
   const app = useContext(AppContext)!;
   const { dispatch } = useRoutesContext();
 
+  const folderId = useParams()["folderId"];
   const { getAccessTokenSilently } = useAuth0();
   const onSubmit = async (data: RouteCreateUpdateInputs) => {
     const accessToken = await getAccessTokenSilently();
@@ -22,7 +23,10 @@ export default function RouteCreate() {
         "content-type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        ...data,
+        folderId: folderId ? parseInt(folderId) : null,
+      }),
     });
     if (res.ok) {
       const newRoute = (await res.json()) as IRoute;

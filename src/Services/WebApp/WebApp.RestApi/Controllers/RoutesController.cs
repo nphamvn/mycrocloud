@@ -146,7 +146,7 @@ public class RoutesController(IRouteService routeService,
             : null;
         
         await routeService.Create(appId, entity);
-        return Created("", entity);
+        return Created("", new { entity.Id, entity.Version });
     }
     
     [HttpPut("{id:int}")]
