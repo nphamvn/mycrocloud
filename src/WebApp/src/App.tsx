@@ -73,7 +73,7 @@ function App() {
               >
                 <Route index Component={AppOverview} />
                 <Route path="routes" Component={RouteIndex}>
-                  <Route path="new" Component={RouteCreate} />
+                  <Route path="new/:folderId?" Component={RouteCreate} />
                   <Route path=":routeId" Component={RouteEdit} />
                   <Route path=":routeId/logs" Component={RouteLogs} />
                 </Route>

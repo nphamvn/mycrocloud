@@ -25,14 +25,23 @@ public static class StaticResponseHandler
         {
             var request = await ReadRequest(context.Request);
             body = new Engine()
-                .SetValue("requestJson", JsonSerializer.Serialize(request))
-                .SetValue("source", body)
+                .SetValue("method", context.Request.Method)
+                .SetValue("path", context.Request.Path.Value)
+                .SetValue("params", body)
                 .Execute(scripts["handlebars"])
                 .Execute("Handlebars.registerHelper('json', function(context) { return JSON.stringify(context); });")
                 .Evaluate("""
-                    const request = JSON.parse(requestJson);
-                    const template = Handlebars.compile(source);
-                    template({ request });
+                    const data = {
+                        request: {
+                             method: method,
+                             path: path,
+                             params: requestJson.params,
+                             query: requestJson.query,
+                             headers: requestJson.headers,
+                             body: JSON.parse(body)
+                        }
+                    };
+                    Handlebars.compile(source)(data);
                     """)
                 .AsString();
         }
@@ -53,7 +62,7 @@ public static class StaticResponseHandler
             @params = request.RouteValues.ToDictionary(x => x.Key, x => x.Value?.ToString()),
             query = request.Query.ToDictionary(x => x.Key, x => x.Value.ToString()),
             headers = request.Headers.ToDictionary(x => x.Key, x => x.Value.ToString()),
-            body = !string.IsNullOrEmpty(body) ? JsonSerializer.Deserialize<dynamic>(body) : null
+            body
         };
     }
 }

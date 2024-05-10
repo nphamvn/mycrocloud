@@ -26,6 +26,8 @@ public class Route : BaseEntity
     public bool UseDynamicResponse { get; set; }
     public int? FileId { get; set; }
     public File File { get; set; }
+
+    public RouteFolder Folder { get; set; }
 }
 
 public class ResponseHeader

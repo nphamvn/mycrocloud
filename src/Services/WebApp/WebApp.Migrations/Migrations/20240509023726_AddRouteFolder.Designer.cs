@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebApp.Infrastructure.Repositories.EfCore;
@@ -12,9 +13,11 @@ using WebApp.Infrastructure.Repositories.EfCore;
 namespace WebApp.Migrations.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240509023726_AddRouteFolder")]
+    partial class AddRouteFolder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -372,9 +375,6 @@ namespace WebApp.Migrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AppId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -392,8 +392,6 @@ namespace WebApp.Migrations.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AppId");
 
                     b.HasIndex("ParentId");
 
@@ -662,15 +660,9 @@ namespace WebApp.Migrations.Migrations
 
             modelBuilder.Entity("WebApp.Domain.Entities.RouteFolder", b =>
                 {
-                    b.HasOne("WebApp.Domain.Entities.App", "App")
-                        .WithMany()
-                        .HasForeignKey("AppId");
-
                     b.HasOne("WebApp.Domain.Entities.RouteFolder", "Parent")
                         .WithMany("SubFolders")
                         .HasForeignKey("ParentId");
-
-                    b.Navigation("App");
 
                     b.Navigation("Parent");
                 });

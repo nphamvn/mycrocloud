@@ -7,6 +7,8 @@ namespace WebApp.Infrastructure.Repositories.EfCore;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<App> Apps { get; set; }
+    
+    public DbSet<RouteFolder> RouteFolders { get; set; }
     public DbSet<Route> Routes { get; set; }
     public DbSet<Folder> Folders { get; set; }
     public DbSet<File> Files { get; set; }

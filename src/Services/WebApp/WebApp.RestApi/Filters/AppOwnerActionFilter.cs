@@ -28,8 +28,9 @@ public class AppOwnerActionFilter(AppDbContext appDbContext,
         
         var appId = (int) appIdArgument!;
         logger.LogDebug("AppId: {AppId}", appId);
-        
-        var isAppOwner = appDbContext.Apps.Any(a => a.Id == appId && a.UserId == userId);
+
+        var app = appDbContext.Apps.Find(appId);
+        var isAppOwner = app?.UserId == userId;
         logger.LogDebug("IsAppOwner: {IsAppOwner}", isAppOwner);
         if (!isAppOwner)
         {
@@ -39,6 +40,7 @@ public class AppOwnerActionFilter(AppDbContext appDbContext,
         }
         
         logger.LogDebug("User {UserId} is the owner of the app {AppId}", userId, appId);
+        context.HttpContext.Items["App"] = app;
         return next();
     }
 }
