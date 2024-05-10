@@ -8,7 +8,7 @@ public enum RouteRouteFolderType
     Folder = 2
 }
 
-public class IndexV2Item
+public class IndexItemV2
 {
     public RouteRouteFolderType Type { get; set; }
     public int Id { get; set; }

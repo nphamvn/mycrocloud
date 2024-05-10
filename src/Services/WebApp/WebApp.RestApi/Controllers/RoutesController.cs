@@ -1,4 +1,3 @@
-using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
@@ -36,40 +35,40 @@ public class RoutesController(IRouteService routeService,
     [HttpGet("v2")]
     public async Task<IActionResult> IndexV2(int appId, string? q, string? s)
     {
-        var connection = appDbContext.Database.GetDbConnection();
+        var folders = appDbContext.RouteFolders
+            .Where(f => f.App.Id == appId)
+            .Select(f => new IndexItemV2
+            {
+                Type = RouteRouteFolderType.Folder,
+                Id = f.Id,
+                ParentId = f.Parent != null ? f.Parent.Id : null,
+                CreatedAt = f.CreatedAt,
+                UpdatedAt = f.UpdatedAt,
+                RouteName = null,
+                RouteMethod = null,
+                RoutePath = null,
+                RouteStatus = null,
+                FolderName = f.Name
+            });
+        
+        var routes = appDbContext.Routes
+            .Where(r => r.App.Id == appId)
+            .Select(r => new IndexItemV2
+            {
+                Type = RouteRouteFolderType.Route,
+                Id = r.Id,
+                ParentId = r.Folder != null ? r.Folder.Id : null,
+                CreatedAt = r.CreatedAt,
+                UpdatedAt = r.UpdatedAt,
+                RouteName = r.Name,
+                RouteMethod = r.Method,
+                RoutePath = r.Path,
+                RouteStatus = r.Status,
+                FolderName = null
+            });
 
-        const string sql = """
-                           SELECT
-                               'Route' AS "Type",
-                               r."Id" AS "Id",
-                               r."FolderId" AS "ParentId",
-                               r."Name" AS "RouteName",
-                               r."Method" AS "RouteMethod",
-                               r."Path" AS "RoutePath",
-                               r."Status" AS "RouteStatus",
-                               NULL AS "FolderName"
-                           FROM
-                               "Routes" r
-                           WHERE 
-                               "AppId" = @app_id
-                           UNION ALL 
-                           
-                           SELECT 
-                               'Folder' AS "Type",
-                               rf."Id" AS "Id",
-                               rf."ParentId" AS "ParentId",
-                               NULL AS "RouteName",
-                               NULL AS "RouteMethod",
-                               NULL AS "RoutePath",
-                               NULL AS "RouteStatus",
-                               rf."Name" AS "FolderName"
-                           FROM
-                               "RouteFolders" rf
-                           WHERE
-                               "AppId" = @app_id
-                           """;
-        var items = await connection.QueryAsync<IndexV2Item>(sql, new { app_id = appId});
-
+        var items = await folders.Union(routes).ToListAsync();
+        
         return Ok(items.Select(item => new
         {
             Type = item.Type.ToString(),

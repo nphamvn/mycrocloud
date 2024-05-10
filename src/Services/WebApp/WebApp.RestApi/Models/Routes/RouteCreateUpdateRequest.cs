@@ -1,11 +1,16 @@
+using System.ComponentModel.DataAnnotations;
 using Route = WebApp.Domain.Entities.Route;
 namespace WebApp.RestApi.Models.Routes;
 
 public class RouteCreateUpdateRequest
 {
+    [Required]
     public string Name { get; set; }
+    [Required]
     public string Method { get; set; }
+    [Required]
     public string Path { get; set; }
+    [Required]
     public string ResponseType { get; set; }
     public int? ResponseStatusCode { get; set; }
     public List<ResponseHeader> ResponseHeaders { get; set; } = [];
@@ -44,6 +49,7 @@ public class RouteCreateUpdateRequest
             FileId = FileId
         };
     }
+    
     public void ToUpdateEntity(Route route)
     {
         route.Name = Name;
@@ -54,7 +60,7 @@ public class RouteCreateUpdateRequest
         route.RequestBodySchema = RequestBodySchema;
         route.ResponseType = ResponseType;
         route.ResponseStatusCode = ResponseStatusCode;
-        route.ResponseHeaders = ResponseHeaders?.Select(h => h.ToEntity()).ToList();
+        route.ResponseHeaders = ResponseHeaders.Select(h => h.ToEntity()).ToList();
         route.ResponseBodyLanguage = ResponseBodyLanguage;
         route.ResponseBody = ResponseBody;
         route.UseDynamicResponse = UseDynamicResponse;
@@ -67,12 +73,15 @@ public class RouteCreateUpdateRequest
 
 public class ResponseHeader
 {
+    [Required]
     public string Name { get; set; }
+    [Required]
     public string Value { get; set; }
 
     public Domain.Entities.ResponseHeader ToEntity()
     {
-        return new Domain.Entities.ResponseHeader() {
+        return new Domain.Entities.ResponseHeader
+        {
             Name = Name,
             Value = Value
         };
