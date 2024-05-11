@@ -40,7 +40,7 @@ public class AppOwnerActionFilter(AppDbContext appDbContext,
         }
         
         logger.LogDebug("User {UserId} is the owner of the app {AppId}", userId, appId);
-        context.HttpContext.Items["App"] = app;
+        context.HttpContext.Items["App"] = app!;
         return next();
     }
 }

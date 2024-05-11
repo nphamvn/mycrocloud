@@ -1,3 +1,4 @@
+using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
@@ -17,6 +18,8 @@ public class RoutesController(IRouteService routeService,
     AppDbContext appDbContext
     ) : BaseController
 {
+    private App App => (HttpContext.Items["App"] as App)!;
+    
     [HttpGet]
     public async Task<IActionResult> Index(int appId, string? q, string? s)
     {
@@ -203,5 +206,31 @@ public class RoutesController(IRouteService routeService,
             newFolder.Name,
             newFolder.Version
         });
+    }
+    
+    [HttpDelete("folders/{id:int}")]
+    public async Task<IActionResult> DeleteFolder(int appId, int id)
+    {
+        var folder = await appDbContext.RouteFolders.SingleAsync(f => f.App == App && f.Id == id);
+        
+        const string sql = 
+"""
+CREATE TEMP TABLE folders_to_delete AS (
+   WITH RECURSIVE cte AS (
+       SELECT "Id" FROM "RouteFolders" WHERE "Id" = @id
+       UNION ALL
+       SELECT rf."Id" FROM "RouteFolders" rf JOIN cte ON rf."ParentId" = cte."Id"
+   )
+   SELECT "Id" FROM cte
+);
+
+DELETE FROM "Routes" WHERE "FolderId" IN (SELECT "Id" FROM folders_to_delete);
+DELETE FROM "RouteFolders" WHERE "Id" IN (SELECT "Id" FROM folders_to_delete);
+
+""";
+        
+        await appDbContext.Database.GetDbConnection().ExecuteAsync(sql, new { id = folder.Id });
+        
+        return NoContent();
     }
 }
