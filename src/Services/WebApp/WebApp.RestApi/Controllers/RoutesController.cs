@@ -39,7 +39,7 @@ public class RoutesController(IRouteService routeService,
     public async Task<IActionResult> IndexV2(int appId, string? q, string? s)
     {
         var folders = appDbContext.RouteFolders
-            .Where(f => f.App.Id == appId)
+            .Where(f => f.App == App)
             .Select(f => new IndexItemV2
             {
                 Type = RouteRouteFolderType.Folder,
@@ -55,7 +55,7 @@ public class RoutesController(IRouteService routeService,
             });
         
         var routes = appDbContext.Routes
-            .Where(r => r.App.Id == appId)
+            .Where(r => r.App == App)
             .Select(r => new IndexItemV2
             {
                 Type = RouteRouteFolderType.Route,
@@ -208,6 +208,101 @@ public class RoutesController(IRouteService routeService,
         });
     }
     
+    [HttpPost("folders/{id:int}/duplicate")]
+    public async Task<IActionResult> DuplicateFolder(int appId, int id)
+    {
+        var folder = await appDbContext.RouteFolders
+            .Include(routeFolder => routeFolder.Parent)
+            .SingleAsync(f => f.App == App && f.Id == id);
+        
+        var newFolder = await InternalDuplicateFolder(folder, folder.Parent, true);
+        
+        await appDbContext.SaveChangesAsync();
+        
+        const string sql = """
+                           WITH RECURSIVE FolderHierarchy AS (
+                               SELECT "Id", "ParentId", "Name"
+                               FROM "RouteFolders"
+                               WHERE "Id" = @id
+                           
+                               UNION ALL
+                           
+                               SELECT rf."Id", rf."ParentId", rf."Name"
+                               FROM "RouteFolders" rf
+                                        JOIN FolderHierarchy fh ON fh."Id" = rf."ParentId"
+                           )
+                           SELECT 2 AS "Type", "Id", "ParentId", NULL AS "RouteName", NULL AS "RouteMethod", NULL AS "RoutePath", NULL AS "RouteStatus", "Name" AS "FolderName"
+                           FROM FolderHierarchy
+                           UNION ALL
+                           SELECT 1 AS "Type", "Id", "FolderId" AS "ParentId", "Name" AS "RouteName", "Method" AS "RouteMethod", "Path" AS "RoutePath", "Status" AS "RouteStatus", NULL AS "FolderName"
+                           FROM "Routes"
+                           WHERE "FolderId" IN (SELECT "Id" FROM FolderHierarchy);
+                           """;
+        var items = await appDbContext.Database.GetDbConnection().QueryAsync<IndexItemV2>(sql, new
+        {
+            id = newFolder.Id
+        });
+        
+        return Created(newFolder.Id.ToString(), items.Select(item => new
+        {
+            Type = item.Type.ToString(),
+            item.Id,
+            item.ParentId,
+            Route = item.Type == RouteRouteFolderType.Route
+                ? new
+                {
+                    Name = item.RouteName,
+                    Method = item.RouteMethod,
+                    Path = item.RoutePath,
+                    Status = item.RouteStatus.ToString()
+                }
+                : null,
+            Folder = item.Type == RouteRouteFolderType.Folder
+                ? new
+                {
+                    Name = item.FolderName
+                }
+                : null
+        }));
+    }
+
+    private async Task<RouteFolder> InternalDuplicateFolder(RouteFolder sourceFolder, RouteFolder parent, bool isTop = false)
+    {
+        var newFolder = new RouteFolder
+        {
+            App = App,
+            Name = isTop ? sourceFolder.Name + " - Copy" : sourceFolder.Name,
+            Parent = parent
+        };
+        
+        await appDbContext.RouteFolders.AddAsync(newFolder);
+        
+        var routes = await appDbContext.Routes
+            .Where(r => r.App == App && r.Folder == sourceFolder)
+            .AsNoTracking()
+            .ToListAsync();
+        
+        foreach (var route in routes)
+        {
+            route.Id = 0; // Reset ID to create new
+            route.Folder = newFolder;
+        }
+        await appDbContext.Routes.AddRangeAsync(routes);
+        
+        var subFolders = await appDbContext.RouteFolders
+            .Where(f => f.App == App && f.Parent == sourceFolder)
+            .AsNoTracking()
+            .ToListAsync();
+
+        foreach (var subFolder in subFolders)
+        {
+            await InternalDuplicateFolder(subFolder, newFolder);
+        }
+        
+        //return top folder
+        return newFolder;
+    }
+
     [HttpDelete("folders/{id:int}")]
     public async Task<IActionResult> DeleteFolder(int appId, int id)
     {

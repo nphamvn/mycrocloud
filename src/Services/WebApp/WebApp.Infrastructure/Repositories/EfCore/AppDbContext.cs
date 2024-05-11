@@ -42,11 +42,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     }
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        AddTimestamps();
+        AddTimestampsAndVersion();
         return base.SaveChangesAsync(cancellationToken);
     }
 
-    private void AddTimestamps()
+    private void AddTimestampsAndVersion()
     {
         var entries = ChangeTracker
             .Entries()
@@ -63,6 +63,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             {
                 ((BaseEntity)entityEntry.Entity).UpdatedAt = DateTime.UtcNow;
             }
+            ((BaseEntity)entityEntry.Entity).Version = Guid.NewGuid();
         }
     }
 }

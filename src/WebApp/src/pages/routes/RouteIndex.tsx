@@ -14,23 +14,29 @@ import {
 } from "@heroicons/react/24/solid";
 //import { toast } from "react-toastify";
 
-interface ExplorerItem {
+interface IRouteFolderItem {
   type: "Route" | "Folder";
   id: number;
   parentId: number | null;
-  route: IExplorerItemRoute | null;
-  folder: {
-    name: string;
-  } | null;
-  folderCollapsed?: boolean;
+  route: IRouteItem | null;
+  folder: IFolderItem | null;
 }
 
-interface IExplorerItemRoute {
+interface IExplorerItem extends IRouteFolderItem {
+  level: number;
+  collapsed: boolean;
+}
+
+interface IRouteItem {
   id: number;
   name: string;
   method: string;
   path: string;
   status: string;
+}
+
+interface IFolderItem {
+  name: string;
 }
 
 export default function RouteIndex() {
@@ -91,7 +97,7 @@ export default function RouteIndex() {
           </div>
 
           <hr className="my-1" />
-          <TreeNode />
+          <RouteExplorer />
         </div>
         <div className="flex-1">
           {newRouteActive || editRouteActive || logPageActive ? (
@@ -109,12 +115,12 @@ export default function RouteIndex() {
   );
 }
 
-function TreeNode() {
+function RouteExplorer() {
   const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
 
   const app = useContext(AppContext)!;
-  const [nodes, setNodes] = useState<ExplorerItem[]>([]);
+  const [explorerItems, setExplorerItems] = useState<IExplorerItem[]>([]);
 
   useEffect(() => {
     const getRoutes = async () => {
@@ -124,17 +130,41 @@ function TreeNode() {
           Authorization: `Bearer ${accessToken}`,
         },
       })
-        .then((res) => res.json())
+        .then((res) => res.json() as Promise<IRouteFolderItem[]>)
         .then((routes) => {
-          console.log(routes);
-          setNodes(routes);
+          setExplorerItems(
+            routes.map((route) => {
+              return {
+                ...route,
+                level: calculateLevel(route, routes),
+                collapsed: false,
+              };
+
+              function calculateLevel(
+                route: IRouteFolderItem,
+                routes: IRouteFolderItem[],
+              ): number {
+                if (route.parentId === null) {
+                  return 0;
+                }
+                const parent = routes.find((r) => r.id === route.parentId);
+
+                if (!parent) {
+                  throw new Error("Parent not found for route");
+                }
+
+                var parentLevel = calculateLevel(parent, routes);
+                return parentLevel + 1;
+              }
+            }),
+          );
         });
     };
     getRoutes();
   }, []);
 
   const [showActionMenu, setShowActionMenu] = useState(false);
-  const actionMenuNodeRef = useRef<ExplorerItem>();
+  const actionMenuNodeRef = useRef<IExplorerItem>();
 
   const actionMenuRef = useRef<HTMLDivElement>(null);
   const actionMenuClientXRef = useRef<number>();
@@ -154,21 +184,22 @@ function TreeNode() {
   }
 
   const handleActionMenuClick = (
-    route: ExplorerItem,
+    item: IExplorerItem,
     clientX: number,
     clientY: number,
   ) => {
     actionMenuClientXRef.current = clientX;
     actionMenuClientYRef.current = clientY;
-    actionMenuNodeRef.current = route;
+    actionMenuNodeRef.current = item;
+    console.log("actionMenuNodeRef", actionMenuNodeRef.current);
     setShowActionMenu(true);
   };
 
   const handleNewRouteClick = async () => {
     navigate(`new/${actionMenuNodeRef.current!.id}`);
 
-    setNodes((nodes) => {
-      const newRoute: ExplorerItem = {
+    setExplorerItems((items) => {
+      const newRoute: IExplorerItem = {
         type: "Route",
         id: -1,
         parentId: actionMenuNodeRef.current!.id,
@@ -180,8 +211,10 @@ function TreeNode() {
           status: "Active",
         },
         folder: null,
+        level: actionMenuNodeRef.current!.level + 1,
+        collapsed: false,
       };
-      return [...nodes, newRoute];
+      return [...items, newRoute];
     });
   };
 
@@ -201,8 +234,8 @@ function TreeNode() {
         }),
       });
       if (res.ok) {
-        setNodes((nodes) => {
-          const newFolder: ExplorerItem = {
+        setExplorerItems((items) => {
+          const newFolder: IExplorerItem = {
             type: "Folder",
             id: parseInt(res.headers.get("Location")!),
             parentId: actionMenuNodeRef.current!.id,
@@ -210,8 +243,10 @@ function TreeNode() {
             folder: {
               name: folderName,
             },
+            collapsed: false,
+            level: actionMenuNodeRef.current!.level + 1,
           };
-          return [...nodes, newFolder];
+          return [...items, newFolder];
         });
       } else {
         console.log("Folder creation failed");
@@ -220,42 +255,106 @@ function TreeNode() {
   };
 
   const handleDuplicateClick = async () => {
-    // const accessToken = await getAccessTokenSilently();
-    // const res = await fetch(
-    //   `/api/apps/${app.id}/routes/${actionMenuRoute!.id}/clone`,
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       Authorization: `Bearer ${accessToken}`,
-    //     },
-    //   },
-    // );
-    // const newRoute = (await res.json()) as IRoute;
-    // if (res.ok) {
-    //   toast.success("Route cloned");
-    //   dispatch({ type: "ADD_ROUTE", payload: newRoute });
-    // }
+    const { type, id } = actionMenuNodeRef.current!;
+    console.log("duplicate", type, id);
+    const accessToken = await getAccessTokenSilently();
+    const url =
+      type === "Route"
+        ? `/api/apps/${app.id}/routes/${id}/clone`
+        : `/api/apps/${app.id}/routes/folders/${id}/duplicate`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (res.ok) {
+      if (type === "Folder") {
+        const newFolderId = parseInt(res.headers.get("Location")!);
+        const newItems = (await res.json()) as IRouteFolderItem[];
+        const newFolder = newItems.find((item) => item.id === newFolderId)!;
+        const newFolderLevel = explorerItems.find(
+          (item) => item.parentId === newFolder.parentId,
+        )!.level;
+
+        const newExplorerItems: IExplorerItem[] = newItems.map((item) => {
+          return {
+            ...item,
+            level: calculateLevel(item, newItems, newFolderId, newFolderLevel),
+            collapsed: false,
+          };
+
+          function calculateLevel(
+            item: IRouteFolderItem,
+            items: IRouteFolderItem[],
+            topItemId: number,
+            topItemLevel: number,
+          ): number {
+            if (item.id === topItemId) {
+              return topItemLevel;
+            }
+            var parent = items.find((i) => i.id === item.parentId);
+            if (!parent) {
+              throw new Error("Parent not found");
+            }
+            var parentLevel = calculateLevel(
+              parent,
+              items,
+              topItemId,
+              topItemLevel,
+            );
+            return parentLevel + 1;
+          }
+        });
+
+        setExplorerItems((items) => {
+          return items.concat(newExplorerItems);
+        });
+      }
+      // toast.success("Route cloned");
+      // dispatch({ type: "ADD_ROUTE", payload: newRoute });
+    }
   };
   const handleDeleteClick = async () => {
-    const type = actionMenuNodeRef.current!.folder ? "folder" : "route";
-    if (confirm(`Are you sure want to delete this ${type}?`)) {
+    const { type, id } = actionMenuNodeRef.current!;
+    if (confirm(`Are you sure want to delete this ${type.toLowerCase()}?`)) {
+      console.log("delete", type, id);
       const accessToken = await getAccessTokenSilently();
-      const res = await fetch(
-        `/api/apps/${app.id}/routes/${actionMenuNodeRef.current!.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+      const url =
+        type === "Route"
+          ? `/api/apps/${app.id}/routes/${id}`
+          : `/api/apps/${app.id}/routes/folders/${id}`;
+
+      const res = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
-      );
+      });
       if (res.ok) {
-        setNodes((nodes) => {
-          return nodes.filter(
-            (node) =>
-              node.type !== actionMenuNodeRef.current!.type &&
-              node.id !== actionMenuNodeRef.current!.id,
-          );
+        setExplorerItems((nodes) => {
+          if (type === "Route") {
+            return nodes.filter(
+              (node) => node.type !== "Route" && node.id !== id,
+            );
+          }
+
+          let deleteItems = getFolderItems(actionMenuNodeRef.current!);
+          console.log("deleteItems", deleteItems);
+          return nodes.filter((node) => {
+            return !deleteItems.some((item) => item.id === node.id);
+          });
+
+          function getFolderItems(folder: IExplorerItem) {
+            var items = nodes.filter((node) => node.parentId === folder.id);
+            for (const item of items) {
+              if (item.type === "Folder") {
+                items = items.concat(getFolderItems(item));
+              }
+            }
+            return items.concat(folder);
+          }
         });
         // if (actionMenuRoute!.id === activeRoute?.id) {
         //   navigate("./");
@@ -264,41 +363,54 @@ function TreeNode() {
     }
   };
 
-  const renderTree = (
-    nodes: ExplorerItem[],
-    parentId: number | null,
-    isRoot: boolean = false,
-  ) => {
-    console.log("rendering tree", nodes, parentId);
+  if (explorerItems.length === 0) {
+    return <div>Loading...</div>;
+  }
+
+  console.log("nodes", explorerItems);
+
+  const handleFolderCollapseClick = (target: IExplorerItem) => {
+    setExplorerItems((items) => {
+      return items.map((item) => {
+        if (item.type === "Folder" && item.id === target.id) {
+          return {
+            ...item,
+            collapsed: !item.collapsed,
+          };
+        }
+        return item;
+      });
+    });
+  };
+
+  const render = (nodes: IExplorerItem[], parentId: number | null) => {
     return (
       <>
         {nodes
-          .filter((node) => node.parentId === parentId)
-          .map((node) => {
-            console.log("rendering node", node);
-            return (
-              <div key={node.id} style={{ marginLeft: isRoot ? 0 : 20 }}>
-                {node.folder ? (
+          .filter((n) => n.parentId === parentId)
+          .map((node) => (
+            <div style={{ paddingLeft: node.level === 0 ? 0 : 20 }}>
+              {node.type === "Folder" ? (
+                <>
                   <FolderItem
-                    folder={node.folder}
-                    collapsed={node.folderCollapsed!}
-                    onActionMenuClick={(buttonLeft, buttonTop) =>
-                      handleActionMenuClick(node, buttonLeft, buttonTop)
+                    item={node}
+                    onCollapseClick={() => handleFolderCollapseClick(node)}
+                    onActionMenuClick={(clientX, clientY) =>
+                      handleActionMenuClick(node, clientX, clientY)
                     }
                   />
-                ) : (
-                  <RouteItem
-                    route={node.route}
-                    id={node.id}
-                    onActionMenuClick={(buttonLeft, buttonTop) =>
-                      handleActionMenuClick(node, buttonLeft, buttonTop)
-                    }
-                  />
-                )}
-                {renderTree(nodes, node.id)}
-              </div>
-            );
-          })}
+                  {node.collapsed ? null : render(nodes, node.id)}
+                </>
+              ) : (
+                <RouteItem
+                  item={node}
+                  onActionMenuClick={(clientX, clientY) =>
+                    handleActionMenuClick(node, clientX, clientY)
+                  }
+                />
+              )}
+            </div>
+          ))}
       </>
     );
   };
@@ -316,25 +428,23 @@ function TreeNode() {
             onDuplicateClick={handleDuplicateClick}
             onDeleteClick={handleDeleteClick}
             onOutSideClick={() => {
-              actionMenuNodeRef.current = undefined;
+              //actionMenuNodeRef.current = undefined;
               setShowActionMenu(false);
             }}
           />
         )}
       </div>
-      {renderTree(nodes, null, true)}
+      {render(explorerItems, null)}
     </div>
   );
 }
 
 function RouteItem({
-  route,
-  id,
+  item: { route },
   onActionMenuClick,
 }: {
-  route: ExplorerItem["route"];
-  id: number;
-  onActionMenuClick(buttonLeft: number, buttonTop: number): void;
+  item: IExplorerItem;
+  onActionMenuClick?: (buttonLeft: number, buttonTop: number) => void;
 }) {
   if (!route) {
     return null;
@@ -352,7 +462,9 @@ function RouteItem({
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.stopPropagation();
-    onActionMenuClick(e.currentTarget.offsetLeft, e.currentTarget.offsetTop);
+    if (onActionMenuClick) {
+      onActionMenuClick(e.currentTarget.offsetLeft, e.currentTarget.offsetTop);
+    }
   };
 
   return (
@@ -360,7 +472,7 @@ function RouteItem({
       className="group flex items-center p-0.5"
       style={{ cursor: "pointer" }}
       onClick={() => {
-        navigate(id.toString());
+        navigate(route.id.toString());
       }}
     >
       <span
@@ -389,13 +501,13 @@ function RouteItem({
 }
 
 function FolderItem({
-  folder,
-  collapsed,
+  item: { folder, collapsed },
   onActionMenuClick,
+  onCollapseClick,
 }: {
-  folder: ExplorerItem["folder"];
-  collapsed: boolean;
-  onActionMenuClick(buttonLeft: number, buttonTop: number): void;
+  item: IExplorerItem;
+  onActionMenuClick?: (buttonLeft: number, buttonTop: number) => void;
+  onCollapseClick?: () => void;
 }) {
   if (!folder) {
     return null;
@@ -403,28 +515,23 @@ function FolderItem({
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.stopPropagation();
-    onActionMenuClick(e.currentTarget.offsetLeft, e.currentTarget.offsetTop);
+    if (onActionMenuClick) {
+      onActionMenuClick(e.currentTarget.offsetLeft, e.currentTarget.offsetTop);
+    }
   };
 
   return (
     <div
       className="group flex items-center p-0.5"
       style={{ cursor: "pointer" }}
+      onClick={() => {
+        onCollapseClick && onCollapseClick();
+      }}
     >
       {collapsed ? (
-        <ChevronRightIcon
-          onClick={() => {
-            console.log(collapsed);
-          }}
-          className="h-4 w-4"
-        />
+        <ChevronRightIcon className="me-1 h-4 w-4" />
       ) : (
-        <ChevronDownIcon
-          onClick={() => {
-            console.log(collapsed);
-          }}
-          className="h-4 w-4"
-        />
+        <ChevronDownIcon className="me-1 h-4 w-4" />
       )}
       <span className="overflow-hidden text-ellipsis whitespace-nowrap text-sm">
         {folder.name}
@@ -450,7 +557,7 @@ function ActionMenu({
   onOutSideClick,
   onDeleteClick,
 }: {
-  node: ExplorerItem;
+  node: IRouteFolderItem;
   top: number;
   right: number;
   onNewRouteClick(): void;
