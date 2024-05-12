@@ -328,4 +328,13 @@ DELETE FROM "RouteFolders" WHERE "Id" IN (SELECT "Id" FROM folders_to_delete);
         
         return NoContent();
     }
+    
+    [HttpPatch("folders/{id:int}/rename")]
+    public async Task<IActionResult> RenameFolder(int appId, int id, FolderRenameRequest folderRenameRequest)
+    {
+        var folder = await appDbContext.RouteFolders.SingleAsync(f => f.App == App && f.Id == id);
+        folder.Name = folderRenameRequest.Name;
+        await appDbContext.SaveChangesAsync();
+        return NoContent();
+    }
 }
