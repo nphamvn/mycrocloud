@@ -12,63 +12,23 @@ import {
   ChevronRightIcon,
   EllipsisVerticalIcon,
 } from "@heroicons/react/24/solid";
+import { useForm } from "react-hook-form";
+import { ensureSuccess } from "../../utils/fetchUtils";
 //import { toast } from "react-toastify";
 
-interface IRouteFolderItem {
-  type: "Route" | "Folder";
-  id: number;
-  parentId: number | null;
-  route: IRouteItem | null;
-  folder: IFolderItem | null;
-}
-
 interface IExplorerItem extends IRouteFolderItem {
-  level: number;
-  collapsed: boolean;
-}
-
-interface IRouteItem {
-  id: number;
-  name: string;
-  method: string;
-  path: string;
-  status: string;
-}
-
-interface IFolderItem {
-  name: string;
+  collapsed?: boolean;
+  isEditing?: boolean;
 }
 
 export default function RouteIndex() {
-  const app = useContext(AppContext)!;
   const [state, dispatch] = useReducer(routesReducer, {
     routes: [],
     activeRoute: undefined,
   });
-  const { getAccessTokenSilently } = useAuth0();
-  const navigate = useNavigate();
   const params = useParams();
   const routeId = params["routeId"] ? parseInt(params["routeId"]) : undefined;
 
-  const handleNewFolderClick = async () => {
-    const folderName = prompt("Enter folder name");
-    if (folderName) {
-      const accessToken = await getAccessTokenSilently();
-      const res = await fetch(`/api/apps/${app.id}/routes/folders`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ name: folderName }),
-      });
-      if (res.ok) {
-        console.log("Folder created");
-      } else {
-        console.log("Folder creation failed");
-      }
-    }
-  };
   const newRouteActive = useMatch("/apps/:appId/routes/new/:folderId?");
   const editRouteActive = useMatch("/apps/:appId/routes/:routeId");
   const logPageActive = useMatch("/apps/:appId/routes/:routeId/logs");
@@ -76,27 +36,7 @@ export default function RouteIndex() {
   return (
     <RoutesContext.Provider value={{ state, dispatch }}>
       <div className="flex h-full">
-        <div className="w-48 border-r p-1">
-          <div className="flex justify-center space-x-2">
-            <button
-              type="button"
-              onClick={() => {
-                navigate("new");
-              }}
-              className="bg-primary px-2 py-1 text-white enabled:hover:bg-cyan-700 disabled:opacity-50"
-            >
-              New Route
-            </button>
-            <button
-              type="button"
-              onClick={handleNewFolderClick}
-              className="bg-primary px-2 py-1 text-white enabled:hover:bg-cyan-700 disabled:opacity-50"
-            >
-              New Folder
-            </button>
-          </div>
-
-          <hr className="my-1" />
+        <div className="w-64 border-r p-1">
           <RouteExplorer />
         </div>
         <div className="flex-1">
@@ -125,47 +65,22 @@ function RouteExplorer() {
   useEffect(() => {
     const getRoutes = async () => {
       const accessToken = await getAccessTokenSilently();
-      fetch(`/api/apps/${app.id}/routes/v2`, {
+      fetch(`/api/apps/${app.id}/routes`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       })
         .then((res) => res.json() as Promise<IRouteFolderItem[]>)
         .then((routes) => {
-          setExplorerItems(
-            routes.map((route) => {
-              return {
-                ...route,
-                level: calculateLevel(route, routes),
-                collapsed: false,
-              };
-
-              function calculateLevel(
-                route: IRouteFolderItem,
-                routes: IRouteFolderItem[],
-              ): number {
-                if (route.parentId === null) {
-                  return 0;
-                }
-                const parent = routes.find((r) => r.id === route.parentId);
-
-                if (!parent) {
-                  throw new Error("Parent not found for route");
-                }
-
-                var parentLevel = calculateLevel(parent, routes);
-                return parentLevel + 1;
-              }
-            }),
-          );
+          setExplorerItems(routes);
         });
     };
     getRoutes();
   }, []);
 
+  //#region Action Menu
   const [showActionMenu, setShowActionMenu] = useState(false);
-  const actionMenuNodeRef = useRef<IExplorerItem>();
-
+  const actionMenuItemRef = useRef<IExplorerItem>();
   const actionMenuRef = useRef<HTMLDivElement>(null);
   const actionMenuClientXRef = useRef<number>();
   const actionMenuClientYRef = useRef<number>();
@@ -190,38 +105,71 @@ function RouteExplorer() {
   ) => {
     actionMenuClientXRef.current = clientX;
     actionMenuClientYRef.current = clientY;
-    actionMenuNodeRef.current = item;
-    console.log("actionMenuNodeRef", actionMenuNodeRef.current);
+    actionMenuItemRef.current = item;
     setShowActionMenu(true);
   };
 
-  const handleNewRouteClick = async () => {
-    navigate(`new/${actionMenuNodeRef.current!.id}`);
+  //#endregion
 
+  const handleNewRouteClick = async () => {
+    navigate(`new/${actionMenuItemRef.current!.id}`);
     setExplorerItems((items) => {
       const newRoute: IExplorerItem = {
         type: "Route",
         id: -1,
-        parentId: actionMenuNodeRef.current!.id,
+        parentId: actionMenuItemRef.current!.id,
         route: {
-          id: -1,
           name: "New Route",
           method: "GET",
           path: "/new-route",
           status: "Active",
         },
         folder: null,
-        level: actionMenuNodeRef.current!.level + 1,
         collapsed: false,
       };
       return [...items, newRoute];
     });
   };
 
-  const handleNewFolderClick = async () => {
-    const folderName = prompt("Enter folder name");
-    if (folderName) {
-      const accessToken = await getAccessTokenSilently();
+  const handleNewFolderClick = async (atRoot: boolean = false) => {
+    const parentId = atRoot ? null : actionMenuItemRef.current!.id;
+    setExplorerItems((items) => {
+      const newFolder: IExplorerItem = {
+        type: "Folder",
+        id: -1,
+        parentId: parentId,
+        route: null,
+        folder: {
+          name: "new folder",
+        },
+        collapsed: false,
+        isEditing: true,
+      };
+      return [...items, newFolder];
+    });
+  };
+
+  const handleFolderRenameClick = (folder: IExplorerItem) => {
+    setExplorerItems((items) => {
+      return items.map((item) => {
+        if (item.type === "Folder" && item.id === folder.id) {
+          return {
+            ...item,
+            isEditing: true,
+          };
+        }
+        return item;
+      });
+    });
+  };
+
+  const handleFolderNameSubmit = async (
+    folder: IExplorerItem,
+    name: string,
+  ) => {
+    const isNewFolder = folder.id === -1;
+    const accessToken = await getAccessTokenSilently();
+    if (isNewFolder) {
       const res = await fetch(`/api/apps/${app.id}/routes/folders`, {
         method: "POST",
         headers: {
@@ -229,34 +177,60 @@ function RouteExplorer() {
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          name: folderName,
-          parentId: actionMenuNodeRef.current!.id,
+          name: name,
+          parentId: folder.parentId,
         }),
       });
-      if (res.ok) {
-        setExplorerItems((items) => {
-          const newFolder: IExplorerItem = {
-            type: "Folder",
-            id: parseInt(res.headers.get("Location")!),
-            parentId: actionMenuNodeRef.current!.id,
-            route: null,
-            folder: {
-              name: folderName,
-            },
-            collapsed: false,
-            level: actionMenuNodeRef.current!.level + 1,
-          };
-          return [...items, newFolder];
+      ensureSuccess(res);
+      setExplorerItems((items) => {
+        return items.map((item) => {
+          if (item.id === folder.id) {
+            return {
+              ...item,
+              id: parseInt(res.headers.get("Location")!),
+              folder: {
+                name: name,
+              },
+              isEditing: false,
+            };
+          }
+          return item;
         });
-      } else {
-        console.log("Folder creation failed");
-      }
+      });
+    } else {
+      const res = await fetch(
+        `/api/apps/${app.id}/routes/folders/${folder.id}/rename`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            name: name,
+          }),
+        },
+      );
+      ensureSuccess(res);
+      setExplorerItems((items) => {
+        return items.map((item) => {
+          if (item.id === folder.id) {
+            return {
+              ...item,
+              folder: {
+                name: name,
+              },
+              isEditing: false,
+            };
+          }
+          return item;
+        });
+      });
     }
   };
 
   const handleDuplicateClick = async () => {
-    const { type, id } = actionMenuNodeRef.current!;
-    console.log("duplicate", type, id);
+    const { type, id } = actionMenuItemRef.current!;
     const accessToken = await getAccessTokenSilently();
     const url =
       type === "Route"
@@ -269,55 +243,23 @@ function RouteExplorer() {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    if (res.ok) {
-      if (type === "Folder") {
-        const newFolderId = parseInt(res.headers.get("Location")!);
-        const newItems = (await res.json()) as IRouteFolderItem[];
-        const newFolder = newItems.find((item) => item.id === newFolderId)!;
-        const newFolderLevel = explorerItems.find(
-          (item) => item.parentId === newFolder.parentId,
-        )!.level;
-
-        const newExplorerItems: IExplorerItem[] = newItems.map((item) => {
-          return {
-            ...item,
-            level: calculateLevel(item, newItems, newFolderId, newFolderLevel),
-            collapsed: false,
-          };
-
-          function calculateLevel(
-            item: IRouteFolderItem,
-            items: IRouteFolderItem[],
-            topItemId: number,
-            topItemLevel: number,
-          ): number {
-            if (item.id === topItemId) {
-              return topItemLevel;
-            }
-            var parent = items.find((i) => i.id === item.parentId);
-            if (!parent) {
-              throw new Error("Parent not found");
-            }
-            var parentLevel = calculateLevel(
-              parent,
-              items,
-              topItemId,
-              topItemLevel,
-            );
-            return parentLevel + 1;
-          }
-        });
-
-        setExplorerItems((items) => {
-          return items.concat(newExplorerItems);
-        });
-      }
-      // toast.success("Route cloned");
-      // dispatch({ type: "ADD_ROUTE", payload: newRoute });
+    ensureSuccess(res);
+    if (type === "Folder") {
+      const newItems = (await res.json()) as IRouteFolderItem[];
+      setExplorerItems((items) => {
+        return items.concat(
+          newItems.map((item) => {
+            return {
+              ...item,
+              collapsed: false,
+            };
+          }),
+        );
+      });
     }
   };
   const handleDeleteClick = async () => {
-    const { type, id } = actionMenuNodeRef.current!;
+    const { type, id } = actionMenuItemRef.current!;
     if (confirm(`Are you sure want to delete this ${type.toLowerCase()}?`)) {
       console.log("delete", type, id);
       const accessToken = await getAccessTokenSilently();
@@ -332,47 +274,36 @@ function RouteExplorer() {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      if (res.ok) {
-        setExplorerItems((nodes) => {
-          if (type === "Route") {
-            return nodes.filter(
-              (node) => node.type !== "Route" && node.id !== id,
-            );
-          }
+      ensureSuccess(res);
+      setExplorerItems((nodes) => {
+        if (type === "Route") {
+          return nodes.filter(
+            (node) => node.type !== "Route" && node.id !== id,
+          );
+        }
 
-          let deleteItems = getFolderItems(actionMenuNodeRef.current!);
-          console.log("deleteItems", deleteItems);
-          return nodes.filter((node) => {
-            return !deleteItems.some((item) => item.id === node.id);
-          });
-
-          function getFolderItems(folder: IExplorerItem) {
-            var items = nodes.filter((node) => node.parentId === folder.id);
-            for (const item of items) {
-              if (item.type === "Folder") {
-                items = items.concat(getFolderItems(item));
-              }
-            }
-            return items.concat(folder);
-          }
+        let deleteItems = getFolderItems(actionMenuItemRef.current!);
+        return nodes.filter((node) => {
+          return !deleteItems.some((item) => item.id === node.id);
         });
-        // if (actionMenuRoute!.id === activeRoute?.id) {
-        //   navigate("./");
-        // }
-      }
+
+        function getFolderItems(folder: IExplorerItem) {
+          var items = nodes.filter((node) => node.parentId === folder.id);
+          for (const item of items) {
+            if (item.type === "Folder") {
+              items = items.concat(getFolderItems(item));
+            }
+          }
+          return items.concat(folder);
+        }
+      });
     }
   };
 
-  if (explorerItems.length === 0) {
-    return <div>Loading...</div>;
-  }
-
-  console.log("nodes", explorerItems);
-
-  const handleFolderCollapseClick = (target: IExplorerItem) => {
+  const handleFolderClick = (folder: IExplorerItem) => {
     setExplorerItems((items) => {
       return items.map((item) => {
-        if (item.type === "Folder" && item.id === target.id) {
+        if (item.type === "Folder" && item.id === folder.id) {
           return {
             ...item,
             collapsed: !item.collapsed,
@@ -383,27 +314,33 @@ function RouteExplorer() {
     });
   };
 
-  const render = (nodes: IExplorerItem[], parentId: number | null) => {
+  const handleRouteClick = (route: IExplorerItem) => {
+    navigate(route.id.toString());
+  };
+
+  const renderTree = (nodes: IExplorerItem[], parentId: number | null) => {
     return (
       <>
         {nodes
           .filter((n) => n.parentId === parentId)
           .map((node) => (
-            <div style={{ paddingLeft: node.level === 0 ? 0 : 20 }}>
+            <div style={{ paddingLeft: parentId === null ? 0 : 20 }}>
               {node.type === "Folder" ? (
                 <>
                   <FolderItem
                     item={node}
-                    onCollapseClick={() => handleFolderCollapseClick(node)}
+                    onClick={() => handleFolderClick(node)}
                     onActionMenuClick={(clientX, clientY) =>
                       handleActionMenuClick(node, clientX, clientY)
                     }
+                    onNameSubmit={(name) => handleFolderNameSubmit(node, name)}
                   />
-                  {node.collapsed ? null : render(nodes, node.id)}
+                  {node.collapsed ? null : renderTree(nodes, node.id)}
                 </>
               ) : (
                 <RouteItem
                   item={node}
+                  onClick={() => handleRouteClick(node)}
                   onActionMenuClick={(clientX, clientY) =>
                     handleActionMenuClick(node, clientX, clientY)
                   }
@@ -422,35 +359,57 @@ function RouteExplorer() {
           <ActionMenu
             top={calculateActionMenuTop()!}
             right={calculateActionMenuRight()!}
-            node={actionMenuNodeRef.current!}
+            node={actionMenuItemRef.current!}
             onNewRouteClick={handleNewRouteClick}
-            onNewFolderClick={handleNewFolderClick}
+            onNewFolderClick={() => handleNewFolderClick(false)}
+            onFolderRenameClick={() =>
+              handleFolderRenameClick(actionMenuItemRef.current!)
+            }
             onDuplicateClick={handleDuplicateClick}
             onDeleteClick={handleDeleteClick}
             onOutSideClick={() => {
-              //actionMenuNodeRef.current = undefined;
               setShowActionMenu(false);
             }}
           />
         )}
       </div>
-      {render(explorerItems, null)}
+      <div className="flex justify-center space-x-2">
+        <button
+          type="button"
+          onClick={() => {
+            navigate("new");
+          }}
+          className="bg-primary px-2 py-1 text-white enabled:hover:bg-cyan-700 disabled:opacity-50"
+        >
+          New Route
+        </button>
+        <button
+          type="button"
+          onClick={() => handleNewFolderClick(true)}
+          className="bg-primary px-2 py-1 text-white enabled:hover:bg-cyan-700 disabled:opacity-50"
+        >
+          New Folder
+        </button>
+      </div>
+
+      <hr className="my-1" />
+      {renderTree(explorerItems, null)}
     </div>
   );
 }
 
 function RouteItem({
   item: { route },
+  onClick,
   onActionMenuClick,
 }: {
   item: IExplorerItem;
   onActionMenuClick?: (buttonLeft: number, buttonTop: number) => void;
+  onClick: () => void;
 }) {
   if (!route) {
     return null;
   }
-
-  const navigate = useNavigate();
 
   const methodTextColors = new Map<string, string>([
     ["GET", "text-sky-500"],
@@ -460,7 +419,9 @@ function RouteItem({
     ["PATCH", "text-yellow-500"],
   ]);
 
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleActionMenuClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
     e.stopPropagation();
     if (onActionMenuClick) {
       onActionMenuClick(e.currentTarget.offsetLeft, e.currentTarget.offsetTop);
@@ -471,9 +432,7 @@ function RouteItem({
     <div
       className="group flex items-center p-0.5"
       style={{ cursor: "pointer" }}
-      onClick={() => {
-        navigate(route.id.toString());
-      }}
+      onClick={onClick}
     >
       <span
         className={`me-1 font-semibold ${methodTextColors.get(
@@ -488,7 +447,7 @@ function RouteItem({
       </span>
       <button
         type="button"
-        onClick={(e) => handleClick(e)}
+        onClick={(e) => handleActionMenuClick(e)}
         className="ms-auto hidden group-hover:block"
       >
         <EllipsisVerticalIcon className="h-4 w-4 text-gray-600" />
@@ -501,13 +460,15 @@ function RouteItem({
 }
 
 function FolderItem({
-  item: { folder, collapsed },
+  item: { folder, collapsed, isEditing },
   onActionMenuClick,
-  onCollapseClick,
+  onClick,
+  onNameSubmit,
 }: {
   item: IExplorerItem;
-  onActionMenuClick?: (buttonLeft: number, buttonTop: number) => void;
-  onCollapseClick?: () => void;
+  onActionMenuClick: (buttonLeft: number, buttonTop: number) => void;
+  onClick: () => void;
+  onNameSubmit: (name: string) => void;
 }) {
   if (!folder) {
     return null;
@@ -515,18 +476,23 @@ function FolderItem({
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.stopPropagation();
-    if (onActionMenuClick) {
-      onActionMenuClick(e.currentTarget.offsetLeft, e.currentTarget.offsetTop);
-    }
+    onActionMenuClick(e.currentTarget.offsetLeft, e.currentTarget.offsetTop);
   };
 
-  return (
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{ name: string }>();
+
+  const onSubmit = (data: { name: string }) => {
+    onNameSubmit(data.name);
+  };
+  return !isEditing ? (
     <div
       className="group flex items-center p-0.5"
       style={{ cursor: "pointer" }}
-      onClick={() => {
-        onCollapseClick && onCollapseClick();
-      }}
+      onClick={onClick}
     >
       {collapsed ? (
         <ChevronRightIcon className="me-1 h-4 w-4" />
@@ -544,6 +510,20 @@ function FolderItem({
         <EllipsisVerticalIcon className="h-4 w-4 text-gray-600" />
       </button>
     </div>
+  ) : (
+    <div className="flex items-center p-0.5">
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <input
+          type="text"
+          {...register("name", { required: "Name is required" })}
+          className="w-full border"
+          defaultValue={folder.name}
+        />
+        {errors.name && (
+          <span className="text-red-500">{errors.name.message}</span>
+        )}
+      </form>
+    </div>
   );
 }
 
@@ -556,6 +536,7 @@ function ActionMenu({
   onDuplicateClick,
   onOutSideClick,
   onDeleteClick,
+  onFolderRenameClick,
 }: {
   node: IRouteFolderItem;
   top: number;
@@ -565,6 +546,7 @@ function ActionMenu({
   onDuplicateClick(): void;
   onDeleteClick(): void;
   onOutSideClick(): void;
+  onFolderRenameClick(): void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const windowClickHandler = () => {
@@ -585,7 +567,7 @@ function ActionMenu({
         className="absolute w-[80%] border bg-white shadow"
       >
         <ul>
-          {node.folder && (
+          {node.type === "Folder" && (
             <>
               <li className="p-1.5">
                 <button
@@ -616,6 +598,17 @@ function ActionMenu({
               Duplicate
             </button>
           </li>
+          {node.type === "Folder" && (
+            <li className="p-1.5">
+              <button
+                type="button"
+                onClick={onFolderRenameClick}
+                className="w-full text-left"
+              >
+                Rename
+              </button>
+            </li>
+          )}
           <hr />
           <li className="p-1.5">
             <button
