@@ -21,6 +21,7 @@ import {
 import { useForm } from "react-hook-form";
 import { ensureSuccess } from "../../utils/fetchUtils";
 import IRouteFolderRouteItem, { calculateLevel } from "./IRouteFolderRouteItem";
+import IRoute from "./Route";
 //import { toast } from "react-toastify";
 
 interface IExplorerItem extends IRouteFolderRouteItem {
@@ -276,11 +277,15 @@ function RouteExplorer() {
         );
       });
     } else {
-      const newRoute = (await res.json()) as IRouteFolderRouteItem;
+      const newRoute = (await res.json()) as IRoute;
+      var originalRoute = explorerItems.find(
+        (item) => type === "Route" && item.id === id,
+      )!;
       setExplorerItems((items) => {
         return items.concat({
-          ...newRoute,
-          level: level,
+          ...originalRoute,
+          id: newRoute.id,
+          route: newRoute,
         });
       });
     }
@@ -289,7 +294,6 @@ function RouteExplorer() {
   const handleDeleteClick = async () => {
     const { type, id } = actionMenuItemRef.current!;
     if (confirm(`Are you sure want to delete this ${type.toLowerCase()}?`)) {
-      console.log("delete", type, id);
       const accessToken = await getAccessTokenSilently();
       const url =
         type === "Route"
@@ -303,28 +307,38 @@ function RouteExplorer() {
         },
       });
       ensureSuccess(res);
-      setExplorerItems((nodes) => {
-        if (type === "Route") {
-          return nodes.filter(
-            (node) => node.type !== "Route" && node.id !== id,
-          );
-        }
 
-        let deleteItems = getFolderItems(actionMenuItemRef.current!);
-        return nodes.filter((node) => {
-          return !deleteItems.some((item) => item.id === node.id);
+      if (type === "Folder") {
+        setExplorerItems((nodes) => {
+          let deleteItems = getFolderItems(actionMenuItemRef.current!);
+          return nodes.filter((node) => {
+            return !deleteItems.some((item) => item.id === node.id);
+          });
+
+          function getFolderItems(folder: IExplorerItem) {
+            var items = nodes.filter((node) => node.parentId === folder.id);
+            for (const item of items) {
+              if (item.type === "Folder") {
+                items = items.concat(getFolderItems(item));
+              }
+            }
+            return items.concat(folder);
+          }
         });
+      } else {
+        setExplorerItems((items) => {
+          let remainingItems: IExplorerItem[] = [];
 
-        function getFolderItems(folder: IExplorerItem) {
-          var items = nodes.filter((node) => node.parentId === folder.id);
           for (const item of items) {
-            if (item.type === "Folder") {
-              items = items.concat(getFolderItems(item));
+            const isDeletedRoute = item.type === "Route" && item.id === id;
+            if (!isDeletedRoute) {
+              remainingItems.push(item);
             }
           }
-          return items.concat(folder);
-        }
-      });
+
+          return remainingItems;
+        });
+      }
     }
   };
 
