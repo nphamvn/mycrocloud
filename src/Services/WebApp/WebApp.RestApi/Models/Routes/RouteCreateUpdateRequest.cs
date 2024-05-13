@@ -50,7 +50,7 @@ public class RouteCreateUpdateRequest
         };
     }
     
-    public void ToUpdateEntity(Route route)
+    public void ToUpdateEntity(ref Route route)
     {
         route.Name = Name;
         route.Method = Method;

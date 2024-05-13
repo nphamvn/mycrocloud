@@ -62,9 +62,12 @@ public class RoutesController(IRouteService routeService,
     }
 
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> Get(int id)
+    public async Task<IActionResult> Get(int appId, int id)
     {
-        var route = await routeRepository.GetById(id);
+        var route = await appDbContext.Routes
+            .Include(r => r.File)
+            .SingleAsync(r => r.App == App && r.Id == id);
+        
         return Ok(RouteDetails(route));
     }
 
@@ -132,14 +135,20 @@ public class RoutesController(IRouteService routeService,
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Edit(int id, RouteCreateUpdateRequest route)
     {
-        var currentRoute = await routeRepository.GetById(id);
+        var currentRoute = await appDbContext.Routes
+            .Include(r => r.File)
+            .SingleAsync(r => r.App == App && r.Id == id);
+        
         if (currentRoute.Status == RouteStatus.Blocked)
         {
             // Do not allow editing blocked route
             return BadRequest();
         }
-        route.ToUpdateEntity(currentRoute);
-        await routeService.Update(id, currentRoute);
+        
+        route.ToUpdateEntity(ref currentRoute);
+
+        await appDbContext.SaveChangesAsync();
+        
         return NoContent();
     }
     
