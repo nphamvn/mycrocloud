@@ -108,7 +108,7 @@ public class RoutesController(IRouteService routeService,
     [HttpPost("{id:int}/Clone")]
     public async Task<IActionResult> Clone(int appId, int id)
     {
-        var route = await appDbContext.Routes.SingleAsync(r => r.App == App && r.Id == id);
+        var route = await appDbContext.Routes.AsNoTracking().SingleAsync(r => r.App == App && r.Id == id);
         route.Id = 0;
         route.Name += " - Copy";
 
@@ -119,13 +119,13 @@ public class RoutesController(IRouteService routeService,
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(int appId, RouteCreateUpdateRequest route)
+    public async Task<IActionResult> Create(int appId, RouteCreateUpdateRequest createRequest)
     {
-        var entity = route.ToCreateEntity();
+        var entity = createRequest.ToCreateEntity();
 
-        entity.Folder = route.FolderId != null
+        entity.Folder = createRequest.FolderId != null
             ? await appDbContext.RouteFolders.SingleAsync(f =>
-                f.App.Id == appId && f.Id == route.FolderId.Value)
+                f.App.Id == appId && f.Id == createRequest.FolderId.Value)
             : null;
         
         await routeService.Create(appId, entity);
@@ -133,7 +133,7 @@ public class RoutesController(IRouteService routeService,
     }
     
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Edit(int id, RouteCreateUpdateRequest route)
+    public async Task<IActionResult> Edit(int appId, int id, RouteCreateUpdateRequest updateRequest)
     {
         var currentRoute = await appDbContext.Routes
             .Include(r => r.File)
@@ -141,11 +141,11 @@ public class RoutesController(IRouteService routeService,
         
         if (currentRoute.Status == RouteStatus.Blocked)
         {
-            // Do not allow editing blocked route
+            // Do not allow editing blocked route   
             return BadRequest();
         }
         
-        route.ToUpdateEntity(ref currentRoute);
+        updateRequest.ToUpdateEntity(ref currentRoute);
 
         await appDbContext.SaveChangesAsync();
         
@@ -153,7 +153,7 @@ public class RoutesController(IRouteService routeService,
     }
     
     [HttpDelete("{id:int}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int appId, int id)
     {
         var route = await routeRepository.GetById(id);
         if (route.Status == RouteStatus.Blocked)

@@ -27,6 +27,7 @@ public class Route : BaseEntity
     public int? FileId { get; set; }
     public File File { get; set; }
 
+    public int? FolderId { get; set; }
     public RouteFolder Folder { get; set; }
 }
 
