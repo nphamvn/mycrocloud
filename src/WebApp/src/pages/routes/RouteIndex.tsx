@@ -70,6 +70,7 @@ function RouteExplorer() {
 
   const app = useContext(AppContext)!;
   const [explorerItems, setExplorerItems] = useState<IExplorerItem[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
     const getRoutes = async () => {
@@ -438,6 +439,16 @@ function RouteExplorer() {
         >
           New Folder
         </button>
+      </div>
+      <div className="mt-1">
+        <input
+          type="text"
+          placeholder="Search"
+          className="w-full border px-1 py-0.5"
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+          }}
+        />
       </div>
       <hr className="my-1" />
       {explorerItems
