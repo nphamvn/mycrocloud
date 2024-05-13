@@ -8,6 +8,7 @@ using WebApp.Domain.Services;
 using WebApp.Infrastructure.Repositories.EfCore;
 using WebApp.RestApi.Filters;
 using WebApp.RestApi.Models.Routes;
+using Route = WebApp.Domain.Entities.Route;
 
 namespace WebApp.RestApi.Controllers;
 
@@ -64,7 +65,13 @@ public class RoutesController(IRouteService routeService,
     public async Task<IActionResult> Get(int id)
     {
         var route = await routeRepository.GetById(id);
-        return Ok(new {
+        return Ok(RouteDetails(route));
+    }
+
+    private static object RouteDetails(Route route)
+    {
+        return new
+        {
             route.Id,
             route.AppId,
             route.Name,
@@ -75,7 +82,8 @@ public class RoutesController(IRouteService routeService,
             route.RequestBodySchema,
             route.ResponseType,
             route.ResponseStatusCode,
-            ResponseHeaders = (route.ResponseHeaders ?? []).Select(h => new {
+            ResponseHeaders = (route.ResponseHeaders ?? []).Select(h => new
+            {
                 h.Name,
                 h.Value
             }),
@@ -91,15 +99,20 @@ public class RoutesController(IRouteService routeService,
             FileFolderId = route.File?.FolderId,
             route.CreatedAt,
             route.UpdatedAt
-        });
+        };
     }
 
     [HttpPost("{id:int}/Clone")]
-    public async Task<IActionResult> Clone(int id)
+    public async Task<IActionResult> Clone(int appId, int id)
     {
-        var newRouteId = await routeService.Clone(id);
-        var newRoute = await routeRepository.GetById(newRouteId);
-        return Created("", newRoute);
+        var route = await appDbContext.Routes.SingleAsync(r => r.App == App && r.Id == id);
+        route.Id = 0;
+        route.Name += " - Copy";
+
+        await appDbContext.Routes.AddAsync(route);
+        await appDbContext.SaveChangesAsync();
+
+        return Created(route.Id.ToString(), RouteDetails(route));
     }
 
     [HttpPost]
