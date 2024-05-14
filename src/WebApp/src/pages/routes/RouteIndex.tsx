@@ -71,6 +71,18 @@ function RouteExplorer() {
   const app = useContext(AppContext)!;
   const [explorerItems, setExplorerItems] = useState<IExplorerItem[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const filteredItems = getFilteredItems(explorerItems, searchTerm);
+
+  function getFilteredItems(
+    explorerItems: IExplorerItem[],
+    searchTerm: string,
+  ) {
+    if (!searchTerm) {
+      return explorerItems;
+    }
+    //todo: implement search
+    return explorerItems;
+  }
 
   useEffect(() => {
     const getRoutes = async () => {
@@ -361,40 +373,43 @@ function RouteExplorer() {
     navigate(route.id.toString());
   };
 
-  const renderRow = (
-    node: IExplorerItem,
-    items: IExplorerItem[],
-  ): JSX.Element => {
-    const children = items.filter((i) => i.parentId === node.id);
+  const renderNode = (node: IExplorerItem | null, items: IExplorerItem[]) => {
+    const isRoot = node === null;
+    const children = isRoot
+      ? items.filter((i) => i.parentId === null)
+      : items.filter((i) => i.parentId === node.id);
+
     return (
       <>
-        <div
-          style={{ paddingLeft: node.level * 8 }}
-          className="hover:bg-slate-100"
-        >
-          {node.type === "Folder" ? (
-            <FolderItem
-              item={node}
-              onClick={() => handleFolderClick(node)}
-              onActionMenuClick={(clientX, clientY) =>
-                handleActionMenuClick(node, clientX, clientY)
-              }
-              onNameSubmit={(name) => handleFolderNameSubmit(node, name)}
-            />
-          ) : (
-            <RouteItem
-              item={node}
-              onClick={() => handleRouteClick(node)}
-              onActionMenuClick={(clientX, clientY) =>
-                handleActionMenuClick(node, clientX, clientY)
-              }
-            />
-          )}
-        </div>
-        {!node.collapsed &&
+        {isRoot ? null : (
+          <div
+            style={{ paddingLeft: node.level * 8 }}
+            className="hover:bg-slate-100"
+          >
+            {node.type === "Folder" ? (
+              <FolderItem
+                item={node}
+                onClick={() => handleFolderClick(node)}
+                onActionMenuClick={(clientX, clientY) =>
+                  handleActionMenuClick(node, clientX, clientY)
+                }
+                onNameSubmit={(name) => handleFolderNameSubmit(node, name)}
+              />
+            ) : (
+              <RouteItem
+                item={node}
+                onClick={() => handleRouteClick(node)}
+                onActionMenuClick={(clientX, clientY) =>
+                  handleActionMenuClick(node, clientX, clientY)
+                }
+              />
+            )}
+          </div>
+        )}
+        {(isRoot || !node.collapsed) &&
           children.map((child) => (
             <React.Fragment key={child.type + "-" + child.id}>
-              {renderRow(child, items)}
+              {renderNode(child, items)}
             </React.Fragment>
           ))}
       </>
@@ -451,13 +466,7 @@ function RouteExplorer() {
         />
       </div>
       <hr className="my-1" />
-      {explorerItems
-        .filter((item) => item.parentId === null)
-        .map((item) => (
-          <React.Fragment key={item.type + "-" + item.id}>
-            {renderRow(item, explorerItems)}
-          </React.Fragment>
-        ))}
+      {renderNode(null, filteredItems)}
     </div>
   );
 }
@@ -468,7 +477,7 @@ function RouteItem({
   onActionMenuClick,
 }: {
   item: IExplorerItem;
-  onActionMenuClick?: (buttonLeft: number, buttonTop: number) => void;
+  onActionMenuClick: (buttonLeft: number, buttonTop: number) => void;
   onClick: () => void;
 }) {
   if (!route) {
@@ -487,9 +496,7 @@ function RouteItem({
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.stopPropagation();
-    if (onActionMenuClick) {
-      onActionMenuClick(e.currentTarget.offsetLeft, e.currentTarget.offsetTop);
-    }
+    onActionMenuClick(e.currentTarget.offsetLeft, e.currentTarget.offsetTop);
   };
 
   return (
@@ -624,67 +631,65 @@ function ActionMenu({
     };
   }, []);
   return (
-    <>
-      <div
-        style={{ top: `${top}px`, right: `${right}px` }}
-        ref={ref}
-        className="absolute w-36 border bg-white p-2 shadow"
-      >
-        <ul className="">
-          {node.type === "Folder" && (
-            <>
-              <li className="p-1 hover:bg-gray-100">
-                <button
-                  type="button"
-                  onClick={onNewRouteClick}
-                  className="w-full text-left"
-                >
-                  New Route
-                </button>
-              </li>
-              <li className="p-1 hover:bg-gray-100">
-                <button
-                  type="button"
-                  onClick={onNewFolderClick}
-                  className="w-full text-left"
-                >
-                  New Folder
-                </button>
-              </li>
-            </>
-          )}
-          <li className="p-1 hover:bg-gray-100">
-            <button
-              type="button"
-              onClick={onDuplicateClick}
-              className="w-full text-left"
-            >
-              Duplicate
-            </button>
-          </li>
-          {node.type === "Folder" && (
+    <div
+      style={{ top: `${top}px`, right: `${right}px` }}
+      ref={ref}
+      className="absolute w-36 border bg-white p-2 shadow"
+    >
+      <ul className="">
+        {node.type === "Folder" && (
+          <>
             <li className="p-1 hover:bg-gray-100">
               <button
                 type="button"
-                onClick={onFolderRenameClick}
+                onClick={onNewRouteClick}
                 className="w-full text-left"
               >
-                Rename
+                New Route
               </button>
             </li>
-          )}
-          <hr className="my-1" />
+            <li className="p-1 hover:bg-gray-100">
+              <button
+                type="button"
+                onClick={onNewFolderClick}
+                className="w-full text-left"
+              >
+                New Folder
+              </button>
+            </li>
+          </>
+        )}
+        <li className="p-1 hover:bg-gray-100">
+          <button
+            type="button"
+            onClick={onDuplicateClick}
+            className="w-full text-left"
+          >
+            Duplicate
+          </button>
+        </li>
+        {node.type === "Folder" && (
           <li className="p-1 hover:bg-gray-100">
             <button
               type="button"
-              className="w-full text-left text-red-500"
-              onClick={onDeleteClick}
+              onClick={onFolderRenameClick}
+              className="w-full text-left"
             >
-              Delete
+              Rename
             </button>
           </li>
-        </ul>
-      </div>
-    </>
+        )}
+        <hr className="my-1" />
+        <li className="p-1 hover:bg-gray-100">
+          <button
+            type="button"
+            className="w-full text-left text-red-500"
+            onClick={onDeleteClick}
+          >
+            Delete
+          </button>
+        </li>
+      </ul>
+    </div>
   );
 }
