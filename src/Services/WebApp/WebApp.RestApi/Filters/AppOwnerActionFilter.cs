@@ -9,6 +9,26 @@ public class AppOwnerActionFilter(AppDbContext appDbContext,
     ILogger<AppOwnerActionFilter> logger, string appIdArgumentName = "appId")
     : IAsyncActionFilter
 {
+    private bool TryGetAppId(ActionExecutingContext context, out int? appId)
+    {
+        appId = null;
+        
+        // Get from RouteData, ActionArguments.
+        if (context.RouteData.Values.TryGetValue(appIdArgumentName, out var routeValue))
+        {
+            appId = int.Parse(routeValue!.ToString() ?? throw new InvalidOperationException());
+            return true;
+        }
+        
+        if (context.ActionArguments.TryGetValue(appIdArgumentName, out var actionValue))
+        {
+            appId = int.Parse(actionValue!.ToString() ?? throw new InvalidOperationException());
+            return true;
+        }
+        
+        return false;
+    }
+    
     public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         logger.LogDebug("Executing AppOwnerActionFilter");
@@ -20,13 +40,12 @@ public class AppOwnerActionFilter(AppDbContext appDbContext,
         var userId = context.HttpContext.User.GetUserId();
         logger.LogDebug("UserId: {UserId}", userId);
         
-        if (!context.ActionArguments.TryGetValue(appIdArgumentName, out var appIdArgument))
+        if (!TryGetAppId(context, out var appId))
         {
             logger.LogWarning("AppId argument is missing");
             return next();
         }
         
-        var appId = (int) appIdArgument!;
         logger.LogDebug("AppId: {AppId}", appId);
 
         var app = appDbContext.Apps.Find(appId);

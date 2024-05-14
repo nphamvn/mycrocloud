@@ -22,7 +22,7 @@ public class RoutesController(IRouteService routeService,
     private App App => (HttpContext.Items["App"] as App)!;
     
     [HttpGet]
-    public async Task<IActionResult> List(int appId, string? q, string? s)
+    public async Task<IActionResult> List(string? q, string? s)
     {
         var folders = appDbContext.RouteFolders
             .Where(f => f.App == App)
@@ -62,7 +62,7 @@ public class RoutesController(IRouteService routeService,
     }
 
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> Get(int appId, int id)
+    public async Task<IActionResult> Get(int id)
     {
         var route = await appDbContext.Routes
             .Include(r => r.File)
@@ -106,7 +106,7 @@ public class RoutesController(IRouteService routeService,
     }
 
     [HttpPost("{id:int}/Clone")]
-    public async Task<IActionResult> Clone(int appId, int id)
+    public async Task<IActionResult> Clone(int id)
     {
         var route = await appDbContext.Routes.AsNoTracking().SingleAsync(r => r.App == App && r.Id == id);
         route.Id = 0;
@@ -119,33 +119,37 @@ public class RoutesController(IRouteService routeService,
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(int appId, RouteCreateUpdateRequest createRequest)
+    public async Task<IActionResult> Create(RouteCreateUpdateRequest createRequest)
     {
-        var entity = createRequest.ToCreateEntity();
+        var route = createRequest.ToCreateEntity();
 
-        entity.Folder = createRequest.FolderId != null
+        route.Folder = createRequest.FolderId != null
             ? await appDbContext.RouteFolders.SingleAsync(f =>
-                f.App.Id == appId && f.Id == createRequest.FolderId.Value)
+                f.App == App && f.Id == createRequest.FolderId.Value)
             : null;
         
-        await routeService.Create(appId, entity);
-        return Created("", new { entity.Id, entity.Version });
+        route.App = App;
+        
+        await appDbContext.Routes.AddAsync(route);
+        await appDbContext.SaveChangesAsync();
+        
+        return Created("", new { route.Id, route.Version });
     }
     
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Edit(int appId, int id, RouteCreateUpdateRequest updateRequest)
+    public async Task<IActionResult> Edit(int id, RouteCreateUpdateRequest updateRequest)
     {
-        var currentRoute = await appDbContext.Routes
+        var route = await appDbContext.Routes
             .Include(r => r.File)
             .SingleAsync(r => r.App == App && r.Id == id);
         
-        if (currentRoute.Status == RouteStatus.Blocked)
+        if (route.Status == RouteStatus.Blocked)
         {
             // Do not allow editing blocked route   
             return BadRequest();
         }
         
-        updateRequest.ToUpdateEntity(ref currentRoute);
+        updateRequest.ToUpdateEntity(ref route);
 
         await appDbContext.SaveChangesAsync();
         
@@ -153,7 +157,7 @@ public class RoutesController(IRouteService routeService,
     }
     
     [HttpDelete("{id:int}")]
-    public async Task<IActionResult> Delete(int appId, int id)
+    public async Task<IActionResult> Delete(int id)
     {
         var route = await routeRepository.GetById(id);
         if (route.Status == RouteStatus.Blocked)
@@ -166,18 +170,16 @@ public class RoutesController(IRouteService routeService,
     }
     
     [HttpPost("folders")] 
-    public async Task<IActionResult> CreateFolder(int appId, FolderCreateRequest folderCreateRequest)
+    public async Task<IActionResult> CreateFolder(FolderCreateRequest folderCreateRequest)
     {
-        var app = await appDbContext.Apps.SingleAsync(a => a.Id == appId);
-        
         var parentFolder = folderCreateRequest.ParentId != null
             ? await appDbContext.RouteFolders.SingleAsync(f =>
-                f.App == app && f.Id == folderCreateRequest.ParentId.Value)
+                f.App == App && f.Id == folderCreateRequest.ParentId.Value)
             : null;
         
         var newFolder = new RouteFolder
         {
-            App = app,
+            App = App,
             Name = folderCreateRequest.Name,
             Parent = parentFolder,
             Version = Guid.NewGuid()
@@ -196,13 +198,13 @@ public class RoutesController(IRouteService routeService,
     }
     
     [HttpPost("folders/{id:int}/duplicate")]
-    public async Task<IActionResult> DuplicateFolder(int appId, int id)
+    public async Task<IActionResult> DuplicateFolder(int id)
     {
         var folder = await appDbContext.RouteFolders
             .Include(routeFolder => routeFolder.Parent)
             .SingleAsync(f => f.App == App && f.Id == id);
         
-        var newFolder = await InternalDuplicateFolder(folder, folder.Parent, true);
+        var newFolder = await RecursiveDuplicateFolder(folder, folder.Parent, true);
         
         await appDbContext.SaveChangesAsync();
         
@@ -254,7 +256,7 @@ public class RoutesController(IRouteService routeService,
         return Created(newFolder.Id.ToString(), createdItems.Select(RouteFolderRouteItem));
     }
 
-    private async Task<RouteFolder> InternalDuplicateFolder(RouteFolder sourceFolder, RouteFolder parent, bool isTop = false)
+    private async Task<RouteFolder> RecursiveDuplicateFolder(RouteFolder sourceFolder, RouteFolder parent, bool isTop = false)
     {
         var newFolder = new RouteFolder
         {
@@ -284,7 +286,7 @@ public class RoutesController(IRouteService routeService,
 
         foreach (var subFolder in subFolders)
         {
-            await InternalDuplicateFolder(subFolder, newFolder);
+            await RecursiveDuplicateFolder(subFolder, newFolder);
         }
         
         //return top folder
@@ -292,7 +294,7 @@ public class RoutesController(IRouteService routeService,
     }
 
     [HttpDelete("folders/{id:int}")]
-    public async Task<IActionResult> DeleteFolder(int appId, int id)
+    public async Task<IActionResult> DeleteFolder(int id)
     {
         var folder = await appDbContext.RouteFolders.SingleAsync(f => f.App == App && f.Id == id);
         
@@ -347,7 +349,7 @@ WHERE
     }
     
     [HttpPatch("folders/{id:int}/rename")]
-    public async Task<IActionResult> RenameFolder(int appId, int id, FolderRenameRequest folderRenameRequest)
+    public async Task<IActionResult> RenameFolder(int id, FolderRenameRequest folderRenameRequest)
     {
         var folder = await appDbContext.RouteFolders.SingleAsync(f => f.App == App && f.Id == id);
         folder.Name = folderRenameRequest.Name;
