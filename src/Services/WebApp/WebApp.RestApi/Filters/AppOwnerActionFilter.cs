@@ -9,6 +9,52 @@ public class AppOwnerActionFilter(AppDbContext appDbContext,
     ILogger<AppOwnerActionFilter> logger, string appIdArgumentName = "appId")
     : IAsyncActionFilter
 {
+    public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    {
+        if (!await DoWork(context))
+        {
+            // short-circuit
+            return;
+        }
+        
+        await next();
+    }
+
+    private async Task<bool> DoWork(ActionExecutingContext context)
+    {
+        logger.LogDebug("Executing AppOwnerActionFilter");
+        if (context.HttpContext.User.Identity is null || !context.HttpContext.User.Identity.IsAuthenticated)
+        {
+            logger.LogWarning("User is not authenticated");
+            return true;
+        }
+        var userId = context.HttpContext.User.GetUserId();
+        logger.LogDebug("UserId: {UserId}", userId);
+        
+        if (!TryGetAppId(context, out var appId))
+        {
+            logger.LogWarning("AppId argument is missing");
+            return true;
+        }
+        
+        logger.LogDebug("AppId: {AppId}", appId);
+
+        var app = await appDbContext.Apps.FindAsync(appId);
+        var isAppOwner = app?.UserId == userId;
+        logger.LogDebug("IsAppOwner: {IsAppOwner}", isAppOwner);
+        if (!isAppOwner)
+        {
+            logger.LogWarning("User {UserId} is not the owner of the app {AppId}", userId, appId);
+            context.Result = new ForbidResult();
+            return false;
+        }
+        
+        logger.LogDebug("User {UserId} is the owner of the app {AppId}", userId, appId);
+        context.HttpContext.Items["App"] = app!;
+        
+        return true;
+    }
+
     private bool TryGetAppId(ActionExecutingContext context, out int? appId)
     {
         appId = null;
@@ -28,38 +74,5 @@ public class AppOwnerActionFilter(AppDbContext appDbContext,
         
         return false;
     }
-    
-    public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
-    {
-        logger.LogDebug("Executing AppOwnerActionFilter");
-        if (context.HttpContext.User.Identity is null || !context.HttpContext.User.Identity.IsAuthenticated)
-        {
-            logger.LogWarning("User is not authenticated");
-            return next();
-        }
-        var userId = context.HttpContext.User.GetUserId();
-        logger.LogDebug("UserId: {UserId}", userId);
-        
-        if (!TryGetAppId(context, out var appId))
-        {
-            logger.LogWarning("AppId argument is missing");
-            return next();
-        }
-        
-        logger.LogDebug("AppId: {AppId}", appId);
 
-        var app = appDbContext.Apps.Find(appId);
-        var isAppOwner = app?.UserId == userId;
-        logger.LogDebug("IsAppOwner: {IsAppOwner}", isAppOwner);
-        if (!isAppOwner)
-        {
-            logger.LogWarning("User {UserId} is not the owner of the app {AppId}", userId, appId);
-            context.Result = new ForbidResult();
-            return Task.CompletedTask;
-        }
-        
-        logger.LogDebug("User {UserId} is the owner of the app {AppId}", userId, appId);
-        context.HttpContext.Items["App"] = app!;
-        return next();
-    }
 }
