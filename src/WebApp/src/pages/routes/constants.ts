@@ -32,4 +32,5 @@ export const sampleRoute: IRoute = {
   responseBodyLanguage: "plaintext",
   responseBody: "Hello, world!",
   functionHandler: "",
+  enabled: true,
 };
