@@ -1,17 +1,23 @@
 import { Link } from "react-router-dom";
 import IApp from "./App";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
-export default function AppList() {
+export default function List() {
+  document.title = "Apps";
+  const { getAccessTokenSilently } = useAuth0();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [apps, setApps] = useState<IApp[]>([]);
-  const { getAccessTokenSilently } = useAuth0();
+  const filteredApps = useMemo(
+    () => filterApps(apps, searchTerm),
+    [apps, searchTerm],
+  );
 
   useEffect(() => {
     const getApps = async () => {
       const accessToken = await getAccessTokenSilently();
-      const res = await fetch(`/api/apps?term=${searchTerm}`, {
+      const res = await fetch("/api/apps", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -20,23 +26,24 @@ export default function AppList() {
       setApps(apps);
     };
     getApps();
-    //TODO: debounce
-  }, [searchTerm]);
-
-  useEffect(() => {
-    document.title = "Apps";
   }, []);
+
+  function filterApps(apps: IApp[], searchTerm: string) {
+    if (!searchTerm) {
+      return apps;
+    }
+
+    return apps.filter((app) => {
+      return app.name.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  }
+
   return (
     <div className="mx-auto mt-2 max-w-4xl p-2">
       <div className="flex items-center">
         <h1 className="font-semibold">Apps</h1>
-        <Link
-          to={"new"}
-          className="group relative ms-auto flex items-center justify-center border border-transparent bg-primary p-0.5 text-center font-medium text-white focus:z-10 focus:outline-none focus:ring-2 focus:ring-cyan-300 enabled:hover:bg-cyan-800"
-        >
-          <span className="flex items-center rounded-md px-3 py-1 text-sm transition-all duration-200">
-            New
-          </span>
+        <Link to={"new"} className="ms-auto bg-primary px-2 py-1 text-white">
+          New
         </Link>
       </div>
       <form className="mt-2">
@@ -57,7 +64,7 @@ export default function AppList() {
         />
       </form>
       <ul className="mt-3 divide-y">
-        {apps.map((app) => {
+        {filteredApps.map((app) => {
           return (
             <li key={app.id}>
               <div className="mb-2">
