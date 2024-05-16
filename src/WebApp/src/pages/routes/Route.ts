@@ -19,6 +19,7 @@ export default interface IRoute {
   fileId?: number;
   fileName?: string;
   fileFolderId?: number;
+  enabled: boolean;
 }
 
 export interface IResponseHeader {

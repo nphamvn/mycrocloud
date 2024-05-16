@@ -26,6 +26,8 @@ public class RouteCreateUpdateRequest
     public int? FileId { get; set; }
 
     public int? FolderId { get; set; }
+
+    public bool Enabled { get; set; } = true;
     
     public Route ToCreateEntity()
     {
@@ -46,7 +48,8 @@ public class RouteCreateUpdateRequest
             FunctionHandler = FunctionHandler,
             FunctionHandlerDependencies = FunctionHandlerDependencies,
             RequireAuthorization = RequireAuthorization,
-            FileId = FileId
+            FileId = FileId,
+            Enabled = Enabled
         };
     }
     
@@ -68,6 +71,7 @@ public class RouteCreateUpdateRequest
         route.FunctionHandlerDependencies = FunctionHandlerDependencies;
         route.RequireAuthorization = RequireAuthorization;
         route.FileId = FileId;
+        route.Enabled = Enabled;
     }
 }
 

@@ -29,6 +29,8 @@ public class Route : BaseEntity
 
     public int? FolderId { get; set; }
     public RouteFolder Folder { get; set; }
+
+    public bool Enabled { get; set; }
 }
 
 public class ResponseHeader

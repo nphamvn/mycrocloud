@@ -39,6 +39,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasOne(route => route.File)
             .WithMany()
             .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Route>()
+            .Property(r => r.Enabled)
+            .HasDefaultValue(true);
     }
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

@@ -100,6 +100,7 @@ public class RoutesController(IRouteService routeService,
             route.FileId,
             FileName = route.File?.Name,
             FileFolderId = route.File?.FolderId,
+            route.Enabled,
             route.CreatedAt,
             route.UpdatedAt
         };

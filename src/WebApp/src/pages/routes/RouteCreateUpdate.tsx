@@ -67,8 +67,9 @@ export default function RouteCreateUpdate({
       responseBodyLanguage: route?.responseBodyLanguage || "plaintext",
       functionHandler: route?.functionHandler,
       functionHandlerDependencies: route?.functionHandlerDependencies || [],
-      useDynamicResponse: route?.useDynamicResponse || false,
+      useDynamicResponse: route?.useDynamicResponse,
       fileId: route?.fileId,
+      enabled: route?.enabled,
     },
   });
   const {
@@ -106,6 +107,13 @@ export default function RouteCreateUpdate({
             />
             {errors.name && (
               <span className="text-red-500">{errors.name.message}</span>
+            )}
+          </div>
+          <div className="mt-1">
+            <input type="checkbox" {...register("enabled")} id="enable" />
+            <label htmlFor="enable">Enable</label>
+            {errors.enabled && (
+              <span className="text-red-500">{errors.enabled.message}</span>
             )}
           </div>
           <section>

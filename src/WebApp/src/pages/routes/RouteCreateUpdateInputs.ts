@@ -19,6 +19,7 @@ export type RouteCreateUpdateInputs = {
   functionHandlerDependencies?: (string | undefined)[];
   useDynamicResponse?: boolean;
   fileId?: number | null;
+  enabled: boolean;
 };
 
 export interface HeaderInput {
@@ -52,4 +53,5 @@ export const routeCreateUpdateInputsSchema: ObjectSchema<RouteCreateUpdateInputs
     functionHandlerDependencies: yup.array().of(yup.string()),
     useDynamicResponse: yup.boolean(),
     fileId: yup.number().nullable(),
+    enabled: yup.boolean().required(),
   });
