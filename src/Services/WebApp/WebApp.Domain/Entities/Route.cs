@@ -31,6 +31,9 @@ public class Route : BaseEntity
     public RouteFolder Folder { get; set; }
 
     public bool Enabled { get; set; }
+    
+    // Navigation properties
+    public ICollection<Log> Logs { get; set; }
 }
 
 public class ResponseHeader

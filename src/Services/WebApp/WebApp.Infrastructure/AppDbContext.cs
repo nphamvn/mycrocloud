@@ -43,6 +43,62 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<Route>()
             .Property(r => r.Enabled)
             .HasDefaultValue(true);
+        
+        modelBuilder.Entity<Route>()
+            .HasOne(r => r.App)
+            .WithMany(a => a.Routes)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        
+        modelBuilder.Entity<ApiKey>()
+            .HasOne(r => r.App)
+            .WithMany(a => a.ApiKeys)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<AuthenticationScheme>()
+            .HasOne(r => r.App)
+            .WithMany(a => a.AuthenticationSchemes)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<Folder>()
+            .HasOne(r => r.App)
+            .WithMany(a => a.Folders)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<Folder>()
+            .HasMany(f => f.Files)
+            .WithOne(f => f.Folder)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<Log>()
+            .HasOne(r => r.App)
+            .WithMany(a => a.Logs)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<Log>()
+            .HasOne(r => r.Route)
+            .WithMany(a => a.Logs)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<RouteFolder>()
+            .HasOne(f => f.App)
+            .WithMany(a => a.RouteFolders)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<RouteFolder>()
+            .HasMany(f => f.Routes)
+            .WithOne(f => f.Folder)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<TextStorage>()
+            .HasOne(s => s.App)
+            .WithMany(a => a.TextStorages)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<Variable>()
+            .HasOne(v => v.App)
+            .WithMany(a => a.Variables)
+            .OnDelete(DeleteBehavior.Cascade);
     }
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
