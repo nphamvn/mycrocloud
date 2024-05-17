@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Enums;
 using WebApp.Domain.Repositories;
-using WebApp.Infrastructure.Repositories.EfCore;
+using WebApp.Infrastructure;
 
 namespace WebApp.MiniApiGateway;
 

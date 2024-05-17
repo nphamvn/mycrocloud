@@ -1,4 +1,4 @@
-using WebApp.Infrastructure.Repositories.EfCore;
+using WebApp.Infrastructure;
 using Route = WebApp.Domain.Entities.Route;
 namespace WebApp.MiniApiGateway;
 

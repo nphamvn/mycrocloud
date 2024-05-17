@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Repositories;
-using WebApp.Infrastructure.Repositories.EfCore;
+using WebApp.Infrastructure;
+using WebApp.Infrastructure.Repositories;
 using WebApp.MiniApiGateway;
 using Route = WebApp.Domain.Entities.Route;
 

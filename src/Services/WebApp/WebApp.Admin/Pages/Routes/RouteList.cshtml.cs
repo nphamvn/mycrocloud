@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Enums;
-using WebApp.Infrastructure.Repositories.EfCore;
+using WebApp.Infrastructure;
 using Route = WebApp.Domain.Entities.Route;
 namespace WebApp.Admin.Pages.Routes
 {

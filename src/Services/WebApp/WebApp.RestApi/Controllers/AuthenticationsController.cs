@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
-using WebApp.Infrastructure.Repositories.EfCore;
+using WebApp.Infrastructure;
 using WebApp.RestApi.Filters;
 
 namespace WebApp.RestApi.Controllers;

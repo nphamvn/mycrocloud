@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WebApp.Infrastructure.Repositories.EfCore;
+using WebApp.Infrastructure;
 using WebApp.Migrations;
 
 namespace WebApp.MigrationTest;

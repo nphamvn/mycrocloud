@@ -2,7 +2,7 @@
 using WebApp.Domain.Entities;
 using File = WebApp.Domain.Entities.File;
 
-namespace WebApp.Infrastructure.Repositories.EfCore;
+namespace WebApp.Infrastructure;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {

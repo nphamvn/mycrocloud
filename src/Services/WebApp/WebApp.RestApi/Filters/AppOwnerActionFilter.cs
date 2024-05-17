@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using WebApp.Infrastructure.Repositories.EfCore;
+using WebApp.Infrastructure;
 using WebApp.RestApi.Extensions;
 
 namespace WebApp.RestApi.Filters;

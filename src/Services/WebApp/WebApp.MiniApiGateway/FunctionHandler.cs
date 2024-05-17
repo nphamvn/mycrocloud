@@ -6,7 +6,7 @@ using Jint.Native;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
-using WebApp.Infrastructure.Repositories.EfCore;
+using WebApp.Infrastructure;
 using Route = WebApp.Domain.Entities.Route;
 
 namespace WebApp.MiniApiGateway;

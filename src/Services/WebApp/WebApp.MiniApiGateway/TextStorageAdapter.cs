@@ -1,5 +1,5 @@
 ﻿using WebApp.Domain.Entities;
-using WebApp.Infrastructure.Repositories.EfCore;
+using WebApp.Infrastructure;
 
 namespace WebApp.MiniApiGateway;
 

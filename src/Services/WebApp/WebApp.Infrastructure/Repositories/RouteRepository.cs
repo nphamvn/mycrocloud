@@ -2,7 +2,7 @@
 using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
 
-namespace WebApp.Infrastructure.Repositories.EfCore;
+namespace WebApp.Infrastructure.Repositories;
 
 public class RouteRepository(AppDbContext dbContext) : IRouteRepository
 {

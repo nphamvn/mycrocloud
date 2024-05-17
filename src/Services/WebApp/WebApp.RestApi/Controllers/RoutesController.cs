@@ -5,7 +5,7 @@ using WebApp.Domain.Entities;
 using WebApp.Domain.Enums;
 using WebApp.Domain.Repositories;
 using WebApp.Domain.Services;
-using WebApp.Infrastructure.Repositories.EfCore;
+using WebApp.Infrastructure;
 using WebApp.RestApi.Filters;
 using WebApp.RestApi.Models.Routes;
 using Route = WebApp.Domain.Entities.Route;
