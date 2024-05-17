@@ -2,6 +2,7 @@ import { Outlet, useNavigate, useParams, useMatch } from "react-router-dom";
 import React, {
   useContext,
   useEffect,
+  useMemo,
   useReducer,
   useRef,
   useState,
@@ -71,7 +72,10 @@ function RouteExplorer() {
   const app = useContext(AppContext)!;
   const [explorerItems, setExplorerItems] = useState<IExplorerItem[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const filteredItems = getFilteredItems(explorerItems, searchTerm);
+  const filteredItems = useMemo(
+    () => getFilteredItems(explorerItems, searchTerm),
+    [explorerItems, searchTerm],
+  );
 
   function getFilteredItems(
     explorerItems: IExplorerItem[],
@@ -80,8 +84,53 @@ function RouteExplorer() {
     if (!searchTerm) {
       return explorerItems;
     }
-    //todo: implement search
-    return explorerItems;
+
+    function filterItems(items: IExplorerItem[], searchTerm: string) {
+      let result: IExplorerItem[] = [];
+
+      for (const item of items) {
+        if (item.type === "Route") {
+          if (
+            item.route?.name.toLowerCase().includes(searchTerm.toLowerCase())
+          ) {
+            result.push(item);
+            const pathNodes: IExplorerItem[] = [];
+            getPathNodes(explorerItems, item, pathNodes);
+
+            result.push(
+              ...pathNodes.filter(
+                (folder) =>
+                  !result.some(
+                    (i) => i.type === "Folder" && i.id === folder.id,
+                  ),
+              ),
+            );
+
+            function getPathNodes(
+              items: IExplorerItem[],
+              item: IExplorerItem,
+              result: IExplorerItem[],
+            ) {
+              const parent = items.find(
+                (i) => i.type === "Folder" && i.id === item.parentId,
+              );
+
+              if (!parent) {
+                return;
+              }
+
+              if (parent) {
+                result.push(parent);
+                getPathNodes(items, parent, result);
+              }
+            }
+          }
+        }
+      }
+      return result;
+    }
+
+    return filterItems(explorerItems, searchTerm);
   }
 
   useEffect(() => {
@@ -458,7 +507,7 @@ function RouteExplorer() {
       <div className="mt-1">
         <input
           type="text"
-          placeholder="Search"
+          placeholder="Filter"
           className="w-full border px-1 py-0.5"
           onChange={(e) => {
             setSearchTerm(e.target.value);
