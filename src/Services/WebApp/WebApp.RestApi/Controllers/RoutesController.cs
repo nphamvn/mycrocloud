@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Enums;
-using WebApp.Domain.Repositories;
-using WebApp.Domain.Services;
 using WebApp.Infrastructure;
 using WebApp.RestApi.Filters;
 using WebApp.RestApi.Models.Routes;
@@ -14,13 +12,12 @@ namespace WebApp.RestApi.Controllers;
 
 [Route("apps/{appId:int}/[controller]")]
 [TypeFilter<AppOwnerActionFilter>(Arguments = ["appId"])]
-public class RoutesController(IRouteService routeService,
-    IRouteRepository routeRepository,
+public class RoutesController(
     AppDbContext appDbContext
-    ) : BaseController
+) : BaseController
 {
     private App App => (HttpContext.Items["App"] as App)!;
-    
+
     [HttpGet]
     public async Task<IActionResult> List(string? q, string? s)
     {
@@ -39,7 +36,7 @@ public class RoutesController(IRouteService routeService,
                 RouteStatus = null,
                 FolderName = f.Name
             });
-        
+
         var routes = appDbContext.Routes
             .Where(r => r.App == App)
             .Select(r => new RouteFolderRouteItem
@@ -57,7 +54,7 @@ public class RoutesController(IRouteService routeService,
             });
 
         var items = await folders.Union(routes).ToListAsync();
-        
+
         return Ok(items.Select(RouteFolderRouteItem));
     }
 
@@ -67,7 +64,7 @@ public class RoutesController(IRouteService routeService,
         var route = await appDbContext.Routes
             .Include(r => r.File)
             .SingleAsync(r => r.App == App && r.Id == id);
-        
+
         return Ok(RouteDetails(route));
     }
 
@@ -128,56 +125,58 @@ public class RoutesController(IRouteService routeService,
             ? await appDbContext.RouteFolders.SingleAsync(f =>
                 f.App == App && f.Id == createRequest.FolderId.Value)
             : null;
-        
+
         route.App = App;
-        
+
         await appDbContext.Routes.AddAsync(route);
         await appDbContext.SaveChangesAsync();
-        
-        return Created("", new { route.Id, route.Version });
+
+        return Created(route.Id.ToString(), new { route.Id, route.Version });
     }
-    
+
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Edit(int id, RouteCreateUpdateRequest updateRequest)
     {
         var route = await appDbContext.Routes
             .Include(r => r.File)
             .SingleAsync(r => r.App == App && r.Id == id);
-        
+
         if (route.Status == RouteStatus.Blocked)
         {
             // Do not allow editing blocked route   
             return BadRequest();
         }
-        
+
         updateRequest.ToUpdateEntity(ref route);
 
         await appDbContext.SaveChangesAsync();
-        
+
         return NoContent();
     }
-    
+
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var route = await routeRepository.GetById(id);
+        var route = await appDbContext.Routes.SingleAsync(r => r.App == App && r.Id == id);
         if (route.Status == RouteStatus.Blocked)
         {
             // Do not allow deleting blocked route
             return BadRequest();
         }
-        await routeService.Delete(id);
+
+        appDbContext.Routes.Remove(route);
+        await appDbContext.SaveChangesAsync();
         return NoContent();
     }
-    
-    [HttpPost("folders")] 
+
+    [HttpPost("folders")]
     public async Task<IActionResult> CreateFolder(FolderCreateRequest folderCreateRequest)
     {
         var parentFolder = folderCreateRequest.ParentId != null
             ? await appDbContext.RouteFolders.SingleAsync(f =>
                 f.App == App && f.Id == folderCreateRequest.ParentId.Value)
             : null;
-        
+
         var newFolder = new RouteFolder
         {
             App = App,
@@ -185,11 +184,11 @@ public class RoutesController(IRouteService routeService,
             Parent = parentFolder,
             Version = Guid.NewGuid()
         };
-        
+
         await appDbContext.RouteFolders.AddAsync(newFolder);
 
         await appDbContext.SaveChangesAsync();
-        
+
         return Created(newFolder.Id.ToString(), new
         {
             newFolder.Id,
@@ -197,18 +196,18 @@ public class RoutesController(IRouteService routeService,
             newFolder.Version
         });
     }
-    
+
     [HttpPost("folders/{id:int}/duplicate")]
     public async Task<IActionResult> DuplicateFolder(int id)
     {
         var folder = await appDbContext.RouteFolders
             .Include(routeFolder => routeFolder.Parent)
             .SingleAsync(f => f.App == App && f.Id == id);
-        
+
         var newFolder = await RecursiveDuplicateFolder(folder, folder.Parent, true);
-        
+
         await appDbContext.SaveChangesAsync();
-        
+
         const string sql = """
                            WITH RECURSIVE FolderHierarchy AS (
                                SELECT "Id", "ParentId", "Name"
@@ -222,42 +221,43 @@ public class RoutesController(IRouteService routeService,
                                         JOIN FolderHierarchy fh ON fh."Id" = rf."ParentId"
                            )
                            SELECT
-                                1 AS "Type", 
-                                "Id", 
+                                1 AS "Type",
+                                "Id",
                                 "ParentId",
                                 NULL AS "RouteName",
                                 NULL AS "RouteMethod",
-                                NULL AS "RoutePath", 
-                                NULL AS "RouteStatus", 
+                                NULL AS "RoutePath",
+                                NULL AS "RouteStatus",
                                 "Name" AS "FolderName"
                            FROM
                                 FolderHierarchy
                                 
                            UNION ALL
-                           
+
                            SELECT
-                                2 AS "Type", 
-                                "Id", 
-                                "FolderId" AS "ParentId", 
-                                "Name" AS "RouteName", 
-                                "Method" AS "RouteMethod", 
-                                "Path" AS "RoutePath", 
-                                "Status" AS "RouteStatus", 
+                                2 AS "Type",
+                                "Id",
+                                "FolderId" AS "ParentId",
+                                "Name" AS "RouteName",
+                                "Method" AS "RouteMethod",
+                                "Path" AS "RoutePath",
+                                "Status" AS "RouteStatus",
                                 NULL AS "FolderName"
-                           FROM 
+                           FROM
                                 "Routes"
-                           WHERE 
+                           WHERE
                                 "FolderId" IN (SELECT "Id" FROM FolderHierarchy);
                            """;
         var createdItems = await appDbContext.Database.GetDbConnection().QueryAsync<RouteFolderRouteItem>(sql, new
         {
             id = newFolder.Id
         });
-        
+
         return Created(newFolder.Id.ToString(), createdItems.Select(RouteFolderRouteItem));
     }
 
-    private async Task<RouteFolder> RecursiveDuplicateFolder(RouteFolder sourceFolder, RouteFolder parent, bool isTop = false)
+    private async Task<RouteFolder> RecursiveDuplicateFolder(RouteFolder sourceFolder, RouteFolder parent,
+        bool isTop = false)
     {
         var newFolder = new RouteFolder
         {
@@ -265,21 +265,22 @@ public class RoutesController(IRouteService routeService,
             Name = isTop ? sourceFolder.Name + " - Copy" : sourceFolder.Name,
             Parent = parent
         };
-        
+
         await appDbContext.RouteFolders.AddAsync(newFolder);
-        
+
         var routes = await appDbContext.Routes
             .Where(r => r.App == App && r.Folder == sourceFolder)
             .AsNoTracking()
             .ToListAsync();
-        
+
         foreach (var route in routes)
         {
             route.Id = 0; // Reset ID to create new
             route.Folder = newFolder;
         }
+
         await appDbContext.Routes.AddRangeAsync(routes);
-        
+
         var subFolders = await appDbContext.RouteFolders
             .Where(f => f.App == App && f.Parent == sourceFolder)
             .AsNoTracking()
@@ -289,7 +290,7 @@ public class RoutesController(IRouteService routeService,
         {
             await RecursiveDuplicateFolder(subFolder, newFolder);
         }
-        
+
         //return top folder
         return newFolder;
     }
@@ -298,57 +299,57 @@ public class RoutesController(IRouteService routeService,
     public async Task<IActionResult> DeleteFolder(int id)
     {
         var folder = await appDbContext.RouteFolders.SingleAsync(f => f.App == App && f.Id == id);
-        
-        const string sql = 
-"""
-CREATE TEMP TABLE folders_to_delete AS (
-   WITH RECURSIVE cte AS (
-       SELECT "Id" FROM "RouteFolders" WHERE "Id" = @id
-       UNION ALL
-       SELECT rf."Id" FROM "RouteFolders" rf JOIN cte ON rf."ParentId" = cte."Id"
-   )
-   SELECT "Id" FROM cte
-);
 
-DELETE FROM "Routes" WHERE "FolderId" IN (SELECT "Id" FROM folders_to_delete);
-DELETE FROM "RouteFolders" WHERE "Id" IN (SELECT "Id" FROM folders_to_delete);
+        const string sql =
+            """
+            CREATE TEMP TABLE folders_to_delete AS (
+               WITH RECURSIVE cte AS (
+                   SELECT "Id" FROM "RouteFolders" WHERE "Id" = @id
+                   UNION ALL
+                   SELECT rf."Id" FROM "RouteFolders" rf JOIN cte ON rf."ParentId" = cte."Id"
+               )
+               SELECT "Id" FROM cte
+            );
 
-SELECT 
-    1 AS "Type", 
-    "Id", "ParentId", 
-    NULL AS "RouteName", 
-    NULL AS "RouteMethod", 
-    NULL AS "RoutePath", 
-    NULL AS "RouteStatus", 
-    "Name" AS "FolderName"
-FROM 
-    "RouteFolders" 
-WHERE 
-    "Id" IN (SELECT "Id" FROM folders_to_delete)
-    
-UNION ALL
+            DELETE FROM "Routes" WHERE "FolderId" IN (SELECT "Id" FROM folders_to_delete);
+            DELETE FROM "RouteFolders" WHERE "Id" IN (SELECT "Id" FROM folders_to_delete);
 
-SELECT
-    2 AS "Type",
-    "Id",
-    "FolderId" AS "ParentId",
-    "Name" AS "RouteName",
-    "Method" AS "RouteMethod",
-    "Path" AS "RoutePath",
-    "Status" AS "RouteStatus", 
-    NULL AS "FolderName"
-FROM
-    "Routes"
-WHERE
-    "FolderId" IN (SELECT "Id" FROM folders_to_delete);
-""";
+            SELECT
+                1 AS "Type",
+                "Id", "ParentId",
+                NULL AS "RouteName",
+                NULL AS "RouteMethod",
+                NULL AS "RoutePath",
+                NULL AS "RouteStatus",
+                "Name" AS "FolderName"
+            FROM
+                "RouteFolders"
+            WHERE
+                "Id" IN (SELECT "Id" FROM folders_to_delete)
+                
+            UNION ALL
+
+            SELECT
+                2 AS "Type",
+                "Id",
+                "FolderId" AS "ParentId",
+                "Name" AS "RouteName",
+                "Method" AS "RouteMethod",
+                "Path" AS "RoutePath",
+                "Status" AS "RouteStatus",
+                NULL AS "FolderName"
+            FROM
+                "Routes"
+            WHERE
+                "FolderId" IN (SELECT "Id" FROM folders_to_delete);
+            """;
 
         var deletedItems = await appDbContext.Database.GetDbConnection()
             .QueryAsync<RouteFolderRouteItem>(sql, new { id = folder.Id });
-        
+
         return Ok(deletedItems.Select(RouteFolderRouteItem));
     }
-    
+
     [HttpPatch("folders/{id:int}/rename")]
     public async Task<IActionResult> RenameFolder(int id, FolderRenameRequest folderRenameRequest)
     {
@@ -357,7 +358,7 @@ WHERE
         await appDbContext.SaveChangesAsync();
         return NoContent();
     }
-    
+
     private static object RouteFolderRouteItem(RouteFolderRouteItem item)
     {
         return new
