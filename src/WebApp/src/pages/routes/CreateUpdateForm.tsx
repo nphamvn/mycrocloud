@@ -14,7 +14,7 @@ import { bodyLanguages, methods } from "./constants";
 import {
   RouteCreateUpdateInputs,
   routeCreateUpdateInputsSchema,
-} from "./RouteCreateUpdateInputs";
+} from "./CreateUpdateFormInputs";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/16/solid";
 import { Modal } from "flowbite-react";
 import {
