@@ -11,7 +11,7 @@ public class Route : BaseEntity
     public string Method { get; set; }
     public string Path { get; set; }
     public string Description { get; set; }
-    public string ResponseType { get; set; }
+    public ResponseType ResponseType { get; set; }
     public int? ResponseStatusCode { get; set; }
     public IList<ResponseHeader> ResponseHeaders { get; set; }
     public string ResponseBody { get; set; }
@@ -40,4 +40,11 @@ public class ResponseHeader
 {
     public string Name { get; set; }
     public string Value { get; set; }
+}
+
+public enum ResponseType
+{
+    Static = 1,
+    StaticFile = 2,
+    Function = 3
 }

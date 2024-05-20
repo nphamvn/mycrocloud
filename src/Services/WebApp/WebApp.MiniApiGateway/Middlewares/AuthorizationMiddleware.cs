@@ -1,7 +1,7 @@
 using WebApp.Domain.Entities;
 using Route = WebApp.Domain.Entities.Route;
 
-namespace WebApp.MiniApiGateway;
+namespace WebApp.MiniApiGateway.Middlewares;
 
 public class AuthorizationMiddleware(RequestDelegate next)
 {

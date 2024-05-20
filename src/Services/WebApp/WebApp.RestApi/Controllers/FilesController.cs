@@ -192,7 +192,7 @@ ORDER BY depth;
             Name = name,
             Method = "GET",
             Path = path,
-            ResponseType = "staticFile",
+            ResponseType = ResponseType.StaticFile,
             ResponseStatusCode = 200,
             File = file
         });

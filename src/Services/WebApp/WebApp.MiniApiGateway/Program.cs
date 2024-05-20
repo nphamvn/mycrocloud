@@ -1,8 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
 using WebApp.Infrastructure;
 using WebApp.Infrastructure.Repositories;
 using WebApp.MiniApiGateway;
+using WebApp.MiniApiGateway.Middlewares;
+using File = System.IO.File;
 using Route = WebApp.Domain.Entities.Route;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,7 +37,7 @@ builder.Services.AddHealthChecks();
 var app = builder.Build();
 
 app.UseHttpLogging();
-app.UseWhen(context => context.Request.Host.Host == builder.Configuration["Host"], (config) =>
+app.UseWhen(context => context.Request.Host.Host == builder.Configuration["Host"], config =>
 {
     config.UseHealthChecks("/healthz");
     config.Run(async context =>
@@ -47,24 +50,7 @@ app.UseLoggingMiddleware();
 
 if (app.Environment.IsDevelopment())
 {
-    app.Use((context, next) =>
-    {
-        //Mock header. In production this header should be set from LB
-        var host = context.Request.Host.Host;
-        var pattern = builder.Configuration["HostRegex"]!;
-        var match = System.Text.RegularExpressions.Regex.Match(host, pattern);
-        if (match.Success)
-        {
-            var appId = int.Parse(match.Groups[1].Value);
-            var source = builder.Configuration["AppIdSource"]!.Split(":")[0];
-            var name = builder.Configuration["AppIdSource"]!.Split(":")[1];
-            if (source == "Header")
-            {
-                context.Request.Headers.Append(name, appId.ToString());
-            }
-        }
-        return next(context);
-    });
+    app.UseMiddleware<DevAppIdResolverMiddleware>();
 }
 
 app.UseAppResolverMiddleware();
@@ -79,13 +65,13 @@ app.UseAuthorizationMiddleware();
 
 app.UseValidationMiddleware();
 
-app.MapWhen(context => ((Route)context.Items["_Route"]!).ResponseType == "static",
+app.MapWhen(context => ((Route)context.Items["_Route"]!).ResponseType == ResponseType.Static,
     appBuilder => appBuilder.Run(StaticResponseHandler.Handle));
 
-app.MapWhen(context => ((Route)context.Items["_Route"]!).ResponseType == "staticFile",
+app.MapWhen(context => ((Route)context.Items["_Route"]!).ResponseType == ResponseType.StaticFile,
     appBuilder => appBuilder.Run(FileResponseHandler.Handle));
 
-app.MapWhen(context => ((Route)context.Items["_Route"]!).ResponseType == "function",
+app.MapWhen(context => ((Route)context.Items["_Route"]!).ResponseType == ResponseType.Function,
     appBuilder => appBuilder.Run(FunctionHandler.Handle));
 
 app.Run();

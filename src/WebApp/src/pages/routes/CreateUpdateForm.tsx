@@ -196,15 +196,15 @@ export default function RouteCreateUpdate({
             <div className="mt-1">
               <label className="me-1">Type</label>
               <select {...register("responseType")}>
-                <option value="static">static</option>
-                <option value="staticFile">static file</option>
-                <option value="function">function</option>
+                {["Static", "StaticFile", "Function"].map((t) => (
+                  <option key={t}>{t}</option>
+                ))}
               </select>
             </div>
 
             <div className="mt-1">
-              {responseType === "static" && <StaticResponse />}
-              {responseType === "staticFile" && (
+              {responseType === "Static" && <StaticResponse />}
+              {responseType === "StaticFile" && (
                 <StaticFile
                   file={
                     route?.fileId
@@ -217,7 +217,7 @@ export default function RouteCreateUpdate({
                   }
                 />
               )}
-              {responseType === "function" && <FunctionHandler />}
+              {responseType === "Function" && <FunctionHandler />}
             </div>
           </section>
         </div>

@@ -80,7 +80,7 @@ public class RoutesController(
             route.RequestQuerySchema,
             route.RequestHeaderSchema,
             route.RequestBodySchema,
-            route.ResponseType,
+            ResponseType= route.ResponseType.ToString(),
             route.ResponseStatusCode,
             ResponseHeaders = (route.ResponseHeaders ?? []).Select(h => new
             {

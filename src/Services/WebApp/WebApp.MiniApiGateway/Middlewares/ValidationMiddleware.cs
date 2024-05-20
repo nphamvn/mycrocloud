@@ -1,10 +1,10 @@
-﻿using Route = WebApp.Domain.Entities.Route;
-using WebApp.Domain.Repositories;
-using Newtonsoft.Json.Schema;
+﻿using System.Text.Json;
 using Newtonsoft.Json.Linq;
-using System.Text.Json;
+using Newtonsoft.Json.Schema;
+using WebApp.Domain.Repositories;
+using Route = WebApp.Domain.Entities.Route;
 
-namespace WebApp.MiniApiGateway;
+namespace WebApp.MiniApiGateway.Middlewares;
 
 public class ValidationMiddleware(RequestDelegate next)
 {

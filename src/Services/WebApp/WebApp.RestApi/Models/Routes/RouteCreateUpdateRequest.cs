@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using WebApp.Domain.Entities;
 using Route = WebApp.Domain.Entities.Route;
 namespace WebApp.RestApi.Models.Routes;
 
@@ -11,7 +13,8 @@ public class RouteCreateUpdateRequest
     [Required]
     public string Path { get; set; }
     [Required]
-    public string ResponseType { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public ResponseType ResponseType { get; set; }
     public int? ResponseStatusCode { get; set; }
     public List<ResponseHeader> ResponseHeaders { get; set; } = [];
     public string? ResponseBody { get; set; }

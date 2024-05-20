@@ -6,7 +6,7 @@ using WebApp.Domain.Repositories;
 using WebApp.Infrastructure;
 using Route = WebApp.Domain.Entities.Route;
 
-namespace WebApp.MiniApiGateway;
+namespace WebApp.MiniApiGateway.Middlewares;
 
 public class RouteResolverMiddleware(RequestDelegate next)
 {
