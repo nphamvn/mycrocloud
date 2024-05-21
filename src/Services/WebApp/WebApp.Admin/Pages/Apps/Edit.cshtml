@@ -1,0 +1,15 @@
+﻿@page "{appId:int}"
+@model EditPageModel
+@{
+    
+}
+
+<h1>Edit App</h1>
+<code>@Json.Serialize(Model.App)</code>
+<form method="post">
+    <div>
+        <label asp-for="App.Name"></label>
+        <input type="text" asp-for="App.Name" />
+    </div>
+    <button type="submit">Save</button>
+</form>

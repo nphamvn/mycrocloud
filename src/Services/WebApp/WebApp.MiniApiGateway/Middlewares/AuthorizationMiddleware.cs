@@ -1,5 +1,4 @@
 using WebApp.Domain.Entities;
-using Route = WebApp.Domain.Entities.Route;
 
 namespace WebApp.MiniApiGateway.Middlewares;
 

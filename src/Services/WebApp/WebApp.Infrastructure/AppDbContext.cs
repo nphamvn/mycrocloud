@@ -49,6 +49,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .WithMany(a => a.Routes)
             .OnDelete(DeleteBehavior.Cascade);
         
+        modelBuilder.Entity<Route>()
+            .Property(r => r.FunctionHandlerMethod)
+            .HasDefaultValue("handler");
         
         modelBuilder.Entity<ApiKey>()
             .HasOne(r => r.App)

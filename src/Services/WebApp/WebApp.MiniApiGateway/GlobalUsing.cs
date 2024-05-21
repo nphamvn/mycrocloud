@@ -1,0 +1,1 @@
+﻿global using Route = WebApp.Domain.Entities.Route;

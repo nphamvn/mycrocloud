@@ -1,12 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
 using WebApp.Infrastructure;
 
-namespace MyApp.Namespace
+namespace WebApp.Admin.Pages.Apps
 {
-    public class AppListModel(AppDbContext appDbContext) : PageModel
+    public class ListPageModel(AppDbContext appDbContext) : PageModel
     {
         public IEnumerable<App> Apps { get; set; } = new List<App>();
 

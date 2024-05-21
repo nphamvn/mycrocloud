@@ -1,0 +1,23 @@
+﻿@page
+@model ListPageModel
+@{
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Route Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var app in Model.Apps)
+        {
+            <tr>
+                <td>@app.Id</td>
+                <td><a asp-page="Edit" asp-route-appId="@app.Id">@app.Name</a></td>
+                <td><a asp-page="/Routes/List" asp-route-appId="@app.Id">@app.Routes.Count</a></td>
+            </tr>
+        }
+    </tbody>
+</table>

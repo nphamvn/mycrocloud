@@ -25,7 +25,7 @@ export const sampleRoute: IRoute = {
   requestQuerySchema: "",
   requestHeaderSchema: "",
   requestBodySchema: "",
-  responseType: "static",
+  responseType: "Static",
   responseStatusCode: 200,
   responseHeaders: [{ name: "content-type", value: "text/plain" }],
   useDynamicResponse: false,

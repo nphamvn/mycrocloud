@@ -2,7 +2,6 @@
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 using WebApp.Domain.Repositories;
-using Route = WebApp.Domain.Entities.Route;
 
 namespace WebApp.MiniApiGateway.Middlewares;
 

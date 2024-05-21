@@ -53,7 +53,7 @@ export default function RouteCreateUpdate({
       requestHeaderSchema: route?.requestHeaderSchema,
       requestBodySchema: route?.requestBodySchema,
       requireAuthorization: route?.requireAuthorization,
-      responseType: route?.responseType || "static",
+      responseType: route?.responseType || "Static",
       responseStatusCode: route?.responseStatusCode || 200,
       responseHeaders: route?.responseHeaders
         ? route.responseHeaders.map((value) => {
@@ -69,7 +69,7 @@ export default function RouteCreateUpdate({
       functionHandlerDependencies: route?.functionHandlerDependencies || [],
       useDynamicResponse: route?.useDynamicResponse,
       fileId: route?.fileId,
-      enabled: route?.enabled,
+      enabled: route ? route.enabled : true,
     },
   });
   const {
@@ -848,12 +848,25 @@ function FunctionHandler() {
   const handlerEditorRef = useRef<HTMLDivElement>(null);
   const handlerEditor = useRef<monaco.editor.IStandaloneCodeEditor>();
 
+  const sampleFunctionHandler = `function handler(req) {
+  return {
+    statusCode: 200,
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ message: "Hello, world!" }),
+  }
+}`;
+
   useEffect(() => {
     handlerEditor.current?.dispose();
 
+    const functionHandler = getValues("functionHandler");
+    if (!functionHandler) {
+      console.log("setting sampleFunctionHandler");
+      setValue("functionHandler", sampleFunctionHandler);
+    }
     handlerEditor.current = monaco.editor.create(handlerEditorRef.current!, {
       language: "javascript",
-      value: getValues("functionHandler") || `function handler(req) {\n}`,
+      value: functionHandler || sampleFunctionHandler,
       minimap: {
         enabled: false,
       },

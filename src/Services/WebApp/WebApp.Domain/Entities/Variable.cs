@@ -11,6 +11,9 @@ public class Variable : BaseEntity
     public App App { get; set; }
 }
 
+/// <summary>
+/// Based on JSON primitive types
+/// </summary>
 public enum VariableValueType
 {
     String,

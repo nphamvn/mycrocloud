@@ -17,6 +17,8 @@ public class Route : BaseEntity
     public string ResponseBody { get; set; }
     public string ResponseBodyLanguage { get; set; }
     public string FunctionHandler { get; set; }
+    
+    public string FunctionHandlerMethod { get; set; }
     public IList<string> FunctionHandlerDependencies { get; set; }
     public string RequestQuerySchema { get; set; }
     public string RequestHeaderSchema { get; set; }

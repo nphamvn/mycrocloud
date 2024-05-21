@@ -4,7 +4,6 @@ using WebApp.Domain.Entities;
 using WebApp.Domain.Enums;
 using WebApp.Domain.Repositories;
 using WebApp.Infrastructure;
-using Route = WebApp.Domain.Entities.Route;
 
 namespace WebApp.MiniApiGateway.Middlewares;
 

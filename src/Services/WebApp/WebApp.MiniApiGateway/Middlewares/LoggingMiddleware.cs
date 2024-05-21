@@ -2,7 +2,6 @@
 using WebApp.Domain.Entities;
 using WebApp.Domain.Enums;
 using WebApp.Domain.Repositories;
-using Route = WebApp.Domain.Entities.Route;
 
 namespace WebApp.MiniApiGateway.Middlewares;
 
@@ -23,7 +22,7 @@ public class LoggingMiddleware(RequestDelegate next)
                 App = app,
                 Route = route,
                 Method = context.Request.Method,
-                Path = context.Request.Path,
+                Path = context.Request.Path + context.Request.QueryString,
                 StatusCode = context.Response.StatusCode,
                 AdditionalLogMessage = functionExecutionResult?.AdditionalLogMessage,
                 FunctionExecutionDuration = functionExecutionResult?.Duration,
