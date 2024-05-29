@@ -31,7 +31,12 @@ public class AppsController(IAppService appService, IAppRepository appRepository
     {
         var app = Map(appCreateRequest);
         await appService.Create(User.GetUserId(), app);
-        return Created(app.Id.ToString(), app);
+        return Created(app.Id.ToString(), new
+        {
+            app.Id,
+            app.CreatedAt,
+            app.Version
+        });
 
         App Map(AppCreateRequest source)
         {
