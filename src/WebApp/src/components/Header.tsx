@@ -23,7 +23,7 @@ function Header() {
   }
 
   return (
-    <Navbar fluid rounded className="border-b-[1px]">
+    <nav className="flex items-center border-b-[1px] border-b-gray-300 px-8 py-2">
       <Link to="/" className="">
         <span className="self-center whitespace-nowrap text-xl font-semibold">
           MycroCloud
@@ -31,30 +31,7 @@ function Header() {
       </Link>
       {isAuthenticated ? (
         <>
-          <div className="flex md:order-2">
-            <Dropdown
-              arrowIcon={false}
-              inline
-              label={<Avatar alt="User settings" img={user?.picture} rounded />}
-            >
-              <Dropdown.Header>
-                <span className="block">{user?.name}</span>
-                <span className="block truncate font-medium">
-                  {user?.email}
-                </span>
-              </Dropdown.Header>
-              <Dropdown.Item disabled>Settings</Dropdown.Item>
-              <Dropdown.Divider />
-              <Dropdown.Item onClick={() => logout()}>Log out</Dropdown.Item>
-              {isDevMode && (
-                <Dropdown.Item onClick={handleCopyAccessTokenClick}>
-                  Copy access token
-                </Dropdown.Item>
-              )}
-            </Dropdown>
-            <Navbar.Toggle />
-          </div>
-          <Navbar.Collapse className="items-start">
+          <ul className="me-auto ms-4 flex space-x-2">
             <li>
               <Link
                 className="block border-b border-gray-100 py-2 pl-3 pr-4 text-gray-700 hover:bg-gray-50 md:border-0 md:p-0 md:hover:bg-transparent md:hover:text-cyan-700 "
@@ -71,14 +48,30 @@ function Header() {
                 Forms
               </Link>
             </li>
-          </Navbar.Collapse>
+          </ul>
+          <Dropdown
+            arrowIcon={false}
+            inline
+            label={<Avatar alt="User settings" img={user?.picture} rounded />}
+          >
+            <Dropdown.Header>
+              <span className="block">{user?.name}</span>
+              <span className="block truncate font-medium">{user?.email}</span>
+            </Dropdown.Header>
+            <Dropdown.Item onClick={() => logout()}>Log out</Dropdown.Item>
+            {isDevMode && (
+              <Dropdown.Item onClick={handleCopyAccessTokenClick}>
+                Copy access token
+              </Dropdown.Item>
+            )}
+          </Dropdown>
         </>
       ) : (
         <Button size="sm" onClick={() => loginWithRedirect()}>
           Log in
         </Button>
       )}
-    </Navbar>
+    </nav>
   );
 }
 export default Header;

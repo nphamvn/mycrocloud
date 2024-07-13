@@ -81,7 +81,7 @@ function AppCreate() {
         </button>
         <button
           type="submit"
-          className="group relative flex items-center justify-center border border-transparent bg-cyan-700 p-0.5 text-center font-medium text-white focus:z-10 focus:outline-none focus:ring-2 focus:ring-cyan-300 enabled:hover:bg-cyan-800"
+          className="group relative flex items-center justify-center border border-transparent bg-primary p-0.5 text-center font-medium text-white focus:z-10 focus:outline-none focus:ring-2 focus:ring-cyan-300 enabled:hover:bg-cyan-700"
         >
           <span className="flex items-center rounded-md px-3 py-1.5  transition-all duration-200">
             Save

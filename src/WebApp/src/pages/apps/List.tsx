@@ -4,17 +4,22 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
 export default function List() {
-  document.title = "Apps";
   const { getAccessTokenSilently } = useAuth0();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [apps, setApps] = useState<IApp[]>([]);
-  const filteredApps = useMemo(
-    () => filterApps(apps, searchTerm),
-    [apps, searchTerm],
-  );
+  const filteredApps = useMemo(() => {
+    if (!searchTerm) {
+      return apps;
+    }
+
+    return apps.filter((app) => {
+      return app.name.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  }, [apps, searchTerm]);
 
   useEffect(() => {
+    document.title = "Apps";
     const getApps = async () => {
       const accessToken = await getAccessTokenSilently();
       const res = await fetch("/api/apps", {
@@ -27,16 +32,6 @@ export default function List() {
     };
     getApps();
   }, []);
-
-  function filterApps(apps: IApp[], searchTerm: string) {
-    if (!searchTerm) {
-      return apps;
-    }
-
-    return apps.filter((app) => {
-      return app.name.toLowerCase().includes(searchTerm.toLowerCase());
-    });
-  }
 
   return (
     <div className="mx-auto mt-2 max-w-4xl p-2">
