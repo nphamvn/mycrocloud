@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
+import { Avatar, Button, Dropdown } from "flowbite-react";
 import { Link } from "react-router-dom";
 const isDevMode = import.meta.env.DEV;
 
