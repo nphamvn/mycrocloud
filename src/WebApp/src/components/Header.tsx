@@ -67,7 +67,11 @@ function Header() {
           </Dropdown>
         </>
       ) : (
-        <Button size="sm" onClick={() => loginWithRedirect()}>
+        <Button
+          className="ms-auto"
+          size="sm"
+          onClick={() => loginWithRedirect()}
+        >
           Log in
         </Button>
       )}
