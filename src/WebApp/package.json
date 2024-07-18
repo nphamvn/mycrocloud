@@ -16,7 +16,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@heroicons/react": "^2.1.5",
     "@hookform/resolvers": "^3.6.0",
-    "@microsoft/signalr": "^8.0.0",
+    "@microsoft/signalr": "^8.0.7",
     "ajv": "^8.17.1",
     "dotenv": "^16.3.1",
     "flowbite": "^2.4.1",
