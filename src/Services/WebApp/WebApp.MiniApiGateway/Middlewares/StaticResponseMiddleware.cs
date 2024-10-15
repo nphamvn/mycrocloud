@@ -48,7 +48,7 @@ public class StaticResponseMiddleware (RequestDelegate next)
                           
                           switch (bodyParser) {
                               case 'json':
-                                  request.body = JSON.parse(body);
+                                  request.body = body ? JSON.parse(body) : null;
                                   break;
                           }
                           
