@@ -21,23 +21,41 @@ public class StaticResponseMiddleware (RequestDelegate next)
         var body = route.ResponseBody;
         if (route.UseDynamicResponse)
         {
+            var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
+            var requestHeaders = context.Request.Headers.ToDictionary(x => x.Key, x => x.Value.ToString());
+            var requestQuery = context.Request.Query.ToDictionary(x => x.Key, x => x.Value.ToString());
+            var requestParams = context.Request.RouteValues.ToDictionary(x => x.Key, x => x.Value.ToString());
+            
             body = new Engine()
                 .SetValue("method", context.Request.Method)
                 .SetValue("path", context.Request.Path.Value)
-                .SetValue("params", body)
+                .SetValue("headers", requestHeaders)
+                .SetValue("query", requestQuery)
+                .SetValue("params", requestParams)
+                .SetValue("bodyParser", "json")
+                .SetValue("body", requestBody) // pass raw body. we don't parse it here because we don't know the content type. Even if we know, we don't trust the content type.
+                .SetValue("source", body)
                 .Execute(scripts.Handlebars)
                 .Execute("Handlebars.registerHelper('json', function(context) { return JSON.stringify(context); });")
                 .Evaluate("""
+                          const request = {
+                              method: method,
+                              path: path,
+                              headers: headers,
+                              query: query,
+                              params: params,
+                          }
+                          
+                          switch (bodyParser) {
+                              case 'json':
+                                  request.body = JSON.parse(body);
+                                  break;
+                          }
+                          
                           const data = {
-                              request: {
-                                   method: method,
-                                   path: path,
-                                   params: requestJson.params,
-                                   query: requestJson.query,
-                                   headers: requestJson.headers,
-                                   body: JSON.parse(body)
-                              }
-                          };
+                              request
+                          }
+                          
                           Handlebars.compile(source)(data);
                           """)
                 .AsString();
