@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.Text;
-using System.Text.Json;
 using System.Text.Unicode;
 using Jint;
 using Jint.Native;
@@ -14,11 +13,19 @@ namespace WebApp.MiniApiGateway.Middlewares;
 
 public class FunctionInvokerMiddleware(RequestDelegate next)
 {
-    public async Task InvokeAsync(HttpContext context, AppDbContext dbContext, Scripts scripts, IAppRepository appRepository)
+    public async Task InvokeAsync(HttpContext context, AppDbContext dbContext, Scripts scripts,
+        IAppRepository appRepository)
     {
         var app = (App)context.Items["_App"]!;
         var route = (Route)context.Items["_Route"]!;
-        var request = await ReadRequest(context.Request);
+
+        var request = context.Request;
+        var requestMethod = request.Method;
+        var requestPath = request.Path.Value;
+        var requestParams = request.RouteValues.ToDictionary(x => x.Key, x => x.Value?.ToString());
+        var requestQuery = request.Query.ToDictionary(x => x.Key, x => x.Value.ToString());
+        var requestHeaders = request.Headers.ToDictionary(x => x.Key, x => x.Value.ToString());
+        var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
 
         var engine = new Engine(options =>
         {
@@ -26,7 +33,7 @@ public class FunctionInvokerMiddleware(RequestDelegate next)
             {
                 var memoryLimit = app.Settings.FunctionExecutionLimitMemoryBytes ?? 1 * 1024 * 1024;
                 memoryLimit += 10 * 1024 * 1024;
-                
+
                 options.LimitMemory(memoryLimit);
             }
 
@@ -44,7 +51,7 @@ public class FunctionInvokerMiddleware(RequestDelegate next)
 
         //Inject user-defined dependencies
         await InjectUserDefinedDependencies(route, engine);
-        
+
         //Inject plugins
         InjectPlugIns(engine, app);
 
@@ -55,8 +62,36 @@ public class FunctionInvokerMiddleware(RequestDelegate next)
         try
         {
             engine.Execute(route.FunctionHandler);
-            var handler = engine.GetValue(route.FunctionHandlerMethod ?? "handler");
-            jsResult = engine.Invoke(handler, request);
+            engine.SetValue("_requestMethod", requestMethod)
+                .SetValue("_requestPath", requestPath)
+                .SetValue("_requestParams", requestParams)
+                .SetValue("_requestQuery", requestQuery)
+                .SetValue("_requestHeaders", requestHeaders)
+                .SetValue("bodyParser", "json")
+                .SetValue("_requestBody", requestBody)
+                ;
+
+            const string code = @"
+function _invoke() {
+    const request = {
+        method: _requestMethod,
+        path: _requestPath,
+        headers: _requestHeaders,
+        query: _requestQuery,
+        params: _requestParams,
+    }
+
+    switch (bodyParser) {
+        case 'json':
+            request.body = _requestBody ? JSON.parse(_requestBody) : null;
+            break;
+    }
+    
+    return $FunctionHandler$(request);
+}
+";
+            engine.Execute(code.Replace("$FunctionHandler$", route.FunctionHandlerMethod ?? "handler"));
+            jsResult = engine.Invoke("_invoke");
         }
         catch (Exception e)
         {
@@ -72,7 +107,7 @@ public class FunctionInvokerMiddleware(RequestDelegate next)
         {
             result.Duration = Stopwatch.GetElapsedTime(startingTimestamp);
         }
-        
+
         var statusCode = jsResult.Get("statusCode");
         if (statusCode.IsNumber())
         {
@@ -145,7 +180,8 @@ public class FunctionInvokerMiddleware(RequestDelegate next)
 
     private static void InjectPlugIns(Engine engine, App app)
     {
-        engine.SetValue("useTextStorage", new Func<string, TextStorageAdapter>(name => {
+        engine.SetValue("useTextStorage", new Func<string, TextStorageAdapter>(name =>
+        {
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
             optionsBuilder.UseNpgsql(ConfigurationHelper.Configuration!.GetConnectionString("DefaultConnection"));
             var appDbContext = new AppDbContext(optionsBuilder.Options);
@@ -189,26 +225,13 @@ public class FunctionInvokerMiddleware(RequestDelegate next)
             };
             variables[variable.Name] = value;
         }
+
         engine.SetValue("env", variables);
     }
 
     private async Task<string> LoadScript(string dependency)
     {
         return string.Empty;
-    }
-
-    private static async Task<object> ReadRequest(HttpRequest request)
-    {
-        var bodyString = await new StreamReader(request.Body).ReadToEndAsync();
-        return new
-        {
-            method = request.Method,
-            path = request.Path.Value,
-            @params = request.RouteValues.ToDictionary(x => x.Key, x => x.Value?.ToString()),
-            query = request.Query.ToDictionary(x => x.Key, x => x.Value.ToString()),
-            headers = request.Headers.ToDictionary(x => x.Key, x => x.Value.ToString()),
-            body = !string.IsNullOrEmpty(bodyString) ? JsonSerializer.Deserialize<dynamic>(bodyString) : null
-        };
     }
 }
 
