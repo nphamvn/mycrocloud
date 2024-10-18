@@ -1,0 +1,7 @@
+﻿POST http://apigw-2.mycrocloud.local:5101/users/2/?age=18
+Content-Type: application/json
+Job: Engineer
+
+{
+  "name": "Nam"
+}

@@ -41,6 +41,9 @@ import { default as FormList } from "./modules/form/List";
 import { default as FormCreateUpdate } from "./modules/form/CreateUpdate";
 import { default as FormSubmissionList } from "./modules/form/SubmissionList";
 
+import { default as DatabaseList } from "./modules/databases/list";
+import { default as DatabaseEdit } from "./modules/databases/edit";
+
 import { DevPage, devRoutes } from "./components/devpages";
 import About from "./pages/About";
 import { NotFoundPage } from "./pages/NotFoundPage";
@@ -146,6 +149,22 @@ function App() {
                 <Route
                   path="submissions"
                   element={<ProtectedPage children={<FormSubmissionList />} />}
+                />
+              </Route>
+            </Route>
+            <Route path="databases">
+              <Route
+                index
+                element={<ProtectedPage children={<DatabaseList />} />}
+              />
+              <Route
+                path="new"
+                element={<ProtectedPage children={<DatabaseEdit />} />}
+              />
+              <Route path=":id">
+                <Route
+                  index
+                  element={<ProtectedPage children={<DatabaseEdit />} />}
                 />
               </Route>
             </Route>
