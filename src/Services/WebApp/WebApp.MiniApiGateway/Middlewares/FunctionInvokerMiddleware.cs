@@ -25,7 +25,7 @@ public class FunctionInvokerMiddleware(RequestDelegate next)
             if (app.Settings.CheckFunctionExecutionLimitMemory)
             {
                 var memoryLimit = app.Settings.FunctionExecutionLimitMemoryBytes ?? 1 * 1024 * 1024;
-                memoryLimit += 2 * 1024 * 1024;
+                memoryLimit += 10 * 1024 * 1024;
                 
                 options.LimitMemory(memoryLimit);
             }
