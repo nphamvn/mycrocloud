@@ -1,10 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
-using System.Text;
-using System.Text.Unicode;
 using Jint;
 using Jint.Native;
-using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
 using WebApp.Infrastructure;
