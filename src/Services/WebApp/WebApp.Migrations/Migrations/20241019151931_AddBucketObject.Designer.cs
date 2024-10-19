@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebApp.Infrastructure;
@@ -12,9 +13,11 @@ using WebApp.Infrastructure;
 namespace WebApp.Migrations.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241019151931_AddBucketObject")]
+    partial class AddBucketObject
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -604,7 +607,7 @@ namespace WebApp.Migrations.Migrations
             modelBuilder.Entity("WebApp.Domain.Entities.BucketObject", b =>
                 {
                     b.HasOne("WebApp.Domain.Entities.App", "App")
-                        .WithMany("BucketObjects")
+                        .WithMany()
                         .HasForeignKey("AppId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -753,8 +756,6 @@ namespace WebApp.Migrations.Migrations
                     b.Navigation("ApiKeys");
 
                     b.Navigation("AuthenticationSchemes");
-
-                    b.Navigation("BucketObjects");
 
                     b.Navigation("Folders");
 

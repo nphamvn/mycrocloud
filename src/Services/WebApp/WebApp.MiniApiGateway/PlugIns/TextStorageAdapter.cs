@@ -1,7 +1,7 @@
 ﻿using WebApp.Domain.Entities;
 using WebApp.Infrastructure;
 
-namespace WebApp.MiniApiGateway;
+namespace WebApp.MiniApiGateway.PlugIns;
 
 public class TextStorageAdapter(App app, string name, AppDbContext appDbContext)
 {

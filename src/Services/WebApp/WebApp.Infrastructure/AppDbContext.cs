@@ -19,6 +19,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     
     public DbSet<Variable> Variables { get; set; }
     public DbSet<TextStorage> TextStorages { get; set; }
+
+    public DbSet<BucketObject> BucketObjects { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<App>()
@@ -101,6 +104,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<Variable>()
             .HasOne(v => v.App)
             .WithMany(a => a.Variables)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BucketObject>()
+            .HasKey(bo => new { bo.AppId, bo.Key });
+        
+        modelBuilder.Entity<BucketObject>()
+            .HasOne(s => s.App)
+            .WithMany(a => a.BucketObjects)
             .OnDelete(DeleteBehavior.Cascade);
     }
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

@@ -5,6 +5,7 @@ using Jint.Native;
 using WebApp.Domain.Entities;
 using WebApp.Domain.Repositories;
 using WebApp.Infrastructure;
+using WebApp.MiniApiGateway.PlugIns;
 
 namespace WebApp.MiniApiGateway.Middlewares;
 
@@ -150,6 +151,9 @@ public class FunctionInvokerMiddleware(RequestDelegate next)
     {
         engine.SetValue("useTextStorage",
             new Func<string, TextStorageAdapter>(name => new TextStorageAdapter(app, name, dbContext)));
+
+        engine.SetValue("useObjectStorage",
+            () => new ObjectStorageAdapter(app.Id, dbContext));
     }
 
     private async Task InjectUserDefinedDependencies(Route route, Engine engine)
