@@ -69,6 +69,9 @@ function RouteExplorer() {
   const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
 
+  const params = useParams();
+  const routeId = params["routeId"] ? parseInt(params["routeId"]) : undefined;
+
   const app = useContext(AppContext)!;
   const [explorerItems, setExplorerItems] = useState<IExplorerItem[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -428,12 +431,13 @@ function RouteExplorer() {
       ? items.filter((i) => i.parentId === null)
       : items.filter((i) => i.parentId === node.id);
 
+    const isCurrentRoute = node?.type === "Route" && node.id === routeId;
     return (
       <>
         {isRoot ? null : (
           <div
             style={{ paddingLeft: node.level * 8 }}
-            className="hover:bg-slate-100"
+            className={`hover:bg-slate-100 ${isCurrentRoute ? "bg-slate-100" : ""}`}
           >
             {node.type === "Folder" ? (
               <FolderItem
