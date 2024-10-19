@@ -41,7 +41,6 @@ import { default as FormList } from "./modules/form/List";
 import { default as FormCreateUpdate } from "./modules/form/CreateUpdate";
 import { default as FormSubmissionList } from "./modules/form/SubmissionList";
 
-import { DevPage, devRoutes } from "./components/devpages";
 import About from "./pages/About";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { ApiKeyCreateUpdate, ApiKeyList } from "./pages/authentications/apikey";
@@ -154,13 +153,6 @@ function App() {
               element={<ProtectedPage children={<About />} />}
             />
             <Route path="*" Component={NotFoundPage} />
-            {import.meta.env.DEV && (
-              <Route path="_dev" Component={DevPage}>
-                {devRoutes.map((r, i) => (
-                  <Route key={i} path={r.path} Component={r.component} />
-                ))}
-              </Route>
-            )}
           </Routes>
         </div>
         <ToastContainer />
