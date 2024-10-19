@@ -3,11 +3,13 @@ import IVariable from "./Variable";
 import { Link } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { AppContext } from "../../apps";
+import { toast } from "react-toastify";
 
 export default function AppVariables() {
   const app = useContext(AppContext)!;
   const [variables, setVariables] = useState<IVariable[]>([]);
   const { getAccessTokenSilently } = useAuth0();
+
   useEffect(() => {
     const getVariable = async () => {
       const accessToken = await getAccessTokenSilently();
@@ -21,6 +23,31 @@ export default function AppVariables() {
     };
     getVariable();
   }, []);
+
+  const handleDeleteClick = async (variable: IVariable) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete the variable "${variable.name}"?`,
+      )
+    ) {
+      return;
+    }
+    const accessToken = await getAccessTokenSilently();
+    const response = await fetch(
+      `/api/apps/${app.id}/variables/${variable.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    if (response.ok) {
+      toast.success(`Variable "${variable.name}" has been deleted.`);
+      setVariables(variables.filter((v) => v.id !== variable.id));
+    }
+  };
   return (
     <div className="p-2">
       <h1 className="font-bold">Variables</h1>
@@ -32,14 +59,14 @@ export default function AppVariables() {
         >
           Add
         </Link>
-        <table className="mt-2 w-full table-auto">
+        <table className="mt-2 w-full">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Value Type</th>
-              <th>Created at</th>
-              <th>Updated at</th>
-              <th>Actions</th>
+              <th className="text-start">Name</th>
+              <th className="text-start">Value Type</th>
+              <th className="text-start">Created at</th>
+              <th className="text-start">Updated at</th>
+              <th className="text-start">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -56,7 +83,11 @@ export default function AppVariables() {
                   {v.updatedAt ? new Date(v.updatedAt).toLocaleString() : "-"}
                 </td>
                 <td className="inline-flex">
-                  <button type="button" className="text-red-500">
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteClick(v)}
+                    className="text-red-500"
+                  >
                     Delete
                   </button>
                 </td>
