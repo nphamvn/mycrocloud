@@ -636,7 +636,7 @@ function FolderItem({
     </div>
   ) : (
     <div className="flex items-center p-0.5">
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} className="w-full">
         <input
           type="text"
           {...register("name", { required: "Name is required" })}
