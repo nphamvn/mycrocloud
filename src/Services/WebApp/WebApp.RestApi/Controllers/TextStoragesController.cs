@@ -32,7 +32,7 @@ public class TextStoragesController(AppDbContext appDbContext) : BaseController
         entity.AppId = appId;
         await appDbContext.TextStorages.AddAsync(entity);
         await appDbContext.SaveChangesAsync();
-        return Created("", entity);
+        return Created("", new { entity.Id });;
     }
 
     [HttpPut("{id:int}")]
