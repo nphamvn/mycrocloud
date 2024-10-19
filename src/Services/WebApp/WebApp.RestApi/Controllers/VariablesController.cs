@@ -34,7 +34,7 @@ public class VariablesController(AppDbContext appDbContext) : BaseController
         entity.AppId = appId;
         await appDbContext.Variables.AddAsync(entity);
         await appDbContext.SaveChangesAsync();
-        return Created("", entity);
+        return Created("", new { entity.Id });
     }
 
     [HttpPut("{id:int}")]
