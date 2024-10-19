@@ -48,4 +48,32 @@ public class Tests
             .AsString();
         Assert.That(result, Is.EqualTo($"Hi {name}"));
     }
+    
+    [Test]
+    public void Test2()
+    {
+        var engine = new Engine();
+        
+        const string userCode = """
+                            function handle(number) {
+                                return number;
+                            }
+                            """;
+        
+        engine.Execute(userCode);
+        
+        const int number = 1;
+        engine.SetValue("number", number);
+        
+        
+        const string code = """
+                            (() => {
+                                return handle(number);
+                            })();
+                            """;
+        
+        var resultNumber = engine.Evaluate(code).AsNumber();
+        
+        Assert.That(resultNumber, Is.EqualTo(number));
+    }
 }

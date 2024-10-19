@@ -19,14 +19,6 @@ public class FunctionInvokerMiddleware(RequestDelegate next)
         var app = (App)context.Items["_App"]!;
         var route = (Route)context.Items["_Route"]!;
 
-        var request = context.Request;
-        var requestMethod = request.Method;
-        var requestPath = request.Path.Value;
-        var requestParams = request.RouteValues.ToDictionary(x => x.Key, x => x.Value?.ToString());
-        var requestQuery = request.Query.ToDictionary(x => x.Key, x => x.Value.ToString());
-        var requestHeaders = request.Headers.ToDictionary(x => x.Key, x => x.Value.ToString());
-        var requestBody = await new StreamReader(request.Body).ReadToEndAsync();
-
         var engine = new Engine(options =>
         {
             if (app.Settings.CheckFunctionExecutionLimitMemory)
@@ -39,7 +31,7 @@ public class FunctionInvokerMiddleware(RequestDelegate next)
 
             if (app.Settings.CheckFunctionExecutionTimeout)
             {
-                options.TimeoutInterval(TimeSpan.FromSeconds(app.Settings.FunctionExecutionTimeoutSeconds ?? 3));
+                options.TimeoutInterval(TimeSpan.FromSeconds(app.Settings.FunctionExecutionTimeoutSeconds ?? 10));
             }
         });
 
@@ -47,13 +39,15 @@ public class FunctionInvokerMiddleware(RequestDelegate next)
         await InjectEnvironmentVariables(appRepository, app, engine);
 
         // Inject utility scripts
-        InjectBuiltInUltilityScripts(scripts, engine);
+        InjectBuiltInUtilityScripts(scripts, engine);
 
         //Inject user-defined dependencies
         await InjectUserDefinedDependencies(route, engine);
 
         //Inject plugins
-        InjectPlugIns(engine, app);
+        using var scope = context.RequestServices.CreateScope();
+        var dbContext2 = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        InjectPlugIns(engine, dbContext2, app);
 
         JsValue jsResult;
         var result = new FunctionExecutionResult();
@@ -62,36 +56,12 @@ public class FunctionInvokerMiddleware(RequestDelegate next)
         try
         {
             engine.Execute(route.FunctionHandler);
-            engine.SetValue("_requestMethod", requestMethod)
-                .SetValue("_requestPath", requestPath)
-                .SetValue("_requestParams", requestParams)
-                .SetValue("_requestQuery", requestQuery)
-                .SetValue("_requestHeaders", requestHeaders)
-                .SetValue("bodyParser", "json")
-                .SetValue("_requestBody", requestBody)
-                ;
 
-            const string code = @"
-function _invoke() {
-    const request = {
-        method: _requestMethod,
-        path: _requestPath,
-        headers: _requestHeaders,
-        query: _requestQuery,
-        params: _requestParams,
-    }
+            await engine.SetRequestValue(context.Request);
 
-    switch (bodyParser) {
-        case 'json':
-            request.body = _requestBody ? JSON.parse(_requestBody) : null;
-            break;
-    }
-    
-    return $FunctionHandler$(request);
-}
-";
-            engine.Execute(code.Replace("$FunctionHandler$", route.FunctionHandlerMethod ?? "handler"));
-            jsResult = engine.Invoke("_invoke");
+            const string code = "(() => { return $FunctionHandler$(request); })();";
+
+            jsResult = engine.Evaluate(code.Replace("$FunctionHandler$", route.FunctionHandlerMethod ?? "handler"));
         }
         catch (Exception e)
         {
@@ -155,6 +125,7 @@ function _invoke() {
             }
         }
 
+
         var body = jsResult.Get("body");
         if (body.IsString())
         {
@@ -178,16 +149,10 @@ function _invoke() {
         context.Items["_FunctionExecutionResult"] = result;
     }
 
-    private static void InjectPlugIns(Engine engine, App app)
+    private static void InjectPlugIns(Engine engine, AppDbContext dbContext, App app)
     {
-        engine.SetValue("useTextStorage", new Func<string, TextStorageAdapter>(name =>
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseNpgsql(ConfigurationHelper.Configuration!.GetConnectionString("DefaultConnection"));
-            var appDbContext = new AppDbContext(optionsBuilder.Options);
-            var adapter = new TextStorageAdapter(app, name, appDbContext);
-            return adapter;
-        }));
+        engine.SetValue("useTextStorage",
+            new Func<string, TextStorageAdapter>(name => new TextStorageAdapter(app, name, dbContext)));
     }
 
     private async Task InjectUserDefinedDependencies(Route route, Engine engine)
@@ -202,7 +167,7 @@ function _invoke() {
         }
     }
 
-    private static void InjectBuiltInUltilityScripts(Scripts scripts, Engine engine)
+    private static void InjectBuiltInUtilityScripts(Scripts scripts, Engine engine)
     {
         //engine.Execute(scripts.Faker);
         engine.Execute(scripts.Handlebars);
