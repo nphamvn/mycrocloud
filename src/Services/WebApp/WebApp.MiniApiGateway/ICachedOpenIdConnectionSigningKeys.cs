@@ -29,8 +29,11 @@ public class MemoryCachedOpenIdConnectionSigningKeys : ICachedOpenIdConnectionSi
             $"{issuer.TrimEnd('/')}/.well-known/openid-configuration",
             new OpenIdConnectConfigurationRetriever(),
             new HttpDocumentRetriever());
+        
         var openIdConnectConfiguration = await configurationManager.GetConfigurationAsync();
+        
         _jsonWebKeySet.TryAdd(issuer, openIdConnectConfiguration.JsonWebKeySet);
+        
         return openIdConnectConfiguration.SigningKeys;
     }
 }
