@@ -5,4 +5,5 @@ export default interface IApp {
   createdAt: string;
   updatedAt?: string;
   status: string;
+  version: string;
 }

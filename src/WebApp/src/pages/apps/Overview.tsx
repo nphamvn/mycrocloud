@@ -254,6 +254,7 @@ function RenameSection() {
       headers: {
         "content-type": "application/json",
         Authorization: `Bearer ${accessToken}`,
+        "If-Match": app.version,
       },
       body: JSON.stringify(input),
     });
