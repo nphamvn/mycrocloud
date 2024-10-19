@@ -110,8 +110,10 @@ export default function RouteCreateUpdate({
             )}
           </div>
           <div className="mt-1">
-            <input type="checkbox" {...register("enabled")} id="enable" />
-            <label htmlFor="enable">Enable</label>
+            <label htmlFor="enable" className="flex items-center">
+              <input type="checkbox" {...register("enabled")} id="enable" />
+              Enable
+            </label>
             {errors.enabled && (
               <span className="text-red-500">{errors.enabled.message}</span>
             )}
@@ -378,7 +380,7 @@ function RequestValidation() {
       <button
         type="button"
         onClick={() => setShow(!show)}
-        className="inline-flex"
+        className="inline-flex items-center"
       >
         {show ? (
           <ChevronDownIcon className="h-4 w-4 text-blue-500" />
@@ -543,7 +545,7 @@ function StaticResponse() {
               onClick={() =>
                 addResponseHeaders({ name: button.key, value: button.value })
               }
-              className=" mt-1 text-blue-600 hover:underline"
+              className="mt-1 text-blue-600 hover:underline"
             >
               {button.text}
             </button>
@@ -554,13 +556,16 @@ function StaticResponse() {
         <label className="block">Body</label>
         <div className="mt-1 flex">
           <div>
-            <input
-              id="useDynamicResponse"
-              type="checkbox"
-              {...register("useDynamicResponse")}
-              className="inline-block border border-gray-200 px-2 py-1"
-            />
-            <label htmlFor="useDynamicResponse" className="mt-2">
+            <label
+              htmlFor="useDynamicResponse"
+              className="mt-2 flex items-center"
+            >
+              <input
+                id="useDynamicResponse"
+                type="checkbox"
+                {...register("useDynamicResponse")}
+                className="inline-block border border-gray-200 px-2 py-1"
+              />
               Use dynamic response
             </label>
           </div>
@@ -717,7 +722,7 @@ function StaticFile({ file }: { file?: IFile }) {
               onClick={() =>
                 addResponseHeaders({ name: button.key, value: button.value })
               }
-              className=" mt-1 text-blue-600 hover:underline"
+              className="mt-1 text-blue-600 hover:underline"
             >
               {button.text}
             </button>
