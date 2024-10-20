@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebApp.Domain.Entities;
 using File = WebApp.Domain.Entities.File;
+using Object = WebApp.Domain.Entities.Object;
 
 namespace WebApp.Infrastructure;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<App> Apps { get; set; }
-    
+
     public DbSet<RouteFolder> RouteFolders { get; set; }
     public DbSet<Route> Routes { get; set; }
     public DbSet<Folder> Folders { get; set; }
@@ -16,24 +17,17 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<AuthenticationScheme> AuthenticationSchemes { get; set; }
 
     public DbSet<ApiKey> ApiKeys { get; set; }
-    
+
     public DbSet<Variable> Variables { get; set; }
     public DbSet<TextStorage> TextStorages { get; set; }
+    public DbSet<Object> Objects { get; set; }
 
-    public DbSet<BucketObject> BucketObjects { get; set; }
-    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<App>()
-            .OwnsOne(app => app.Settings, ownedNavigationBuilder =>
-            {
-                ownedNavigationBuilder.ToJson();
-            });
+            .OwnsOne(app => app.Settings, ownedNavigationBuilder => { ownedNavigationBuilder.ToJson(); });
         modelBuilder.Entity<App>()
-            .OwnsOne(app => app.CorsSettings, ownedNavigationBuilder =>
-            {
-                ownedNavigationBuilder.ToJson();
-            });
+            .OwnsOne(app => app.CorsSettings, ownedNavigationBuilder => { ownedNavigationBuilder.ToJson(); });
 
         modelBuilder.Entity<Route>().OwnsMany(route => route.ResponseHeaders,
             ownedNavigationBuilder => { ownedNavigationBuilder.ToJson(); });
@@ -46,74 +40,75 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<Route>()
             .Property(r => r.Enabled)
             .HasDefaultValue(true);
-        
+
         modelBuilder.Entity<Route>()
             .HasOne(r => r.App)
             .WithMany(a => a.Routes)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         modelBuilder.Entity<Route>()
             .Property(r => r.FunctionHandlerMethod)
             .HasDefaultValue("handler");
-        
+
         modelBuilder.Entity<ApiKey>()
             .HasOne(r => r.App)
             .WithMany(a => a.ApiKeys)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         modelBuilder.Entity<AuthenticationScheme>()
             .HasOne(r => r.App)
             .WithMany(a => a.AuthenticationSchemes)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         modelBuilder.Entity<Folder>()
             .HasOne(r => r.App)
             .WithMany(a => a.Folders)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         modelBuilder.Entity<Folder>()
             .HasMany(f => f.Files)
             .WithOne(f => f.Folder)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         modelBuilder.Entity<Log>()
             .HasOne(r => r.App)
             .WithMany(a => a.Logs)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         modelBuilder.Entity<Log>()
             .HasOne(r => r.Route)
             .WithMany(a => a.Logs)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         modelBuilder.Entity<RouteFolder>()
             .HasOne(f => f.App)
             .WithMany(a => a.RouteFolders)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         modelBuilder.Entity<RouteFolder>()
             .HasMany(f => f.Routes)
             .WithOne(f => f.Folder)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         modelBuilder.Entity<TextStorage>()
             .HasOne(s => s.App)
             .WithMany(a => a.TextStorages)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         modelBuilder.Entity<Variable>()
             .HasOne(v => v.App)
             .WithMany(a => a.Variables)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<BucketObject>()
+        modelBuilder.Entity<Object>()
             .HasKey(bo => new { bo.AppId, bo.Key });
-        
-        modelBuilder.Entity<BucketObject>()
+
+        modelBuilder.Entity<Object>()
             .HasOne(s => s.App)
-            .WithMany(a => a.BucketObjects)
+            .WithMany(a => a.Objects)
             .OnDelete(DeleteBehavior.Cascade);
     }
+
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         AddTimestampsAndVersion();
@@ -137,6 +132,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             {
                 ((BaseEntity)entityEntry.Entity).UpdatedAt = DateTime.UtcNow;
             }
+
             ((BaseEntity)entityEntry.Entity).Version = Guid.NewGuid();
         }
     }

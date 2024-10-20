@@ -1,6 +1,6 @@
 namespace WebApp.Domain.Entities;
 
-public class BucketObject : BaseEntity
+public class Object : BaseEntity
 {
     public App App { get; set; }
     public int AppId { get; set; }

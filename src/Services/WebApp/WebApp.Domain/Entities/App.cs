@@ -25,5 +25,5 @@ public class App : BaseEntity
     public ICollection<TextStorage> TextStorages { get; set; }
     public ICollection<Variable> Variables { get; set; }
     
-    public ICollection<BucketObject> BucketObjects { get; set; }
+    public ICollection<Object> Objects { get; set; }
 }
