@@ -194,7 +194,8 @@ ORDER BY depth;
             Path = path,
             ResponseType = ResponseType.StaticFile,
             ResponseStatusCode = 200,
-            File = file
+            File = file,
+            Enabled = true
         });
     }
 
