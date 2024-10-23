@@ -27,6 +27,7 @@ export default function AppLayout() {
   const isMatchVariables = part3 == "storages" && part4 === "variables";
 
   const isMatchLogs = part3 == "logs";
+  const isMatchIntegrations = part3 == "integrations";
 
   useEffect(() => {
     const getApp = async () => {
@@ -138,6 +139,12 @@ export default function AppLayout() {
                 </Link>
               </div>
             </div>
+            <Link
+              to="integrations"
+              className={`text-xs ${isMatchIntegrations ? "text-primary" : ""}`}
+            >
+              Intergrations
+            </Link>
             <Link
               to="logs"
               className={`text-xs ${isMatchLogs ? "text-primary" : ""}`}

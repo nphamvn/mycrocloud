@@ -47,6 +47,9 @@ import About from "./pages/About";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { ApiKeyCreateUpdate, ApiKeyList } from "./pages/authentications/apikey";
 
+import { default as Integrations } from "./pages/integrations";
+import { default as IntegrationsGitHubCallback } from "./pages/integrations/github_callback";
+
 function App() {
   return (
     <Auth0Provider
@@ -131,7 +134,14 @@ function App() {
                     />
                   </Route>
                 </Route>
+                <Route path="integrations" Component={Integrations}></Route>
               </Route>
+            </Route>
+            <Route path="integrations">
+              <Route
+                path="callback/github"
+                Component={IntegrationsGitHubCallback}
+              />
             </Route>
             <Route path="forms">
               <Route

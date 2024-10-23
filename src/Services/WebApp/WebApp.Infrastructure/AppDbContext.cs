@@ -22,6 +22,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<TextStorage> TextStorages { get; set; }
     public DbSet<Object> Objects { get; set; }
 
+    public DbSet<UserToken> UserTokens { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<App>()
@@ -107,6 +109,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasOne(s => s.App)
             .WithMany(a => a.Objects)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<UserToken>()
+            .HasKey(t => new { t.UserId, t.Provider, t.Purpose });
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
