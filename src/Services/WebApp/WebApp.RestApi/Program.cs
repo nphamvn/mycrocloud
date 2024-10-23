@@ -9,6 +9,7 @@ using System.Reflection;
 using WebApp.Infrastructure;
 using WebApp.Infrastructure.Repositories;
 using WebApp.RestApi.Filters;
+using WebApp.RestApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add(typeof(GlobalExceptionFilter));
+    options.Filters.Add<GitHubWebhookValidationFilter>();
     options.InputFormatters.Insert(options.InputFormatters.Count, new TextPlainInputFormatter());
 });
 
@@ -56,6 +58,7 @@ builder.Services.AddScoped<IAppService, AppService>();
 builder.Services.AddScoped<IRouteRepository, RouteRepository>();
 builder.Services.AddScoped<IRouteService, RouteService>();
 builder.Services.AddScoped<ILogRepository, LogRepository>();
+builder.Services.AddSingleton<RabbitMqService>();
 
 var app = builder.Build();
 
