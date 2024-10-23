@@ -26,4 +26,6 @@ public class App : BaseEntity
     public ICollection<Variable> Variables { get; set; }
     
     public ICollection<Object> Objects { get; set; }
+    
+    public int? GitHubRepoId { get; set; }
 }

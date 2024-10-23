@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
@@ -91,9 +92,66 @@ public class IntegrationsController(AppDbContext appDbContext, IConfiguration co
     }
 
     [HttpPost("app-github")]
-    public async Task<IActionResult> ConnectAppGitHub(int appId, int repoId)
+    public async Task<IActionResult> ConnectAppGitHub(int appId, int repoId, bool connect)
     {
+        var userToken = await appDbContext.UserTokens
+            .Where(t => t.UserId == User.GetUserId() && t.Provider == "GitHub" &&
+                        t.Purpose == UserTokenPurpose.AppIntegration)
+            .SingleOrDefaultAsync();
+        if (userToken is null)
+        {
+            return Unauthorized();
+        }
         
+        var app = await appDbContext.Apps.SingleAsync(a => a.Id == appId);
+        
+
+        if (connect)
+        {
+            // Fetch repo details
+            using var client = new HttpClient();
+            var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/repositories/{repoId}");
+            request.Headers.UserAgent.Add(new ProductInfoHeaderValue("WebApp", "1.0"));
+            request.Headers.Add("Accept", "application/vnd.github+json");
+            request.Headers.Add("Authorization", "Bearer " + userToken.Token);
+            request.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var repo = JsonSerializer.Deserialize<GitHubRepo>(responseBody)!;
+            app.GitHubRepoId = repo.Id;
+            
+            // Add webhook
+            var webhookRequest = new
+            {
+                name = "web",
+                active = true,
+                events = new[] { "push" },
+                config = new
+                {
+                    url = $"{configuration["App:Url"]}/webhooks/github",
+                    content_type = "json"
+                }
+            };
+            var webhookResponse = await client.PostAsync($"https://api.github.com/repos/{repo.FullName}/hooks", new StringContent(JsonSerializer.Serialize(webhookRequest), Encoding.UTF8, "application/json"));
+            webhookResponse.EnsureSuccessStatusCode();
+        }
+        else
+        {
+            // Remove webhook
+            using var client = new HttpClient();
+            var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/repositories/{repoId}/hooks");
+            request.Headers.UserAgent.Add(new ProductInfoHeaderValue("WebApp", "1.0"));
+            request.Headers.Add("Accept", "application/vnd.github+json");
+            request.Headers.Add("Authorization", "Bearer " + userToken.Token);
+            request.Headers.Add("X-GitHub-Api-Version", "2022-11-28");
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+        }
+        
+        app.GitHubRepoId = connect ? repoId : null;
+        await appDbContext.SaveChangesAsync();
+        return NoContent();
     }
 }
 

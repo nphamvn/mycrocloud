@@ -21,6 +21,7 @@ export default function Integrations() {
 
   const [repoId, setRepoId] = useState<number | null>(null);
   const [githubAuthorized, setGitHubAuthorized] = useState(true);
+  const [githubConnected, setGitHubConnected] = useState(true);
   const [githubRepos, setGitHubRepos] = useState<GitHubRepo[]>([]);
 
   const onClickGitHubIntegration = async () => {
@@ -33,7 +34,7 @@ export default function Integrations() {
   const onConnectClick = async () => {
     const accessToken = await getAccessTokenSilently();
     const res = await fetch(
-      `/api/integrations/app-github?appId=${appId}&repoId=${repoId}`,
+      `/api/integrations/app-github?appId=${appId}&repoId=${repoId}&connect=${!githubConnected}`,
       {
         method: "POST",
         headers: {
@@ -41,6 +42,9 @@ export default function Integrations() {
         },
       },
     );
+    if (res.ok) {
+      setGitHubConnected(!githubConnected);
+    }
   };
 
   useEffect(() => {
@@ -83,7 +87,7 @@ export default function Integrations() {
             >
               <option>Select a repository</option>
               {githubRepos.map((repo) => (
-                <option key={repo.id} value={repo.fullName}>
+                <option key={repo.id} value={repo.id}>
                   {repo.fullName}
                 </option>
               ))}
@@ -92,7 +96,7 @@ export default function Integrations() {
               onClick={onConnectClick}
               className="ms-2 bg-primary px-2 text-white"
             >
-              Connect
+              {githubConnected ? "Disconnect" : "Connect"}
             </button>
           </div>
         )}
