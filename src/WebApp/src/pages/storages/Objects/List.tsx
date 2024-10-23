@@ -5,6 +5,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { AppContext } from "../../apps";
 import { Modal } from "flowbite-react";
 import Object from "./Object";
+import { downloadFile } from "../../../utils";
 
 export default function List() {
   const app = useContext(AppContext)!;
@@ -92,19 +93,13 @@ export default function List() {
 
   const handleDownloadClick = async (object: Object) => {
     const accessToken = await getAccessTokenSilently();
-    const res = await fetch(`/api/apps/${app.id}/objects/${object.key}`, {
-      headers: {
+    await downloadFile(
+      `/api/apps/${app.id}/objects/${object.key}`,
+      {
         Authorization: `Bearer ${accessToken}`,
       },
-    });
-    if (res.ok) {
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = object.key;
-      a.click();
-    }
+      object.key,
+    );
   };
 
   return (
