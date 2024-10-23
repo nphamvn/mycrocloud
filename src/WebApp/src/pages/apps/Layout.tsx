@@ -113,6 +113,14 @@ export default function AppLayout() {
                   Files
                 </Link>
                 <Link
+                  to="storages/objects"
+                  className={`text-xs ${
+                    isMatchFileStorages ? "text-primary" : ""
+                  }`}
+                >
+                  Objects
+                </Link>
+                <Link
                   to="storages/textstorages"
                   className={`text-xs ${
                     isMatchTextStorages ? "text-primary" : ""

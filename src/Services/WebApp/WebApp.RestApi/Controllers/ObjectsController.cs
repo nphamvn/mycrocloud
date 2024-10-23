@@ -7,7 +7,7 @@ namespace WebApp.RestApi.Controllers;
 
 [Route("apps/{appId:int}/[controller]")]
 [TypeFilter<AppOwnerActionFilter>(Arguments = ["appId"])]
-public class ObjectStorageController(AppDbContext appDbContext) : BaseController
+public class ObjectsController(AppDbContext appDbContext) : BaseController
 {
     [HttpGet]
     public async Task<IActionResult> ListObjects(int appId, string? prefix = null)
@@ -16,15 +16,26 @@ public class ObjectStorageController(AppDbContext appDbContext) : BaseController
                 .Include(app => app.Objects)
                 .SingleAsync(app => app.Id == appId)
             ;
+        
+        var objects = app.Objects
+                .Where(obj => prefix is null || obj.Key.StartsWith(prefix))
+                .Select(obj => new
+                {
+                    obj.Key,
+                    obj.CreatedAt,
+                    obj.UpdatedAt
+                })
+                .ToList()
+            ;
 
-        return Ok(app.Objects.Select(obj => new
+        return Ok(objects.Select(obj => new
         {
             obj.Key,
             obj.CreatedAt,
             obj.UpdatedAt
         }));
     }
-    
+
     [HttpGet("{key}")]
     public async Task<IActionResult> GetObject(int appId, string key)
     {
@@ -32,7 +43,7 @@ public class ObjectStorageController(AppDbContext appDbContext) : BaseController
                 .Include(app => app.Objects)
                 .SingleAsync(app => app.Id == appId)
             ;
-        
+
         var obj = app.Objects.SingleOrDefault(obj => obj.Key == key);
 
         if (obj is null)

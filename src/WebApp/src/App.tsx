@@ -37,6 +37,8 @@ import {
 
 import { FileList } from "./pages/storages/files";
 
+import { ObjectList } from "./pages/storages/Objects";
+
 import { default as FormList } from "./modules/form/List";
 import { default as FormCreateUpdate } from "./modules/form/CreateUpdate";
 import { default as FormSubmissionList } from "./modules/form/SubmissionList";
@@ -116,6 +118,9 @@ function App() {
                       path=":storageId/logon"
                       Component={LogonTextStorage}
                     />
+                  </Route>
+                  <Route path="objects">
+                    <Route index Component={ObjectList} />
                   </Route>
                   <Route path="variables">
                     <Route index Component={VariableList} />

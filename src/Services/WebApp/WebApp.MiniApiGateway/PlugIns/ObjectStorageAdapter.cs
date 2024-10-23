@@ -21,12 +21,16 @@ internal class ObjectStorageAdapter(int appId, AppDbContext dbContext)
             {
                 AppId = appId,
                 Key = key,
-                Content = content
+                Content = content,
+                CreatedAt = DateTime.UtcNow,
+                Version = Guid.NewGuid()
             });
         }
         else
         {
             obj.Content = content;
+            obj.UpdatedAt = DateTime.UtcNow;
+            obj.Version = Guid.NewGuid();
         }
 
         dbContext.SaveChanges();
