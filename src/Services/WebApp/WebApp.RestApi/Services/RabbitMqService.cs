@@ -8,10 +8,13 @@ namespace WebApp.RestApi.Services
         private readonly IConnection _connection;
         private readonly IModel _channel;
 
-        public RabbitMqService()
+        public RabbitMqService(IConfiguration configuration)
         {
             // Create a connection factory
-            var factory = new ConnectionFactory() { HostName = "localhost" }; // Adjust for your RabbitMQ server
+            var factory = new ConnectionFactory
+            {
+                Uri = new Uri(configuration.GetConnectionString("RabbitMq")!),
+            };
 
             // Create a connection and a channel
             _connection = factory.CreateConnection();
@@ -19,10 +22,10 @@ namespace WebApp.RestApi.Services
 
             // Declare a queue (ensure the queue exists)
             _channel.QueueDeclare(queue: "job_queue", // Name of the queue
-                                  durable: true,     // Durable queue (persists)
-                                  exclusive: false,  // Not exclusive to one consumer
-                                  autoDelete: false, // Do not auto-delete the queue
-                                  arguments: null);  // No additional arguments
+                durable: true, // Durable queue (persists)
+                exclusive: false, // Not exclusive to one consumer
+                autoDelete: false, // Do not auto-delete the queue
+                arguments: null); // No additional arguments
         }
 
         // Method to publish a message to the RabbitMQ queue
@@ -30,10 +33,10 @@ namespace WebApp.RestApi.Services
         {
             var body = Encoding.UTF8.GetBytes(message);
 
-            _channel.BasicPublish(exchange: "",           // Default exchange
-                                  routingKey: "job_queue", // Queue name
-                                  basicProperties: null,   // No custom properties
-                                  body: body);             // Message body
+            _channel.BasicPublish(exchange: "", // Default exchange
+                routingKey: "job_queue", // Queue name
+                basicProperties: null, // No custom properties
+                body: body); // Message body
 
             Console.WriteLine($" [x] Sent '{message}'");
         }

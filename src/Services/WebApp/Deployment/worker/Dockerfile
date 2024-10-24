@@ -10,10 +10,12 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o worker .
 
-FROM alpine:latest
+FROM node:20-alpine
 
 WORKDIR /root/
 
 COPY --from=builder /app/worker .
+
+RUN apk update && apk add git
 
 CMD ["./worker"]

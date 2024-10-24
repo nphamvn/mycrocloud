@@ -8,24 +8,23 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-public class GitHubWebhookValidationFilter : IAsyncActionFilter
+public class GitHubWebhookValidationFilter(IConfiguration configuration, ILogger<GitHubWebhookValidationFilter> logger, IWebHostEnvironment env)
+    : IAsyncActionFilter
 {
-    private readonly IConfiguration _configuration;
-    private readonly ILogger<GitHubWebhookValidationFilter> _logger;
-
-    public GitHubWebhookValidationFilter(IConfiguration configuration, ILogger<GitHubWebhookValidationFilter> logger)
-    {
-        _configuration = configuration;
-        _logger = logger;
-    }
-
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        // skip for development environment
+        if (env.IsDevelopment())
+        {
+            await next();
+            return;
+        }
+        
         // Retrieve the secret token from configuration
-        var secret = _configuration["GitHubWebhookSecret"];
+        var secret = configuration["GitHubWebhookSecret"];
         if (string.IsNullOrEmpty(secret))
         {
-            _logger.LogError("GitHub Webhook secret is not configured.");
+            logger.LogError("GitHub Webhook secret is not configured.");
             context.Result = new BadRequestObjectResult("Server misconfiguration.");
             return;
         }
@@ -34,7 +33,7 @@ public class GitHubWebhookValidationFilter : IAsyncActionFilter
         var signatureHeader = context.HttpContext.Request.Headers["X-Hub-Signature-256"].ToString();
         if (string.IsNullOrEmpty(signatureHeader))
         {
-            _logger.LogWarning("Missing GitHub signature header.");
+            logger.LogWarning("Missing GitHub signature header.");
             context.Result = new UnauthorizedObjectResult("Missing GitHub signature.");
             return;
         }
@@ -51,7 +50,7 @@ public class GitHubWebhookValidationFilter : IAsyncActionFilter
         // Compare the computed signature with the one sent by GitHub
         if (!VerifySignature(signature, signatureHeader))
         {
-            _logger.LogWarning("GitHub signature verification failed.");
+            logger.LogWarning("GitHub signature verification failed.");
             context.Result = new UnauthorizedObjectResult("Invalid GitHub signature.");
             return;
         }

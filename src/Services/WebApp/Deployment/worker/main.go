@@ -1,13 +1,20 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"os"
+	"os/exec"
 	"sync"
-	"time"
 
 	"github.com/streadway/amqp"
 )
+
+type BuildMessage struct {
+	Id           string `json:"Id"`
+	RepoFullName string `json:"RepoFullName"`
+	CloneUrl     string `json:"CloneUrl"`
+}
 
 func failOnError(err error, msg string) {
 	if err != nil {
@@ -19,13 +26,57 @@ func failOnError(err error, msg string) {
 const MaxConcurrentJobs = 3
 
 // ProcessJob simulates job processing asynchronously
-func ProcessJob(job string, wg *sync.WaitGroup) {
+func ProcessJob(jsonString string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	// Simulate job processing time (5 seconds)
-	log.Printf("Processing %s...", job)
-	time.Sleep(5 * time.Second)
-	log.Printf("Finished processing %s", job)
+	var repo BuildMessage
+	err := json.Unmarshal([]byte(jsonString), &repo)
+	failOnError(err, "Failed to unmarshal JSON")
+	log.Printf("Processing... Id: %s, RepoFullName: %s", repo.Id, repo.RepoFullName)
+
+	// clone the repo
+	log.Printf("Cloning repo %s", repo.RepoFullName)
+	// create a directory with name as repo.Id
+	dir := repo.Id
+	err = os.RemoveAll(dir)
+	failOnError(err, "Failed to remove directory")
+	err = os.Mkdir(dir, 0755)
+	failOnError(err, "Failed to create directory")
+
+	// clone the repo to the directory
+	cloneCmd := exec.Command("git", "clone", repo.CloneUrl, dir)
+	err = cloneCmd.Run()
+	failOnError(err, "Failed to clone repository")
+
+	//print node version
+	log.Printf("Printing node version")
+	printNodeVersionCmd := exec.Command("node", "--version")
+	printNodeVersionCmd.Dir = dir
+	err = printNodeVersionCmd.Run()
+	failOnError(err, "Failed to print node version")
+
+	// run npm install
+	log.Printf("Running npm install")
+	installCmd := exec.Command("npm", "install")
+	installCmd.Dir = dir
+	err = installCmd.Run()
+	failOnError(err, "Failed to run npm install")
+
+	// run npm run build
+	log.Printf("Running npm run build")
+	buildCmd := exec.Command("npm", "run", "build")
+	buildCmd.Dir = dir
+	err = buildCmd.Run()
+	failOnError(err, "Failed to run npm run build")
+
+	// upload the build to S3
+	log.Printf("Uploading build to S3")
+	uploadCmd := exec.Command("aws", "s3", "cp", "--recursive", "build", "s3://my-bucket")
+	uploadCmd.Dir = dir
+	err = uploadCmd.Run()
+	failOnError(err, "Failed to upload build to S3")
+
+	log.Printf("Finished processing. Id: %s", repo.Id)
 }
 
 func main() {
