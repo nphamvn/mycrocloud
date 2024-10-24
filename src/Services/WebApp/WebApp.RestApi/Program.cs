@@ -18,7 +18,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add(typeof(GlobalExceptionFilter));
-    options.Filters.Add<GitHubWebhookValidationFilter>();
     options.InputFormatters.Insert(options.InputFormatters.Count, new TextPlainInputFormatter());
 });
 
