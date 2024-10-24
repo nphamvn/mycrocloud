@@ -82,6 +82,7 @@ func ProcessJob(jsonString string, wg *sync.WaitGroup) {
 func main() {
 	rabbitMQURL := os.Getenv("RABBITMQ_URL")
 	// Connect to RabbitMQ server
+	log.Printf("Connecting to RabbitMQ server at %s", rabbitMQURL)
 	conn, err := amqp.Dial(rabbitMQURL)
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()

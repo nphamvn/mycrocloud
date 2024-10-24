@@ -62,6 +62,7 @@ public class AppsController(IAppService appService, IAppRepository appRepository
             app.Name,
             app.Description,
             Status = app.Status.ToString(),
+            app.GitHubRepoFullName,
             app.CreatedAt,
             app.UpdatedAt,
             app.Version

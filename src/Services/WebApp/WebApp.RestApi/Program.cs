@@ -85,7 +85,17 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/healthz");
 app.Map("ping", () => "pong");
-app.Map("me", (ClaimsPrincipal user) => user.GetUserId())
+app.Map("me", async (AppDbContext appDbContext, ClaimsPrincipal user) => {
+    var userId = user.GetUserId();
+    var tokens = await appDbContext.UserTokens
+        .Where(t => t.UserId == userId)
+        .ToListAsync();
+        
+    return new {
+        userId,
+        connections = tokens.Select(t => new { t.Provider, t.Purpose, t.CreatedAt, t.UpdatedAt })
+    };
+})
     .RequireAuthorization();
 
 app.MapGet("_assembly", ()  => {

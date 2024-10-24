@@ -6,4 +6,5 @@ export default interface IApp {
   updatedAt?: string;
   status: string;
   version: string;
+  gitHubRepoFullName?: string;
 }

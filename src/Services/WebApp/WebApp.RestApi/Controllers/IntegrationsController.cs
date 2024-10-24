@@ -11,7 +11,7 @@ using WebApp.RestApi.Extensions;
 namespace WebApp.RestApi.Controllers;
 
 [Route("[controller]")]
-public class IntegrationsController(AppDbContext appDbContext, IConfiguration configuration) : BaseController
+public class IntegrationsController(AppDbContext appDbContext, IConfiguration configuration, ILogger<IntegrationsController> logger) : BaseController
 {
     [HttpPost("github/callback")]
     public async Task<IActionResult> GitHubCallback(GitHubAuthRequest request)
@@ -92,7 +92,7 @@ public class IntegrationsController(AppDbContext appDbContext, IConfiguration co
     }
 
     [HttpPost("app-github")]
-    public async Task<IActionResult> ConnectAppGitHub(int appId, int repoId, bool connect)
+    public async Task<IActionResult> ConnectAppGitHub(int appId, string repoFullName, bool connect)
     {
         var userToken = await appDbContext.UserTokens
             .Where(t => t.UserId == User.GetUserId() && t.Provider == "GitHub" &&
@@ -105,12 +105,11 @@ public class IntegrationsController(AppDbContext appDbContext, IConfiguration co
         
         var app = await appDbContext.Apps.SingleAsync(a => a.Id == appId);
         
-
         if (connect)
         {
             // Fetch repo details
             using var client = new HttpClient();
-            var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/repositories/{repoId}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/repositories/{repoFullName}");
             request.Headers.UserAgent.Add(new ProductInfoHeaderValue("WebApp", "1.0"));
             request.Headers.Add("Accept", "application/vnd.github+json");
             request.Headers.Add("Authorization", "Bearer " + userToken.Token);
@@ -119,19 +118,18 @@ public class IntegrationsController(AppDbContext appDbContext, IConfiguration co
             response.EnsureSuccessStatusCode();
             var responseBody = await response.Content.ReadAsStringAsync();
             var repo = JsonSerializer.Deserialize<GitHubRepo>(responseBody)!;
-            app.GitHubRepoId = repo.Id;
-            
+
             // Add webhook
+            var config = configuration.GetSection("AppIntegrations:GitHubWebhook");
             var webhookRequest = new
             {
-                name = "web",
-                active = true,
-                events = new[] { "push" },
+                events = config.GetValue<string[]>("Events"),
                 config = new
                 {
-                    url = $"{configuration["App:Url"]}/webhooks/github",
+                    url = config["Config:Url"]!.TrimEnd('/') + $"/{appId}",
                     content_type = "json"
-                }
+                },
+                secret = config["Config:Secret"]
             };
             var webhookResponse = await client.PostAsync($"https://api.github.com/repos/{repo.FullName}/hooks", new StringContent(JsonSerializer.Serialize(webhookRequest), Encoding.UTF8, "application/json"));
             webhookResponse.EnsureSuccessStatusCode();
@@ -140,7 +138,7 @@ public class IntegrationsController(AppDbContext appDbContext, IConfiguration co
         {
             // Remove webhook
             using var client = new HttpClient();
-            var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/repositories/{repoId}/hooks");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/repositories/{app.GitHubRepoFullName}/hooks");
             request.Headers.UserAgent.Add(new ProductInfoHeaderValue("WebApp", "1.0"));
             request.Headers.Add("Accept", "application/vnd.github+json");
             request.Headers.Add("Authorization", "Bearer " + userToken.Token);
@@ -149,7 +147,7 @@ public class IntegrationsController(AppDbContext appDbContext, IConfiguration co
             response.EnsureSuccessStatusCode();
         }
         
-        app.GitHubRepoId = connect ? repoId : null;
+        app.GitHubRepoFullName = connect ? repoFullName : null;
         await appDbContext.SaveChangesAsync();
         return NoContent();
     }

@@ -48,7 +48,8 @@ import { NotFoundPage } from "./pages/NotFoundPage";
 import { ApiKeyCreateUpdate, ApiKeyList } from "./pages/authentications/apikey";
 
 import { default as Integrations } from "./pages/integrations";
-import { default as IntegrationsGitHubCallback } from "./pages/integrations/github_callback";
+import { default as IntegrationsGitHubCallback } from "./pages/settings/github_callback";
+import Settings from "./pages/settings";
 
 function App() {
   return (
@@ -65,6 +66,7 @@ function App() {
         <div className="container mx-auto min-h-screen p-2">
           <Routes>
             <Route path="/" Component={Home} />
+            <Route path="settings" Component={Settings} />
             <Route path="apps">
               <Route index element={<ProtectedPage children={<AppList />} />} />
               <Route

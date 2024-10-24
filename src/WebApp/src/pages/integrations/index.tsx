@@ -1,9 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
-
-const CLIENT_ID = "Ov23liBsXIEMEdjwuUQM";
-const REDIRECT_URI = "http://localhost:5173/integrations/callback/github";
+import { useContext, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { AppContext } from "../apps";
 
 export interface GitHubRepo {
   id: number;
@@ -16,38 +14,34 @@ export interface GitHubRepo {
 
 export default function Integrations() {
   const { getAccessTokenSilently } = useAuth0();
-  const appId = parseInt(useParams()["appId"]!.toString());
-  const { pathname } = useLocation();
+  const app = useContext(AppContext)!;
+  console.log(app);
+  const navigate = useNavigate();
 
-  const [repoId, setRepoId] = useState<number | null>(null);
-  const [githubAuthorized, setGitHubAuthorized] = useState(true);
-  const [githubConnected, setGitHubConnected] = useState(true);
+  const [repoFullName, setRepoFullName] = useState<string | null>(null);
+  const [githubAuthorized, setGitHubAuthorized] = useState(false);
   const [githubRepos, setGitHubRepos] = useState<GitHubRepo[]>([]);
 
-  const onClickGitHubIntegration = async () => {
-    let authUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=repo`;
-    const state = encodeURIComponent(JSON.stringify({ pathname }));
-    authUrl += `&state=${state}`;
-    window.location.href = authUrl;
-  };
-
-  const onConnectClick = async () => {
-    const accessToken = await getAccessTokenSilently();
-    const res = await fetch(
-      `/api/integrations/app-github?appId=${appId}&repoId=${repoId}&connect=${!githubConnected}`,
-      {
-        method: "POST",
+  useEffect(() => {
+    (async () => {
+      const accessToken = await getAccessTokenSilently();
+      const res = await fetch(`/api/me`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      },
-    );
-    if (res.ok) {
-      setGitHubConnected(!githubConnected);
-    }
-  };
+      });
+      if (res.ok) {
+        const { connections } = await res.json();
+        setGitHubAuthorized(
+          connections.find((c: any) => c.provider === "GitHub"),
+        );
+      }
+    })();
+  }, []);
 
   useEffect(() => {
+    if (!githubAuthorized) return;
+
     (async () => {
       const accessToken = await getAccessTokenSilently();
       const res = await fetch(`/api/integrations/github/repos`, {
@@ -56,14 +50,28 @@ export default function Integrations() {
         },
       });
       if (res.ok) {
-        setGitHubAuthorized(true);
         const repos = (await res.json()) as GitHubRepo[];
         setGitHubRepos(repos);
-      } else if (res.status === 401) {
-        setGitHubAuthorized(false);
       }
     })();
-  }, []);
+  }, [githubAuthorized]);
+
+  const onConnectClick = async () => {
+    const accessToken = await getAccessTokenSilently();
+    const connect = !app.gitHubRepoFullName;
+    const res = await fetch(
+      `/api/integrations/app-github?appId=${app.id}&repoFullName=${repoFullName}&connect=${connect}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+    if (res.ok) {
+      //todo: update app state
+    }
+  };
 
   return (
     <div className="p-2">
@@ -71,24 +79,26 @@ export default function Integrations() {
       <div className="mt-4 rounded-sm border p-2">
         {githubAuthorized === false ? (
           <button
-            onClick={onClickGitHubIntegration}
+            onClick={() => {
+              navigate("/settings");
+            }}
             className="rounded-sm border bg-gray-900 px-2 py-1.5 text-white"
           >
-            Connect to GitHub
+            Go to Settings to connect GitHub
           </button>
         ) : (
           <div className="flex">
             <select
-              value={repoId || ""}
+              value={repoFullName || ""}
               onChange={(e) => {
-                setRepoId(parseInt(e.target.value));
+                setRepoFullName(e.target.value);
               }}
               className="border px-2 py-1.5"
             >
               <option>Select a repository</option>
               {githubRepos.map((repo) => (
-                <option key={repo.id} value={repo.id}>
-                  {repo.fullName}
+                <option key={repo.fullName} value={repo.fullName}>
+                  {repo.name}
                 </option>
               ))}
             </select>
@@ -96,7 +106,7 @@ export default function Integrations() {
               onClick={onConnectClick}
               className="ms-2 bg-primary px-2 text-white"
             >
-              {githubConnected ? "Disconnect" : "Connect"}
+              {app.gitHubRepoFullName ? "Disconnect" : "Connect"}
             </button>
           </div>
         )}

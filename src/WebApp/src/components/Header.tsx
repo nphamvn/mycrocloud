@@ -1,6 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Avatar, Button, Dropdown } from "flowbite-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const isDevMode = import.meta.env.DEV;
 
 function Header() {
@@ -12,6 +12,7 @@ function Header() {
     logout,
     getAccessTokenSilently,
   } = useAuth0();
+  const navigate = useNavigate();
 
   const handleCopyAccessTokenClick = async () => {
     const accessToken = await getAccessTokenSilently();
@@ -34,7 +35,7 @@ function Header() {
           <ul className="me-auto ms-4 flex space-x-2">
             <li>
               <Link
-                className="block border-b border-gray-100 py-2 pl-3 pr-4 text-gray-700 hover:bg-gray-50 md:border-0 md:p-0 md:hover:bg-transparent md:hover:text-cyan-700 "
+                className="block border-b border-gray-100 py-2 pl-3 pr-4 text-gray-700 hover:bg-gray-50 md:border-0 md:p-0 md:hover:bg-transparent md:hover:text-cyan-700"
                 to="apps"
               >
                 Apps
@@ -50,6 +51,10 @@ function Header() {
               <span className="block">{user?.name}</span>
               <span className="block truncate font-medium">{user?.email}</span>
             </Dropdown.Header>
+            <Dropdown.Item onClick={() => navigate("/settings")}>
+              Settings
+            </Dropdown.Item>
+            <Dropdown.Divider />
             <Dropdown.Item onClick={() => logout()}>Log out</Dropdown.Item>
             {isDevMode && (
               <Dropdown.Item onClick={handleCopyAccessTokenClick}>

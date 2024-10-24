@@ -27,5 +27,5 @@ public class App : BaseEntity
     
     public ICollection<Object> Objects { get; set; }
     
-    public int? GitHubRepoId { get; set; }
+    public string GitHubRepoFullName { get; set; }
 }

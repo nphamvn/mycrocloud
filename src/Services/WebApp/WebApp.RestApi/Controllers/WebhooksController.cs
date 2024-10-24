@@ -11,12 +11,11 @@ namespace WebApp.RestApi.Controllers;
 
 public class WebhooksController(AppDbContext appDbContext, RabbitMqService rabbitMqService) : BaseController
 {
-    [HttpPost("github")]
+    [HttpPost("github/postreceive/{appId:int}")]
     [AllowAnonymous]
     [TypeFilter<GitHubWebhookValidationFilter>]
-    public async Task<IActionResult> ReceiveGitHubEvent()
+    public async Task<IActionResult> ReceiveGitHubEvent(int appId, Dictionary<string, object> payload)
     {
-        var appId = 1; //todo: get appId from the request
         var repoId = 1; //todo: get repoId from the request
         var fullName = "";
         var app = await appDbContext.Apps.SingleOrDefaultAsync(a => a.Id == appId);
